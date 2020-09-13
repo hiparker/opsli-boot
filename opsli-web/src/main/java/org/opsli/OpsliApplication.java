@@ -1,10 +1,8 @@
 package org.opsli;
 
-import org.opsli.common.print.StartPrint;
+import org.opsli.general.StartPrint;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.context.ConfigurableApplicationContext;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
