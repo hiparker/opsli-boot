@@ -13,4 +13,11 @@
     <artifactId>opsli-common</artifactId>
     <version>${project.parent.version}</version>
 
+    <dependencies>
+        <!-- 需要使用着两个版本 来引入对应的模块和插件 -->
+        <!-- 插件版本 ${plugins.version} -->
+        <!-- 模块版本 ${modulars.version}-->
+
+    </dependencies>
+
 </project>
