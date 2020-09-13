@@ -3,21 +3,29 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>opsli-plugins</artifactId>
         <groupId>org.opsliframework.boot</groupId>
+        <artifactId>opsli-boot-parent</artifactId>
         <version>1.0.0</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>opsli-plugins-mail</artifactId>
-    <version>${project.parent.version}</version>
+    <artifactId>opsli-plugins</artifactId>
+    <version>1.0.0</version>
+    <packaging>pom</packaging>
+
+    <!-- 插件 -->
+    <modules>
+        <module>opsli-plugins-mail</module>
+    </modules>
+
 
     <dependencies>
-        <!-- 邮件服务 -->
+        <!-- 引入公共模块 -->
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-mail</artifactId>
+            <groupId>org.opsliframework.boot</groupId>
+            <artifactId>opsli-common</artifactId>
+            <version>${project.parent.version}</version>
         </dependency>
     </dependencies>
 
