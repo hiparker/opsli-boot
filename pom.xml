@@ -56,8 +56,12 @@
 
     <!-- 全局版本 -->
     <properties>
+        <!-- 需要使用着两个版本 来引入对应的模块和插件 -->
+        <!-- 插件版本 -->
         <plugins.version>1.0.0</plugins.version>
+        <!-- 模块版本 -->
         <modulars.version>1.0.0</modulars.version>
+
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>1.8</java.version>

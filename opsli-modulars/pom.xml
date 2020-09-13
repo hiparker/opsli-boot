@@ -19,8 +19,12 @@
         <module>opsli-modulars-test</module>
     </modules>
 
-    <!-- 规定子类所引用的版本 -->
+    <!-- 规定子类所引用的版本***** -->
     <dependencyManagement>
+        <!-- 需要使用着两个版本 来引入对应的模块和插件 -->
+        <!-- 插件版本 ${plugins.version} -->
+        <!-- 模块版本 ${modulars.version}-->
+
         <dependencies>
             <!-- 引入邮件插件 -->
             <dependency>
@@ -32,6 +36,10 @@
     </dependencyManagement>
 
     <dependencies>
+        <!-- 需要使用着两个版本 来引入对应的模块和插件 -->
+        <!-- 插件版本 ${plugins.version} -->
+        <!-- 模块版本 ${modulars.version}-->
+
         <!-- 引入公共模块 -->
         <dependency>
             <groupId>org.opsliframework.boot</groupId>
