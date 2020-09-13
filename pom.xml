@@ -48,13 +48,16 @@
     <!-- 引入 modules -->
     <modules>
         <module>opsli-web</module>
+        <module>opsli-core</module>
         <module>opsli-common</module>
-        <module>opsli-modulars/opsli-modulars-test</module>
-        <module>opsli-plugins/opsli-plugins-mail</module>
+        <module>opsli-plugins</module>
+        <module>opsli-modulars</module>
     </modules>
 
     <!-- 全局版本 -->
     <properties>
+        <plugins.version>1.0.0</plugins.version>
+        <modulars.version>1.0.0</modulars.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>1.8</java.version>
@@ -81,11 +84,7 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-web</artifactId>
             </dependency>
-            <!-- 邮件服务 -->
-            <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-starter-mail</artifactId>
-            </dependency>
+
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-test</artifactId>
@@ -112,13 +111,13 @@
 
         <!-- 集成Shiro鉴权安全认证 BEGIN -->
             <!--shiro-->
-            <dependency>
+            <!--<dependency>
                 <groupId>org.apache.shiro</groupId>
                 <artifactId>shiro-spring-boot-starter</artifactId>
                 <version>1.6.0</version>
             </dependency>
 
-            <!-- shiro-redis -->
+            &lt;!&ndash; shiro-redis &ndash;&gt;
             <dependency>
                 <groupId>org.crazycake</groupId>
                 <artifactId>shiro-redis</artifactId>
@@ -129,7 +128,7 @@
                         <artifactId>shiro-core</artifactId>
                     </exclusion>
                 </exclusions>
-            </dependency>
+            </dependency>-->
         <!-- 集成Shiro鉴权安全认证 END -->
 
         <!-- 集成数据库相关配置  BEGIN-->
@@ -273,6 +272,8 @@
                 <version>${hutool.version}</version>
             </dependency>
         <!-- 集成工具  END-->
+
+
 
     </dependencies>
 

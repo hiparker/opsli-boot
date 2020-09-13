@@ -1,4 +1,4 @@
-package org.opsli.common.conf;
+package org.opsli.core.conf;
 
 import com.github.xiaoymin.swaggerbootstrapui.annotations.EnableSwaggerBootstrapUI;
 import io.swagger.annotations.ApiOperation;
@@ -20,6 +20,8 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
  * @Author parker
  *
  * swagger配置
+ *
+ * spring 条件 如果 enable为fasle 则不会自动注入该类
  */
 @Slf4j
 @Configuration

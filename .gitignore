@@ -31,3 +31,4 @@ build/
 .vscode/
 /git-pull.sh
 /git-push.sh
+/app-log/

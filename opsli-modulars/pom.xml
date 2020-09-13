@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <groupId>org.opsliframework.boot</groupId>
+        <artifactId>opsli-boot-parent</artifactId>
+        <version>1.0.0</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>opsli-modulars</artifactId>
+    <version>1.0.0</version>
+    <packaging>pom</packaging>
+
+    <!-- 模块 -->
+    <modules>
+        <module>opsli-modulars-test</module>
+    </modules>
+
+    <!-- 规定子类所引用的版本 -->
+    <dependencyManagement>
+        <dependencies>
+            <!-- 引入邮件插件 -->
+            <dependency>
+                <groupId>org.opsliframework.boot</groupId>
+                <artifactId>opsli-plugins-mail</artifactId>
+                <version>${plugins.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <dependencies>
+        <!-- 引入公共模块 -->
+        <dependency>
+            <groupId>org.opsliframework.boot</groupId>
+            <artifactId>opsli-common</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+
+        <!-- 引入核心模块 -->
+        <dependency>
+            <groupId>org.opsliframework.boot</groupId>
+            <artifactId>opsli-core</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+    </dependencies>
+
+</project>

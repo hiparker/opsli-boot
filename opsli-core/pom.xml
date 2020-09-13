@@ -10,9 +10,8 @@
 
 
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>opsli-web</artifactId>
+    <artifactId>opsli-core</artifactId>
     <version>${project.parent.version}</version>
-
 
     <dependencies>
         <!-- 引入公用模块 -->
@@ -21,32 +20,6 @@
             <artifactId>opsli-common</artifactId>
             <version>${version}</version>
         </dependency>
-
-        <!-- 引入核心模块 -->
-        <dependency>
-            <groupId>org.opsliframework.boot</groupId>
-            <artifactId>opsli-core</artifactId>
-            <version>${version}</version>
-        </dependency>
-
-
-        <!-- 引入测试业务模块 -->
-        <dependency>
-            <groupId>org.opsliframework.boot</groupId>
-            <artifactId>opsli-modulars-test</artifactId>
-            <version>${modulars.version}</version>
-        </dependency>
-
     </dependencies>
-
-    <!-- 编译环境 -->
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-            </plugin>
-        </plugins>
-    </build>
 
 </project>

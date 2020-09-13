@@ -1,4 +1,7 @@
 ## ---- 开发环境 ---- ##
+opsli:
+  prefix: api
+  version: v1
 
 
 # 端口设置

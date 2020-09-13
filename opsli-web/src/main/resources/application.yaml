@@ -34,6 +34,9 @@ mybatis-plus:
     call-setters-on-nulls: true
 
 spring:
+  profiles:
+    #此处由maven的环境选择决定
+    active: "@spring.active@"
   servlet:
     multipart:
       max-file-size: 10MB
@@ -49,6 +52,16 @@ spring:
   autoconfigure:
     exclude:
       - com.alibaba.druid.spring.boot.autoconfigure.DruidDataSourceAutoConfigure
-  profiles:
-    #此处由maven的环境选择决定
-    active: "@spring.active@"
+  # 邮件设置
+  mail:
+    host: smtp.qq.com
+    properties:
+      mail:
+        smpt:
+          # 认证
+          auth: true
+          starttls:
+            enable: true
+            required: true
+    # 默认编码
+    default-encoding: UTF-8
