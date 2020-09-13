@@ -1,0 +1,10 @@
+
+  ${AnsiColor.GREEN}   ____     ____    ${AnsiColor.CYAN}_____    __     ____
+  ${AnsiColor.GREEN}  / __ \   / __ \  ${AnsiColor.CYAN}/ ___/   / /    /  _/
+  ${AnsiColor.GREEN} / / / /  / /_/ /  ${AnsiColor.CYAN}\__ \   / /     / /
+  ${AnsiColor.GREEN}/ /_/ /  / ____/  ${AnsiColor.CYAN}___/ /  / /___ _/ /
+  ${AnsiColor.GREEN}\____/  /_/      ${AnsiColor.CYAN}/____/  /_____//___/
+
+
+${AnsiColor.BRIGHT_BLUE}:: opsli   :: Running Spring Boot ${spring-boot.version} ::
+:: https://www.opsli.com ::${AnsiColor.DEFAULT}
