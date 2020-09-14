@@ -1,6 +1,9 @@
 # tomcat 配置
 server:
   tomcat:
+    # Tomcat 编码
+    uri-encoding: UTF-8
+    # 对于 Tomcat 头清秀不限制大小
     max-swallow-size: -1
   servlet:
     context-path: /opsli-boot
@@ -15,23 +18,6 @@ management:
     web:
       exposure:
         include: metrics,httptrace
-
-#mybatis plus 设置
-mybatis-plus:
-  mapper-locations: classpath*:org/opsli/modulars/**/xml/*Mapper.xml
-  global-config:
-    # 关闭MP3.0自带的banner
-    banner: false
-    db-config:
-      #主键类型  0:"数据库ID自增",1:"该类型为未设置主键类型", 2:"用户输入ID",3:"全局唯一ID (数字类型唯一ID)", 4:"全局唯一ID UUID",5:"字符串全局唯一ID (idWorker 的字符串表示)";
-      id-type: 4
-      # 默认数据库表下划线命名
-      table-underline: true
-  configuration:
-    # 这个配置会将执行的sql打印出来，在开发或测试的时候可以用
-    #log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
-    # 返回类型为Map,显示null对应的字段
-    call-setters-on-nulls: true
 
 spring:
   profiles:
@@ -55,6 +41,8 @@ spring:
   # 邮件设置
   mail:
     host: smtp.qq.com
+    username: meet.parker@foxmail.com
+    password: pamjnijkjkqdbbea
     properties:
       mail:
         smpt:
@@ -65,3 +53,75 @@ spring:
             required: true
     # 默认编码
     default-encoding: UTF-8
+
+  #redis 配置
+  redis:
+    lettuce:
+      pool:
+        max-active: 8   #最大连接数据库连接数,设 0 为没有限制
+        max-idle: 8     #最大等待连接中的数量,设 0 为没有限制
+        max-wait: -1ms  #最大建立连接等待时间。如果超过此时间将接到异常。设为-1表示无限制。
+        min-idle: 0     #最小等待连接中的数量,设 0 为没有限制
+      shutdown-timeout: 100ms
+
+  # 数据库配置
+  datasource:
+    # 数据库连接池监控
+    druid:
+      web-stat-filter:
+        enabled: true
+        url-pattern: /*
+        exclusions: .js,*.gif,*.jpg,*.bmp,*.png,*.css,*.ico,/druid/*
+
+    # 多数据源
+    dynamic:
+      druid:
+        # 连接池的配置信息
+        # 初始化大小，最小，最大
+        initial-size: 5
+        min-idle: 5
+        maxActive: 20
+        # 配置获取连接等待超时的时间
+        maxWait: 60000
+        # 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒
+        timeBetweenEvictionRunsMillis: 60000
+        # 配置一个连接在池中最小生存的时间，单位是毫秒
+        minEvictableIdleTimeMillis: 300000
+        validationQuery: SELECT 1 FROM DUAL
+        testWhileIdle: true
+        testOnBorrow: false
+        testOnReturn: false
+        # 打开PSCache，并且指定每个连接上PSCache的大小
+        poolPreparedStatements: true
+        maxPoolPreparedStatementPerConnectionSize: 20
+        # 配置监控统计拦截的 Filter，去掉后监控界面 SQL 无法统计，wall 用于防火墙
+        filters: stat,wall,slf4j
+        # 通过connectProperties属性来打开mergeSql功能；慢SQL记录
+        connectionProperties: druid.stat.mergeSql\=true;druid.stat.slowSqlMillis\=5000
+
+#mybatis-plus 插件
+mybatis-plus:
+  #所有的mapper映射文件
+  mapper-locations:
+    - classpath*:org/opsli/modulars/**/mapper/xml/*.xml
+  # 实体扫描，多个package 继续往后跟
+  typeAliasesPackage:
+    - org.opsli.modulars.**.entity
+  global-config:
+    # 关闭Banner
+    banner: false
+    db-config:
+      # 主键类型 id-type:
+      # 数据库ID自增 - auto | 0   未设置主键类型 - none | 1   手动输入ID - input | 2  数字类型唯一ID - assign_id | 3  唯一ID一UUID - assign_uuid | 4
+      id-type: assign_id
+      logic-delete-field: deleted  # 全局逻辑删除的实体字段名(since 3.3.0,配置后可以忽略不配置步骤2)
+      logic-delete-value: 1 # 逻辑已删除值(默认为 1)
+      logic-not-delete-value: 0 # 逻辑未删除值(默认为 0)
+      # 更新策略 - 防止更新 null 值到数据字段中
+      update-strategy: not_empty
+  configuration:
+    map-underscore-to-camel-case: true
+    cache-enabled: false
+    call-setters-on-nulls: true
+    # 打印SQL 开发测试使用 生产关闭 ***
+    #log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
