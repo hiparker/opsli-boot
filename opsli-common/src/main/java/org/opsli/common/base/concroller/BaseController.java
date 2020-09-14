@@ -6,10 +6,9 @@ package org.opsli.common.base.concroller;
  * @BelongsPackage: org.opsli.common.base.concroller
  * @Author: Parker
  * @CreateTime: 2020-09-13 21:16
- * @Description: Base
+ * @Description: Controller 基类
  */
-
-public class BaseController {
+public abstract class BaseController {
 
 
 }
