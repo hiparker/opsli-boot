@@ -9,7 +9,7 @@ import org.opsli.plugins.mail.model.MailModel;
  * @CreateTime: 2020-09-13 18:51
  * @Description: 邮件执行器
  */
-public interface MailHandler {
+public interface MailPlugin {
 
     /**
      * 发送邮件

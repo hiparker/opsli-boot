@@ -3,8 +3,8 @@ package org.opsli.plugins.mail.handler;
 import cn.hutool.core.lang.Validator;
 import lombok.extern.slf4j.Slf4j;
 import org.opsli.common.exception.EmptyException;
-import org.opsli.plugins.mail.MailHandler;
-import org.opsli.plugins.mail.exception.MailException;
+import org.opsli.plugins.mail.MailPlugin;
+import org.opsli.plugins.mail.exception.MailPluginException;
 import org.opsli.plugins.mail.model.MailModel;
 import org.opsli.plugins.mail.msg.MailMsg;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +24,7 @@ import javax.mail.internet.MimeMessage;
  */
 @Slf4j
 @Service
-public class MailHandlerImpl implements MailHandler {
+public class MailPlugInImpl implements MailPlugin {
 
     @Value("${spring.mail.username}")
     private String username;
@@ -44,7 +44,7 @@ public class MailHandlerImpl implements MailHandler {
             javaMailSender.send(message);
         } catch (Exception e) {
             log.error("邮件发送异常：{}",e.getMessage());
-            throw new MailException(MailMsg.EXCEPTION_UNKNOWN);
+            throw new MailPluginException(MailMsg.EXCEPTION_UNKNOWN);
         }
         log.info("邮件发送 - 发送至：{} - 主题：{}", mailModel.getTo(),mailModel.getSubject());
     }

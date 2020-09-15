@@ -10,13 +10,13 @@ import org.opsli.common.exception.ServiceException;
  * @CreateTime: 2020-09-13 18:44
  * @Description: 邮件异常
  */
-public class MailException extends ServiceException {
+public class MailPluginException extends ServiceException {
 
-    public MailException(Integer code, String errorMessage) {
+    public MailPluginException(Integer code, String errorMessage) {
         super(code, errorMessage);
     }
 
-    public MailException(BaseMsg msg) {
+    public MailPluginException(BaseMsg msg) {
         super(msg);
     }
 }
