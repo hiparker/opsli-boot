@@ -1,16 +1,21 @@
 package org.opsli.modulars.test.web;
 
+import cn.hutool.core.thread.ThreadUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.opsli.common.api.ResultVo;
 import org.opsli.common.base.concroller.BaseController;
 import org.opsli.core.cache.pushsub.msgs.DictMsgFactory;
 import org.opsli.plugins.mail.MailPlugin;
 import org.opsli.plugins.mail.model.MailModel;
 import org.opsli.plugins.redis.RedisPlugin;
+import org.opsli.plugins.redis.lock.RedisLock;
 import org.opsli.plugins.redis.pushsub.entity.BaseSubMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  * @BelongsProject: opsli-boot
@@ -72,5 +77,38 @@ public class TestRestController extends BaseController {
         }
         return ResultVo.error("发送订阅消息失败！！！！！！");
     }
+
+
+    /**
+     * 发送 Redis 分布式锁
+     * @return
+     */
+    @GetMapping("/testLock")
+    public ResultVo testLock(){
+
+        // 锁凭证 redisLock 贯穿全程
+        RedisLock redisLock = new RedisLock();
+        redisLock.setLockName("aaabbb");
+        redisLock.setAcquireTimeOut(2000L);
+        redisLock.setLockTimeOut(10000L);
+
+        redisLock = redisPlugin.tryLock(redisLock);
+
+        if(redisLock == null){
+            ResultVo error = ResultVo.error("获得锁失败！！！！！！");
+            error.put("identifier",redisLock);
+            return error;
+        }
+
+        // 睡眠
+        ThreadUtil.sleep(60, TimeUnit.SECONDS);
+
+        redisPlugin.unLock(redisLock);
+        ResultVo success = ResultVo.success("获得锁成功！！！！！！");
+        success.put("identifier",redisLock);
+        return success;
+    }
+
+
 
 }
