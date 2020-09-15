@@ -1,6 +1,5 @@
 package org.opsli.core.msg;
 
-import io.swagger.models.auth.In;
 import org.opsli.common.base.msg.BaseMsg;
 
 /**
@@ -12,10 +11,26 @@ import org.opsli.common.base.msg.BaseMsg;
  */
 public enum CoreMsg implements BaseMsg {
 
+    /**
+     * Mybatis-Plus
+     */
+    /** Mybatis-Plus 乐观锁 */
+    MYBATIS_OPTIMISTIC_LOCKER(10100,"当前数据已被更改，请刷新重试！"),
+
+    /**
+     * Redis
+     */
+    REDIS_EXCEPTION_PUSH_SUB(10200,"Redis 订阅通道失败！")
+
     ;
 
-    private Integer code;
+    private int code;
     private String message;
+
+    CoreMsg(int code,String message){
+        this.code = code;
+        this.message = message;
+    }
 
     @Override
     public Integer getCode() {
