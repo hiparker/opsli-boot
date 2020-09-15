@@ -56,6 +56,9 @@ spring:
 
   #redis 配置
   redis:
+    # 开启消息订阅
+    pushsub:
+      enable: true
     lettuce:
       pool:
         max-active: 8   #最大连接数据库连接数,设 0 为没有限制
