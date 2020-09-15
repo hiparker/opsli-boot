@@ -34,13 +34,20 @@
         </dependency>
 
 
+        <!-- ———————————————————— 模块 - 开始 ———————————————————— -->
         <!-- 引入测试业务模块 -->
         <dependency>
             <groupId>org.opsliframework.boot</groupId>
             <artifactId>opsli-modulars-test</artifactId>
             <version>${modulars.version}</version>
         </dependency>
+        <!-- ———————————————————— 模块 - 结束 ———————————————————— -->
 
+
+
+        <!-- ———————————————————— 工具类 - 开始 ———————————————————— -->
+
+        <!-- ———————————————————— 工具类 - 结束 ———————————————————— -->
     </dependencies>
 
     <!-- 编译环境 -->
