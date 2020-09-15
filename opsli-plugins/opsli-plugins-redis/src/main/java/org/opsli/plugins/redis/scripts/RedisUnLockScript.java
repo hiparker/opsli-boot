@@ -22,14 +22,22 @@ public class RedisUnLockScript implements RedisPluginScript {
 
     @Override
     public String getScript() {
-        return  "local key = KEYS[1]\n" +
-                "local identifier = ARGV[1]\n" +
-                "\n" +
-                "if redis.call(\"GET\", key) == identifier then\n" +
-                "    redis.call(\"DEL\", key)\n" +
-                "    return 1\n" +
-                "end\n" +
-                "return 0";
+
+        return  "-- 解锁脚本\n"+
+                "-- 判断是当前线程持有锁，避免解了其他线程加的锁\n"+
+                "if redis.call('hexists',KEYS[1],ARGV[1]) == 1 then\n"+
+                "   -- 重入次数大于1，扣减次数\n"+
+                "   --if tonumber(redis.call('hget',KEYS[1],ARGV[1])) > 1 then\n"+
+                "   --    return redis.call('hincrby', KEYS[1], ARGV[1], -1);\n"+
+                "   -- 重入次数等于1，删除该锁\n"+
+                "   --else\n"+
+                "       redis.call('del', KEYS[1]);\n"+
+                "       return 1;\n"+
+                "   --end\n"+
+                "-- 判断不是当前线程持有锁，返回解锁失败\n"+
+                "else\n"+
+                "   return 0;\n"+
+                "end\n";
     }
     
 }
