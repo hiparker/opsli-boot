@@ -106,7 +106,11 @@ public class RedisPlugin {
 
 	// ===================== Redis 锁相关 =====================
 	/*
-	* 不建议在 Redis集群下使用，且使用时 需要加一个看门口 来自动续命 ，否则会出现锁重入
+	* 不建议在 Redis集群下使用
+	*
+	* RedisLock redisLock = new RedisLock()   作为唯一锁凭证 贯穿业务逻辑生命周期
+	* redisPlugin.tryLock(redisLock) 加锁
+	* redisPlugin.unLock(redisLock) 释放锁
 	*
 	* 分布式锁需要考虑的问题
 	* 1、这把锁没有失效时间，一旦解锁操作失败，就会导致锁记录一直在tair中，其他线程无法再获得到锁。
@@ -120,9 +124,8 @@ public class RedisPlugin {
 	 * @return identifier 很重要，解锁全靠他 唯一凭证
 	 */
 	public RedisLock tryLock(RedisLock redisLock) {
-		//String identifier = UUID.randomUUID().toString().replaceAll("-","");
-		String identifier = "aaa";
-
+		// 锁凭证
+		String identifier = UUID.randomUUID().toString().replaceAll("-","");
 		redisLock = this.tryLock(redisLock,identifier);
 		if(redisLock != null){
 			log.info("分布式锁 - 开启： 锁名称: "+redisLock.getLockName()+" 锁凭证: \""+redisLock.getIdentifier()+"\"");
