@@ -19,5 +19,6 @@
             <groupId>org.opsliframework.boot</groupId>
             <artifactId>opsli-plugins-mail</artifactId>
         </dependency>
+
     </dependencies>
 </project>

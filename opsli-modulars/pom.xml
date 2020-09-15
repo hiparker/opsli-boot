@@ -53,6 +53,13 @@
             <artifactId>opsli-core</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
+
+        <!-- 引入Redis模块 -->
+<!--        <dependency>-->
+<!--            <groupId>org.opsliframework.boot</groupId>-->
+<!--            <artifactId>opsli-plugins-redis</artifactId>-->
+<!--            <version>${plugins.version}</version>-->
+<!--        </dependency>-->
     </dependencies>
 
 </project>
