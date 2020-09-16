@@ -15,5 +15,5 @@ if redis.call('hexists', KEYS[1], ARGV[1]) == 1 then
    redis.call('pexpire', KEYS[1], expire_time)
    return 1
 end
--- 没抢到锁，返回锁的剩余有效时间ms
+-- 没抢到锁，返回失败
 return 0
