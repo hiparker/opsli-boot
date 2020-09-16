@@ -15,7 +15,15 @@ public enum MsgArgsType {
     DICT_FIELD,
     /** 字典Value */
     DICT_VALUE,
+    /** 字典Value */
+    DICT_TYPE,
 
+    /** 缓存数据Key */
+    CACHE_DATA_KEY,
+    /** 缓存数据Value */
+    CACHE_DATA_VALUE,
+    /** 缓存数据Type */
+    CACHE_DATA_TYPE,
     ;
 
 }

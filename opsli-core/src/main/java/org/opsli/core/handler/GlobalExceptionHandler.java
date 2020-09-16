@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import static org.opsli.common.constants.OrderConstants.EXCEPTION_HANDLER_ORDER;
 
 /**
  * @author parker
@@ -17,11 +18,11 @@ import org.springframework.web.bind.annotation.ResponseStatus;
  */
 @Slf4j
 @ControllerAdvice
-@Order(-1)
+@Order(EXCEPTION_HANDLER_ORDER)
 public class GlobalExceptionHandler {
 
     /**
-     * 拦截业务异常
+     * 拦截 业务异常
      */
     @ExceptionHandler(ServiceException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -34,12 +35,24 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * 拦截空异常
+     * 拦截 自定义 空异常
      */
     @ExceptionHandler(EmptyException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ResponseBody
-    public ResultVo bussinessException(EmptyException e) {
+    public ResultVo emptyException(EmptyException e) {
+        ResultVo errorR = ResultVo.error(e.getMessage());
+        errorR.setCode(e.getCode());
+        return errorR;
+    }
+
+    /**
+     * 拦截 系统空指针异常
+     */
+    @ExceptionHandler(NullPointerException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ResponseBody
+    public ResultVo nullPointerException(EmptyException e) {
         ResultVo errorR = ResultVo.error(e.getMessage());
         errorR.setCode(e.getCode());
         return errorR;

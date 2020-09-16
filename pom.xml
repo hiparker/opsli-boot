@@ -12,7 +12,7 @@
     <developers>
         <!--项目开发者的信息 -->
         <developer>
-            <!--SCM里项目开发者的唯一标识符 -->
+            <!--项目开发者的唯一标识符 -->
             <id>parker</id>
             <!--项目开发者的全名 -->
             <name>Parker Chou</name>
@@ -75,6 +75,7 @@
         <commons.io.version>2.8.0</commons.io.version>
         <guava.version>29.0-jre</guava.version>
         <hutool.version>5.4.2</hutool.version>
+        <ehcache.version>3.9.0</ehcache.version>
 
         <!--        <aliyun-java-sdk-core.version>3.2.3</aliyun-java-sdk-core.version>-->
 <!--        <aliyun-java-sdk-dysmsapi.version>1.0.0</aliyun-java-sdk-dysmsapi.version>-->

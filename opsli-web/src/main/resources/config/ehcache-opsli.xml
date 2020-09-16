@@ -1,0 +1,38 @@
+<config xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+        xmlns='http://www.ehcache.org/v3'
+        xsi:schemaLocation="http://www.ehcache.org/v3 http://www.ehcache.org/schema/ehcache-core.xsd">
+
+    <!--  http://www.ehcache.org/documentation/3.8/xml.html  -->
+
+    <!--指定缓存持久化目录-->
+    <persistence directory="${java.io.tmpdir}/opsli-ehcache-data"/>
+
+    <!-- <cache-template>可以让你创建一个抽象的<cache>配置文件，该配置文件可以进一步的被扩展。-->
+    <!-- 默认缓存模版 -->
+    <cache-template name="opsliDefaults">
+        <!--键值对被声明为字符串类型，如果没有指明，默认是Object类型。-->
+        <key-type>java.lang.String</key-type>
+        <value-type>java.lang.Object</value-type>
+        <resources>
+            <heap unit="entries">2000</heap>       <!--配置堆储存-->
+            <offheap unit="MB">300</offheap>        <!--配置堆外储存-->
+        </resources>
+    </cache-template>
+
+    <!-- hotData 热点数据，它使用名为myDefaults的<cache-template>，并将其主键覆盖到更广泛的类型 -->
+    <cache alias="hotData" uses-template="opsliDefaults">
+        <!--缓存到期配置-->
+        <expiry>
+            <ttl unit="minutes">10</ttl>  <!-- 使用 TTL(time to leave)策略 -->
+        </expiry>
+    </cache>
+
+    <!-- 系统数据 -->
+    <cache alias="systemData" uses-template="opsliDefaults">
+        <!--缓存到期配置-->
+        <expiry>
+            <ttl unit="minutes">600</ttl>  <!-- 使用 TTL(time to leave)策略 -->
+            <!--            <tti unit="minutes">600</tti>   &lt;!&ndash; 使用 TTI(time to idle) 策略 &ndash;&gt;-->
+        </expiry>
+    </cache>
+</config>

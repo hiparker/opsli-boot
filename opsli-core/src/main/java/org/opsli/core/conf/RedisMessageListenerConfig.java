@@ -23,7 +23,7 @@ import javax.annotation.Resource;
 @Slf4j
 @Configuration
 @ConditionalOnProperty(name = "spring.redis.pushsub.enable", havingValue = "true")
-public class RedisMessageListener {
+public class RedisMessageListenerConfig {
 
     @Resource
     private LettuceConnectionFactory factory;

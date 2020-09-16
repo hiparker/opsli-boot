@@ -9,7 +9,10 @@ opsli:
 server:
   port: 8080
 
+
 spring:
+
+
   #redis 配置
   redis:
     database: 0
@@ -49,11 +52,9 @@ spring:
           #password: 12345678
           #driver-class-name: com.mysql.jdbc.Driver
 
-#Mybatis输出sql日志
-#logging:
-#  level:
-#    org.opsli.modulars.system.mapper : debug
 
 # swagger 配置
 swagger:
   production: false
+
+

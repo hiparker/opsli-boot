@@ -1,6 +1,8 @@
 package org.opsli.common.api;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import org.springframework.http.HttpStatus;
 
 import java.io.Serializable;
@@ -15,6 +17,8 @@ import java.util.Map;
  * @author Parker
  * 
  */
+@ApiModel(value="视图层返回Api对象",
+		description="视图层返回Api对象  success:成功状态  code:编号  msg:信息  datatime:时间戳")
 public class ResultVo extends HashMap<String,Object> implements Serializable {
  
  
@@ -22,6 +26,7 @@ public class ResultVo extends HashMap<String,Object> implements Serializable {
 		this.put("success", true);
 		this.put("code", HttpStatus.OK.value());
 		this.put("msg", "操作成功");
+		this.put("datatime", System.currentTimeMillis());
 	}
 
 	/** get/set

@@ -19,27 +19,26 @@ import org.opsli.plugins.redis.pushsub.entity.BaseSubMessage;
 
 @Data
 @Accessors(chain = true)
-public final class DictMsgFactory extends BaseSubMessage{
+public final class CacheDataMsgFactory extends BaseSubMessage{
 
     /** 通道 */
     private static final String CHANNEL = RedisPushSubReceiver.BASE_CHANNEL+RedisPushSubReceiver.CHANNEL;
 
-    private DictMsgFactory(){}
+    private CacheDataMsgFactory(){}
 
     /**
      * 构建消息
      */
-    public static BaseSubMessage createMsg(String key, String field, Object value, CacheType cacheType){
+    public static BaseSubMessage createMsg(PushSubType py,String key, Object value, CacheType cacheType){
         BaseSubMessage baseSubMessage = new BaseSubMessage();
         // 数据
         JSONObject jsonObj = new JSONObject();
-        jsonObj.put(MsgArgsType.DICT_KEY.toString(),key);
-        jsonObj.put(MsgArgsType.DICT_FIELD.toString(),field);
-        jsonObj.put(MsgArgsType.DICT_VALUE.toString(),value);
-        jsonObj.put(MsgArgsType.DICT_TYPE.toString(),cacheType.toString());
+        jsonObj.put(MsgArgsType.CACHE_DATA_KEY.toString(),key);
+        jsonObj.put(MsgArgsType.CACHE_DATA_VALUE.toString(),value);
+        jsonObj.put(MsgArgsType.CACHE_DATA_TYPE.toString(),cacheType.toString());
 
-        // DICT 字典
-        baseSubMessage.build(CHANNEL,PushSubType.DICT.toString(),jsonObj);
+        // 热点数据 - 系统数据
+        baseSubMessage.build(CHANNEL,py.toString(),jsonObj);
         return baseSubMessage;
     }
 
