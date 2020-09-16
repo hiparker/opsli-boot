@@ -92,7 +92,11 @@ public class RedisPluginConfig {
         }
 
 
-//
+        /**
+         * 暂时放弃这种写法 ， 如果把Lua脚本 直接写在Java中，可读性太低了
+         * Lua 就放在 lua 文件夹下 IDEA装一个Lua插件 直接写Lua
+         */
+
 //        // 拿到state包下 实现了 SystemEventState 接口的,所有子类
 //        Set<Class<?>> clazzSet = PackageUtil.listSubClazz(RedisPluginScript.class.getPackage().getName(),
 //                true,
