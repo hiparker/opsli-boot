@@ -16,7 +16,7 @@ import org.springframework.beans.factory.annotation.Value;
  * @BelongsPackage: org.opsli.core.cache.pushsub.handler
  * @Author: Parker
  * @CreateTime: 2020-09-15 16:24
- * @Description: 字典消息处理
+ * @Description: 热数据处理
  */
 @Slf4j
 public class HotDataHandler implements RedisPushSubHandler{
