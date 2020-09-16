@@ -1,7 +1,6 @@
 package org.opsli.plugins.cache.service;
 
 import lombok.extern.slf4j.Slf4j;
-import org.ehcache.core.EhcacheManager;
 import org.springframework.cache.Cache;
 import org.opsli.plugins.cache.EhCachePlugin;
 import org.springframework.beans.factory.annotation.Autowired;
