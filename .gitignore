@@ -32,3 +32,4 @@ build/
 /git-pull.sh
 /git-push.sh
 /app-log/
+/app-opsli-log/

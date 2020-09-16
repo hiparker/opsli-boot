@@ -10,9 +10,9 @@ import org.opsli.plugins.redis.pushsub.entity.BaseSubMessage;
 import org.opsli.plugins.redis.pushsub.receiver.BaseReceiver;
 
 import java.lang.reflect.Modifier;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 /**
  * @BelongsProject: opsli-boot
@@ -31,7 +31,7 @@ public class RedisPushSubReceiver extends BaseReceiver {
     public static final String CHANNEL = "opsli";
 
     /** 处理方法集合 */
-    private static final Map<PushSubType, RedisPushSubHandler> HANDLER_MAP = new HashMap<>();
+    private static final ConcurrentMap<PushSubType, RedisPushSubHandler> HANDLER_MAP = new ConcurrentHashMap<>();
 
     static {
         // 拿到state包下 实现了 SystemEventState 接口的,所有子类

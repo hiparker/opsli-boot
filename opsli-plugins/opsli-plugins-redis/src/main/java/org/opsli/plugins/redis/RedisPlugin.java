@@ -1,28 +1,23 @@
 package org.opsli.plugins.redis;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.opsli.plugins.redis.exception.RedisPluginException;
-import org.opsli.plugins.redis.lock.RedisLock;
 import org.opsli.plugins.redis.msg.RedisMsg;
 import org.opsli.plugins.redis.pushsub.entity.BaseSubMessage;
-import org.opsli.plugins.redis.scripts.RedisPluginScript;
 import org.opsli.plugins.redis.scripts.RedisScriptCache;
 import org.opsli.plugins.redis.scripts.enums.RedisScriptsEnum;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.redis.connection.RedisStringCommands;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
-import org.springframework.data.redis.core.script.RedisScript;
-import org.springframework.data.redis.serializer.RedisSerializer;
-import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.stereotype.Component;
 
-import java.util.*;
-import java.util.concurrent.FutureTask;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -93,150 +88,15 @@ public class RedisPlugin {
 	 */
 	public Object callScript(RedisScriptsEnum scriptsEnum, List<String> keys, Object... argv) {
 		// 获得Script脚本
-		RedisPluginScript script = redisScriptCache.getScript(scriptsEnum);
-		if(script == null){
+		String script = redisScriptCache.getScript(scriptsEnum);
+		if(script == null || "".equals(script)){
 			return false;
 		}
+		// 这里有坑 DefaultRedisScript 必须传 ResultType 类型 ， 且为 Long类型，否则报错
 		DefaultRedisScript<Long> lockScript = new DefaultRedisScript<>();
-		lockScript.setScriptText(script.getScript());
+		lockScript.setScriptText(script);
 		lockScript.setResultType(Long.class);
 		return redisTemplate.execute(lockScript, keys, argv);
-	}
-
-
-	// ===================== Redis 锁相关 =====================
-	/*
-	* 不建议在 Redis集群下使用
-	*
-	* RedisLock redisLock = new RedisLock()   作为唯一锁凭证 贯穿业务逻辑生命周期
-	* redisPlugin.tryLock(redisLock) 加锁
-	* redisPlugin.unLock(redisLock) 释放锁
-	*
-	* 分布式锁需要考虑的问题
-	* 1、这把锁没有失效时间，一旦解锁操作失败，就会导致锁记录一直在tair中，其他线程无法再获得到锁。
-	* 2、这把锁只能是非阻塞的，无论成功还是失败都直接返回。
-	* 3、这把锁是非重入的，一个线程获得锁之后，在释放锁之前，无法再次获得该锁，因为使用到的key在tair中已经存在。无法再执行put操作。
-	* */
-
-	/**
-	 * Redis 加分布式锁
-	 * @param redisLock 锁
-	 * @return identifier 很重要，解锁全靠他 唯一凭证
-	 */
-	public RedisLock tryLock(RedisLock redisLock) {
-		// 锁凭证
-		String identifier = UUID.randomUUID().toString().replaceAll("-","");
-		redisLock = this.tryLock(redisLock,identifier);
-		if(redisLock != null){
-			log.info("分布式锁 - 开启： 锁名称: "+redisLock.getLockName()+" 锁凭证: \""+redisLock.getIdentifier()+"\"");
-			// 启动看门狗
-			this.lockDog(redisLock);
-		}
-		return redisLock;
-	}
-
-	/**
-	 * Redis 加分布式锁
-	 * @param redisLock 锁
-	 * @return identifier 很重要，解锁全靠他 唯一凭证
-	 */
-	private RedisLock tryLock(RedisLock redisLock,String identifier) {
-		try {
-			List<String> keys = Collections.singletonList("lock:" + redisLock.getLockName());
-			long acquireTimeEnd = System.currentTimeMillis() + redisLock.getAcquireTimeOut();
-			boolean acquired = false;
-			// 尝试获得锁
-			while (!acquired && (System.currentTimeMillis() < acquireTimeEnd)) {
-				Long ret = (Long) this.callScript(RedisScriptsEnum.REDIS_LOCK, keys, identifier,redisLock.getLockTimeOut());
-				if(ret == null){
-					break;
-				}
-				if (1 == ret){
-					acquired = true;
-				} else {
-					try {
-						Thread.sleep(10);
-					} catch (InterruptedException ignored) {
-						log.error(ignored.getMessage(),ignored);
-					}
-				}
-			}
-			redisLock.setIdentifier(identifier);
-			return acquired ? redisLock : null;
-		}catch (Exception e){
-			log.error(e.getMessage(),e);
-			return null;
-		}
-	}
-
-	/**
-	 * Redis 释放分布式锁
-	 * @param redisLock 锁
-	 * @return boolean
-	 */
-	public boolean unLock(RedisLock redisLock) {
-		try {
-			List<String> keys = Collections.singletonList("lock:" + redisLock.getLockName());
-			Long ret = (Long) this.callScript(RedisScriptsEnum.REDIS_UN_LOCK, keys, redisLock.getIdentifier());
-			// 减去线程锁
-			redisLock.unThreadLock();
-			log.info("分布式锁 - 解除： 锁名称: "+redisLock.getLockName()+" 锁凭证: "+redisLock.getIdentifier());
-			if(ret == null){
-				return false;
-			}
-			if(1 == ret){
-				return true;
-			}
-			return false;
-		}catch (Exception e){
-			log.error(e.getMessage(),e);
-		}
-		return false;
-	}
-
-	/**
-	 * Redis 分布式锁 - 看门狗 自动续命使用
-	 * @param redisLock 锁
-	 * @return boolean
-	 */
-	private void lockDog(RedisLock redisLock) {
-		Thread t = new Thread(()->{
-			try {
-				// 倒计时前续命
-				long countDownTime = 3000L;
-				// 锁释放时间
-				long lockTimeOutEnd = System.currentTimeMillis() + redisLock.getLockTimeOut();
-				boolean dogFlag = true;
-				// 看门狗检测 当前线程是否还存活
-				while (dogFlag) {
-					int lock = redisLock.getThreadLock();
-					if(lock <= 0){
-						dogFlag = false;
-						// 再一次确定 解锁 防止线程差 最后加锁
-						this.unLock(redisLock);
-						break;
-					}
-					try {
-						Thread.sleep(10);
-					} catch (InterruptedException ignored) {
-						log.error(ignored.getMessage(),ignored);
-					}
-
-					// 如果 距离倒计时 前 2000 毫秒还没有动作 则执行续命
-					if((System.currentTimeMillis()+countDownTime) >= lockTimeOutEnd){
-						Object o = this.tryLock(redisLock,redisLock.getIdentifier());
-						if(o != null){
-							lockTimeOutEnd = System.currentTimeMillis() + redisLock.getLockTimeOut();
-							log.info("分布式锁 - 续命： 锁名称: "+redisLock.getLockName()+" 锁凭证: "+redisLock.getIdentifier());
-						}
-					}
-				}
-			}catch (Exception e){
-				log.error(e.getMessage(),e);
-			}
-		});
-		t.setName("分布式锁看门狗："+" 锁名称: "+redisLock.getLockName()+" 锁凭证: "+redisLock.getIdentifier());
-		t.start();
 	}
 
 

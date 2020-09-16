@@ -1,25 +1,19 @@
 package org.opsli.plugins.redis.conf;
 
+import cn.hutool.core.io.IoUtil;
 import com.alibaba.fastjson.support.spring.FastJsonRedisSerializer;
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.PropertyAccessor;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
-import org.opsli.common.utils.PackageUtil;
-import org.opsli.plugins.redis.msg.RedisMsg;
-import org.opsli.plugins.redis.scripts.RedisPluginScript;
 import org.opsli.plugins.redis.scripts.RedisScriptCache;
+import org.opsli.plugins.redis.scripts.enums.RedisScriptsEnum;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializer;
-import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 import javax.annotation.Resource;
-import java.lang.reflect.Modifier;
-import java.util.Set;
+import java.io.BufferedReader;
+import java.io.InputStream;
 
 /**
  * @Author parker
@@ -71,30 +65,55 @@ public class RedisPluginConfig {
      */
     @Bean
     public RedisScriptCache loadScripts() {
-
         RedisScriptCache redisScriptCache = new RedisScriptCache();
 
-        // 拿到state包下 实现了 SystemEventState 接口的,所有子类
-        Set<Class<?>> clazzSet = PackageUtil.listSubClazz(RedisPluginScript.class.getPackage().getName(),
-                true,
-                RedisPluginScript.class
-        );
-
-        for (Class<?> aClass : clazzSet) {
-            // 位运算 去除抽象类
-            if((aClass.getModifiers() & Modifier.ABSTRACT) != 0){
-                continue;
-            }
-
-            // 通过反射 加载所有的 脚本
+        RedisScriptsEnum[] scriptEnums = RedisScriptsEnum.values();
+        for (RedisScriptsEnum scriptEnum : scriptEnums) {
+            String path = scriptEnum.getPath();
+            InputStream resourceAsStream = null;
             try {
-                RedisPluginScript redisPluginScript = (RedisPluginScript) aClass.newInstance();
-                redisScriptCache.putScript(redisPluginScript);
-            } catch (Exception e) {
-                log.error(RedisMsg.EXCEPTION_REFLEX.getMessage());
+                // IO流 读取lua脚本 存入缓存当中 提高访问效率 避免每次使用脚本还需要再开启IO流
+                StringBuffer stb = new StringBuffer();
+                resourceAsStream= RedisPluginConfig.class.getResourceAsStream(path);
+                BufferedReader br = IoUtil.getUtf8Reader(resourceAsStream);
+                String line = null;
+                while((line = br.readLine())!=null){
+                    stb.append(line);
+                    stb.append("\n");
+                }
+                // 保存脚本到缓存中
+                redisScriptCache.putScript(scriptEnum,stb.toString());
+                br.close();
+            }catch (Exception e){
+                log.error(e.getMessage(),e);
+            }finally {
+                IoUtil.close(resourceAsStream);
             }
-
         }
+
+
+//
+//        // 拿到state包下 实现了 SystemEventState 接口的,所有子类
+//        Set<Class<?>> clazzSet = PackageUtil.listSubClazz(RedisPluginScript.class.getPackage().getName(),
+//                true,
+//                RedisPluginScript.class
+//        );
+//
+//        for (Class<?> aClass : clazzSet) {
+//            // 位运算 去除抽象类
+//            if((aClass.getModifiers() & Modifier.ABSTRACT) != 0){
+//                continue;
+//            }
+//
+//            // 通过反射 加载所有的 脚本
+//            try {
+//                RedisPluginScript redisPluginScript = (RedisPluginScript) aClass.newInstance();
+//                redisScriptCache.putScript(redisPluginScript);
+//            } catch (Exception e) {
+//                log.error(RedisMsg.EXCEPTION_REFLEX.getMessage());
+//            }
+//
+//        }
 
         return redisScriptCache;
     }

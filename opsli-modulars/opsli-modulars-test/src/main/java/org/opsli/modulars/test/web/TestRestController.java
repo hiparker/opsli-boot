@@ -1,12 +1,12 @@
 package org.opsli.modulars.test.web;
 
 import cn.hutool.core.thread.ThreadUtil;
-import org.apache.commons.lang3.StringUtils;
 import org.opsli.common.api.ResultVo;
 import org.opsli.common.base.concroller.BaseController;
 import org.opsli.core.cache.pushsub.msgs.DictMsgFactory;
 import org.opsli.plugins.mail.MailPlugin;
 import org.opsli.plugins.mail.model.MailModel;
+import org.opsli.plugins.redis.RedisLockPlugins;
 import org.opsli.plugins.redis.RedisPlugin;
 import org.opsli.plugins.redis.lock.RedisLock;
 import org.opsli.plugins.redis.pushsub.entity.BaseSubMessage;
@@ -33,6 +33,9 @@ public class TestRestController extends BaseController {
 
     @Autowired
     private RedisPlugin redisPlugin;
+
+    @Autowired
+    private RedisLockPlugins redisLockPlugins;
 
     @GetMapping("/sendMail")
     public ResultVo sendMail(){
@@ -88,24 +91,24 @@ public class TestRestController extends BaseController {
 
         // 锁凭证 redisLock 贯穿全程
         RedisLock redisLock = new RedisLock();
-        redisLock.setLockName("aaabbb");
-        redisLock.setAcquireTimeOut(2000L);
-        redisLock.setLockTimeOut(10000L);
+        redisLock.setLockName("aaabbb")
+                 .setAcquireTimeOut(2000L)
+                 .setLockTimeOut(10000L);
 
-        redisLock = redisPlugin.tryLock(redisLock);
+        redisLock = redisLockPlugins.tryLock(redisLock);
 
         if(redisLock == null){
             ResultVo error = ResultVo.error("获得锁失败！！！！！！");
-            error.put("identifier",redisLock);
+            error.put("redisLock",redisLock);
             return error;
         }
 
-        // 睡眠
+        // 睡眠 模拟线程执行过程
         ThreadUtil.sleep(60, TimeUnit.SECONDS);
 
-        redisPlugin.unLock(redisLock);
+        redisLockPlugins.unLock(redisLock);
         ResultVo success = ResultVo.success("获得锁成功！！！！！！");
-        success.put("identifier",redisLock);
+        success.put("redisLock",redisLock);
         return success;
     }
 
