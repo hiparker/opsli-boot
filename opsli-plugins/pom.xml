@@ -18,6 +18,7 @@
     <modules>
         <module>opsli-plugins-mail</module>
         <module>opsli-plugins-redis</module>
+        <module>opsli-plugins-ehcache</module>
     </modules>
 
     <dependencyManagement>
