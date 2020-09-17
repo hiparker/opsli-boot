@@ -1,8 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <config xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
         xmlns='http://www.ehcache.org/v3'
         xsi:schemaLocation="http://www.ehcache.org/v3 http://www.ehcache.org/schema/ehcache-core.xsd">
 
-    <!--  http://www.ehcache.org/documentation/3.8/xml.html  -->
 
     <!--指定缓存持久化目录-->
     <persistence directory="${java.io.tmpdir}/opsli-ehcache-data"/>
@@ -23,16 +23,9 @@
     <cache alias="hotData" uses-template="opsliDefaults">
         <!--缓存到期配置-->
         <expiry>
-            <ttl unit="minutes">10</ttl>  <!-- 使用 TTL(time to leave)策略 -->
+            <!-- 只允许配秒 -->
+            <ttl unit="seconds">60000</ttl>
         </expiry>
     </cache>
 
-    <!-- 系统数据 -->
-    <cache alias="systemData" uses-template="opsliDefaults">
-        <!--缓存到期配置-->
-        <expiry>
-            <ttl unit="minutes">600</ttl>  <!-- 使用 TTL(time to leave)策略 -->
-            <!--            <tti unit="minutes">600</tti>   &lt;!&ndash; 使用 TTI(time to idle) 策略 &ndash;&gt;-->
-        </expiry>
-    </cache>
 </config>

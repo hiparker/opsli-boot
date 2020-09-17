@@ -71,9 +71,9 @@ public class CacheDataAop {
                     type = PushSubType.HOT_DATA;
                 }
                 // 系统数据
-                else if(CacheConstants.SYSTEM_DATA.equals(aCache.name())){
-                    keyBuf.append(CacheConstants.SYSTEM_DATA).append(":");
-                    type = PushSubType.SYSTEM_DATA;
+                else if(CacheConstants.EDEN_DATA.equals(aCache.name())){
+                    keyBuf.append(CacheConstants.EDEN_DATA).append(":");
+                    type = PushSubType.EDEN_DATA;
                 } else {
                     // 如果都不是 则直接退出 不走缓存
                     return returnValue;
@@ -123,9 +123,9 @@ public class CacheDataAop {
                     type = PushSubType.HOT_DATA;
                 }
                 // 系统数据
-                else if(CacheConstants.SYSTEM_DATA.equals(aCache.name())){
-                    keyBuf.append(CacheConstants.SYSTEM_DATA).append(":");
-                    type = PushSubType.SYSTEM_DATA;
+                else if(CacheConstants.EDEN_DATA.equals(aCache.name())){
+                    keyBuf.append(CacheConstants.EDEN_DATA).append(":");
+                    type = PushSubType.EDEN_DATA;
                 } else {
                     // 如果都不是 则直接退出 不走缓存
                     return returnValue;

@@ -15,8 +15,8 @@ public enum PushSubType {
     /** 热点数据 */
     HOT_DATA,
 
-    /** 系统数据 */
-    SYSTEM_DATA
+    /** 永久数据 */
+    EDEN_DATA
 
     ;
 

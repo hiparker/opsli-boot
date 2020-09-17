@@ -13,6 +13,6 @@ public interface CacheConstants {
     String HOT_DATA = "hotData";
 
     /** 系统常量 */
-    String SYSTEM_DATA = "systemData";
+    String EDEN_DATA = "edenData";
 
 }

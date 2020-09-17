@@ -2,14 +2,10 @@ package org.opsli.core.cache.pushsub.handler;
 
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
-import org.opsli.common.constants.CacheConstants;
+import org.opsli.core.cache.local.CacheUtil;
 import org.opsli.core.cache.pushsub.enums.CacheType;
 import org.opsli.core.cache.pushsub.enums.MsgArgsType;
 import org.opsli.core.cache.pushsub.enums.PushSubType;
-import org.opsli.plugins.cache.EhCachePlugin;
-import org.opsli.plugins.redis.RedisPlugin;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 
 /**
  * @BelongsProject: opsli-boot
@@ -20,15 +16,6 @@ import org.springframework.beans.factory.annotation.Value;
  */
 @Slf4j
 public class HotDataHandler implements RedisPushSubHandler{
-
-    /** 热点数据缓存时间 */
-    @Value("${cache.ttl-hot-data}")
-    private int ttlHotData;
-
-    @Autowired
-    private RedisPlugin redisPlugin;
-    @Autowired
-    private EhCachePlugin cachePlugin;
 
     @Override
     public PushSubType getType() {
@@ -43,17 +30,11 @@ public class HotDataHandler implements RedisPushSubHandler{
 
         // 缓存更新
         if(CacheType.UPDATE == type){
-            // 存入EhCache
-            cachePlugin.put(CacheConstants.HOT_DATA,key, value);
-            // 存入Redis
-            redisPlugin.put(key, value, ttlHotData);
+            CacheUtil.put(key, value);
         }
         // 缓存删除
         else if(CacheType.DELETE == type){
-            // 存入EhCache
-            cachePlugin.delete(CacheConstants.HOT_DATA,key);
-            // 存入Redis
-            redisPlugin.del(key);
+            CacheUtil.del(key);
         }
 
     }

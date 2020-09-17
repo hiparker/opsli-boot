@@ -1,6 +1,7 @@
 package org.opsli.plugins.cache.service;
 
 import lombok.extern.slf4j.Slf4j;
+import org.opsli.plugins.cache.msg.EhCacheMsg;
 import org.springframework.cache.Cache;
 import org.opsli.plugins.cache.EhCachePlugin;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,9 @@ public class EhCachePluginImpl implements EhCachePlugin {
 
     @Override
     public boolean put(String cacheName, String key, Object value) {
+        if(cacheManager == null){
+            return false;
+        }
         boolean ret = false;
         try {
             Cache cache = cacheManager.getCache(cacheName);
@@ -32,39 +36,48 @@ public class EhCachePluginImpl implements EhCachePlugin {
                 ret = true;
             }
         } catch (Exception e) {
-            log.error("添加缓存失败：{}",e.getMessage());
+            log.error(EhCacheMsg.EXCEPTION_PUT.getMessage()+"：{}",e.getMessage());
         }
         return ret;
     }
 
     @Override
     public Object get(String cacheName, String key) {
+        if(cacheManager == null){
+            return null;
+        }
         try {
             Cache cache = cacheManager.getCache(cacheName);
             if(cache != null){
                 return cache.get(key);
             }
         } catch (Exception e) {
-            log.error("获取缓存数据失败：{}",e.getMessage());
+            log.error(EhCacheMsg.EXCEPTION_GET.getMessage()+"：{}",e.getMessage());
         }
         return null;
     }
 
     @Override
     public <V> V get(String cacheName, String key, Class<V> vClass) {
+        if(cacheManager == null){
+            return null;
+        }
         try {
             Cache cache = cacheManager.getCache(cacheName);
             if(cache != null){
                 return cache.get(key,vClass);
             }
         } catch (Exception e) {
-            log.error("获取缓存数据失败：{}",e.getMessage());
+            log.error(EhCacheMsg.EXCEPTION_GET.getMessage()+"：{}", e.getMessage());
         }
         return null;
     }
 
     @Override
     public boolean delete(String cacheName, String key) {
+        if(cacheManager == null){
+            return false;
+        }
         boolean ret = false;
         try {
             Cache cache = cacheManager.getCache(cacheName);
@@ -73,7 +86,7 @@ public class EhCachePluginImpl implements EhCachePlugin {
                 ret = true;
             }
         } catch (Exception e) {
-            log.error("删除缓存数据失败：{}",e.getMessage());
+            log.error(EhCacheMsg.EXCEPTION_DEL.getMessage()+"：{}", e.getMessage());
         }
         return ret;
     }

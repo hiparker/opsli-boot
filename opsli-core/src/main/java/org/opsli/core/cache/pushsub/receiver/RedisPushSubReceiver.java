@@ -74,7 +74,7 @@ public class RedisPushSubReceiver extends BaseReceiver {
                 HANDLER_MAP.put(handler.getType(),handler);
 
                 //将new出的对象放入Spring容器中
-                defaultListableBeanFactory.registerSingleton("redisPushSubHandler"+count,obj);
+                defaultListableBeanFactory.registerSingleton("redisPushSubHandler"+count, obj);
 
                 //自动注入依赖
                 beanFactory.autowireBean(obj);

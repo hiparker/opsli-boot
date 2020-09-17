@@ -56,6 +56,9 @@ spring:
 
   # EhCache 配置
   cache:
+    # 开启 是否启用本地缓存
+    enable: true
+    # 加载配置文件
     jcache:
       config: classpath:config/ehcache-opsli.xml
   #redis 配置
@@ -132,10 +135,3 @@ mybatis-plus:
     call-setters-on-nulls: true
     # 打印SQL 开发测试使用 生产关闭 ***
     #log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
-
-# 缓存设置
-cache:
-  # 热点数据 缓存时间 600秒 10分钟
-  ttl-hot-data: 600
-  # 系统数据 缓存时间 60000秒 6小时
-  ttl-system-data: 60000
