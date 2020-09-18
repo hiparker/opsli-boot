@@ -7,6 +7,11 @@ server:
     max-swallow-size: -1
   servlet:
     context-path: /opsli-boot
+    ## 专门针对 Controller层接口路径前缀全局配置
+    api:
+      path:
+        global-prefix: /api/v1
+
   compression:
     enabled: true
     min-response-size: 1024
@@ -54,14 +59,7 @@ spring:
     # 默认编码
     default-encoding: UTF-8
 
-  # EhCache 配置
-  cache:
-    # 开启 是否启用本地缓存
-    enable: true
-    # 加载配置文件
-    jcache:
-      config: classpath:config/ehcache-opsli.xml
-  #redis 配置
+  # 一级缓存  ---- redis 配置
   redis:
     # 开启消息订阅
     pushsub:
@@ -73,6 +71,13 @@ spring:
         max-wait: -1ms  #最大建立连接等待时间。如果超过此时间将接到异常。设为-1表示无限制。
         min-idle: 0     #最小等待连接中的数量,设 0 为没有限制
       shutdown-timeout: 100ms
+  # 二级缓存 ---- EhCache 配置
+  cache:
+    # 开启 是否启用本地缓存
+    enable: true
+    # 加载配置文件
+    jcache:
+      config: classpath:config/ehcache-opsli.xml
 
   # 数据库配置
   datasource:
@@ -115,8 +120,9 @@ mybatis-plus:
   mapper-locations:
     - classpath*:org/opsli/modulars/**/mapper/xml/*.xml
   # 实体扫描，多个package 继续往后跟
-  typeAliasesPackage:
-    - org.opsli.modulars.**.entity
+  typeAliasesPackage: org.opsli.modulars.**.entity
+  # 实体扫描  BaseEntity 的子类对象
+  typeAliasesSuperType: org.opsli.core.base.entity.BaseEntity
   global-config:
     # 关闭Banner
     banner: false
@@ -134,4 +140,4 @@ mybatis-plus:
     cache-enabled: false
     call-setters-on-nulls: true
     # 打印SQL 开发测试使用 生产关闭 ***
-    #log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl

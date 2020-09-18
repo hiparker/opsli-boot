@@ -1,18 +1,10 @@
 ## ---- 开发环境 ---- ##
-opsli:
-  # 前缀
-  prefix: api
-  # 版本
-  version: v1
 
 # 端口设置
 server:
   port: 8080
 
-
 spring:
-
-
   #redis 配置
   redis:
     database: 0
