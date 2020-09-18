@@ -15,7 +15,7 @@
         <value-type>java.lang.Object</value-type>
         <resources>
             <heap unit="entries">2000</heap>       <!--配置堆储存-->
-            <offheap unit="MB">300</offheap>        <!--配置堆外储存-->
+<!--            <offheap unit="MB">300</offheap>        &lt;!&ndash;配置堆外储存&ndash;&gt;-->
         </resources>
     </cache-template>
 
