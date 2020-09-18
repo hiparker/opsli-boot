@@ -20,7 +20,12 @@ public enum CoreMsg implements BaseMsg {
     /**
      * Redis
      */
-    REDIS_EXCEPTION_PUSH_SUB(10200,"Redis 订阅通道失败！")
+    REDIS_EXCEPTION_PUSH_SUB(10200,"Redis 订阅通道失败！"),
+
+    /**
+     * MySQL
+     */
+    MySQL_EXCEPTION_SQL_INTEGRITY_CONSTRAINT_VIOLATION(10300,"数据主键冲突或者已有该数据！"),
 
     ;
 

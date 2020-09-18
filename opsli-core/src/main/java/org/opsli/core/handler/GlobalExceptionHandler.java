@@ -4,12 +4,16 @@ import lombok.extern.slf4j.Slf4j;
 import org.opsli.common.api.ResultVo;
 import org.opsli.common.exception.EmptyException;
 import org.opsli.common.exception.ServiceException;
+import org.opsli.core.msg.CoreMsg;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
+
+import java.sql.SQLIntegrityConstraintViolationException;
+
 import static org.opsli.common.constants.OrderConstants.EXCEPTION_HANDLER_ORDER;
 
 /**
@@ -57,5 +61,20 @@ public class GlobalExceptionHandler {
         errorR.setCode(e.getCode());
         return errorR;
     }
+
+    /**
+     * 拦截 数据库主键冲突
+     */
+    @ExceptionHandler(SQLIntegrityConstraintViolationException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ResponseBody
+    public ResultVo sqlIntegrityConstraintViolationException(EmptyException e) {
+        log.error("数据异常：{}",e.getMessage(),e);
+        ResultVo errorR = ResultVo.error(CoreMsg.MySQL_EXCEPTION_SQL_INTEGRITY_CONSTRAINT_VIOLATION.getMessage());
+        errorR.setCode(e.getCode());
+        return errorR;
+    }
+
+
 
 }
