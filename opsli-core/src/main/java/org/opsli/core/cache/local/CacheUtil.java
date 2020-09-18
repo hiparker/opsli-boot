@@ -55,7 +55,7 @@ public class CacheUtil {
      *
      * @param key 键
      * @param vClass 转换类型
-     * @return
+     * @return V
      */
     public static <V> V get(String key, Class<V> vClass){
         return CacheUtil.get(CacheConstants.HOT_DATA,key,vClass,true);
@@ -68,7 +68,7 @@ public class CacheUtil {
      *
      * @param key 键
      * @param vClass 转换类型
-     * @return
+     * @return V
      */
     public static <V> V getByKeyOriginal(String key, Class<V> vClass){
         return CacheUtil.get(CacheConstants.HOT_DATA,key,vClass,false);
@@ -103,32 +103,104 @@ public class CacheUtil {
         return v;
     }
 
+
+
+    // ========================= PUT - 热点区 =========================
+
     /**
-     *  存缓存
+     *  存缓存 - 热点区
      *  默认取配置文件中缓存失效时间
      *  注意：不是永久缓存
+     *
      * @param key 键
      * @param value 值
-     * @return
+     * @return boolean
      */
     public static boolean put(String key, Object value) {
-        return CacheUtil.put(key, value, null);
+        return CacheUtil.put(CacheConstants.HOT_DATA, key, value, null, true, true);
     }
-    private static boolean put(String key, Object value,Integer timeout) {
+
+
+    /**
+     * 存缓存 - 热点区
+     * Key 程序不处理
+     * 比如：源Key opsli:hotData:ahdjksahjkd1
+     *
+     * @param key 键
+     * @param value 值
+     * @return boolean
+     */
+    public static boolean putByKeyOriginal(String key, Object value){
+        return CacheUtil.put(CacheConstants.HOT_DATA, key, value, null, true, false);
+    }
+
+    // ========================= PUT - 永久代 =========================
+
+    /**
+     * 存缓存 - 永久代
+     * 注：这里是存入Redis永久代，本地EhCache做临时缓存
+     * Redis不是垃圾桶 谨用 永久缓存
+     *
+     * @param key 键
+     * @param value 值
+     * @return boolean
+     */
+    @Deprecated
+    public static boolean putEden(String key, Object value) {
+        return CacheUtil.put(CacheConstants.EDEN_DATA, key, value, null, false, true);
+    }
+
+    /**
+     * 存缓存 - 永久代
+     * 注：这里是存入Redis永久代，本地EhCache做临时缓存
+     * Redis不是垃圾桶 谨用 永久缓存
+     *
+     * @param key 键
+     * @param value 值
+     * @return boolean
+     */
+    @Deprecated
+    public static boolean putEdenByKeyOriginal(String key, Object value) {
+        return CacheUtil.put(CacheConstants.EDEN_DATA, key, value, null, false, false);
+    }
+
+    private static boolean put(String cacheName, String key, Object value,Integer timeout, boolean timeFlag, boolean keyFlag) {
         boolean ret = false;
         try {
-            // 如果缓存失效时间设置为空 则默认使用系统配置时间
-            // 对于Redis缓存定位，为远程缓存同步库 当EhCache缓存失效时，Redis可以起到抗一波的作用
-            // 所以，为了防止缓存雪崩 让Redis的失效时间 = EhCache热数据失效时间*1.2 ~ 2 倍之间随机
-            if(timeout == null){
-                timeout = RandomUtils.nextInt(
-                        Double.valueOf(String.valueOf(ttlHotData * 1.2)).intValue(),
-                        Double.valueOf(String.valueOf(ttlHotData * 2)).intValue());
+            // 自动处理 key
+            if(keyFlag){
+                StringBuilder keyBuf = new StringBuilder(CacheDataAop.PREFIX_NAME);
+                keyBuf.append(cacheName).append(":");
+                keyBuf.append(key);
+                key = keyBuf.toString();
             }
+
+            // 如果不是 JSONObject 则统一转换为 JSONObject
+            if(!(value instanceof JSONObject)){
+                String jsonStr = JSONObject.toJSONString(value);
+                value = JSONObject.parseObject(jsonStr);
+            }
+
             // 存入EhCache
             ehCachePlugin.put(CacheConstants.HOT_DATA,key, value);
-            // 存入Redis
-            redisPlugin.put(key, value, timeout);
+
+            if(timeFlag){
+
+                // 如果缓存失效时间设置为空 则默认使用系统配置时间
+                // 对于Redis缓存定位，为远程缓存同步库 当EhCache缓存失效时，Redis可以起到抗一波的作用
+                // 所以，为了防止缓存雪崩 让Redis的失效时间 = EhCache热数据失效时间*1.2 ~ 2 倍之间随机
+                if(timeout == null){
+                    timeout = RandomUtils.nextInt(
+                            Double.valueOf(String.valueOf(ttlHotData * 1.2)).intValue(),
+                            Double.valueOf(String.valueOf(ttlHotData * 2)).intValue());
+                }
+                // 存入Redis
+                redisPlugin.put(key, value, timeout);
+            }else {
+                // 存入Redis
+                redisPlugin.put(key, value);
+            }
+
             ret = true;
         }catch (Exception e){
             log.error(e.getMessage(),e);
@@ -136,35 +208,14 @@ public class CacheUtil {
         return ret;
     }
 
-    /**
-     * 存缓存
-     * 注：这里是存入Redis永久代，本地EhCache做临时缓存
-     * Redis不是垃圾桶 谨用 永久缓存
-     *
-     * @param key
-     * @param value
-     * @return
-     */
-    @Deprecated
-    public static boolean putByEden(String key, Object value) {
-        boolean ret = false;
-        try {
-            // 存入EhCache
-            ehCachePlugin.put(CacheConstants.EDEN_DATA,key, value);
-            // 存入Redis
-            redisPlugin.put(key, value);
-            ret = true;
-        }catch (Exception e){
-            log.error(e.getMessage(),e);
-        }
-        return ret;
-    }
+
+    // ========================= DEL - 删除 =========================
 
     /**
      * 删缓存
      *
-     * @param key
-     * @return
+     * @param key 键
+     * @return boolean
      */
     public static boolean del(String key) {
         boolean ret = false;
@@ -179,6 +230,14 @@ public class CacheUtil {
         }
         return ret;
     }
+
+
+
+
+
+
+
+
 
     // ====================================================================
 
