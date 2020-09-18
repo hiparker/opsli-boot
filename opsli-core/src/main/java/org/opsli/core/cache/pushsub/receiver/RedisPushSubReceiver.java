@@ -2,6 +2,7 @@ package org.opsli.core.cache.pushsub.receiver;
 
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
+import org.opsli.common.enums.SystemInfo;
 import org.opsli.common.utils.PackageUtil;
 import org.opsli.core.cache.pushsub.enums.PushSubType;
 import org.opsli.core.cache.pushsub.handler.RedisPushSubHandler;
@@ -98,6 +99,11 @@ public class RedisPushSubReceiver extends BaseReceiver {
         String substring = replaceAll.substring(1, replaceAll.length() - 1);
         JSONObject msgJson = JSONObject.parseObject(substring);
         String type = (String) msgJson.get(BaseSubMessage.BASE_TYPE);
+        String identifier = (String) msgJson.get(BaseSubMessage.BASE_ID);
+        // 本机不广播
+        if(SystemInfo.INSTANCE.getSystemID().equals(identifier)){
+            return;
+        }
         PushSubType pt = PushSubType.valueOf(type);
         RedisPushSubHandler redisPushSubHandler = HANDLER_MAP.get(pt);
         if(redisPushSubHandler == null){

@@ -30,7 +30,7 @@ public class HotDataHandler implements RedisPushSubHandler{
 
         // 缓存更新
         if(CacheType.UPDATE == type){
-            CacheUtil.put(key, value);
+            CacheUtil.putByKeyOriginal(key, value);
         }
         // 缓存删除
         else if(CacheType.DELETE == type){

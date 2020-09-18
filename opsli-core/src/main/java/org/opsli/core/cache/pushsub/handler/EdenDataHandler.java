@@ -30,7 +30,7 @@ public class EdenDataHandler implements RedisPushSubHandler{
 
         // 缓存更新
         if(CacheType.UPDATE == type){
-            CacheUtil.putByEden(key, value);
+            CacheUtil.putEdenByKeyOriginal(key, value);
         }
         // 缓存删除
         else if(CacheType.DELETE == type){
