@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.opsli.modulars.test.mapper.TestMapper">
+
+    <!-- 数据库字段 -->
+    <sql id="TestEntityColumns">
+		a.id as id,
+        a.name as name,
+        a.remark as remark,
+        a.create_by as createBy,
+        a.create_time as createTime,
+        a.update_by as updateBy,
+        a.update_time as updateTime,
+        a.version as version
+	</sql>
+
+    <sql id="TestEntityJoins">
+	</sql>
+
+    <select id="getByName" parameterType="TestEntity"  resultType="TestEntity">
+	   select
+       <include refid="TestEntityColumns"></include>
+       from test_entity a
+       <include refid="TestEntityJoins"></include>
+	   where a.name = #{name}
+	</select>
+
+</mapper>

@@ -2,7 +2,7 @@ package org.opsli.modulars.test.entity;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-import org.opsli.common.base.entity.BaseEntity;
+import org.opsli.core.base.entity.BaseEntity;
 
 /**
  * @BelongsProject: opsli-boot
