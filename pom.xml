@@ -47,11 +47,13 @@
 
     <!-- 引入 modules -->
     <modules>
-        <module>opsli-web</module>
-        <module>opsli-core</module>
-        <module>opsli-common</module>
+        <module>opsli-api</module>
+        <module>opsli-base-support</module>
+<!--        <module>opsli-common</module>-->
+<!--        <module>opsli-core</module>-->
         <module>opsli-plugins</module>
         <module>opsli-modulars</module>
+        <module>opsli-starter</module>
     </modules>
 
     <!-- 全局版本 -->
@@ -188,41 +190,6 @@
         </dependency>
         <!-- ———————————————————— 集成数据库相关配置 - 结束 ———————————————————— -->
 
-        <!-- ———————————————————— 集成SwaggerApi - 开始 ———————————————————— -->
-        <!-- Swagger API文档 -->
-        <dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-swagger2</artifactId>
-            <version>2.9.2</version>
-        </dependency>
-        <dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-swagger-ui</artifactId>
-            <version>2.9.2</version>
-        </dependency>
-        <dependency>
-            <groupId>com.github.xiaoymin</groupId>
-            <artifactId>swagger-bootstrap-ui</artifactId>
-            <version>1.9.3</version>
-        </dependency>
-        <dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-bean-validators</artifactId>
-            <version>2.9.2</version>
-        </dependency>
-        <!-- # 增加两个配置解决 NumberFormatException -->
-        <dependency>
-            <groupId>io.swagger</groupId>
-            <artifactId>swagger-annotations</artifactId>
-            <version>1.5.22</version>
-        </dependency>
-        <dependency>
-            <groupId>io.swagger</groupId>
-            <artifactId>swagger-models</artifactId>
-            <version>1.5.22</version>
-        </dependency>
-        <!-- ———————————————————— 集成SwaggerApi - 结束 ———————————————————— -->
-
         <!-- ———————————————————— 集成工具 - 开始 ———————————————————— -->
         <!-- commons -->
         <dependency>
@@ -247,6 +214,9 @@
             <artifactId>guava</artifactId>
             <version>${guava.version}</version>
         </dependency>
+
+
+
 
         <!-- Lombok -->
         <dependency>

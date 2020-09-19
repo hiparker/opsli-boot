@@ -40,13 +40,6 @@
         <!-- 插件版本 ${plugins.version} -->
         <!-- 模块版本 ${modulars.version}-->
 
-        <!-- 引入公共模块 -->
-        <dependency>
-            <groupId>org.opsliframework.boot</groupId>
-            <artifactId>opsli-common</artifactId>
-            <version>${project.parent.version}</version>
-        </dependency>
-
         <!-- 引入核心模块 -->
         <dependency>
             <groupId>org.opsliframework.boot</groupId>

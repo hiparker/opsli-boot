@@ -9,7 +9,7 @@ import org.opsli.modulars.test.entity.TestEntity;
  * @BelongsPackage: org.opsli.modulars.test.mapper
  * @Author: Parker
  * @CreateTime: 2020-09-17 13:01
- * @Description: TODO
+ * @Description: 测试Mapper
  */
 @Mapper
 public interface TestMapper extends BaseMapper<TestEntity> {

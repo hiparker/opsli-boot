@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>opsli-boot-parent</artifactId>
+        <groupId>org.opsliframework.boot</groupId>
+        <version>1.0.0</version>
+    </parent>
+
+
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>opsli-starter</artifactId>
+    <version>${project.parent.version}</version>
+
+
+    <dependencies>
+        <!-- 需要使用着两个版本 来引入对应的模块和插件 -->
+        <!-- 插件版本 ${plugins.version} -->
+        <!-- 模块版本 ${modulars.version}-->
+
+        <!-- 引入公用模块 -->
+        <dependency>
+            <groupId>org.opsliframework.boot</groupId>
+            <artifactId>opsli-common</artifactId>
+            <version>${version}</version>
+        </dependency>
+
+        <!-- 引入核心模块 -->
+        <dependency>
+            <groupId>org.opsliframework.boot</groupId>
+            <artifactId>opsli-core</artifactId>
+            <version>${version}</version>
+        </dependency>
+
+
+        <!-- ———————————————————— 模块 - 开始 ———————————————————— -->
+        <!-- 引入测试业务模块 -->
+        <dependency>
+            <groupId>org.opsliframework.boot</groupId>
+            <artifactId>opsli-modulars-test</artifactId>
+            <version>${modulars.version}</version>
+        </dependency>
+        <!-- ———————————————————— 模块 - 结束 ———————————————————— -->
+
+
+
+        <!-- ———————————————————— 工具类 - 开始 ———————————————————— -->
+
+        <!-- ———————————————————— 工具类 - 结束 ———————————————————— -->
+    </dependencies>
+
+    <!-- 编译环境 -->
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

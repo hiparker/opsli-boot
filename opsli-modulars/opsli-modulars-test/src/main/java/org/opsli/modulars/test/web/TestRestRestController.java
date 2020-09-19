@@ -1,9 +1,12 @@
 package org.opsli.modulars.test.web;
 
 import cn.hutool.core.thread.ThreadUtil;
+import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
+import org.opsli.api.base.result.ResultVo;
+import org.opsli.api.wrapper.test.TestModel;
+import org.opsli.api.web.test.ITestApi;
 import org.opsli.common.annotation.ApiRestController;
-import org.opsli.common.api.ResultVo;
 import org.opsli.core.base.concroller.BaseRestController;
 import org.opsli.core.cache.pushsub.enums.CacheType;
 import org.opsli.core.cache.pushsub.msgs.DictMsgFactory;
@@ -16,7 +19,6 @@ import org.opsli.plugins.redis.RedisPlugin;
 import org.opsli.plugins.redis.lock.RedisLock;
 import org.opsli.plugins.redis.pushsub.entity.BaseSubMessage;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,7 +34,8 @@ import java.util.concurrent.TimeUnit;
  * @Description: 测试类
  */
 @ApiRestController("/test")
-public class TestRestRestController extends BaseRestController<TestEntity, ITestService> {
+public class TestRestRestController extends BaseRestController<TestModel, TestEntity, ITestService>
+        implements ITestApi {
 
 
     private Random random = new Random();
@@ -46,8 +49,8 @@ public class TestRestRestController extends BaseRestController<TestEntity, ITest
     @Autowired
     private RedisLockPlugins redisLockPlugins;
 
-
-    @GetMapping("/sendMail")
+    @ApiOperation(value = "发送邮件", notes = "发送邮件")
+    @Override
     public ResultVo sendMail(){
         MailModel mailModel = new MailModel();
         mailModel.setTo("meet.carina@foxmail.com");
@@ -62,7 +65,8 @@ public class TestRestRestController extends BaseRestController<TestEntity, ITest
      * 发送 Redis 订阅消息
      * @return
      */
-    @GetMapping("/sendMsg")
+    @ApiOperation(value = "发送 Redis 订阅消息", notes = "发送 Redis 订阅消息")
+    @Override
     public ResultVo sendMsg(){
 
         BaseSubMessage msg = DictMsgFactory.createMsg("test", "aaa", 123213, CacheType.UPDATE);
@@ -76,10 +80,11 @@ public class TestRestRestController extends BaseRestController<TestEntity, ITest
 
 
     /**
-     * 发送 Redis 订阅消息
+     * 发送 Redis 测试
      * @return
      */
-    @GetMapping("/redisTest")
+    @ApiOperation(value = "发送 Redis 测试", notes = "发送 Redis 测试")
+    @Override
     public ResultVo redisTest(){
         boolean ret = redisPlugin.put("opsli:test", "12315");
         if(ret){
@@ -96,7 +101,8 @@ public class TestRestRestController extends BaseRestController<TestEntity, ITest
      * 发送 Redis 分布式锁
      * @return
      */
-    @GetMapping("/testLock")
+    @ApiOperation(value = "发起 Redis 分布式锁", notes = "发起 Redis 分布式锁")
+    @Override
     public ResultVo testLock(){
 
         // 锁凭证 redisLock 贯穿全程
@@ -126,52 +132,47 @@ public class TestRestRestController extends BaseRestController<TestEntity, ITest
      * 新增数据
      * @return
      */
-    @GetMapping("/insert")
-    public ResultVo insert(TestEntity entity){
+    @ApiOperation(value = "新增数据", notes = "新增数据")
+    @Override
+    public ResultVo insert(TestModel model){
+        // 转化对象 处理 ApiModel 与 本地对象
 
+        model.setName("测试名称"+random.nextInt());
+        model.setRemark("测试备注"+random.nextInt());
 
-        entity.setId(null);
-        entity.setName("测试名称"+random.nextInt());
-        entity.setRemark("测试备注"+random.nextInt());
+        // 调用新增方法
+        TestModel insert = IService.insert(model);
 
-        TestEntity saveObj = IService.insert(entity);
-        if(saveObj == null){
-            ResultVo success = ResultVo.error("新增对象失败！");
-            success.put("object",entity);
-            return success;
-        }
-
-        ResultVo success = ResultVo.success("新增对象成功！");
-        success.put("object",saveObj);
-
-        return success;
+        ResultVo resultVo = new ResultVo();
+        resultVo.setMsg("新增成功");
+        resultVo.put("data",insert);
+        return resultVo;
     }
 
     /**
      * 修改数据
      * @return
      */
-    @GetMapping("/update")
-    public ResultVo update(TestEntity entity){
+    @ApiOperation(value = "修改数据", notes = "修改数据")
+    @Override
+    public ResultVo update(TestModel model){
+        // 转化对象 处理 ApiModel 与 本地对象
 
-        if(StringUtils.isEmpty(entity.getId())){
-            entity.setId(String.valueOf(random.nextLong()));
+        if(StringUtils.isEmpty(model.getId())){
+            model.setId(String.valueOf(random.nextLong()));
         }
 
-        entity.setName("修改名称"+random.nextInt());
-        entity.setRemark("修改备注"+random.nextInt());
+        model.setName("修改名称"+random.nextInt());
+        model.setRemark("修改备注"+random.nextInt());
 
-        TestEntity saveObj = IService.update(entity);
-        if(saveObj == null){
-            ResultVo success = ResultVo.error("修改对象失败！");
-            success.put("object",entity);
-            return success;
-        }
+        // 不需要做 锁状态处理，需要判断是否成功 能往下走的只能是成功
+        TestModel update = IService.update(model);
 
-        ResultVo success = ResultVo.success("修改对象成功！");
-        success.put("object",saveObj);
 
-        return success;
+        ResultVo resultVo = new ResultVo();
+        resultVo.setMsg("修改成功");
+        resultVo.put("data",update);
+        return resultVo;
     }
 
 
@@ -179,13 +180,13 @@ public class TestRestRestController extends BaseRestController<TestEntity, ITest
      * 查看对象
      * @return
      */
-    @GetMapping("/get")
-    public ResultVo get(TestEntity entity){
-        ResultVo success = ResultVo.success("操作成功！");
-        TestEntity byName = IService.getByName(entity);
-        success.put("object",entity);
-        success.put("byName",byName);
-        return success;
+    @ApiOperation(value = "查看对象", notes = "查看对象")
+    @Override
+    public ResultVo get(TestModel model){
+        // 转化对象 处理 ApiModel 与 本地对象
+        ResultVo resultVo = new ResultVo();
+        resultVo.put("data",model);
+        return resultVo;
     }
 
 
@@ -193,7 +194,8 @@ public class TestRestRestController extends BaseRestController<TestEntity, ITest
      * 删除对象
      * @return
      */
-    @GetMapping("/del")
+    @ApiOperation(value = "删除对象", notes = "删除对象")
+    @Override
     public ResultVo del(String id){
 
         TestEntity testEntity1 = new TestEntity();
@@ -202,9 +204,36 @@ public class TestRestRestController extends BaseRestController<TestEntity, ITest
         List<TestEntity> idList = new ArrayList<>();
         idList.add(testEntity1);
 
+
+        //count = IService.delete(id);
+
+        //count = IService.delete(testEntity1);
+
+        //count = IService.deleteAll(idList);
+
+
+        IService.deleteAll(ids);
+
+        ResultVo resultVo = new ResultVo();
+        resultVo.put("data",id);
+        resultVo.setMsg("删除对象成功");
+        return resultVo;
+    }
+
+
+    /**
+     * 删除对象
+     * @return
+     */
+    @ApiOperation(value = "删除全部对象", notes = "删除全部对象")
+    @Override
+    public ResultVo delAll(){
+
+        //IService.
+
         int count = 0;
 
-        count = IService.delete(id);
+        //count = IService.delete(id);
 
         //count = IService.delete(testEntity1);
 
@@ -213,18 +242,12 @@ public class TestRestRestController extends BaseRestController<TestEntity, ITest
         //count = IService.deleteAll(idList);
 
 
-        if(count == 0){
-            ResultVo success = ResultVo.error("删除对象失败！");
-            success.put("object",id);
-            return success;
-        }
 
-        ResultVo success = ResultVo.success("删除对象成功！");
-        success.put("object",id);
 
-        return success;
+        ResultVo resultVo = new ResultVo();
+        resultVo.setMsg("删除对象成功");
+        return resultVo;
     }
-
 
 
 }

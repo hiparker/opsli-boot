@@ -1,5 +1,6 @@
 package org.opsli.modulars.test.service;
 
+import org.opsli.api.wrapper.test.TestModel;
 import org.opsli.core.base.service.interfaces.CrudServiceInterface;
 import org.opsli.modulars.test.entity.TestEntity;
 
@@ -10,13 +11,13 @@ import org.opsli.modulars.test.entity.TestEntity;
  * @CreateTime: 2020-09-17 13:07
  * @Description: 测试接口
  */
-public interface ITestService extends CrudServiceInterface<TestEntity> {
+public interface ITestService extends CrudServiceInterface<TestModel,TestEntity> {
 
     /**
      * 根据名称 获得对象
-     * @param testEntity
+     * @param model
      * @return
      */
-    TestEntity getByName(TestEntity testEntity);
+    TestModel getByName(TestModel model);
 
 }
