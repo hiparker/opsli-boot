@@ -3,9 +3,10 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>opsli-boot-parent</artifactId>
+        <artifactId>opsli-base-support</artifactId>
         <groupId>org.opsliframework.boot</groupId>
         <version>1.0.0</version>
+        <relativePath>../pom.xml</relativePath>
     </parent>
 
 
@@ -25,6 +26,13 @@
             <version>${version}</version>
         </dependency>
 
+        <!-- 引入API模块 -->
+        <dependency>
+            <groupId>org.opsliframework.boot</groupId>
+            <artifactId>opsli-api</artifactId>
+            <version>${version}</version>
+        </dependency>
+
         <!-- 引入Redis插件 -->
         <dependency>
             <groupId>org.opsliframework.boot</groupId>
@@ -38,7 +46,6 @@
             <artifactId>opsli-plugins-ehcache</artifactId>
             <version>${plugins.version}</version>
         </dependency>
-
 
     </dependencies>
 

@@ -3,9 +3,11 @@ package org.opsli.core.base.concroller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.opsli.api.base.warpper.ApiWrapper;
 import org.opsli.common.annotation.EnableHotData;
 import org.opsli.common.exception.ServiceException;
 import org.opsli.common.msg.CommonMsg;
+import org.opsli.common.utils.WrapperUtil;
 import org.opsli.core.base.entity.BaseEntity;
 import org.opsli.core.base.service.interfaces.CrudServiceInterface;
 import org.opsli.core.cache.local.CacheUtil;
@@ -15,7 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.PostConstruct;
-import java.lang.reflect.*;
+import java.lang.reflect.ParameterizedType;
 
 /**
  * @BelongsProject: opsli-boot
@@ -29,11 +31,13 @@ import java.lang.reflect.*;
  */
 @Slf4j
 @RestController
-public abstract class BaseRestController <T extends BaseEntity, S extends CrudServiceInterface<T>>{
+public abstract class BaseRestController <E extends ApiWrapper, T extends BaseEntity, S extends CrudServiceInterface<E,T>>{
 
     /** 开启热点数据状态 */
     protected boolean hotDataFlag = false;
 
+    /** Model Clazz 类 */
+    protected Class<E> modelClazz;
     /** Entity Clazz 类 */
     protected Class<T> entityClazz;
 
@@ -49,47 +53,45 @@ public abstract class BaseRestController <T extends BaseEntity, S extends CrudSe
      * @return
      */
     @ModelAttribute
-    public T get(@RequestParam(required=false) String id) {
-        T entity = null;
+    public E get(@RequestParam(required=false) String id) {
+        E model = null;
         if (StringUtils.isNotBlank(id)){
             // 如果开启缓存 先从缓存读
             if(hotDataFlag){
-                entity = CacheUtil.get(id, entityClazz);
-                if(entity != null){
-                    return entity;
+                model = WrapperUtil.transformInstance(
+                        CacheUtil.get(id, entityClazz),modelClazz);
+                if(model != null){
+                    return model;
                 }
             }
             // 如果缓存没读到 则去数据库读
-            entity = IService.get(id);
-            if(entity != null){
+            model = WrapperUtil.transformInstance(IService.get(id),modelClazz);
+            if(model != null){
                 // 如果开启缓存 将数据库查询对象 存如缓存
                 if(hotDataFlag){
-                    CacheUtil.put(id, entity);
+                    CacheUtil.put(id, model);
                 }
             }
         }
-        if (entity == null){
+        if (model == null){
             try {
                 // 创建泛型对象
-                entity = this.createModel();
+                model = this.createModel();
             }catch (Exception e){
                 log.error(CommonMsg.EXCEPTION_CONTROLLER_MODEL.toString()+" : {}",e.getMessage());
                 throw new ServiceException(CommonMsg.EXCEPTION_CONTROLLER_MODEL);
             }
         }
-        return entity;
+        return model;
     }
-
-
-
-
 
     // =================================================
 
     @PostConstruct
     public void init(){
         try {
-            this.entityClazz = this.getModelClass();
+            this.modelClazz = this.getModelClass();
+            this.entityClazz = this.getEntityClass();
             Class<?> serviceClazz = IService.getServiceClazz();
             // 判断是否开启热点数据
             if(serviceClazz != null){
@@ -106,12 +108,12 @@ public abstract class BaseRestController <T extends BaseEntity, S extends CrudSe
 
 
     /**
-     * 创建泛型对象
+     * 创建包装类泛型对象
      * @return
      */
-    private T createModel() {
+    private E createModel() {
         try {
-            Class<T> modelClazz = this.entityClazz;
+            Class<E> modelClazz = this.modelClazz;
             return modelClazz.newInstance();
         } catch (Exception e) {
             log.error(e.getMessage(),e);
@@ -119,12 +121,22 @@ public abstract class BaseRestController <T extends BaseEntity, S extends CrudSe
         return null;
     }
 
+
     /**
      * 获得 泛型 Clazz
      * @return
      */
-    private Class<T> getModelClass(){
-        Class<T> tClass = (Class<T>)((ParameterizedType)getClass().getGenericSuperclass()).getActualTypeArguments()[0];
+    private Class<E> getModelClass(){
+        Class<E> tClass = (Class<E>)((ParameterizedType)getClass().getGenericSuperclass()).getActualTypeArguments()[0];
+        return tClass;
+    }
+
+    /**
+     * 获得 泛型 Clazz
+     * @return
+     */
+    private Class<T> getEntityClass(){
+        Class<T> tClass = (Class<T>)((ParameterizedType)getClass().getGenericSuperclass()).getActualTypeArguments()[1];
         return tClass;
     }
 

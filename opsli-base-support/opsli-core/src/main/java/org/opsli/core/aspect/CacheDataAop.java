@@ -7,10 +7,10 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
+import org.opsli.api.base.warpper.ApiWrapper;
 import org.opsli.common.annotation.EnableHotData;
 import org.opsli.common.annotation.HotDataDel;
 import org.opsli.common.annotation.HotDataPut;
-import org.opsli.core.base.entity.BaseEntity;
 import org.opsli.common.constants.CacheConstants;
 import org.opsli.core.cache.local.CacheUtil;
 import org.opsli.core.cache.pushsub.entity.CacheDataEntity;
@@ -71,26 +71,27 @@ public class CacheDataAop {
             return returnValue;
         }
 
-
         // ====== 如果 使用了 EnableHotData ，表示开启热数据加载 则执行下段代码
         CacheDataEntity cacheDataEntity = this.putHandlerData(point, returnValue);
-        if(cacheDataEntity != null){
-            // 更新缓存数据
-            // 热点数据
-            if(CacheConstants.HOT_DATA.equals(cacheDataEntity.getCacheName())){
-                CacheUtil.putByKeyOriginal(cacheDataEntity.getKey(), returnValue);
-            }
-            // 永久数据
-            else if(CacheConstants.EDEN_DATA.equals(cacheDataEntity.getCacheName())) {
-                CacheUtil.putEdenByKeyOriginal(cacheDataEntity.getKey(), returnValue);
-            }
-
-            // 广播缓存数据 - 通知其他服务器同步数据
-            redisPlugin.sendMessage(
-                    CacheDataMsgFactory.createMsg(cacheDataEntity.getType(),
-                            cacheDataEntity.getKey(), returnValue, CacheType.UPDATE)
-            );
+        if(cacheDataEntity == null){
+            return returnValue;
         }
+
+        // 更新缓存数据
+        // 热点数据
+        if(CacheConstants.HOT_DATA.equals(cacheDataEntity.getCacheName())){
+            CacheUtil.putByKeyOriginal(cacheDataEntity.getKey(), returnValue);
+        }
+        // 永久数据
+        else if(CacheConstants.EDEN_DATA.equals(cacheDataEntity.getCacheName())) {
+            CacheUtil.putEdenByKeyOriginal(cacheDataEntity.getKey(), returnValue);
+        }
+
+        // 广播缓存数据 - 通知其他服务器同步数据
+        redisPlugin.sendMessage(
+                CacheDataMsgFactory.createMsg(cacheDataEntity.getType(),
+                        cacheDataEntity.getKey(), returnValue, CacheType.UPDATE)
+        );
 
         return returnValue;
     }
@@ -114,17 +115,19 @@ public class CacheDataAop {
 
         // ====== 如果 使用了 EnableHotData ，表示开启热数据加载 则执行下段代码
         List<CacheDataEntity> cacheDataEntityList = this.delHandlerData(point, args);
-        if(cacheDataEntityList != null && cacheDataEntityList.size() > 0){
-            for (CacheDataEntity cacheDataEntity : cacheDataEntityList) {
-                // 更新缓存数据 - 删除缓存
-                CacheUtil.del(cacheDataEntity.getKey());
+        if(cacheDataEntityList == null || cacheDataEntityList.size() == 0){
+            return returnValue;
+        }
 
-                // 广播缓存数据 - 通知其他服务器同步数据
-                redisPlugin.sendMessage(
-                        CacheDataMsgFactory.createMsg(cacheDataEntity.getType(),
-                                cacheDataEntity.getKey(), returnValue, CacheType.DELETE)
-                );
-            }
+        for (CacheDataEntity cacheDataEntity : cacheDataEntityList) {
+            // 更新缓存数据 - 删除缓存
+            CacheUtil.del(cacheDataEntity.getKey());
+
+            // 广播缓存数据 - 通知其他服务器同步数据
+            redisPlugin.sendMessage(
+                    CacheDataMsgFactory.createMsg(cacheDataEntity.getType(),
+                            cacheDataEntity.getKey(), returnValue, CacheType.DELETE)
+            );
         }
 
         return returnValue;
@@ -144,8 +147,8 @@ public class CacheDataAop {
         if(returnValue == null){
             return null;
         }
-        // 这里 只对 继承了 BaseEntity 的类做处理
-        if(!(returnValue instanceof BaseEntity)){
+        // 这里 只对 继承了 ApiWrapper 的类做处理
+        if(!(returnValue instanceof ApiWrapper)){
             return null;
         }
         // 报错不处理
@@ -177,10 +180,10 @@ public class CacheDataAop {
 
                 try {
                     // 这里 只对 继承了 BaseEntity 的类做处理
-                    BaseEntity baseEntity = (BaseEntity) returnValue;
+                    ApiWrapper apiWrapper = (ApiWrapper) returnValue;
 
                     // key 存储ID
-                    String key = keyBuf.append(baseEntity.getId()).toString();
+                    String key = keyBuf.append(apiWrapper.getId()).toString();
 
                     ret = new CacheDataEntity();
                     ret.setKey(key);
@@ -261,10 +264,10 @@ public class CacheDataAop {
                                 ret.setCacheName(aCache.name());
                                 cacheDataEntities.add(ret);
                             }
-                        } else if (arg instanceof BaseEntity) {
+                        } else if (arg instanceof ApiWrapper) {
                             // key 存储ID
-                            BaseEntity baseEntity = (BaseEntity) arg;
-                            String key = keyBuf.toString() + baseEntity.getId();
+                            ApiWrapper apiWrapper = (ApiWrapper) arg;
+                            String key = keyBuf.toString() + apiWrapper.getId();
                             CacheDataEntity ret = new CacheDataEntity();
                             ret.setKey(key);
                             ret.setType(type);
@@ -272,8 +275,8 @@ public class CacheDataAop {
                             cacheDataEntities.add(ret);
                         } else if (arg instanceof Collection) {
                             try {
-                                Collection<BaseEntity> baseEntityList = (Collection<BaseEntity>) arg;
-                                for (BaseEntity baseEntity : baseEntityList) {
+                                Collection<ApiWrapper> baseEntityList = (Collection<ApiWrapper>) arg;
+                                for (ApiWrapper baseEntity : baseEntityList) {
                                     // key 存储ID
                                     String key = keyBuf.toString() + baseEntity.getId();
                                     CacheDataEntity ret = new CacheDataEntity();

@@ -1,7 +1,7 @@
 package org.opsli.core.handler;
 
 import lombok.extern.slf4j.Slf4j;
-import org.opsli.common.api.ResultVo;
+import org.opsli.api.base.result.ResultVo;
 import org.opsli.common.exception.EmptyException;
 import org.opsli.common.exception.ServiceException;
 import org.opsli.core.msg.CoreMsg;
@@ -70,7 +70,7 @@ public class GlobalExceptionHandler {
     @ResponseBody
     public ResultVo sqlIntegrityConstraintViolationException(EmptyException e) {
         log.error("数据异常：{}",e.getMessage(),e);
-        ResultVo errorR = ResultVo.error(CoreMsg.MySQL_EXCEPTION_SQL_INTEGRITY_CONSTRAINT_VIOLATION.getMessage());
+        ResultVo errorR = ResultVo.error(CoreMsg.SQL_EXCEPTION_INTEGRITY_CONSTRAINT_VIOLATION.getMessage());
         errorR.setCode(e.getCode());
         return errorR;
     }

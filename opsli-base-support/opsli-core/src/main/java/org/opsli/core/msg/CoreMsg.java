@@ -11,11 +11,11 @@ import org.opsli.common.base.msg.BaseMsg;
  */
 public enum CoreMsg implements BaseMsg {
 
-    /**
-     * Mybatis-Plus
-     */
-    /** Mybatis-Plus 乐观锁 */
-    MYBATIS_OPTIMISTIC_LOCKER(10100,"当前数据已被更改，请刷新重试！"),
+    /** SQL */
+    SQL_EXCEPTION_UPDATE(10100,"更新数据失败，请稍后再次尝试！"),
+    SQL_EXCEPTION_INSERT(10101,"新增数据失败，请稍后再次尝试！"),
+    SQL_EXCEPTION_DELETE(10102,"删除数据失败，请稍后再次尝试！"),
+    SQL_EXCEPTION_INTEGRITY_CONSTRAINT_VIOLATION(10105,"数据主键冲突或者已有该数据！"),
 
     /**
      * Redis
@@ -25,7 +25,7 @@ public enum CoreMsg implements BaseMsg {
     /**
      * MySQL
      */
-    MySQL_EXCEPTION_SQL_INTEGRITY_CONSTRAINT_VIOLATION(10300,"数据主键冲突或者已有该数据！"),
+
 
     ;
 
