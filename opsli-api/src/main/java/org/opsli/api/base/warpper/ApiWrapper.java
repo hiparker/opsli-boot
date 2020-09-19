@@ -1,7 +1,6 @@
-package org.opsli.core.base.entity;
+package org.opsli.api.base.warpper;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.*;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -14,7 +13,14 @@ import java.util.Date;
 
 /**
  *
- * Entity 基础类
+ * Api 基础类
+ *
+ * 尽量 与本地 服务的 entity 保持一致（除去不想要暴露给 web的字段）
+ *
+ * api层级的 wrapper 也是对于数据安全性的一次包装
+ *
+ * Entity 增加的 deleted 字段， 不需要同步更新到 Wrapper的Model中
+ * Wrapper的Model 只是用于 对外展示
  *
  * @author Parker
  * @date 2019-05-11
@@ -23,12 +29,12 @@ import java.util.Date;
 @Data
 @Accessors(chain = true)
 @EqualsAndHashCode(callSuper = false)
-public abstract class BaseEntity implements Serializable {
+public abstract class ApiWrapper implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
 	/** ID */
-	@TableId(type = IdType.ASSIGN_ID)
+	@TableId
 	@ApiModelProperty(value = "ID")
 	private String id;
 
@@ -53,6 +59,8 @@ public abstract class BaseEntity implements Serializable {
 	private Date updateTime;
 
 	/** 乐观锁 版本 */
+	@ApiModelProperty(value = "版本")
+	@Version
 	private Integer version;
 
 }

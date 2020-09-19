@@ -1,11 +1,13 @@
-package org.opsli.core.conf;
+package org.opsli.api.conf;
 
 import com.github.xiaoymin.swaggerbootstrapui.annotations.EnableSwaggerBootstrapUI;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.opsli.api.conf.prop.ApiPathProperties;
+import org.opsli.common.annotation.ApiRestController;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.PathMatchConfigurer;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import springfox.documentation.builders.ApiInfoBuilder;
@@ -16,24 +18,33 @@ import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
+import javax.annotation.Resource;
+
 /**
- * @Author parker
- *
- * swagger配置
- *
- * spring 条件 如果 enable为fasle 则不会自动注入该类
+ * 配置统一的后台接口访问路径的前缀
+ * @author parker
  */
 @Slf4j
 @Configuration
 @EnableSwagger2
 @EnableSwaggerBootstrapUI
-@ConditionalOnProperty(name = "swagger.enable", havingValue = "true")
-public class SwaggerConfig implements WebMvcConfigurer {
+public class SpringWebMvcConfig implements WebMvcConfigurer {
+
+	@Resource
+	private ApiPathProperties apiPathProperties;
+
+	@Override
+	public void configurePathMatch(PathMatchConfigurer configurer) {
+		configurer
+				.addPathPrefix(apiPathProperties.getGlobalPrefix(),c -> c.isAnnotationPresent(ApiRestController.class));
+	}
+
+	// ========================= Swagger =========================
 
 	/**
 	 *
 	 * 显示swagger-ui.html文档展示页，还必须注入swagger资源：
-	 * 
+	 *
 	 * @param registry
 	 */
 	@Override
@@ -54,13 +65,13 @@ public class SwaggerConfig implements WebMvcConfigurer {
 				.apiInfo(apiInfo())
 				.select()
 				//此包路径下的类，才生成接口文档
-				.apis(RequestHandlerSelectors.basePackage("org.opsli.modulars"))
+				.apis(RequestHandlerSelectors.basePackage("org.opsli"))
 				//加了ApiOperation注解的类，才生成接口文档
-	            .apis(RequestHandlerSelectors.withMethodAnnotation(ApiOperation.class))
+				.apis(RequestHandlerSelectors.withMethodAnnotation(ApiOperation.class))
 				.paths(PathSelectors.any())
 				.build();
-				//.securitySchemes(Collections.singletonList(securityScheme()));
-				//.globalOperationParameters(setHeaderToken());
+		//.securitySchemes(Collections.singletonList(securityScheme()));
+		//.globalOperationParameters(setHeaderToken());
 	}
 
 	/***
@@ -101,9 +112,9 @@ public class SwaggerConfig implements WebMvcConfigurer {
 				.description("后台API接口")
 				// 作者
 				.contact("Parker")
-                .license("The Apache License, Version 2.0")
-                .licenseUrl("http://www.apache.org/licenses/LICENSE-2.0.html")
+				.license("The Apache License, Version 2.0")
+				.licenseUrl("http://www.apache.org/licenses/LICENSE-2.0.html")
 				.build();
 	}
-
+ 
 }
