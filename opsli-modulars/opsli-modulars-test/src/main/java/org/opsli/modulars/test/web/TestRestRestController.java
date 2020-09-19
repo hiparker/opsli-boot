@@ -51,7 +51,7 @@ public class TestRestRestController extends BaseRestController<TestModel, TestEn
 
     @ApiOperation(value = "发送邮件", notes = "发送邮件")
     @Override
-    public ResultVo sendMail(){
+    public ResultVo<?> sendMail(){
         MailModel mailModel = new MailModel();
         mailModel.setTo("meet.carina@foxmail.com");
         mailModel.setSubject("测试邮件功能");
@@ -67,7 +67,7 @@ public class TestRestRestController extends BaseRestController<TestModel, TestEn
      */
     @ApiOperation(value = "发送 Redis 订阅消息", notes = "发送 Redis 订阅消息")
     @Override
-    public ResultVo sendMsg(){
+    public ResultVo<?> sendMsg(){
 
         BaseSubMessage msg = DictMsgFactory.createMsg("test", "aaa", 123213, CacheType.UPDATE);
 
@@ -85,13 +85,11 @@ public class TestRestRestController extends BaseRestController<TestModel, TestEn
      */
     @ApiOperation(value = "发送 Redis 测试", notes = "发送 Redis 测试")
     @Override
-    public ResultVo redisTest(){
+    public ResultVo<?> redisTest(){
         boolean ret = redisPlugin.put("opsli:test", "12315");
         if(ret){
             Object o = redisPlugin.get("opsli:test");
-            ResultVo resultVo = new ResultVo();
-            resultVo.put("data",o);
-            return resultVo;
+            return ResultVo.success(o);
         }
         return ResultVo.error("发送订阅消息失败！！！！！！");
     }
@@ -103,7 +101,7 @@ public class TestRestRestController extends BaseRestController<TestModel, TestEn
      */
     @ApiOperation(value = "发起 Redis 分布式锁", notes = "发起 Redis 分布式锁")
     @Override
-    public ResultVo testLock(){
+    public ResultVo<RedisLock> testLock(){
 
         // 锁凭证 redisLock 贯穿全程
         RedisLock redisLock = new RedisLock();
@@ -114,8 +112,7 @@ public class TestRestRestController extends BaseRestController<TestModel, TestEn
         redisLock = redisLockPlugins.tryLock(redisLock);
 
         if(redisLock == null){
-            ResultVo error = ResultVo.error("获得锁失败！！！！！！");
-            error.put("redisLock",redisLock);
+            ResultVo<RedisLock> error = ResultVo.error(500,"获得锁失败！！！！！！",redisLock);
             return error;
         }
 
@@ -123,8 +120,8 @@ public class TestRestRestController extends BaseRestController<TestModel, TestEn
         ThreadUtil.sleep(60, TimeUnit.SECONDS);
 
         redisLockPlugins.unLock(redisLock);
-        ResultVo success = ResultVo.success("获得锁成功！！！！！！");
-        success.put("redisLock",redisLock);
+        ResultVo<RedisLock> success = ResultVo.success("获得锁成功！！！！！！",redisLock);
+        success.put(redisLock);
         return success;
     }
 
@@ -134,7 +131,7 @@ public class TestRestRestController extends BaseRestController<TestModel, TestEn
      */
     @ApiOperation(value = "新增数据", notes = "新增数据")
     @Override
-    public ResultVo insert(TestModel model){
+    public ResultVo<TestModel> insert(TestModel model){
         // 转化对象 处理 ApiModel 与 本地对象
 
         model.setName("测试名称"+random.nextInt());
@@ -143,10 +140,7 @@ public class TestRestRestController extends BaseRestController<TestModel, TestEn
         // 调用新增方法
         TestModel insert = IService.insert(model);
 
-        ResultVo resultVo = new ResultVo();
-        resultVo.setMsg("新增成功");
-        resultVo.put("data",insert);
-        return resultVo;
+        return ResultVo.success("新增成功",insert);
     }
 
     /**
@@ -155,7 +149,7 @@ public class TestRestRestController extends BaseRestController<TestModel, TestEn
      */
     @ApiOperation(value = "修改数据", notes = "修改数据")
     @Override
-    public ResultVo update(TestModel model){
+    public ResultVo<TestModel> update(TestModel model){
         // 转化对象 处理 ApiModel 与 本地对象
 
         if(StringUtils.isEmpty(model.getId())){
@@ -168,11 +162,7 @@ public class TestRestRestController extends BaseRestController<TestModel, TestEn
         // 不需要做 锁状态处理，需要判断是否成功 能往下走的只能是成功
         TestModel update = IService.update(model);
 
-
-        ResultVo resultVo = new ResultVo();
-        resultVo.setMsg("修改成功");
-        resultVo.put("data",update);
-        return resultVo;
+        return ResultVo.success("修改成功",update);
     }
 
 
@@ -182,11 +172,8 @@ public class TestRestRestController extends BaseRestController<TestModel, TestEn
      */
     @ApiOperation(value = "查看对象", notes = "查看对象")
     @Override
-    public ResultVo get(TestModel model){
-        // 转化对象 处理 ApiModel 与 本地对象
-        ResultVo resultVo = new ResultVo();
-        resultVo.put("data",model);
-        return resultVo;
+    public ResultVo<TestModel> get(TestModel model){
+        return ResultVo.success(model);
     }
 
 
@@ -196,7 +183,7 @@ public class TestRestRestController extends BaseRestController<TestModel, TestEn
      */
     @ApiOperation(value = "删除对象", notes = "删除对象")
     @Override
-    public ResultVo del(String id){
+    public ResultVo<?> del(String id){
 
         TestEntity testEntity1 = new TestEntity();
         testEntity1.setId(id);
@@ -211,13 +198,9 @@ public class TestRestRestController extends BaseRestController<TestModel, TestEn
 
         //count = IService.deleteAll(idList);
 
-
         IService.deleteAll(ids);
 
-        ResultVo resultVo = new ResultVo();
-        resultVo.put("data",id);
-        resultVo.setMsg("删除对象成功");
-        return resultVo;
+        return ResultVo.error("删除对象成功");
     }
 
 
@@ -227,7 +210,7 @@ public class TestRestRestController extends BaseRestController<TestModel, TestEn
      */
     @ApiOperation(value = "删除全部对象", notes = "删除全部对象")
     @Override
-    public ResultVo delAll(){
+    public ResultVo<?> delAll(){
 
         //IService.
 
@@ -241,12 +224,7 @@ public class TestRestRestController extends BaseRestController<TestModel, TestEn
 
         //count = IService.deleteAll(idList);
 
-
-
-
-        ResultVo resultVo = new ResultVo();
-        resultVo.setMsg("删除对象成功");
-        return resultVo;
+        return ResultVo.error("删除对象成功");
     }
 
 

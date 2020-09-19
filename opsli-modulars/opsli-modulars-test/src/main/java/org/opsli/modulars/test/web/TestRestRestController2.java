@@ -22,7 +22,10 @@ public class TestRestRestController2{
     TestApi testApi;
 
     @GetMapping("/insert2")
-    public ResultVo insert(){
+    public ResultVo<TestModel> insert(){
+        for (int i = 0; i < 999; i++) {
+            testApi.insert(new TestModel());
+        }
         return testApi.insert(new TestModel());
     }
 

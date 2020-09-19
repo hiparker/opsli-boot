@@ -1,100 +1,192 @@
 package org.opsli.api.base.result;
 
+import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+import lombok.AccessLevel;
+import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.http.HttpStatus;
-
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
-
 
 /**
- * Web统一返回参数
+ * API 统一返回参数
  *
  * @date 2020年5月15日10:40:54
  * @author Parker
- * 
+ *
+ * 在 Feign 的调用过程中，无法直接序列化数据
+ *
+ * 所以要加上 泛型对象 @JsonProperty ，否者返回则为一个null
+ *
  */
+@Data
 @ApiModel(value="视图层返回Api对象",
 		description="视图层返回Api对象  success:成功状态  code:编号  msg:信息  datatime:时间戳")
-public class ResultVo extends HashMap<String,Object> implements Serializable {
- 
- 
-	public ResultVo(){
-		this.put("success", true);
-		this.put("code", HttpStatus.OK.value());
-		this.put("msg", "操作成功");
-		this.put("datatime", System.currentTimeMillis());
-	}
+public class ResultVo<T> implements Serializable {
 
-	/** get/set
-	 * 	msg : 信息
-	 * 	code : 编码
-	 * 	success : 是否成功状态
-	 * */
-	public String getMsg() {
-		return (String)this.get("msg");
-	}
- 
-	public void setMsg(String msg) {//向json中添加属性，在js中访问，请调用data.msg
-		this.put("msg", msg);
-	}
+	private static final long serialVersionUID = 1L;
 
-	public int getCode() {
-		return (int)this.get("code");
-	}
+	/** 成功状态 */
+	@ApiModelProperty(value = "成功状态")
+	private boolean success;
 
-	public void setCode(int code) {
-		this.put("code", code);
-	}
+	/** 消息 */
+	@ApiModelProperty(value = "消息")
+	private String msg;
 
-	public boolean isSuccess() {
-		return (boolean)this.get("success");
-	}
- 
-	public void setSuccess(boolean success) {
-		this.put("success", success);
-	}
+	/** 状态码 */
+	@ApiModelProperty(value = "状态码")
+	private Integer code;
 
-	// -------------------------------------------
+	/** 时间戳 */
+	@Getter(AccessLevel.NONE)
+	@Setter(AccessLevel.NONE)
+	@ApiModelProperty(value = "时间戳")
+	private long timestamp;
 
-	@JsonIgnore//返回对象时忽略此属性
-	public static ResultVo success(String msg) {
-		ResultVo j = new ResultVo();
-		j.setMsg(msg);
-		return j;
-	}
-	@JsonIgnore//返回对象时忽略此属性
-	public static ResultVo error(String msg) {
-		ResultVo j = new ResultVo();
-		j.setSuccess(false);
-		j.setMsg(msg);
-		return j;
-	}
+	/** 数据对象 */
+	@ApiModelProperty(value = "数据")
+	@Getter(AccessLevel.NONE)
+	@Setter(AccessLevel.NONE)
+	@JsonProperty("data")
+	private T data;
 
-	@JsonIgnore//返回对象时忽略此属性
-	public static ResultVo success(Map<String, Object> map) {
-		ResultVo restResponse = new ResultVo();
-		restResponse.putAll(map);
-		return restResponse;
-	}
 
-	@JsonIgnore//返回对象时忽略此属性
-	public static ResultVo success() {
-		return new ResultVo();
-	}
- 
- 
-	@Override
-	public ResultVo put(String key, Object value) {
-		super.put(key, value);
+	/**
+	 * 设置值
+	 * @param data 数据
+	 * @return ResultVo<T>
+	 */
+	public ResultVo<T> put(T data) {
+		this.data = data;
 		return this;
 	}
- 
-	public ResultVo putMap(Map m) {
-		super.putAll(m);
-		return this;
+
+	/**
+	 * 获得值
+	 * @return T
+	 */
+	public T get(){
+		return this.data;
+	}
+
+	/**
+	 * 转化成Json字符串
+	 * @return String
+	 */
+	public String toJsonStr(){
+		return JSONObject.toJSONString(this);
+	}
+
+	// ===========================================
+
+	/**
+	 * 构造函数
+	 */
+	public ResultVo() {
+		// 初始化值
+		this.success = true;
+		this.msg = "操作成功！";
+		this.code = HttpStatus.OK.value();
+		this.timestamp = System.currentTimeMillis();
+	}
+
+	// ================================== 静态方法 ===================================
+
+	/**
+	 * 返回成功状态
+	 * @return ResultVo<Object>
+	 */
+	@JsonIgnore//返回对象时忽略此属性
+	public static ResultVo<Object> success() {
+		return new ResultVo<>();
+	}
+
+	/**
+	 * 返回成功状态
+	 * @param msg 返回信息
+	 * @return ResultVo<Object>
+	 */
+	@JsonIgnore//返回对象时忽略此属性
+	public static ResultVo<Object> success(String msg) {
+		ResultVo<Object> ret = new ResultVo<>();
+		ret.setMsg(msg);
+		return ret;
+	}
+
+	/**
+	 * 返回成功状态
+	 * @param data 返回数据
+	 * @param <T> 泛型
+	 * @return ResultVo<T>
+	 */
+	@JsonIgnore//返回对象时忽略此属性
+	public static <T> ResultVo<T> success(T data) {
+		ResultVo<T> ret = new ResultVo<>();
+		ret.put(data);
+		return ret;
+	}
+
+	/**
+	 * 返回成功状态
+	 * @param msg 返回信息
+	 * @param data 返回数据
+	 * @param <T> 泛型
+	 * @return ResultVo<T>
+	 */
+	@JsonIgnore//返回对象时忽略此属性
+	public static <T> ResultVo<T> success(String msg, T data) {
+		ResultVo<T> ret = new ResultVo<>();
+		ret.put(data);
+		return ret;
+	}
+
+
+	/**
+	 * 返回错误状态
+	 * @param msg 返回信息
+	 * @return ResultVo<Object>
+	 */
+	@JsonIgnore//返回对象时忽略此属性
+	public static ResultVo<Object> error(String msg) {
+		ResultVo<Object> ret = new ResultVo<>();
+		ret.setMsg(msg);
+		ret.setCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
+		return ret;
+	}
+
+	/**
+	 * 返回错误状态
+	 * @param code 错误编号
+	 * @param msg 返回信息
+	 * @return ResultVo<T>
+	 */
+	@JsonIgnore//返回对象时忽略此属性
+	public static ResultVo<Object> error(int code, String msg) {
+		ResultVo<Object> ret = new ResultVo<>();
+		ret.setMsg(msg);
+		ret.setCode(code);
+		return ret;
+	}
+
+	/**
+	 * 返回成功状态
+	 * @param code 错误编号
+	 * @param data 返回数据
+	 * @param <T> 泛型
+	 * @return ResultVo<T>
+	 */
+	@JsonIgnore//返回对象时忽略此属性
+	public static <T> ResultVo<T> error(int code, String msg, T data) {
+		ResultVo<T> ret = new ResultVo<>();
+		ret.setMsg(msg);
+		ret.setCode(code);
+		ret.put(data);
+		return ret;
 	}
 
 }
