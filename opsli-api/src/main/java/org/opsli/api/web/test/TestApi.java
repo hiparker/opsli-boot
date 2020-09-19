@@ -3,7 +3,6 @@ package org.opsli.api.web.test;
 import io.swagger.annotations.ApiOperation;
 import org.opsli.api.base.result.ResultVo;
 import org.opsli.api.wrapper.test.TestModel;
-import org.opsli.common.annotation.ApiRestController;
 import org.springframework.web.bind.annotation.GetMapping;
 
 
@@ -13,9 +12,15 @@ import org.springframework.web.bind.annotation.GetMapping;
  * @Author: Parker
  * @CreateTime: 2020-09-13 17:40
  * @Description: 测试类
+ *
+ * 对外 API 直接 暴露 @GetMapping 或者 @PostMapping
+ * 对内也推荐 单机版 不需要设置 Mapping 但是调用方法得从Controller写起
+ *
+ * 这样写法虽然比较绕，但是当单体项目想要改造微服务架构时 时非常容易的
+ *
+ *
  */
-@ApiRestController("/test")
-public interface ITestApi {
+public interface TestApi {
 
 
     @ApiOperation(value = "发送邮件", notes = "发送邮件")

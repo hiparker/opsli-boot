@@ -5,7 +5,7 @@ import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
 import org.opsli.api.base.result.ResultVo;
 import org.opsli.api.wrapper.test.TestModel;
-import org.opsli.api.web.test.ITestApi;
+import org.opsli.api.web.test.TestApi;
 import org.opsli.common.annotation.ApiRestController;
 import org.opsli.core.base.concroller.BaseRestController;
 import org.opsli.core.cache.pushsub.enums.CacheType;
@@ -35,7 +35,7 @@ import java.util.concurrent.TimeUnit;
  */
 @ApiRestController("/test")
 public class TestRestRestController extends BaseRestController<TestModel, TestEntity, ITestService>
-        implements ITestApi {
+        implements TestApi {
 
 
     private Random random = new Random();

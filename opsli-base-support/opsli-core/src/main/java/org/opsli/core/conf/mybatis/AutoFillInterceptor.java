@@ -3,6 +3,7 @@ package org.opsli.core.conf.mybatis;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.ReflectUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.ibatis.binding.MapperMethod;
 import org.apache.ibatis.executor.Executor;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.mapping.SqlCommandType;
@@ -111,14 +112,23 @@ public class AutoFillInterceptor implements Interceptor {
      * @param arg
      */
     public void updateFill(Object arg) {
-        /**
-         * TODO 新增 修改的 时间有问题
-         *
-         * 并且 修改 名字不同步
-         *
-          */
-
-        Field[] fields = ReflectUtil.getFields(arg.getClass());
+        // 2020-09-19
+        // 修改这儿 有可能会拿到一个 MapperMethod，需要特殊处理
+        Field[] fields;
+        if (arg instanceof MapperMethod.ParamMap) {
+            MapperMethod.ParamMap<?> paramMap = (MapperMethod.ParamMap<?>) arg;
+            if (paramMap.containsKey("et")) {
+                arg = paramMap.get("et");
+            } else {
+                arg = paramMap.get("param1");
+            }
+            if (arg == null) {
+                return;
+            }
+            fields = ReflectUtil.getFields(arg.getClass());
+        } else {
+            fields = ReflectUtil.getFields(arg.getClass());
+        }
         for (Field f : fields) {
             f.setAccessible(true);
             switch (f.getName()) {
