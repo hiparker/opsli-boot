@@ -88,6 +88,13 @@ public abstract class CrudServiceImpl<M extends BaseMapper<T>, E extends ApiWrap
     }
 
     @Override
+    public boolean insertBatch(List<E> models) {
+        if(models == null || models.size() == 0) return false;
+        List<T> entitys = transformMs2Ts(models);
+        return super.saveBatch(entitys);
+    }
+
+    @Override
     public E update(E model) {
         if(model == null) return null;
         T entity = transformM2T(model);

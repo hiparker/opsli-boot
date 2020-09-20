@@ -65,6 +65,17 @@ public class PageQueryBuilder<E extends ApiWrapper,T extends BaseEntity>{
     }
 
     /**
+     * 构造函数 只是生产 查询器
+     * @param entityClazz Entity 的 clazz
+     * @param parameterMap request 参数
+     */
+    public PageQueryBuilder(Class<T> entityClazz, Map<String, String[]> parameterMap){
+        this.parameterMap = parameterMap;
+        this.entityClazz = entityClazz;
+    }
+
+
+    /**
      * 构建builderPage
      * @return
      */
@@ -73,6 +84,14 @@ public class PageQueryBuilder<E extends ApiWrapper,T extends BaseEntity>{
         QueryWrapper<T> queryWrapper = this.createQueryWrapper();
         page.setQueryWrapper(queryWrapper);
         return page;
+    }
+
+    /**
+     * 创建 查询条件构造器
+     * @return
+     */
+    public QueryWrapper<T> builderQueryWrapper(){
+        return this.createQueryWrapper();
     }
 
     /**

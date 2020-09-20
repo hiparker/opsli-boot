@@ -1,4 +1,4 @@
-package org.opsli.plugins.redis.msg;
+package org.opsli.plugins.excel.msg;
 
 import org.opsli.common.base.msg.BaseMsg;
 
@@ -9,21 +9,18 @@ import org.opsli.common.base.msg.BaseMsg;
  * @CreateTime: 2020-09-13 19:54
  * @Description: Redis消息
  */
-public enum RedisMsg implements BaseMsg {
+public enum ExcelMsg implements BaseMsg {
 
-    /** Redis异常 */
-    EXCEPTION_KEY_NULL(90300,"Key不可为空！"),
-    EXCEPTION_INCREMENT(90301,"递增值必须大于0！"),
-    EXCEPTION_DECREMENT(90302,"递减值必须大于0！"),
-    EXCEPTION_REFLEX(90303,"反射Redis脚本失败"),
-    EXCEPTION_PUSH_SUB_NULL(90304,"发布消息体不可为空！"),
+    /** Excel 异常 */
+    EXCEPTION_FILE_FORMAT(90000,"文件格式错误！"),
+    EXCEPTION_CREATE_ERROR(90000,"创建文件失败！"),
     ;
 
 
     private int code;
     private String message;
 
-    RedisMsg(int code, String message){
+    ExcelMsg(int code, String message){
         this.code = code;
         this.message = message;
     }

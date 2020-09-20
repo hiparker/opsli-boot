@@ -55,6 +55,20 @@ public interface CrudServiceInterface<E,T> extends BaseServiceInterface<T> {
     E insert(E model);
 
     /**
+     * 批量插入数据(批量插入数据 暂不支持更新热数据)
+     *
+     * 不需要做锁状态处理
+     * 不需要判断是否成功
+     * 能往下走的只能是成功
+     * 异常问题 已经统一被处理
+     *
+     * @param models model 数据模型
+     * @return E
+     */
+    boolean insertBatch(List<E> models);
+
+
+    /**
      * 更新数据
      *
      * 不需要做锁状态处理

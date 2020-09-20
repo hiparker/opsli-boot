@@ -1,9 +1,13 @@
 package org.opsli.api.wrapper.test;
 
+import com.alibaba.excel.annotation.ExcelProperty;
+import com.alibaba.excel.annotation.write.style.*;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import org.apache.poi.ss.usermodel.FillPatternType;
 import org.opsli.api.base.warpper.ApiWrapper;
+import org.opsli.plugins.excel.annotation.CellStyleFormat;
 
 /**
  * @BelongsProject: opsli-boot
@@ -17,9 +21,13 @@ import org.opsli.api.base.warpper.ApiWrapper;
 public class TestModel extends ApiWrapper {
 
     @ApiModelProperty(value = "名称")
+    @ExcelProperty(value = "名称", order = 1)
+    @CellStyleFormat
     private String name;
 
     @ApiModelProperty(value = "备注")
+    @ExcelProperty(value = "备注", order = 2)
+    @CellStyleFormat
     private String remark;
 
 }

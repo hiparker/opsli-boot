@@ -3,10 +3,11 @@ package org.opsli.modulars.test.web;
 import cn.hutool.core.thread.ThreadUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import io.swagger.annotations.ApiOperation;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.opsli.api.base.result.ResultVo;
-import org.opsli.api.wrapper.test.TestModel;
 import org.opsli.api.web.test.TestApi;
+import org.opsli.api.wrapper.test.TestModel;
 import org.opsli.common.annotation.ApiRestController;
 import org.opsli.common.utils.WrapperUtil;
 import org.opsli.core.base.concroller.BaseRestController;
@@ -23,8 +24,10 @@ import org.opsli.plugins.redis.RedisPlugin;
 import org.opsli.plugins.redis.lock.RedisLock;
 import org.opsli.plugins.redis.pushsub.entity.BaseSubMessage;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -38,6 +41,7 @@ import java.util.concurrent.TimeUnit;
  * @CreateTime: 2020-09-13 17:40
  * @Description: 测试类
  */
+@Slf4j
 @ApiRestController("/test")
 public class TestRestRestController extends BaseRestController<TestModel, TestEntity, ITestService>
         implements TestApi {
@@ -257,6 +261,27 @@ public class TestRestRestController extends BaseRestController<TestModel, TestEn
         );
         Page<TestModel, TestEntity> page = IService.findPage(pageQueryBuilder.builderPage());
         return ResultVo.success(page.getBootstrapData());
+    }
+
+    @ApiOperation(value = "导出Excel", notes = "导出Excel")
+    @Override
+    public ResultVo<?> exportExcel(HttpServletRequest request, HttpServletResponse response) {
+        PageQueryBuilder<TestModel,TestEntity> pageQueryBuilder = new PageQueryBuilder<>(
+                TestEntity.class, request.getParameterMap()
+        );
+        return super.excelExport("测试", pageQueryBuilder.builderQueryWrapper(), response);
+    }
+
+    @ApiOperation(value = "导入Excel", notes = "导入Excel")
+    @Override
+    public ResultVo<?> excelImport(MultipartHttpServletRequest request) {
+        return super.excelImport(request);
+    }
+
+    @ApiOperation(value = "导出Excel模版", notes = "导出Excel模版")
+    @Override
+    public ResultVo<?> importTemplate(HttpServletResponse response) {
+        return super.importTemplate("测试", response);
     }
 
 }

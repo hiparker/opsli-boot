@@ -21,7 +21,15 @@ public class TestEntity extends BaseEntity {
     /** 备注 */
     private String remark;
 
+
+    // ========================================
+
+
     /** 多租户字段 */
     private String tenantId;
+
+    /** 逻辑删除字段 */
+    //@TableLogic
+    //private Integer deleted;
 
 }

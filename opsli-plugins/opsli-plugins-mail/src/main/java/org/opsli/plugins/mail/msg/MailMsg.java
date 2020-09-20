@@ -12,7 +12,7 @@ import org.opsli.common.base.msg.BaseMsg;
 public enum MailMsg implements BaseMsg {
 
     /** 未知消息异常 */
-    EXCEPTION_UNKNOWN(90001,"邮件发送失败"),
+    EXCEPTION_UNKNOWN(90200,"邮件发送失败"),
     ;
 
 

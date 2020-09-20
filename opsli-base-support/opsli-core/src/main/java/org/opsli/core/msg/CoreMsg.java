@@ -23,9 +23,14 @@ public enum CoreMsg implements BaseMsg {
     REDIS_EXCEPTION_PUSH_SUB(10200,"Redis 订阅通道失败！"),
 
     /**
-     * MySQL
+     * Excel
      */
-
+    EXCEL_EXPORT_SUCCESS(10300,"Excel 导出成功！"),
+    EXCEL_EXPORT_ERROR(10301,"Excel 导出失败！{}"),
+    EXCEL_IMPORT_SUCCESS(10302,"EXCEL 导入成功！数据行数：{}  耗时(秒)：{}"),
+    EXCEL_IMPORT_ERROR(10303,"Excel导入失败：{}  耗时(秒)：{}"),
+    EXCEL_IMPORT_NO(10304,""),
+    EXCEL_FILE_NULL(10305,"请选择文件")
 
     ;
 

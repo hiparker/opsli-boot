@@ -49,8 +49,6 @@
     <modules>
         <module>opsli-api</module>
         <module>opsli-base-support</module>
-<!--        <module>opsli-common</module>-->
-<!--        <module>opsli-core</module>-->
         <module>opsli-plugins</module>
         <module>opsli-modulars</module>
         <module>opsli-starter</module>

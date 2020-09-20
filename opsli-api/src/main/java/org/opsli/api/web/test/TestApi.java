@@ -5,8 +5,10 @@ import org.opsli.api.base.result.ResultVo;
 import org.opsli.api.wrapper.test.TestModel;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
 
@@ -120,5 +122,27 @@ public interface TestApi {
             @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize,
             HttpServletRequest request
     );
+
+
+    /**
+     * Excel 导出
+     * @return
+     */
+    @GetMapping("/exportExcel")
+    ResultVo<?> exportExcel(HttpServletRequest request, HttpServletResponse response);
+
+    /**
+     * Excel 导入
+     * @return
+     */
+    @GetMapping("/exportImport")
+    ResultVo<?> excelImport(MultipartHttpServletRequest request);
+
+    /**
+     * Excel 下载导入模版
+     * @return
+     */
+    @GetMapping("/exportImport/template")
+    ResultVo<?> importTemplate(HttpServletResponse response);
 
 }

@@ -20,6 +20,13 @@
             <version>${version}</version>
         </dependency>
 
+        <!-- 引入Excel插件 -->
+        <dependency>
+            <groupId>org.opsliframework.boot</groupId>
+            <artifactId>opsli-plugins-excel</artifactId>
+            <version>${plugins.version}</version>
+        </dependency>
+
         <!-- ———————————————————— 集成SwaggerApi - 开始 ———————————————————— -->
         <!-- Swagger API文档 -->
         <dependency>

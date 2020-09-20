@@ -1,9 +1,10 @@
 # tomcat 配置
 server:
   tomcat:
+    #basedir: /Users/xxx
     # Tomcat 编码
     uri-encoding: UTF-8
-    # 对于 Tomcat 头清秀不限制大小
+    # 对于 Tomcat 头文件不限制大小
     max-swallow-size: -1
   servlet:
     context-path: /opsli-boot
