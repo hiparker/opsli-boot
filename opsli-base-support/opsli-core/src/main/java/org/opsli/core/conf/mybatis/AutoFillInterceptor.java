@@ -49,13 +49,13 @@ public class AutoFillInterceptor implements Interceptor {
         SqlCommandType sqlCommandType = null;
         for (int i = 0; i < args.length; i++) {
             Object arg = args[i];
-            String className = arg.getClass().getName();
-            log.info(i + " 参数类型：" + className);
+            //String className = arg.getClass().getName();
+            //log.info(i + " 参数类型：" + className);
             //第一个参数处理。根据它判断是否给“操作属性”赋值。
             if (arg instanceof MappedStatement) {//如果是第一个参数 MappedStatement
                 MappedStatement ms = (MappedStatement) arg;
                 sqlCommandType = ms.getSqlCommandType();
-                log.info("操作类型：" + sqlCommandType);
+                //log.info("操作类型：" + sqlCommandType);
                 if (sqlCommandType == SqlCommandType.INSERT || sqlCommandType == SqlCommandType.UPDATE) {//如果是“增加”或“更新”操作，则继续进行默认操作信息赋值。否则，则退出
                     continue;
                 } else {

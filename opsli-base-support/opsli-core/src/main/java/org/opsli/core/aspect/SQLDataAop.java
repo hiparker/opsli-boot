@@ -65,8 +65,8 @@ public class SQLDataAop {
     public void deleteHadnler(Object ret){
         try {
             if(ret != null){
-                Integer retCount = (Integer) ret;
-                if(retCount == 0){
+                Boolean retFlag = (Boolean) ret;
+                if(!retFlag){
                     throw new ServiceException(CoreMsg.SQL_EXCEPTION_DELETE);
                 }
             }else{
