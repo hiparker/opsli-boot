@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.opsli.api.base.warpper.ApiWrapper;
+import org.opsli.common.constants.MyBatisConstants;
 import org.opsli.common.utils.HumpUtil;
 import org.opsli.core.base.entity.BaseEntity;
 
@@ -103,6 +104,8 @@ public class PageQueryBuilder<E extends ApiWrapper,T extends BaseEntity>{
         if(this.parameterMap == null){
             return queryWrapper;
         }
+        // order 排序次数 如果为0 则默认按照修改时间来排序
+        int orderCount = 0;
         for (Map.Entry<String, String[]> stringEntry : this.parameterMap.entrySet()) {
             String keys = stringEntry.getKey();
             String[] values = stringEntry.getValue();
@@ -130,8 +133,16 @@ public class PageQueryBuilder<E extends ApiWrapper,T extends BaseEntity>{
                     String value = values[0];
                     // 赋值
                     this.handlerValue(queryWrapper, handle, key ,value);
+                    // 如果有排序 就+1
+                    if(ORDER.equals(handle)){
+                        orderCount++;
+                    }
                 }
             }
+        }
+        // 如果没有排序 默认按照 修改时间倒叙排序
+        if(orderCount == 0){
+            queryWrapper.orderByDesc(HumpUtil.humpToUnderline(MyBatisConstants.FIELD_UPDATE_TIME));
         }
         return queryWrapper;
     }

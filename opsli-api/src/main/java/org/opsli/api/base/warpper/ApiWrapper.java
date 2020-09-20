@@ -1,5 +1,6 @@
 package org.opsli.api.base.warpper;
 
+import com.alibaba.excel.annotation.ExcelIgnore;
 import com.alibaba.excel.annotation.ExcelProperty;
 import com.alibaba.excel.annotation.write.style.*;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -80,7 +81,7 @@ public abstract class ApiWrapper implements Serializable {
 
 	/** 乐观锁 版本 */
 	@ApiModelProperty(value = "版本")
-	@ExcelProperty(value = "版本", order = 1005)
+	@ExcelIgnore
 	@CellStyleFormat
 	@Version
 	private Integer version;
