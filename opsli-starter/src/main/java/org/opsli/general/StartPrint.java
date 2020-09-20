@@ -1,5 +1,6 @@
 package org.opsli.general;
 
+import cn.hutool.core.lang.Console;
 import cn.hutool.core.thread.ThreadUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.env.Environment;
@@ -41,7 +42,7 @@ public enum StartPrint {
                 .append("项目地址: \t\thttp://" + ip + ":" + serverPort + contextPath + "/\n")
                 .append("Doc文档: \t\thttp://" + ip + ":" + serverPort + contextPath + "/doc.html\n")
                 .append("----------------------------------------------------------\n");
-        log.info(printStr.toString());
+        Console.log(printStr.toString());
     }
 
 }
