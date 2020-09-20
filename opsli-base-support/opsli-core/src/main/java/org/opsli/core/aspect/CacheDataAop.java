@@ -113,6 +113,17 @@ public class CacheDataAop {
             return returnValue;
         }
 
+        // 删除状态判断
+        try {
+            Boolean ret = (Boolean) returnValue;
+            if(ret == null || !ret){
+                return returnValue;
+            }
+        }catch (Exception e){
+            log.error(e.getMessage(),e);
+            return returnValue;
+        }
+
         // ====== 如果 使用了 EnableHotData ，表示开启热数据加载 则执行下段代码
         List<CacheDataEntity> cacheDataEntityList = this.delHandlerData(point, args);
         if(cacheDataEntityList == null || cacheDataEntityList.size() == 0){

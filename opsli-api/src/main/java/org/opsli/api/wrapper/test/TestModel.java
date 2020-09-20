@@ -1,5 +1,6 @@
 package org.opsli.api.wrapper.test;
 
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import org.opsli.api.base.warpper.ApiWrapper;
@@ -11,6 +12,7 @@ import org.opsli.api.base.warpper.ApiWrapper;
  * @CreateTime: 2020-09-16 17:33
  * @Description: 测试类
  */
+@ApiModel(value="测试接口返回Model",description="测试接口返回Model")
 @Data
 public class TestModel extends ApiWrapper {
 

@@ -2,7 +2,8 @@ package org.opsli.core.base.service.interfaces;
 
 
 
-import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import org.opsli.core.persistence.Page;
 
 import java.util.Collection;
 import java.util.List;
@@ -26,16 +27,16 @@ public interface CrudServiceInterface<E,T> extends BaseServiceInterface<T> {
     /**
      * 获取单条数据
      *
-     * @param id
-     * @return
+     * @param id ID
+     * @return E
      */
     E get(String id);
 
     /**
      * 获取单条数据
      *
-     * @param model
-     * @return
+     * @param model model 数据模型
+     * @return E
      */
     E get(E model);
 
@@ -48,8 +49,8 @@ public interface CrudServiceInterface<E,T> extends BaseServiceInterface<T> {
      * 能往下走的只能是成功
      * 异常问题 已经统一被处理
      *
-     * @param model
-     * @return
+     * @param model model 数据模型
+     * @return E
      */
     E insert(E model);
 
@@ -61,8 +62,8 @@ public interface CrudServiceInterface<E,T> extends BaseServiceInterface<T> {
      * 能往下走的只能是成功
      * 异常问题 已经统一被处理
      *
-     * @param model
-     * @return
+     * @param model model 数据模型
+     * @return E
      */
     E update(E model);
 
@@ -75,11 +76,10 @@ public interface CrudServiceInterface<E,T> extends BaseServiceInterface<T> {
      * 能往下走的只能是成功
      * 异常问题 已经统一被处理
      *
-     * @param id
-     * @return
-     * @see int delete(T entity)
+     * @param id ID
+     * @return boolean
      */
-    int delete(String id);
+    boolean delete(String id);
 
 
     /**
@@ -90,10 +90,10 @@ public interface CrudServiceInterface<E,T> extends BaseServiceInterface<T> {
      * 能往下走的只能是成功
      * 异常问题 已经统一被处理
      *
-     * @param model
-     * @return
+     * @param model 数据模型
+     * @return boolean
      */
-    int delete(E model);
+    boolean delete(E model);
 
 
     /**
@@ -104,10 +104,10 @@ public interface CrudServiceInterface<E,T> extends BaseServiceInterface<T> {
      * 能往下走的只能是成功
      * 异常问题 已经统一被处理
      *
-     * @param ids
-     * @return
+     * @param ids id数组
+     * @return boolean
      */
-    int deleteAll(String[] ids);
+    boolean deleteAll(String[] ids);
 
     /**
      * 批量物理删除
@@ -117,27 +117,34 @@ public interface CrudServiceInterface<E,T> extends BaseServiceInterface<T> {
      * 能往下走的只能是成功
      * 异常问题 已经统一被处理
      *
-     * @param models
-     * @return
+     * @param models 封装模型
+     * @return boolean
      */
-    int deleteAll(Collection<E> models);
+    boolean deleteAll(Collection<E> models);
 
 
     /**
      * 查询数据列表
      *
-     * @param model
-     * @return
+     * @param queryWrapper 查询条件构造器
+     * @return List<E>
      */
-    List<E> findList(E model);
+    List<T> findList(QueryWrapper<T> queryWrapper);
+
 
     /**
-     * 查询所有数据列表
+     * 查询全部数据列表
      *
-     * @return
-     * @see List<E> findAllList(T entity)
+     * @return List<T>
      */
-    //Page findPage(Page page, T t);
+    List<T> findAllList();
+
+    /**
+     * 查询分页数据
+     *
+     * @return  Page<T>
+     */
+    Page<E,T> findPage(Page<E,T> page);
 
 
 }

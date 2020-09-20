@@ -4,6 +4,10 @@ import io.swagger.annotations.ApiOperation;
 import org.opsli.api.base.result.ResultVo;
 import org.opsli.api.wrapper.test.TestModel;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 
 /**
@@ -23,7 +27,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 public interface TestApi {
 
 
-    @ApiOperation(value = "发送邮件", notes = "发送邮件")
     @GetMapping("/sendMail")
     ResultVo<?> sendMail();
 
@@ -32,7 +35,6 @@ public interface TestApi {
      * 发送 Redis 订阅消息
      * @return
      */
-    @ApiOperation(value = "发送 Redis 订阅消息", notes = "发送 Redis 订阅消息")
     @GetMapping("/sendMsg")
     ResultVo<?> sendMsg();
 
@@ -41,7 +43,6 @@ public interface TestApi {
      * 发送 Redis 订阅消息
      * @return
      */
-    @ApiOperation(value = "发送 Redis 测试", notes = "发送 Redis 测试")
     @GetMapping("/redisTest")
     ResultVo<?> redisTest();
 
@@ -50,7 +51,6 @@ public interface TestApi {
      * 发起 Redis 分布式锁
      * @return
      */
-    @ApiOperation(value = "发起 Redis 分布式锁", notes = "发起 Redis 分布式锁")
     @GetMapping("/testLock")
     ResultVo<?> testLock();
 
@@ -66,7 +66,6 @@ public interface TestApi {
      * 修改数据
      * @return
      */
-    @ApiOperation(value = "修改数据", notes = "修改数据")
     @GetMapping("/update")
     ResultVo<TestModel> update(TestModel entity);
 
@@ -75,7 +74,6 @@ public interface TestApi {
      * 查看对象
      * @return
      */
-    @ApiOperation(value = "查看对象", notes = "查看对象")
     @GetMapping("/get")
     ResultVo<TestModel> get(TestModel entity);
 
@@ -84,7 +82,6 @@ public interface TestApi {
      * 删除对象
      * @return
      */
-    @ApiOperation(value = "删除对象", notes = "删除对象")
     @GetMapping("/del")
     ResultVo<?> del(String id);
 
@@ -93,9 +90,35 @@ public interface TestApi {
      * 删除全部对象
      * @return
      */
-    @ApiOperation(value = "删除全部对象", notes = "删除全部对象")
     @GetMapping("/delAll")
     ResultVo<?> delAll();
 
+
+    /**
+     * 查找一个集合
+     * @return
+     */
+    @GetMapping("/findList")
+    ResultVo<List<TestModel>> findList();
+
+
+    /**
+     * 查找一个全部集合
+     * @return
+     */
+    @GetMapping("/findAllList")
+    ResultVo<List<TestModel>> findAllList();
+
+
+    /**
+     * 查找一个分页
+     * @return
+     */
+    @GetMapping("/findPage")
+    ResultVo<?> findPage(
+            @RequestParam(name = "pageNo", defaultValue = "1") Integer pageNo,
+            @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize,
+            HttpServletRequest request
+    );
 
 }

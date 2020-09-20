@@ -25,7 +25,7 @@ import java.io.Serializable;
  */
 @Data
 @ApiModel(value="视图层返回Api对象",
-		description="视图层返回Api对象  success:成功状态  code:编号  msg:信息  datatime:时间戳")
+		description="视图层返回Api对象  success:成功状态  code:编号  msg:信息  timestamp:时间戳  data:数据")
 public class ResultVo<T> implements Serializable {
 
 	private static final long serialVersionUID = 1L;

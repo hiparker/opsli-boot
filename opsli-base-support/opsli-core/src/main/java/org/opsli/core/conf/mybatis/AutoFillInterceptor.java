@@ -9,6 +9,7 @@ import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.mapping.SqlCommandType;
 import org.apache.ibatis.plugin.*;
 import org.opsli.common.constants.MyBatisConstants;
+import org.opsli.core.utils.UserUtil;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Field;
@@ -19,6 +20,12 @@ import java.util.*;
  * MyBatis 拦截器 注入属性用
  *
  * PS：Plus中的自动注入器太难用了
+ *
+ * -- 多租户设置 当前方案选择的是按照表加 租户字段
+ *      如果租户数量过大 可考虑按照 业务分库 再选择横纵拆表 然后再按照表中租户分区 可以缓解一下数量问题
+ *    多租户要考虑数据隔离级别 这里选择的是 按照分页进行隔离，毕竟对于客户来讲，只能看到分页的数据
+ *      也就是说 要控制再 findList层
+ *      自定义查询SQL的话 一定要注意 ， 如果有租户设置 一定要加上多租户查询
  *
  * 参考地址：https://www.cnblogs.com/qingshan-tang/p/13299701.html
  */
@@ -99,6 +106,10 @@ public class AutoFillInterceptor implements Interceptor {
                 // 逻辑删除
                 case MyBatisConstants.FIELD_DELETE_LOGIC:
                     setProperty(arg, MyBatisConstants.FIELD_DELETE_LOGIC,  MyBatisConstants.LOGIC_NOT_DELETE_VALUE);
+                    break;
+                // 多租户设置
+                case MyBatisConstants.FIELD_TENANT:
+                    setProperty(arg, MyBatisConstants.FIELD_TENANT,  UserUtil.getTenantId());
                     break;
                 default:
                     break;

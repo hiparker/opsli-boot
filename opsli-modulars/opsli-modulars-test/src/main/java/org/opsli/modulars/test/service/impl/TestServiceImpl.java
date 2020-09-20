@@ -59,25 +59,25 @@ public class TestServiceImpl extends CrudServiceImpl<TestMapper, TestModel, Test
 
     @Override
     @HotDataDel
-    public int delete(String id) {
+    public boolean delete(String id) {
         return super.delete(id);
     }
 
     @Override
     @HotDataDel
-    public int delete(TestModel model) {
+    public boolean delete(TestModel model) {
         return super.delete(model);
     }
 
     @Override
     @HotDataDel
-    public int deleteAll(String[] ids) {
+    public boolean deleteAll(String[] ids) {
         return super.deleteAll(ids);
     }
 
     @Override
     @HotDataDel
-    public int deleteAll(Collection<TestModel> models) {
+    public boolean deleteAll(Collection<TestModel> models) {
         return super.deleteAll(models);
     }
 

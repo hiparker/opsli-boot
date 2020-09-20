@@ -1,6 +1,5 @@
 package org.opsli.core.base.entity;
 
-import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
@@ -34,5 +33,21 @@ public abstract class BaseEntity extends ApiWrapper {
 	private Integer deleted;
 
 	**/
+
+
+
+	/**
+	 * 多租户 ID ，如果要使用多租户模式的话 子类必须重写父类字段
+	 * 且 数据库 有 tenant_id 字段 varchar类型 32 位
+	 *
+	 * 只需要加载 Entity上 Wrapper的Model不需要加字段，如果没有 tenantId 字段默认不是租户模式
+	 * 且不可为空，为空的字段当数据量大起来时 查询会影响效率
+	 */
+	/**
+
+	private String tenantId;
+
+	*/
+
 
 }

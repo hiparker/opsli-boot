@@ -1,15 +1,19 @@
 package org.opsli.modulars.test.web;
 
 import cn.hutool.core.thread.ThreadUtil;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
 import org.opsli.api.base.result.ResultVo;
 import org.opsli.api.wrapper.test.TestModel;
 import org.opsli.api.web.test.TestApi;
 import org.opsli.common.annotation.ApiRestController;
+import org.opsli.common.utils.WrapperUtil;
 import org.opsli.core.base.concroller.BaseRestController;
 import org.opsli.core.cache.pushsub.enums.CacheType;
 import org.opsli.core.cache.pushsub.msgs.DictMsgFactory;
+import org.opsli.core.persistence.Page;
+import org.opsli.core.persistence.PageQueryBuilder;
 import org.opsli.modulars.test.entity.TestEntity;
 import org.opsli.modulars.test.service.ITestService;
 import org.opsli.plugins.mail.MailPlugin;
@@ -20,6 +24,7 @@ import org.opsli.plugins.redis.lock.RedisLock;
 import org.opsli.plugins.redis.pushsub.entity.BaseSubMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -227,5 +232,31 @@ public class TestRestRestController extends BaseRestController<TestModel, TestEn
         return ResultVo.error("删除对象成功");
     }
 
+    @ApiOperation(value = "查找一个集合", notes = "查找一个集合")
+    @Override
+    public ResultVo<List<TestModel>> findList() {
+        QueryWrapper<TestEntity> queryWrapper = new QueryWrapper<>();
+        List<TestEntity> list = IService.findList(queryWrapper);
+        List<TestModel> testModels = WrapperUtil.transformInstance(list, TestModel.class);
+        return ResultVo.success(testModels);
+    }
+
+    @ApiOperation(value = "查找全部数据", notes = "查找全部数据")
+    @Override
+    public ResultVo<List<TestModel>> findAllList() {
+        List<TestEntity> list = IService.findAllList();
+        List<TestModel> testModels = WrapperUtil.transformInstance(list, TestModel.class);
+        return ResultVo.success(testModels);
+    }
+
+    @ApiOperation(value = "查询分页", notes = "查询分页")
+    @Override
+    public ResultVo<?> findPage(Integer pageNo, Integer pageSize, HttpServletRequest request) {
+        PageQueryBuilder<TestModel,TestEntity> pageQueryBuilder = new PageQueryBuilder<>(
+                TestEntity.class, pageNo, pageSize, request.getParameterMap()
+        );
+        Page<TestModel, TestEntity> page = IService.findPage(pageQueryBuilder.builderPage());
+        return ResultVo.success(page.getBootstrapData());
+    }
 
 }

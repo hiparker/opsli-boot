@@ -1,20 +1,27 @@
 package org.opsli.core.base.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import cn.hutool.core.convert.Convert;
+import cn.hutool.core.util.ReflectUtil;
+import cn.hutool.core.util.TypeUtil;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.github.pagehelper.PageInfo;
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.opsli.api.base.warpper.ApiWrapper;
-import org.opsli.common.annotation.EnableHotData;
 import org.opsli.common.constants.MyBatisConstants;
+import org.opsli.common.utils.HumpUtil;
 import org.opsli.common.utils.WrapperUtil;
 import org.opsli.core.base.entity.BaseEntity;
 import org.opsli.core.base.service.base.BaseService;
 import org.opsli.core.base.service.interfaces.CrudServiceInterface;
+import org.opsli.core.persistence.Page;
+import org.opsli.core.utils.UserUtil;
 
 import javax.annotation.PostConstruct;
 import java.lang.reflect.ParameterizedType;
-import java.util.Arrays;
+import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.List;
 
@@ -31,21 +38,33 @@ import java.util.List;
  *
  * 没有 直接用一个save类的原因，可能是觉得 新增和修改分开一些会比较好 防止串了数据
  *
+ * 批量查询  做了多租户判断
+ * 单独按照ID查询数据 和 按照ID修改、删除数据 隔离级别暂时不需要
+ * 既然能从page列表中看到的数据 则是这个租户的数据
+ *
  */
 @Slf4j
 public abstract class CrudServiceImpl<M extends BaseMapper<T>, E extends ApiWrapper, T extends BaseEntity>
         extends BaseService<M, T> implements CrudServiceInterface<E,T> {
 
-    /** entity Class 类 */
-    protected Class<T> entityClazz;
 
-    /** entity Class 类 */
+    /** Model Clazz 类 */
     protected Class<E> modelClazz;
+    /** Model 泛型游标 */
+    private static final int modelIndex = 1;
+    /** Entity Clazz 类 */
+    protected Class<T> entityClazz;
+    /** Entity 泛型游标 */
+    private static final int entityIndex = 2;
+
+
+    /** 多租户状态  */
+    protected boolean tenantFlag = false;
 
     @Override
     public E get(String id) {
         return transformT2M(
-                baseMapper.selectById(id)
+                super.getById(id)
         );
     }
 
@@ -53,7 +72,7 @@ public abstract class CrudServiceImpl<M extends BaseMapper<T>, E extends ApiWrap
     public E get(E model) {
         if(model == null)  return null;
         return transformT2M(
-                baseMapper.selectById(model.getId())
+                super.getById(model.getId())
         );
     }
 
@@ -61,8 +80,8 @@ public abstract class CrudServiceImpl<M extends BaseMapper<T>, E extends ApiWrap
     public E insert(E model) {
         if(model == null) return null;
         T entity = transformM2T(model);
-        int count = baseMapper.insert(entity);
-        if(count > 0){
+        boolean ret = super.save(entity);
+        if(ret){
             return transformT2M(entity);
         }
         return null;
@@ -72,44 +91,78 @@ public abstract class CrudServiceImpl<M extends BaseMapper<T>, E extends ApiWrap
     public E update(E model) {
         if(model == null) return null;
         T entity = transformM2T(model);
-        int count = baseMapper.updateById(entity);
-        if(count > 0){
+        boolean ret = super.updateById(entity);
+        if(ret){
             return transformT2M(entity);
         }
         return null;
     }
 
     @Override
-    public int delete(String id) {
-        return baseMapper.deleteById(id);
+    public boolean delete(String id) {
+        return super.removeById(id);
     }
 
     @Override
-    public int delete(E model) {
-        if(model == null) return 0;
-        return baseMapper.deleteById(model.getId());
+    public boolean delete(E model) {
+        if(model == null) return false;
+        return super.removeById(model.getId());
     }
 
     @Override
-    public int deleteAll(String[] ids) {
-        if(ids == null) return 0;
-        List<String> idList = Arrays.asList(ids);
-        return baseMapper.deleteBatchIds(idList);
+    public boolean deleteAll(String[] ids) {
+        if(ids == null) return false;
+        List<String> idList = Convert.toList(String.class, ids);
+        return super.removeByIds(idList);
     }
 
     @Override
-    public int deleteAll(Collection<E> models) {
-        if(models == null || models.isEmpty()) return 0;
+    public boolean deleteAll(Collection<E> models) {
+        if(models == null || models.isEmpty()) return false;
         List<String> idList = Lists.newArrayListWithCapacity(models.size());
         for (E entity : models) {
             idList.add(entity.getId());
         }
-        return baseMapper.deleteBatchIds(idList);
+        return super.removeByIds(idList);
     }
 
     @Override
-    public List<E> findList(E model) {
-        return null;
+    public List<T> findList(QueryWrapper<T> queryWrapper) {
+        // 判断多租户
+        if(this.tenantFlag) {
+            String tenantId = UserUtil.getTenantId();
+            if (StringUtils.isNotEmpty(tenantId)) {
+                queryWrapper.eq(HumpUtil.humpToUnderline(MyBatisConstants.FIELD_TENANT), tenantId);
+            }
+        }
+        return super.list(queryWrapper);
+    }
+
+    @Override
+    public List<T> findAllList() {
+        QueryWrapper<T> queryWrapper = new QueryWrapper<>();
+        // 判断多租户
+        if(this.tenantFlag){
+            String tenantId = UserUtil.getTenantId();
+            if(StringUtils.isNotEmpty(tenantId)){
+                queryWrapper.eq(HumpUtil.humpToUnderline(MyBatisConstants.FIELD_TENANT), tenantId);
+            }
+        }
+        return super.list(queryWrapper);
+    }
+
+    @Override
+    public Page<E,T> findPage(Page<E,T> page) {
+        page.pageHelperBegin();
+        try{
+            List<T> list = this.findList(page.getQueryWrapper());
+            List<E> es = WrapperUtil.transformInstance(list, modelClazz);
+            PageInfo<E> pageInfo = new PageInfo<>(es);
+            page.instance(pageInfo);
+        } finally {
+            page.pageHelperEnd();
+        }
+        return page;
     }
 
     // ======================== 对象转化 ========================
@@ -164,17 +217,24 @@ public abstract class CrudServiceImpl<M extends BaseMapper<T>, E extends ApiWrap
         try {
             this.modelClazz = this.getModelClass();
             this.entityClazz = this.getEntityClass();
+            // 多租户判断
+            this.tenantFlag = ReflectUtil.hasField(entityClazz, MyBatisConstants.FIELD_TENANT);
         }catch (Exception e){
             log.error(e.getMessage(),e);
         }
     }
+
 
     /**
      * 获得 泛型 Clazz
      * @return
      */
     private Class<E> getModelClass(){
-        Class<E> tClass = (Class<E>)((ParameterizedType)getClass().getGenericSuperclass()).getActualTypeArguments()[1];
+        Class<E> tClass = null;
+        Type typeArgument = TypeUtil.getTypeArgument(getClass().getGenericSuperclass(), modelIndex);
+        if(typeArgument != null){
+            tClass = (Class<E>) typeArgument;
+        }
         return tClass;
     }
 
@@ -183,7 +243,11 @@ public abstract class CrudServiceImpl<M extends BaseMapper<T>, E extends ApiWrap
      * @return
      */
     private Class<T> getEntityClass(){
-        Class<T> tClass = (Class<T>)((ParameterizedType)getClass().getGenericSuperclass()).getActualTypeArguments()[2];
+        Class<T> tClass = null;
+        Type typeArgument = TypeUtil.getTypeArgument(getClass().getGenericSuperclass(), entityIndex);
+        if(typeArgument != null){
+            tClass = (Class<T>) typeArgument;
+        }
         return tClass;
     }
 

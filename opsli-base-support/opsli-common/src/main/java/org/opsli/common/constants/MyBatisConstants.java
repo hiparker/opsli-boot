@@ -20,7 +20,8 @@ public final class MyBatisConstants {
     public static final char  LOGIC_NOT_DELETE_VALUE =
             prop.getChar("mybatis-plus.global-config.db-config.logic-not-delete-value",'0');
 
-
+    /** ID */
+    public static final String FIELD_ID = "id";
     /** 创建人 */
     public static final String FIELD_CREATE_BY = "createBy";
     /** 更新时间 */
@@ -33,6 +34,8 @@ public final class MyBatisConstants {
     public static final String FIELD_DELETE_LOGIC = "deleted";
     /** 乐观锁 */
     public static final String FIELD_OPTIMISTIC_LOCK = "version";
+    /** 多租户字段 */
+    public static final String FIELD_TENANT = "tenantId";
 
     private MyBatisConstants(){}
 }

@@ -1,6 +1,7 @@
 package org.opsli.core.base.concroller;
 
 
+import cn.hutool.core.util.TypeUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.opsli.api.base.warpper.ApiWrapper;
@@ -17,7 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.PostConstruct;
-import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 
 /**
  * @BelongsProject: opsli-boot
@@ -38,8 +39,12 @@ public abstract class BaseRestController <E extends ApiWrapper, T extends BaseEn
 
     /** Model Clazz 类 */
     protected Class<E> modelClazz;
+    /** Model 泛型游标 */
+    private static final int modelIndex = 0;
     /** Entity Clazz 类 */
     protected Class<T> entityClazz;
+    /** Entity 泛型游标 */
+    private static final int entityIndex = 1;
 
     @Autowired(required = false)
     protected S IService;
@@ -69,6 +74,8 @@ public abstract class BaseRestController <E extends ApiWrapper, T extends BaseEn
             if(model != null){
                 // 如果开启缓存 将数据库查询对象 存如缓存
                 if(hotDataFlag){
+                    // 这里会 同步更新到本地Ehcache 和 Redis缓存
+                    // 如果其他服务器缓存也丢失了 则 回去Redis拉取
                     CacheUtil.put(id, model);
                 }
             }
@@ -127,7 +134,11 @@ public abstract class BaseRestController <E extends ApiWrapper, T extends BaseEn
      * @return
      */
     private Class<E> getModelClass(){
-        Class<E> tClass = (Class<E>)((ParameterizedType)getClass().getGenericSuperclass()).getActualTypeArguments()[0];
+        Class<E> tClass = null;
+        Type typeArgument = TypeUtil.getTypeArgument(getClass().getGenericSuperclass(), modelIndex);
+        if(typeArgument != null){
+            tClass = (Class<E>) typeArgument;
+        }
         return tClass;
     }
 
@@ -136,7 +147,11 @@ public abstract class BaseRestController <E extends ApiWrapper, T extends BaseEn
      * @return
      */
     private Class<T> getEntityClass(){
-        Class<T> tClass = (Class<T>)((ParameterizedType)getClass().getGenericSuperclass()).getActualTypeArguments()[1];
+        Class<T> tClass = null;
+        Type typeArgument = TypeUtil.getTypeArgument(getClass().getGenericSuperclass(), entityIndex);
+        if(typeArgument != null){
+            tClass = (Class<T>) typeArgument;
+        }
         return tClass;
     }
 
