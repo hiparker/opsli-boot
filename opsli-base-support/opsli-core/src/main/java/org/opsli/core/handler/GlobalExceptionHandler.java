@@ -31,11 +31,9 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ServiceException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ResponseBody
-    public ResultVo bussinessException(ServiceException e) {
+    public ResultVo<?> bussinessException(ServiceException e) {
         log.warn("业务异常 - 异常编号：{} - 异常信息：{}",e.getCode(),e.getMessage());
-        ResultVo errorR = ResultVo.error(e.getMessage());
-        errorR.setCode(e.getCode());
-        return errorR;
+        return ResultVo.error(e.getCode(), e.getMessage());
     }
 
     /**
@@ -44,10 +42,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(EmptyException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ResponseBody
-    public ResultVo emptyException(EmptyException e) {
-        ResultVo errorR = ResultVo.error(e.getMessage());
-        errorR.setCode(e.getCode());
-        return errorR;
+    public ResultVo<?> emptyException(EmptyException e) {
+        return ResultVo.error(e.getCode(), e.getMessage());
     }
 
     /**
@@ -56,10 +52,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(NullPointerException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ResponseBody
-    public ResultVo nullPointerException(EmptyException e) {
-        ResultVo errorR = ResultVo.error(e.getMessage());
-        errorR.setCode(e.getCode());
-        return errorR;
+    public ResultVo<?> nullPointerException(EmptyException e) {
+        return ResultVo.error(e.getCode(), e.getMessage());
     }
 
     /**
@@ -68,11 +62,9 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(SQLIntegrityConstraintViolationException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ResponseBody
-    public ResultVo sqlIntegrityConstraintViolationException(EmptyException e) {
+    public ResultVo<?> sqlIntegrityConstraintViolationException(EmptyException e) {
         log.error("数据异常：{}",e.getMessage(),e);
-        ResultVo errorR = ResultVo.error(CoreMsg.SQL_EXCEPTION_INTEGRITY_CONSTRAINT_VIOLATION.getMessage());
-        errorR.setCode(e.getCode());
-        return errorR;
+        return ResultVo.error(e.getCode(), CoreMsg.SQL_EXCEPTION_INTEGRITY_CONSTRAINT_VIOLATION.getMessage());
     }
 
 
