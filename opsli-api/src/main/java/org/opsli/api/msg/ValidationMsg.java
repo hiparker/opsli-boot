@@ -1,0 +1,80 @@
+package org.opsli.api.msg;
+
+import org.opsli.common.base.msg.BaseMsg;
+
+/**
+ * @BelongsProject: opsli-boot
+ * @BelongsPackage: org.opsli.core.msg
+ * @Author: Parker
+ * @CreateTime: 2020-09-13 19:36
+ * @Description: 参数验证 - 消息
+ */
+public enum ValidationMsg implements BaseMsg {
+
+    /** 不能为空 */
+    EXCEPTION_IS_NOT_NULL(9800,"不能为空! "),
+    /** 字母，数字和下划线 */
+    EXCEPTION_IS_GENERAL(9801,"不是字母，数字或下划线! "),
+    /** 数字 */
+    EXCEPTION_IS_NUMBER(9802,"不是数字! "),
+    /** 纯字母 */
+    EXCEPTION_IS_LETTER(9803,"不是纯字母! "),
+    /** 大写 */
+    EXCEPTION_IS_UPPER_CASE(9804,"不是大写字母! "),
+    /** 小写 */
+    EXCEPTION_IS_LOWER_CASE(9805,"不是小写字母! "),
+    /** ip4 */
+    EXCEPTION_IS_IPV4(9806,"不是IPV4地址! "),
+    /** 金额 */
+    EXCEPTION_IS_MONEY(9807,"不是金额! "),
+    /** 邮箱 */
+    EXCEPTION_IS_EMAIL(9808,"不是邮箱! "),
+    /** 手机号 */
+    EXCEPTION_IS_MOBILE(9809,"不是手机号! "),
+    /** 18位身份证 */
+    EXCEPTION_IS_CITIZENID(9810,"不是18位身份证! "),
+    /** 邮编 */
+    EXCEPTION_IS_ZIPCODE(9811,"不是邮编! "),
+    /** URL */
+    EXCEPTION_IS_URL(9812,"不是URL! "),
+    /** 汉字 */
+    EXCEPTION_IS_CHINESE(9813,"不是汉字! "),
+    /** 汉字，字母，数字和下划线 */
+    EXCEPTION_IS_GENERAL_WITH_CHINESE(9814,"不是汉字，字母，数字和下划线! "),
+    /** MAC地址 */
+    EXCEPTION_IS_MAC(9815,"不是MAC地址! "),
+    /** 中国车牌 */
+    EXCEPTION_IS_PLATE_NUMBER(9816,"不是中国车牌! "),
+
+    /** 超出最大长度 */
+    EXCEPTION_IS_MAX(9816,"超出最大长度! "),
+
+    /** 小于最小长度 */
+    EXCEPTION_IS_MIN(9816,"小于最小长度! "),
+
+    ;
+
+    private static final String PREFIX = "参数验证错误: ";
+    private int code;
+    private String fieldName;
+    private String message;
+
+    ValidationMsg(int code, String message){
+        this.code = code;
+        this.message = message;
+    }
+
+    public void setFieldName(String fieldName) {
+        this.fieldName = fieldName;
+    }
+
+    @Override
+    public Integer getCode() {
+        return this.code;
+    }
+
+    @Override
+    public String getMessage() {
+        return PREFIX + this.fieldName + "，" + this.message;
+    }
+}

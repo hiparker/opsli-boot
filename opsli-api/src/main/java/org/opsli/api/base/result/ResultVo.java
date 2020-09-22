@@ -156,6 +156,7 @@ public class ResultVo<T> implements Serializable {
 		ResultVo<Object> ret = new ResultVo<>();
 		ret.setMsg(msg);
 		ret.setCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
+		ret.setSuccess(false);
 		return ret;
 	}
 
@@ -170,6 +171,7 @@ public class ResultVo<T> implements Serializable {
 		ResultVo<Object> ret = new ResultVo<>();
 		ret.setMsg(msg);
 		ret.setCode(code);
+		ret.setSuccess(false);
 		return ret;
 	}
 
@@ -186,6 +188,7 @@ public class ResultVo<T> implements Serializable {
 		ret.setMsg(msg);
 		ret.setCode(code);
 		ret.put(data);
+		ret.setSuccess(false);
 		return ret;
 	}
 
