@@ -2,6 +2,7 @@ package org.opsli.core.cache.local;
 
 import cn.hutool.core.util.XmlUtil;
 import com.alibaba.fastjson.JSONObject;
+import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -15,6 +16,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import java.util.List;
 
 
 /**
@@ -35,6 +38,9 @@ import org.w3c.dom.NodeList;
 @Slf4j
 @Component
 public class CacheUtil {
+
+    /** 空状态 key 前缀 */
+    private static final String NIL_FLAG_PREFIX = "opsli:nil:";
 
     /** 热点数据缓存时间 秒 */
     private static int ttlHotData;
@@ -73,27 +79,170 @@ public class CacheUtil {
     public static <V> V getByKeyOriginal(String key, Class<V> vClass){
         return CacheUtil.get(CacheConstants.HOT_DATA,key,vClass,false);
     }
-    private static <V> V get(String cacheName, String key, Class<V> vClass,boolean keyFlag){
-        String KeyOriginal = key;
+
+
+    /**
+     * 取缓存 - 永久
+     * Key 程序自处理
+     * 比如：jksahdjh1j1hjk1
+     *
+     * @param key 键
+     * @param vClass 转换类型
+     * @return V
+     */
+    public static <V> V getEden(String key, Class<V> vClass){
+        return CacheUtil.get(CacheConstants.EDEN_DATA,key,vClass,true);
+    }
+
+    /**
+     * 取缓存 - 永久
+     * Key 程序不处理
+     * 比如：源Key opsli:hotData:ahdjksahjkd1
+     *
+     * @param key 键
+     * @param vClass 转换类型
+     * @return V
+     */
+    public static <V> V getEdenByKeyOriginal(String key, Class<V> vClass){
+        return CacheUtil.get(CacheConstants.EDEN_DATA,key,vClass,false);
+    }
+
+    /**
+     * 取Hash缓存
+     * Key 程序自处理
+     * 比如：jksahdjh1j1hjk1
+     *
+     * @param key 键
+     * @param field 字段
+     * @param vClass 转换类型
+     * @return V
+     */
+    public static <V> V getHash(String key, String field, Class<V> vClass){
+        return CacheUtil.getHash(CacheConstants.EDEN_HASH_DATA,key,field,vClass,true);
+    }
+
+    /**
+     * 取Hash缓存
+     * Key 程序不处理
+     * 比如：源Key opsli:hotData:ahdjksahjkd1
+     *
+     * @param key 键
+     * @param field 字段
+     * @param vClass 转换类型
+     * @return V
+     */
+    public static <V> V getHashByKeyOriginal(String key, String field, Class<V> vClass){
+        return CacheUtil.getHash(CacheConstants.EDEN_HASH_DATA,key,field,vClass,false);
+    }
+
+    /**
+     * 取缓存 - 集合
+     * Key 程序自处理
+     * 比如：jksahdjh1j1hjk1
+     *
+     * @param keys 键 - 集合
+     * @param vClass 转换类型
+     * @return V
+     */
+    public static <V> List<V> getAll(List<String> keys, Class<V> vClass){
+        return CacheUtil.getAll(CacheConstants.HOT_DATA,keys,vClass,true);
+    }
+
+    /**
+     * 取缓存 - 集合
+     * Key 程序不处理
+     * 比如：源Key opsli:hotData:ahdjksahjkd1
+     *
+     * @param keys 键 - 集合
+     * @param vClass 转换类型
+     * @return V
+     */
+    public static <V> List<V> getAllByKeyOriginal(List<String> keys, Class<V> vClass){
+        return CacheUtil.getAll(CacheConstants.HOT_DATA,keys,vClass,false);
+    }
+
+    /**
+     * 取缓存 - 永久 - 集合
+     * Key 程序自处理
+     * 比如：jksahdjh1j1hjk1
+     *
+     * @param keys 键 - 集合
+     * @param vClass 转换类型
+     * @return V
+     */
+    public static <V> List<V> getEdenAll(List<String> keys, Class<V> vClass){
+        return CacheUtil.getAll(CacheConstants.EDEN_DATA,keys,vClass,true);
+    }
+
+    /**
+     * 取缓存 - 永久 -集合
+     * Key 程序不处理
+     * 比如：源Key opsli:hotData:ahdjksahjkd1
+     *
+     * @param keys 键 - 集合
+     * @param vClass 转换类型
+     * @return V
+     */
+    public static <V> List<V> getEdenAllByKeyOriginal(List<String> keys, Class<V> vClass){
+        return CacheUtil.getAll(CacheConstants.EDEN_DATA,keys,vClass,false);
+    }
+
+    /**
+     * 取Hash缓存
+     * Key 程序自处理
+     * 比如：jksahdjh1j1hjk1
+     *
+     * @param key 键
+     * @param fields 字段集合
+     * @param vClass 转换类型
+     * @return V
+     */
+    public static <V> List<V> getHashAll(String key, List<String> fields, Class<V> vClass){
+        return CacheUtil.getHashAll(CacheConstants.EDEN_HASH_DATA,key,fields,vClass,true);
+    }
+
+    /**
+     * 取Hash缓存
+     * Key 程序不处理
+     * 比如：源Key opsli:hotData:ahdjksahjkd1
+     *
+     * @param key 键
+     * @param fields 字段集合
+     * @param vClass 转换类型
+     * @return V
+     */
+    public static <V> List<V> getHashAllByKeyOriginal(String key, List<String> fields, Class<V> vClass){
+        return CacheUtil.getHashAll(CacheConstants.EDEN_HASH_DATA,key,fields,vClass,false);
+    }
+
+
+    /**
+     * 获得 Hash 缓存
+     * @param cacheName 主缓存名
+     * @param key 键
+     * @param field 字段名
+     * @param vClass Clazz 反射
+     * @param keyFlag 是否处理key
+     * @param <V> 泛型
+     * @return
+     */
+    private static <V> V getHash(String cacheName, String key, String field, Class<V> vClass,boolean keyFlag){
         // 自动处理 key
         if(keyFlag){
-            StringBuilder keyBuf = new StringBuilder(CacheDataAop.PREFIX_NAME);
-            keyBuf.append(cacheName).append(":");
-            keyBuf.append(key);
-            key = keyBuf.toString();
+            key = CacheUtil.handleKey(cacheName, key);
         }
         V v = null;
         try {
             JSONObject jsonObject;
-            jsonObject = ehCachePlugin.get(cacheName, key, JSONObject.class);
+            jsonObject = ehCachePlugin.get(CacheConstants.HOT_DATA, key+":"+field, JSONObject.class);
             // 如果本地缓存为空 则去Redis中 再去取一次
             if(jsonObject != null){
                 v = jsonObject.toJavaObject(vClass);
             }else{
-                jsonObject = (JSONObject) redisPlugin.get(key);
+                jsonObject = (JSONObject) redisPlugin.hGet(key,field);
                 if(jsonObject != null){
                     // 存入EhCache
-                    ehCachePlugin.put(CacheConstants.HOT_DATA, KeyOriginal, jsonObject);
+                    ehCachePlugin.put(CacheConstants.HOT_DATA, key+":"+field, jsonObject);
                     v = jsonObject.toJavaObject(vClass);
                 }
             }
@@ -104,6 +253,126 @@ public class CacheUtil {
     }
 
 
+    /**
+     * 获得 Hash 缓存
+     * @param cacheName 主缓存名
+     * @param key 键
+     * @param vClass Clazz 反射
+     * @param keyFlag 是否处理key
+     * @param <V> 泛型
+     * @return
+     */
+    private static <V> V get(String cacheName, String key, Class<V> vClass,boolean keyFlag){
+        // 自动处理 key
+        if(keyFlag){
+            key = CacheUtil.handleKey(cacheName, key);
+        }
+        V v = null;
+        try {
+            JSONObject jsonObject;
+            jsonObject = ehCachePlugin.get(CacheConstants.HOT_DATA, key, JSONObject.class);
+            // 如果本地缓存为空 则去Redis中 再去取一次
+            if(jsonObject != null){
+                v = jsonObject.toJavaObject(vClass);
+            }else{
+                jsonObject = (JSONObject) redisPlugin.get(key);
+                if(jsonObject != null){
+                    // 存入EhCache
+                    ehCachePlugin.put(CacheConstants.HOT_DATA, key, jsonObject);
+                    v = jsonObject.toJavaObject(vClass);
+                }
+            }
+        }catch (Exception e){
+            log.error(e.getMessage(),e);
+        }
+        return v;
+    }
+
+    /**
+     * 获得 缓存 - 集合
+     * @param cacheName 主缓存名
+     * @param keys 键
+     * @param vClass Clazz 反射
+     * @param keyFlag 是否处理key
+     * @param <V> 泛型
+     * @return
+     */
+    private static <V> List<V> getAll(String cacheName, List<String> keys, Class<V> vClass, boolean keyFlag){
+        List<V> vs = Lists.newArrayList();
+        try {
+
+            List<String> nokeys = Lists.newArrayList();
+            for (String key : keys) {
+                // 自动处理 key
+                if(keyFlag){
+                    key = CacheUtil.handleKey(cacheName, key);
+                }
+                JSONObject jsonObject;
+                jsonObject = ehCachePlugin.get(CacheConstants.HOT_DATA, key, JSONObject.class);
+                if(jsonObject != null){
+                    vs.add(jsonObject.toJavaObject(vClass));
+                } else {
+                    nokeys.add(key);
+                }
+            }
+            // 如果本地缓存为空 则去Redis中 再去取一次
+            if(nokeys.size() > 0){
+                List<Object> objs =  redisPlugin.getAll(nokeys);
+                for (Object obj : objs) {
+                    JSONObject jsonObject = (JSONObject) obj;
+                    if(jsonObject != null){
+                        vs.add(jsonObject.toJavaObject(vClass));
+                    }
+                }
+            }
+        }catch (Exception e){
+            log.error(e.getMessage(),e);
+        }
+        return vs;
+    }
+
+    /**
+     * 获得 Hash 缓存 - 集合
+     * @param cacheName 主缓存名
+     * @param key 键
+     * @param fields 字段集合
+     * @param vClass Clazz 反射
+     * @param keyFlag 是否处理key
+     * @param <V> 泛型
+     * @return
+     */
+    private static <V> List<V> getHashAll(String cacheName,String key,List<String> fields, Class<V> vClass, boolean keyFlag){
+        // 自动处理 key
+        if(keyFlag){
+            key = CacheUtil.handleKey(cacheName, key);
+        }
+        List<V> vs = Lists.newArrayList();
+        try {
+            List<Object> nofields = Lists.newArrayList();
+            for (String field : fields) {
+                JSONObject jsonObject;
+                jsonObject = ehCachePlugin.get(CacheConstants.HOT_DATA, key+":"+field, JSONObject.class);
+                if(jsonObject != null){
+                    vs.add(jsonObject.toJavaObject(vClass));
+                } else {
+                    nofields.add(field);
+                }
+            }
+            // 如果本地缓存为空 则去Redis中 再去取一次
+            if(nofields.size() > 0){
+                List<Object> objs =  redisPlugin.hMultiGet(key, nofields);
+                for (Object obj : objs) {
+                    JSONObject jsonObject = (JSONObject) obj;
+                    if(jsonObject != null){
+                        vs.add(jsonObject.toJavaObject(vClass));
+                    }
+                }
+            }
+        }catch (Exception e){
+            log.error(e.getMessage(),e);
+        }
+        return vs;
+    }
 
     // ========================= PUT - 热点区 =========================
 
@@ -164,15 +433,90 @@ public class CacheUtil {
         return CacheUtil.put(CacheConstants.EDEN_DATA, key, value, null, false, false);
     }
 
+    // ========================= PUT - 永久代 =========================
+
+    /**
+     * 存Hash缓存 - 永久代
+     * 注：这里是存入Redis永久代，本地EhCache做临时缓存
+     * Redis不是垃圾桶 谨用 永久缓存
+     *
+     * @param key 键
+     * @param value 值
+     * @return boolean
+     */
+    @Deprecated
+    public static boolean putEdenHash(String key, String field, Object value) {
+        return CacheUtil.putEdenHash(CacheConstants.EDEN_HASH_DATA, key, field, value, true);
+    }
+
+    /**
+     * 存Hash缓存 - 永久代
+     * 注：这里是存入Redis永久代，本地EhCache做临时缓存
+     * Redis不是垃圾桶 谨用 永久缓存
+     *
+     * @param key 键
+     * @param value 值
+     * @return boolean
+     */
+    @Deprecated
+    public static boolean putEdenHashByKeyOriginal(String key, String field, Object value) {
+        return CacheUtil.putEdenHash(CacheConstants.EDEN_HASH_DATA, key, field, value, false);
+    }
+
+
+
+    /**
+     * 存 Hash 缓存
+     * @param cacheName 主缓存名
+     * @param key 键
+     * @param field 字段名
+     * @param value 值
+     * @param keyFlag 处理key
+     * @return
+     */
+    private static boolean putEdenHash(String cacheName, String key, String field, Object value, boolean keyFlag) {
+        boolean ret = false;
+        try {
+            // 自动处理 key
+            if(keyFlag){
+                key = CacheUtil.handleKey(cacheName, key);
+            }
+
+            // 如果不是 JSONObject 则统一转换为 JSONObject
+            if(!(value instanceof JSONObject)){
+                String jsonStr = JSONObject.toJSONString(value);
+                value = JSONObject.parseObject(jsonStr);
+            }
+
+            // 存入EhCache
+            ehCachePlugin.put(CacheConstants.HOT_DATA, key+":"+field, value);
+
+            // 存入Redis
+            redisPlugin.hPut(key, field, value);
+
+            ret = true;
+        }catch (Exception e){
+            log.error(e.getMessage(),e);
+        }
+        return ret;
+    }
+
+    /**
+     * 存普通缓存
+     * @param cacheName 主缓存名
+     * @param key 键
+     * @param value 值
+     * @param timeout 有效时间
+     * @param timeFlag 是否开启时间
+     * @param keyFlag 处理key
+     * @return
+     */
     private static boolean put(String cacheName, String key, Object value,Integer timeout, boolean timeFlag, boolean keyFlag) {
         boolean ret = false;
         try {
             // 自动处理 key
             if(keyFlag){
-                StringBuilder keyBuf = new StringBuilder(CacheDataAop.PREFIX_NAME);
-                keyBuf.append(cacheName).append(":");
-                keyBuf.append(key);
-                key = keyBuf.toString();
+                key = CacheUtil.handleKey(cacheName, key);
             }
 
             // 如果不是 JSONObject 则统一转换为 JSONObject
@@ -212,15 +556,100 @@ public class CacheUtil {
     // ========================= DEL - 删除 =========================
 
     /**
-     * 删缓存
+     * 删缓存 热点数据
+     *
+     * Key 程序自处理
+     * 比如：源Key opsli:hotData:ahdjksahjkd1
      *
      * @param key 键
      * @return boolean
      */
     public static boolean del(String key) {
+        return CacheUtil.del(CacheConstants.HOT_DATA, key, true);
+    }
+
+    /**
+     * 删缓存 热点数据
+     *
+     * Key 程序不处理
+     * 比如：源Key opsli:hotData:ahdjksahjkd1
+     *
+     * @param key 键
+     * @return boolean
+     */
+    public static boolean delByKeyOriginal(String key) {
+        return CacheUtil.del(CacheConstants.HOT_DATA, key, false);
+    }
+
+    /**
+     * 删 永久Hash 缓存
+     *
+     * Key 程序自处理
+     * 比如：源Key opsli:hotData:ahdjksahjkd1
+     *
+     * @param key 键
+     * @param field 字段名
+     * @return boolean
+     */
+    public static boolean delEdenHash(String key, String field) {
+        return CacheUtil.delEdenHash(CacheConstants.EDEN_HASH_DATA, key, field, true);
+    }
+
+    /**
+     * 删 永久Hash 缓存
+     *
+     * Key 程序不处理
+     * 比如：源Key opsli:hotData:ahdjksahjkd1
+     *
+     * @param key 键
+     * @param field 字段名
+     * @return boolean
+     */
+    public static boolean delEdenHashByKeyOriginal(String key, String field) {
+        return CacheUtil.delEdenHash(CacheConstants.EDEN_HASH_DATA, key, field, false);
+    }
+
+    /**
+     * 删 永久 Hash 缓存
+     * @param cacheName 主缓存名
+     * @param key 键
+     * @param field 字段名
+     * @param keyFlag 是否处理Key
+     * @return boolean
+     */
+    private static boolean delEdenHash(String cacheName, String key, String field, boolean keyFlag) {
         boolean ret = false;
         try {
-            // 删除 EhCache
+            // 自动处理 key
+            if(keyFlag){
+                key = CacheUtil.handleKey(cacheName, key);
+            }
+            // 删除 EhCache 不论是什么 本地都按照热数据处理
+            ehCachePlugin.delete(CacheConstants.HOT_DATA,key+":"+field);
+            // 删除 Redis
+            redisPlugin.hDelete(key, field);
+            ret = true;
+        }catch (Exception e){
+            log.error(e.getMessage(),e);
+        }
+        return ret;
+    }
+
+    /**
+     * 删缓存
+     * @param cacheName 主缓存名
+     * @param key 键
+     * @param keyFlag 是否处理Key
+     * @return boolean
+     */
+    private static boolean del(String cacheName, String key, boolean keyFlag) {
+        boolean ret = false;
+        try {
+            // 自动处理 key
+            if(keyFlag){
+                key = CacheUtil.handleKey(cacheName, key);
+            }
+            // 删除 EhCache 不论是什么 本地都按照热数据处理
             ehCachePlugin.delete(CacheConstants.HOT_DATA,key);
             // 删除 Redis
             redisPlugin.del(key);
@@ -231,15 +660,63 @@ public class CacheUtil {
         return ret;
     }
 
+    // ====================================================================
 
+    /**
+     *  放一个空属性 有效时间为 5分钟
+     *  用于 防止穿透判断 弥补布隆过滤器
+     *
+     * @param key 键
+     * @return boolean
+     */
+    public static boolean putNilFlag(String key) {
+        boolean ret = false;
+        try {
+            // 存入Redis
+            redisPlugin.put(NIL_FLAG_PREFIX + key, 1, 300);
+            ret = true;
+        }catch (Exception e){
+            log.error(e.getMessage(),e);
+        }
+        return ret;
+    }
 
-
-
-
-
+    /**
+     *  获得一个空属性 有效时间为 5分钟
+     *  用于 防止穿透判断 弥补布隆过滤器
+     *
+     * @param key 键
+     * @return boolean
+     */
+    public static boolean hasNilFlag(String key) {
+        try {
+            // 存入Redis
+            Object o = redisPlugin.get(NIL_FLAG_PREFIX + key);
+            if(o != null){
+                return true;
+            }
+            return false;
+        }catch (Exception e){
+            log.error(e.getMessage(),e);
+        }
+        return false;
+    }
 
 
     // ====================================================================
+
+    /**
+     * 处理 key
+     * @param cacheName
+     * @param key
+     * @return
+     */
+    public static String handleKey(String cacheName, String key){
+        StringBuilder keyBuf = new StringBuilder(CacheDataAop.PREFIX_NAME);
+        keyBuf.append(cacheName).append(":");
+        keyBuf.append(key);
+        return keyBuf.toString();
+    }
 
     /**
      * 读配置文件
