@@ -23,6 +23,8 @@ import org.opsli.core.cache.local.CacheUtil;
 import org.opsli.core.msg.CoreMsg;
 import org.opsli.plugins.excel.ExcelUtil;
 import org.opsli.plugins.excel.exception.ExcelPluginException;
+import org.opsli.plugins.redis.RedisLockPlugins;
+import org.opsli.plugins.redis.lock.RedisLock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -64,7 +66,8 @@ public abstract class BaseRestController <E extends ApiWrapper, T extends BaseEn
 
     @Autowired(required = false)
     protected S IService;
-
+    @Autowired
+    private RedisLockPlugins redisLockPlugins;
 
     /**
      * 默认 直接设置 传入数据的
@@ -85,14 +88,46 @@ public abstract class BaseRestController <E extends ApiWrapper, T extends BaseEn
                     return model;
                 }
             }
-            // 如果缓存没读到 则去数据库读
-            model = WrapperUtil.transformInstance(IService.get(id),modelClazz);
-            if(model != null){
-                // 如果开启缓存 将数据库查询对象 存如缓存
+            // 防止缓存穿透判断
+            boolean hasNilFlag = false;
+            // 如果开启缓存 防止缓存穿透判断
+            if(hotDataFlag){
+                hasNilFlag = CacheUtil.hasNilFlag("get:" + id);
+            }
+            if(!hasNilFlag){
+                // 锁凭证 redisLock 贯穿全程
+                RedisLock redisLock = new RedisLock();
+                redisLock.setLockName("getLock:"+id)
+                        .setAcquireTimeOut(3000L)
+                        .setLockTimeOut(10000L);
+                // 这里增加分布式锁 防止缓存击穿
                 if(hotDataFlag){
-                    // 这里会 同步更新到本地Ehcache 和 Redis缓存
-                    // 如果其他服务器缓存也丢失了 则 回去Redis拉取
-                    CacheUtil.put(id, model);
+                    // 加锁
+                    redisLock = redisLockPlugins.tryLock(redisLock);
+                    if(redisLock == null){
+                        throw new ServiceException(CoreMsg.CACHE_PUNCTURE_EXCEPTION);
+                    }
+                    // 如果缓存没读到 则去数据库读
+                    model = WrapperUtil.transformInstance(IService.get(id),modelClazz);
+                    // 释放锁
+                    redisLockPlugins.unLock(redisLock);
+                    redisLock = null;
+                }else{
+                    // 如果缓存没读到 则去数据库读
+                    model = WrapperUtil.transformInstance(IService.get(id),modelClazz);
+                }
+
+                // 获得数据后处理
+                if(model != null){
+                    // 如果开启缓存 将数据库查询对象 存如缓存
+                    if(hotDataFlag){
+                        // 这里会 同步更新到本地Ehcache 和 Redis缓存
+                        // 如果其他服务器缓存也丢失了 则 回去Redis拉取
+                        CacheUtil.put(id, model);
+                    }
+                }else {
+                    // 设置空变量 用于防止穿透判断
+                    CacheUtil.putNilFlag("get:" + id);
                 }
             }
         }
@@ -153,7 +188,7 @@ public abstract class BaseRestController <E extends ApiWrapper, T extends BaseEn
      * @param response
      */
     protected ResultVo<?> importTemplate(String fileName, HttpServletResponse response){
-        return this.excelExport(fileName+" - 模版 ",null, response);
+        return this.excelExport(fileName + " 模版 ",null, response);
     }
 
     /**

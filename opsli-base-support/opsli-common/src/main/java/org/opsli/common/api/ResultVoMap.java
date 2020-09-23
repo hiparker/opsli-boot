@@ -15,10 +15,10 @@ import java.util.Map;
  * @author Parker
  * 
  */
-public class ResultVo extends HashMap<String,Object> implements Serializable {
+public class ResultVoMap extends HashMap<String,Object> implements Serializable {
  
  
-	public ResultVo(){
+	public ResultVoMap(){
 		this.put("success", true);
 		this.put("code", HttpStatus.OK.value());
 		this.put("msg", "操作成功");
@@ -57,39 +57,39 @@ public class ResultVo extends HashMap<String,Object> implements Serializable {
 	// -------------------------------------------
 
 	@JsonIgnore//返回对象时忽略此属性
-	public static ResultVo success(String msg) {
-		ResultVo j = new ResultVo();
+	public static ResultVoMap success(String msg) {
+		ResultVoMap j = new ResultVoMap();
 		j.setMsg(msg);
 		return j;
 	}
 	@JsonIgnore//返回对象时忽略此属性
-	public static ResultVo error(String msg) {
-		ResultVo j = new ResultVo();
+	public static ResultVoMap error(String msg) {
+		ResultVoMap j = new ResultVoMap();
 		j.setSuccess(false);
 		j.setMsg(msg);
 		return j;
 	}
 
 	@JsonIgnore//返回对象时忽略此属性
-	public static ResultVo success(Map<String, Object> map) {
-		ResultVo restResponse = new ResultVo();
+	public static ResultVoMap success(Map<String, Object> map) {
+		ResultVoMap restResponse = new ResultVoMap();
 		restResponse.putAll(map);
 		return restResponse;
 	}
 
 	@JsonIgnore//返回对象时忽略此属性
-	public static ResultVo success() {
-		return new ResultVo();
+	public static ResultVoMap success() {
+		return new ResultVoMap();
 	}
  
  
 	@Override
-	public ResultVo put(String key, Object value) {
+	public ResultVoMap put(String key, Object value) {
 		super.put(key, value);
 		return this;
 	}
  
-	public ResultVo putMap(Map m) {
+	public ResultVoMap putMap(Map m) {
 		super.putAll(m);
 		return this;
 	}

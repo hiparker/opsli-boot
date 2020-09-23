@@ -19,7 +19,7 @@
         </resources>
     </cache-template>
 
-    <!-- hotData 热点数据，它使用名为myDefaults的<cache-template>，并将其主键覆盖到更广泛的类型 -->
+    <!-- hotData 热点数据，它使用名为opsliDefaults的<cache-template>，并将其主键覆盖到更广泛的类型 -->
     <cache alias="hotData" uses-template="opsliDefaults">
         <!--缓存到期配置-->
         <expiry>

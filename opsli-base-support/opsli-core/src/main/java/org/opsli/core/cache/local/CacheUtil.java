@@ -682,6 +682,26 @@ public class CacheUtil {
     }
 
     /**
+     *  删除空属性
+     *  用于 防止穿透判断 弥补布隆过滤器
+     *
+     * @param key 键
+     * @return boolean
+     */
+    public static boolean delNilFlag(String key) {
+        boolean ret = false;
+        try {
+            // 存入Redis
+            redisPlugin.del(NIL_FLAG_PREFIX + key);
+            ret = true;
+        }catch (Exception e){
+            log.error(e.getMessage(),e);
+        }
+        return ret;
+    }
+
+
+    /**
      *  获得一个空属性 有效时间为 5分钟
      *  用于 防止穿透判断 弥补布隆过滤器
      *

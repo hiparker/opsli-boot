@@ -16,6 +16,9 @@ public enum CoreMsg implements BaseMsg {
     SQL_EXCEPTION_INSERT(10101,"新增数据失败，请稍后再次尝试！"),
     SQL_EXCEPTION_DELETE(10102,"删除数据失败，请稍后再次尝试！"),
     SQL_EXCEPTION_INTEGRITY_CONSTRAINT_VIOLATION(10105,"数据主键冲突或者已有该数据！"),
+    SQL_EXCEPTION_NOT_HAVE_DEFAULT_VALUE(10106,"数据异常：{} 字段没有默认值！"),
+    SQL_EXCEPTION_UNKNOWN(10106,"数据异常：未知异常，请联系系统管理员 {}"),
+
 
     /**
      * Redis
@@ -30,8 +33,12 @@ public enum CoreMsg implements BaseMsg {
     EXCEL_IMPORT_SUCCESS(10302,"EXCEL 导入成功！数据行数：{}  耗时(秒)：{}"),
     EXCEL_IMPORT_ERROR(10303,"Excel导入失败：{}  耗时(秒)：{}"),
     EXCEL_IMPORT_NO(10304,""),
-    EXCEL_FILE_NULL(10305,"请选择文件")
+    EXCEL_FILE_NULL(10305,"请选择文件"),
 
+    /**
+     * 缓存
+     */
+    CACHE_PUNCTURE_EXCEPTION(10405, "当期服务繁忙，客官请稍微再次尝试！")
     ;
 
     private int code;

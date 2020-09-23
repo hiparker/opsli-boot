@@ -1,11 +1,18 @@
 package org.opsli.modulars.test.web;
 
+import io.swagger.annotations.ApiOperation;
 import org.opsli.api.base.result.ResultVo;
 import org.opsli.api.web.test.TestApi;
 import org.opsli.api.wrapper.test.TestModel;
 import org.opsli.common.annotation.ApiRestController;
+import org.opsli.common.constants.CacheConstants;
+import org.opsli.core.cache.local.CacheUtil;
+import org.opsli.plugins.cache.EhCachePlugin;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -20,13 +27,22 @@ public class TestRestRestController2{
 
     @Autowired
     TestApi testApi;
+    @Autowired
+    EhCachePlugin ehCachePlugin;
 
-    @GetMapping("/insert2")
-    public ResultVo<TestModel> insert(){
-        for (int i = 0; i < 999; i++) {
-            testApi.insert(new TestModel());
+    @ApiOperation(value = "测试2", notes = "测试2")
+    @GetMapping("/getDictBy")
+    public ResultVo<?> t1(){
+        String id = "test";
+        List<TestModel> testModelList = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            TestModel testModel = new TestModel();
+            testModel.setId(id+i);
+            testModel.setName("测试数据"+i);
+            testModelList.add(testModel);
+            CacheUtil.put(id+i,testModel);
         }
-        return testApi.insert(new TestModel());
+        return ResultVo.success(testModelList);
     }
 
 

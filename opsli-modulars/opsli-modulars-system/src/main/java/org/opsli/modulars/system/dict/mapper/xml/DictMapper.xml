@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.opsli.modulars.system.dict.mapper.DictMapper">
+
+    <!-- 数据库字段 -->
+    <sql id="SysDictColumns">
+		a.id as id,
+
+		a.type_code as dictTypeCode,
+        a.type_name as dictTypeName,
+        a.iz_lock as izLock,
+        a.remark as remark,
+
+        a.create_by as createBy,
+        a.create_time as createTime,
+        a.update_by as updateBy,
+        a.update_time as updateTime,
+        a.version as version,
+        a.deleted as deleted
+	</sql>
+
+    <sql id="SysDictJoins">
+	</sql>
+
+    <select id="uniqueVerificationByCode" parameterType="SysDict" resultType="Integer">
+        select count(0)
+        from sys_dict a
+        where
+        a.type_code = #{typeCode}
+        and a.deleted = 0
+        <if test="id != null and id != ''">
+            AND a.id != #{id}
+        </if>
+    </select>
+
+</mapper>

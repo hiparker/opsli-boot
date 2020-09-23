@@ -101,9 +101,9 @@ public class RedisPushSubReceiver extends BaseReceiver {
         String type = (String) msgJson.get(BaseSubMessage.BASE_TYPE);
         String identifier = (String) msgJson.get(BaseSubMessage.BASE_ID);
         // 本机不广播
-        if(SystemInfo.INSTANCE.getSystemID().equals(identifier)){
-            return;
-        }
+//        if(SystemInfo.INSTANCE.getSystemID().equals(identifier)){
+//            return;
+//        }
         PushSubType pt = PushSubType.valueOf(type);
         RedisPushSubHandler redisPushSubHandler = HANDLER_MAP.get(pt);
         if(redisPushSubHandler == null){

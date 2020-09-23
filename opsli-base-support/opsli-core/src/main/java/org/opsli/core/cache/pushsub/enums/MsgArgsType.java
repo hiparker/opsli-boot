@@ -9,13 +9,13 @@ package org.opsli.core.cache.pushsub.enums;
  */
 public enum MsgArgsType {
 
-    /** 字典Key */
-    DICT_KEY,
-    /** 字典Field */
-    DICT_FIELD,
-    /** 字典Value */
-    DICT_VALUE,
-    /** 字典Value */
+    /** 字典模型 */
+    DICT_MODEL,
+    /** 字典模型-集合 */
+    DICT_MODELS,
+    /** 字典模型-传输类型 */
+    DICT_MODEL_TYPE,
+    /** 字典操作类型 */
     DICT_TYPE,
 
     /** 缓存数据Key */

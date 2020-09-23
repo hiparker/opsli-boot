@@ -1,20 +1,24 @@
 package org.opsli.modulars.test.web;
 
 import cn.hutool.core.thread.ThreadUtil;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.opsli.api.base.result.ResultVo;
 import org.opsli.api.web.test.TestApi;
+import org.opsli.api.wrapper.system.dict.DictModel;
 import org.opsli.api.wrapper.test.TestModel;
 import org.opsli.common.annotation.ApiRestController;
 import org.opsli.common.utils.WrapperUtil;
 import org.opsli.core.base.concroller.BaseRestController;
+import org.opsli.core.cache.local.CacheUtil;
 import org.opsli.core.cache.pushsub.enums.CacheType;
 import org.opsli.core.cache.pushsub.msgs.DictMsgFactory;
 import org.opsli.core.persistence.Page;
-import org.opsli.core.persistence.PageQueryBuilder;
+import org.opsli.core.persistence.querybuilder.QueryBuilder;
+import org.opsli.core.persistence.querybuilder.WebQueryBuilder;
+import org.opsli.core.utils.DictUtil;
 import org.opsli.modulars.test.entity.TestEntity;
 import org.opsli.modulars.test.service.ITestService;
 import org.opsli.plugins.mail.MailPlugin;
@@ -24,6 +28,8 @@ import org.opsli.plugins.redis.RedisPlugin;
 import org.opsli.plugins.redis.lock.RedisLock;
 import org.opsli.plugins.redis.pushsub.entity.BaseSubMessage;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import javax.servlet.http.HttpServletRequest;
@@ -77,8 +83,9 @@ public class TestRestRestController extends BaseRestController<TestModel, TestEn
     @ApiOperation(value = "发送 Redis 订阅消息", notes = "发送 Redis 订阅消息")
     @Override
     public ResultVo<?> sendMsg(){
+        DictModel model = new DictModel();
 
-        BaseSubMessage msg = DictMsgFactory.createMsg("test", "aaa", 123213, CacheType.UPDATE);
+        BaseSubMessage msg = DictMsgFactory.createMsg(model, CacheType.UPDATE);
 
         boolean ret = redisPlugin.sendMessage(msg);
         if(ret){
@@ -130,7 +137,7 @@ public class TestRestRestController extends BaseRestController<TestModel, TestEn
 
         redisLockPlugins.unLock(redisLock);
         ResultVo<RedisLock> success = ResultVo.success("获得锁成功！！！！！！",redisLock);
-        success.put(redisLock);
+        success.setData(redisLock);
         return success;
     }
 
@@ -238,11 +245,13 @@ public class TestRestRestController extends BaseRestController<TestModel, TestEn
 
     @ApiOperation(value = "查找一个集合", notes = "查找一个集合")
     @Override
-    public ResultVo<List<TestModel>> findList() {
-        QueryWrapper<TestEntity> queryWrapper = new QueryWrapper<>();
-        List<TestEntity> list = IService.findList(queryWrapper);
-        List<TestModel> testModels = WrapperUtil.transformInstance(list, TestModel.class);
-        return ResultVo.success(testModels);
+    public ResultVo<List<TestModel>> findList(HttpServletRequest request) {
+
+        QueryBuilder<TestEntity> queryBuilder = new WebQueryBuilder<>(TestEntity.class, request.getParameterMap());
+        List<TestEntity> entitys = IService.findList(queryBuilder.build());
+        List<TestModel> models = WrapperUtil.transformInstance(entitys, TestModel.class);
+
+        return ResultVo.success(models);
     }
 
     @ApiOperation(value = "查找全部数据", notes = "查找全部数据")
@@ -256,20 +265,20 @@ public class TestRestRestController extends BaseRestController<TestModel, TestEn
     @ApiOperation(value = "查询分页", notes = "查询分页")
     @Override
     public ResultVo<?> findPage(Integer pageNo, Integer pageSize, HttpServletRequest request) {
-        PageQueryBuilder<TestModel,TestEntity> pageQueryBuilder = new PageQueryBuilder<>(
-                TestEntity.class, pageNo, pageSize, request.getParameterMap()
-        );
-        Page<TestModel, TestEntity> page = IService.findPage(pageQueryBuilder.builderPage());
+
+        QueryBuilder<TestEntity> queryBuilder = new WebQueryBuilder<>(TestEntity.class, request.getParameterMap());
+        Page<TestModel, TestEntity> page = new Page<>(pageNo, pageSize);
+        page.setQueryWrapper(queryBuilder.build());
+        page = IService.findPage(page);
+
         return ResultVo.success(page.getBootstrapData());
     }
 
     @ApiOperation(value = "导出Excel", notes = "导出Excel")
     @Override
     public ResultVo<?> exportExcel(HttpServletRequest request, HttpServletResponse response) {
-        PageQueryBuilder<TestModel,TestEntity> pageQueryBuilder = new PageQueryBuilder<>(
-                TestEntity.class, request.getParameterMap()
-        );
-        return super.excelExport("测试", pageQueryBuilder.builderQueryWrapper(), response);
+        QueryBuilder<TestEntity> queryBuilder = new WebQueryBuilder<>(TestEntity.class, request.getParameterMap());
+        return super.excelExport("测试", queryBuilder.build(), response);
     }
 
     @ApiOperation(value = "导入Excel", notes = "导入Excel")
@@ -282,6 +291,24 @@ public class TestRestRestController extends BaseRestController<TestModel, TestEn
     @Override
     public ResultVo<?> importTemplate(HttpServletResponse response) {
         return super.importTemplate("测试", response);
+    }
+
+
+
+    @ApiOperation(value = "获得字典 - By Name", notes = "获得字典 - By Name")
+    @GetMapping("/getDictByName")
+    public ResultVo<?> getDictByName(@RequestParam(name = "typeCode") String typeCode,
+                                     @RequestParam(name = "name") String name){
+        String value = DictUtil.getDictValueByName(typeCode, name, "我空了");
+        return ResultVo.success().setData(value);
+    }
+
+    @ApiOperation(value = "获得字典 - By Value", notes = "获得字典 - By Value")
+    @GetMapping("/getDictByValue")
+    public ResultVo<?> getDictByValue(@RequestParam(name = "typeCode") String typeCode,
+                                      @RequestParam(name = "value")  String value){
+        String name = DictUtil.getDictNameByValue(typeCode, value, "我空了");
+        return ResultVo.success().setData(name);
     }
 
 }

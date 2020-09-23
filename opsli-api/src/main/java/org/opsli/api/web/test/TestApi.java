@@ -60,7 +60,6 @@ public interface TestApi {
      * 新增数据
      * @return
      */
-    @ApiOperation(value = "新增数据", notes = "新增数据")
     @GetMapping("/insert")
     ResultVo<TestModel> insert(TestModel entity);
 
@@ -101,7 +100,7 @@ public interface TestApi {
      * @return
      */
     @GetMapping("/findList")
-    ResultVo<List<TestModel>> findList();
+    ResultVo<List<TestModel>> findList(HttpServletRequest request);
 
 
     /**

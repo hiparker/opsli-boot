@@ -82,7 +82,6 @@ public abstract class ApiWrapper implements Serializable {
 	/** 乐观锁 版本 */
 	@ApiModelProperty(value = "版本")
 	@ExcelIgnore
-	@CellStyleFormat
 	@Version
 	private Integer version;
 

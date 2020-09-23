@@ -1,26 +1,24 @@
 package org.opsli.core.base.service.impl;
 
 import cn.hutool.core.convert.Convert;
-import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.TypeUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.github.pagehelper.PageInfo;
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.opsli.api.base.warpper.ApiWrapper;
-import org.opsli.common.constants.MyBatisConstants;
-import org.opsli.common.utils.HumpUtil;
 import org.opsli.common.utils.WrapperUtil;
 import org.opsli.core.base.entity.BaseEntity;
 import org.opsli.core.base.service.base.BaseService;
 import org.opsli.core.base.service.interfaces.CrudServiceInterface;
 import org.opsli.core.persistence.Page;
-import org.opsli.core.utils.UserUtil;
+import org.opsli.core.persistence.querybuilder.GenQueryBuilder;
+import org.opsli.core.persistence.querybuilder.QueryBuilder;
+import org.opsli.core.persistence.querybuilder.chain.TenantHandler;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
-import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.List;
@@ -44,6 +42,7 @@ import java.util.List;
  *
  */
 @Slf4j
+@Transactional(readOnly = true)
 public abstract class CrudServiceImpl<M extends BaseMapper<T>, E extends ApiWrapper, T extends BaseEntity>
         extends BaseService<M, T> implements CrudServiceInterface<E,T> {
 
@@ -57,9 +56,6 @@ public abstract class CrudServiceImpl<M extends BaseMapper<T>, E extends ApiWrap
     /** Entity 泛型游标 */
     private static final int entityIndex = 2;
 
-
-    /** 多租户状态  */
-    protected boolean tenantFlag = false;
 
     @Override
     public E get(String id) {
@@ -77,6 +73,7 @@ public abstract class CrudServiceImpl<M extends BaseMapper<T>, E extends ApiWrap
     }
 
     @Override
+    @Transactional(readOnly = false)
     public E insert(E model) {
         if(model == null) return null;
         T entity = transformM2T(model);
@@ -88,6 +85,7 @@ public abstract class CrudServiceImpl<M extends BaseMapper<T>, E extends ApiWrap
     }
 
     @Override
+    @Transactional(readOnly = false)
     public boolean insertBatch(List<E> models) {
         if(models == null || models.size() == 0) return false;
         List<T> entitys = transformMs2Ts(models);
@@ -95,6 +93,7 @@ public abstract class CrudServiceImpl<M extends BaseMapper<T>, E extends ApiWrap
     }
 
     @Override
+    @Transactional(readOnly = false)
     public E update(E model) {
         if(model == null) return null;
         T entity = transformM2T(model);
@@ -106,17 +105,20 @@ public abstract class CrudServiceImpl<M extends BaseMapper<T>, E extends ApiWrap
     }
 
     @Override
+    @Transactional(readOnly = false)
     public boolean delete(String id) {
         return super.removeById(id);
     }
 
     @Override
+    @Transactional(readOnly = false)
     public boolean delete(E model) {
         if(model == null) return false;
         return super.removeById(model.getId());
     }
 
     @Override
+    @Transactional(readOnly = false)
     public boolean deleteAll(String[] ids) {
         if(ids == null) return false;
         List<String> idList = Convert.toList(String.class, ids);
@@ -124,6 +126,7 @@ public abstract class CrudServiceImpl<M extends BaseMapper<T>, E extends ApiWrap
     }
 
     @Override
+    @Transactional(readOnly = false)
     public boolean deleteAll(Collection<E> models) {
         if(models == null || models.isEmpty()) return false;
         List<String> idList = Lists.newArrayListWithCapacity(models.size());
@@ -135,27 +138,19 @@ public abstract class CrudServiceImpl<M extends BaseMapper<T>, E extends ApiWrap
 
     @Override
     public List<T> findList(QueryWrapper<T> queryWrapper) {
-        // 判断多租户
-        if(this.tenantFlag) {
-            String tenantId = UserUtil.getTenantId();
-            if (StringUtils.isNotEmpty(tenantId)) {
-                queryWrapper.eq(HumpUtil.humpToUnderline(MyBatisConstants.FIELD_TENANT), tenantId);
-            }
-        }
-        return super.list(queryWrapper);
+        // 多租户处理
+        TenantHandler tenantHandler = new TenantHandler();
+        QueryWrapper<T> qWrapper = tenantHandler.handler(entityClazz, queryWrapper);
+        return super.list(qWrapper);
     }
 
     @Override
     public List<T> findAllList() {
-        QueryWrapper<T> queryWrapper = new QueryWrapper<>();
-        // 判断多租户
-        if(this.tenantFlag){
-            String tenantId = UserUtil.getTenantId();
-            if(StringUtils.isNotEmpty(tenantId)){
-                queryWrapper.eq(HumpUtil.humpToUnderline(MyBatisConstants.FIELD_TENANT), tenantId);
-            }
-        }
-        return super.list(queryWrapper);
+        QueryBuilder<T> queryBuilder = new GenQueryBuilder<>();
+        // 多租户处理
+        TenantHandler tenantHandler = new TenantHandler();
+        QueryWrapper<T> qWrapper = tenantHandler.handler(entityClazz, queryBuilder.build());
+        return super.list(qWrapper);
     }
 
     @Override
@@ -224,8 +219,6 @@ public abstract class CrudServiceImpl<M extends BaseMapper<T>, E extends ApiWrap
         try {
             this.modelClazz = this.getModelClass();
             this.entityClazz = this.getEntityClass();
-            // 多租户判断
-            this.tenantFlag = ReflectUtil.hasField(entityClazz, MyBatisConstants.FIELD_TENANT);
         }catch (Exception e){
             log.error(e.getMessage(),e);
         }

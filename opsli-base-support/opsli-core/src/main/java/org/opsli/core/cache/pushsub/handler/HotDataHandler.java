@@ -2,10 +2,13 @@ package org.opsli.core.cache.pushsub.handler;
 
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
+import org.opsli.common.constants.CacheConstants;
 import org.opsli.core.cache.local.CacheUtil;
 import org.opsli.core.cache.pushsub.enums.CacheType;
 import org.opsli.core.cache.pushsub.enums.MsgArgsType;
 import org.opsli.core.cache.pushsub.enums.PushSubType;
+import org.opsli.plugins.cache.EhCachePlugin;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @BelongsProject: opsli-boot
@@ -16,6 +19,9 @@ import org.opsli.core.cache.pushsub.enums.PushSubType;
  */
 @Slf4j
 public class HotDataHandler implements RedisPushSubHandler{
+
+    @Autowired
+    EhCachePlugin ehCachePlugin;
 
     @Override
     public PushSubType getType() {
@@ -28,15 +34,16 @@ public class HotDataHandler implements RedisPushSubHandler{
         Object value = msgJson.get(MsgArgsType.CACHE_DATA_VALUE.toString());
         CacheType type = CacheType.valueOf((String )msgJson.get(MsgArgsType.CACHE_DATA_TYPE.toString()));
 
-        // 缓存更新
+        // 解析 key
+        String handleKey = CacheUtil.handleKey(CacheConstants.HOT_DATA, key);
+
         if(CacheType.UPDATE == type){
-            CacheUtil.putByKeyOriginal(key, value);
+            ehCachePlugin.put(CacheConstants.HOT_DATA, handleKey, value);
         }
         // 缓存删除
         else if(CacheType.DELETE == type){
-            CacheUtil.del(key);
+            ehCachePlugin.delete(CacheConstants.HOT_DATA, handleKey);
         }
-
     }
 
 }

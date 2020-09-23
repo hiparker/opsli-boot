@@ -12,7 +12,9 @@ public interface CacheConstants {
     /** 热点数据 */
     String HOT_DATA = "hotData";
 
-    /** 系统常量 */
+    /** 永久常量 */
     String EDEN_DATA = "edenData";
 
+    /** 永久Hash常量 */
+    String EDEN_HASH_DATA = "edenHashData";
 }

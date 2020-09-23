@@ -4,6 +4,7 @@ import cn.hutool.core.lang.Validator;
 import cn.hutool.core.util.ReflectUtil;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.opsli.api.msg.ValidationMsg;
 import org.opsli.api.wrapper.system.dict.SysDictModel;
 import org.opsli.common.annotation.validation.ValidationArgs;
@@ -79,6 +80,8 @@ public final class ValidationUtil {
             fieldName = annotation.value();
         }
 
+        String value = String.valueOf(fieldValue);
+
         // 循环验证
         for (ValiArgsType type : types) {
             try {
@@ -94,7 +97,8 @@ public final class ValidationUtil {
                         break;
                     // 字母，数字和下划线
                     case IS_GENERAL:
-                        boolean general = Validator.isGeneral(String.valueOf(fieldValue));
+                        if(StringUtils.isEmpty(value) || "null".equals(value)) break;
+                        boolean general = Validator.isGeneral(value);
                         if(!general){
                             ValidationMsg msg = ValidationMsg.EXCEPTION_IS_GENERAL;
                             msg.setFieldName(fieldName);
@@ -103,7 +107,8 @@ public final class ValidationUtil {
                         break;
                     // 数字
                     case IS_NUMBER:
-                        boolean number = Validator.isNumber(String.valueOf(fieldValue));
+                        if(StringUtils.isEmpty(value) || "null".equals(value)) break;
+                        boolean number = Validator.isNumber(value);
                         if(!number){
                             ValidationMsg msg = ValidationMsg.EXCEPTION_IS_NUMBER;
                             msg.setFieldName(fieldName);
@@ -112,7 +117,8 @@ public final class ValidationUtil {
                         break;
                     // 纯字母
                     case IS_LETTER:
-                        boolean letter = Validator.isLetter(String.valueOf(fieldValue));
+                        if(StringUtils.isEmpty(value) || "null".equals(value)) break;
+                        boolean letter = Validator.isLetter(value);
                         if(!letter){
                             ValidationMsg msg = ValidationMsg.EXCEPTION_IS_LETTER;
                             msg.setFieldName(fieldName);
@@ -121,7 +127,8 @@ public final class ValidationUtil {
                         break;
                     // 大写
                     case IS_UPPER_CASE:
-                        boolean upperCase = Validator.isUpperCase(String.valueOf(fieldValue));
+                        if(StringUtils.isEmpty(value) || "null".equals(value)) break;
+                        boolean upperCase = Validator.isUpperCase(value);
                         if(!upperCase){
                             ValidationMsg msg = ValidationMsg.EXCEPTION_IS_UPPER_CASE;
                             msg.setFieldName(fieldName);
@@ -130,7 +137,8 @@ public final class ValidationUtil {
                         break;
                     // 小写
                     case IS_LOWER_CASE:
-                        boolean lowerCase = Validator.isLowerCase(String.valueOf(fieldValue));
+                        if(StringUtils.isEmpty(value) || "null".equals(value)) break;
+                        boolean lowerCase = Validator.isLowerCase(value);
                         if(!lowerCase){
                             ValidationMsg msg = ValidationMsg.EXCEPTION_IS_LOWER_CASE;
                             msg.setFieldName(fieldName);
@@ -139,7 +147,8 @@ public final class ValidationUtil {
                         break;
                     // IPV4
                     case IS_IPV4:
-                        boolean ipv4 = Validator.isIpv4(String.valueOf(fieldValue));
+                        if(StringUtils.isEmpty(value) || "null".equals(value)) break;
+                        boolean ipv4 = Validator.isIpv4(value);
                         if(!ipv4){
                             ValidationMsg msg = ValidationMsg.EXCEPTION_IS_IPV4;
                             msg.setFieldName(fieldName);
@@ -148,7 +157,8 @@ public final class ValidationUtil {
                         break;
                     // 金额
                     case IS_MONEY:
-                        boolean money = Validator.isMoney(String.valueOf(fieldValue));
+                        if(StringUtils.isEmpty(value) || "null".equals(value)) break;
+                        boolean money = Validator.isMoney(value);
                         if(!money){
                             ValidationMsg msg = ValidationMsg.EXCEPTION_IS_MONEY;
                             msg.setFieldName(fieldName);
@@ -157,7 +167,8 @@ public final class ValidationUtil {
                         break;
                     // 邮箱
                     case IS_EMAIL:
-                        boolean email = Validator.isEmail(String.valueOf(fieldValue));
+                        if(StringUtils.isEmpty(value) || "null".equals(value)) break;
+                        boolean email = Validator.isEmail(value);
                         if(!email){
                             ValidationMsg msg = ValidationMsg.EXCEPTION_IS_EMAIL;
                             msg.setFieldName(fieldName);
@@ -166,7 +177,8 @@ public final class ValidationUtil {
                         break;
                     // 手机号
                     case IS_MOBILE:
-                        boolean mobile = Validator.isMobile(String.valueOf(fieldValue));
+                        if(StringUtils.isEmpty(value) || "null".equals(value)) break;
+                        boolean mobile = Validator.isMobile(value);
                         if(!mobile){
                             ValidationMsg msg = ValidationMsg.EXCEPTION_IS_MOBILE;
                             msg.setFieldName(fieldName);
@@ -175,7 +187,8 @@ public final class ValidationUtil {
                         break;
                     // 18位身份证
                     case IS_CITIZENID:
-                        boolean citizenId = Validator.isCitizenId(String.valueOf(fieldValue));
+                        if(StringUtils.isEmpty(value) || "null".equals(value)) break;
+                        boolean citizenId = Validator.isCitizenId(value);
                         if(!citizenId){
                             ValidationMsg msg = ValidationMsg.EXCEPTION_IS_CITIZENID;
                             msg.setFieldName(fieldName);
@@ -184,7 +197,8 @@ public final class ValidationUtil {
                         break;
                     // 邮编
                     case IS_ZIPCODE:
-                        boolean zipCode = Validator.isZipCode(String.valueOf(fieldValue));
+                        if(StringUtils.isEmpty(value) || "null".equals(value)) break;
+                        boolean zipCode = Validator.isZipCode(value);
                         if(!zipCode){
                             ValidationMsg msg = ValidationMsg.EXCEPTION_IS_ZIPCODE;
                             msg.setFieldName(fieldName);
@@ -193,7 +207,8 @@ public final class ValidationUtil {
                         break;
                     // URL
                     case IS_URL:
-                        boolean url = Validator.isUrl(String.valueOf(fieldValue));
+                        if(StringUtils.isEmpty(value) || "null".equals(value)) break;
+                        boolean url = Validator.isUrl(value);
                         if(!url){
                             ValidationMsg msg = ValidationMsg.EXCEPTION_IS_URL;
                             msg.setFieldName(fieldName);
@@ -202,7 +217,8 @@ public final class ValidationUtil {
                         break;
                     // 汉字
                     case IS_CHINESE:
-                        boolean chinese = Validator.isChinese(String.valueOf(fieldValue));
+                        if(StringUtils.isEmpty(value) || "null".equals(value)) break;
+                        boolean chinese = Validator.isChinese(value);
                         if(!chinese){
                             ValidationMsg msg = ValidationMsg.EXCEPTION_IS_CHINESE;
                             msg.setFieldName(fieldName);
@@ -211,7 +227,8 @@ public final class ValidationUtil {
                         break;
                     // 汉字，字母，数字和下划线
                     case IS_GENERAL_WITH_CHINESE:
-                        boolean generalWithChinese = Validator.isGeneralWithChinese(String.valueOf(fieldValue));
+                        if(StringUtils.isEmpty(value) || "null".equals(value)) break;
+                        boolean generalWithChinese = Validator.isGeneralWithChinese(value);
                         if(!generalWithChinese){
                             ValidationMsg msg = ValidationMsg.EXCEPTION_IS_GENERAL_WITH_CHINESE;
                             msg.setFieldName(fieldName);
@@ -220,7 +237,8 @@ public final class ValidationUtil {
                         break;
                     // MAC地址
                     case IS_MAC:
-                        boolean mac = Validator.isMac(String.valueOf(fieldValue));
+                        if(StringUtils.isEmpty(value) || "null".equals(value)) break;
+                        boolean mac = Validator.isMac(value);
                         if(!mac){
                             ValidationMsg msg = ValidationMsg.EXCEPTION_IS_MAC;
                             msg.setFieldName(fieldName);
@@ -229,7 +247,8 @@ public final class ValidationUtil {
                         break;
                     // 中国车牌
                     case IS_PLATE_NUMBER:
-                        boolean plateNumber = Validator.isPlateNumber(String.valueOf(fieldValue));
+                        if(StringUtils.isEmpty(value) || "null".equals(value)) break;
+                        boolean plateNumber = Validator.isPlateNumber(value);
                         if(!plateNumber){
                             ValidationMsg msg = ValidationMsg.EXCEPTION_IS_PLATE_NUMBER;
                             msg.setFieldName(fieldName);

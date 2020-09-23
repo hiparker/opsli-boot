@@ -39,7 +39,7 @@ public class SQLDataAop {
     public void insertHadnler(Object ret){
         try {
             if(ret == null){
-                throw new ServiceException(CoreMsg.SQL_EXCEPTION_UPDATE);
+                throw new ServiceException(CoreMsg.SQL_EXCEPTION_INSERT);
             }
         } catch (ServiceException e) {
             throw e;

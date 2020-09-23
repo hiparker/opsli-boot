@@ -35,6 +35,12 @@
 
 
         <!-- ———————————————————— 模块 - 开始 ———————————————————— -->
+        <!-- 系统模块 -->
+        <dependency>
+            <groupId>org.opsliframework.boot</groupId>
+            <artifactId>opsli-modulars-system</artifactId>
+            <version>${modulars.version}</version>
+        </dependency>
         <!-- 引入测试业务模块 -->
         <dependency>
             <groupId>org.opsliframework.boot</groupId>

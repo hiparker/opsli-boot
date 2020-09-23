@@ -12,6 +12,8 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class RedisLock {
 
+    private static final String LOCK_PREFIX = "opsli:lock:";
+
     /** 锁名称 */
     private String lockName;
 
@@ -41,7 +43,7 @@ public class RedisLock {
      * 构造函数
      */
     public RedisLock(String lockName, Long acquireTimeOut, Long lockTimeOut, String identifier) {
-        this.lockName = lockName;
+        this.lockName = LOCK_PREFIX + lockName;
         this.acquireTimeOut = acquireTimeOut;
         this.lockTimeOut = lockTimeOut;
         this.identifier = identifier;
@@ -69,7 +71,7 @@ public class RedisLock {
     }
 
     public RedisLock setLockName(String lockName) {
-        this.lockName = lockName;
+        this.lockName = LOCK_PREFIX + lockName;
         return this;
     }
 

@@ -120,7 +120,7 @@ public final class ExcelUtil {
             sheetName = "sheet1";
         }
 
-        fileName = fileName+ DateUtil.format(DateUtil.date(), "yyyyMMddHHmmss");
+        fileName = fileName+"-"+DateUtil.format(DateUtil.date(), "yyyyMMddHHmmss");
         OutputStream outputStream = getOutputStream(fileName, response, excelTypeEnum);
         ExcelWriter excelWriter = EasyExcel.write(outputStream, classType).build();
         WriteSheet writeSheet = EasyExcel.writerSheet(1, sheetName).build();

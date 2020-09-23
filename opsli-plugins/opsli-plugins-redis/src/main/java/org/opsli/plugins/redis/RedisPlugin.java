@@ -174,6 +174,19 @@ public class RedisPlugin {
 		return redisTemplate.opsForValue().get(key);
 	}
 
+	/**
+	 * 获取普通对象 - 批量获取
+	 *
+	 * @param keys Redis键
+	 * @return 对象
+	 */
+	public List<Object> getAll(Collection<String> keys) {
+		if(keys == null || keys.size() == 0){
+			return null;
+		}
+		return redisTemplate.opsForValue().multiGet(keys);
+	}
+
 
 
 	/**

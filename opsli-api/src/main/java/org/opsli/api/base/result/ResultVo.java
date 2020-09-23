@@ -5,10 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.AccessLevel;
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
 import org.springframework.http.HttpStatus;
 import java.io.Serializable;
 
@@ -32,46 +29,36 @@ public class ResultVo<T> implements Serializable {
 
 	/** 成功状态 */
 	@ApiModelProperty(value = "成功状态")
+	@JsonProperty("success")
 	private boolean success;
 
 	/** 消息 */
 	@ApiModelProperty(value = "消息")
+	@JsonProperty("msg")
 	private String msg;
 
 	/** 状态码 */
 	@ApiModelProperty(value = "状态码")
+	@JsonProperty("code")
 	private Integer code;
 
 	/** 时间戳 */
-	@Getter(AccessLevel.NONE)
-	@Setter(AccessLevel.NONE)
 	@ApiModelProperty(value = "时间戳")
-	private long timestamp;
+	@JsonProperty("timestamp")
+	private Long timestamp;
 
 	/** 数据对象 */
 	@ApiModelProperty(value = "数据")
-	@Getter(AccessLevel.NONE)
-	@Setter(AccessLevel.NONE)
 	@JsonProperty("data")
 	private T data;
 
-
-	/**
-	 * 设置值
-	 * @param data 数据
-	 * @return ResultVo<T>
-	 */
-	public ResultVo<T> put(T data) {
-		this.data = data;
-		return this;
+	public T getData() {
+		return data;
 	}
 
-	/**
-	 * 获得值
-	 * @return T
-	 */
-	public T get(){
-		return this.data;
+	public ResultVo<T> setData(T data) {
+		this.data = data;
+		return this;
 	}
 
 	/**
@@ -127,7 +114,7 @@ public class ResultVo<T> implements Serializable {
 	@JsonIgnore//返回对象时忽略此属性
 	public static <T> ResultVo<T> success(T data) {
 		ResultVo<T> ret = new ResultVo<>();
-		ret.put(data);
+		ret.setData(data);
 		return ret;
 	}
 
@@ -141,7 +128,7 @@ public class ResultVo<T> implements Serializable {
 	@JsonIgnore//返回对象时忽略此属性
 	public static <T> ResultVo<T> success(String msg, T data) {
 		ResultVo<T> ret = new ResultVo<>();
-		ret.put(data);
+		ret.setData(data);
 		return ret;
 	}
 
@@ -187,7 +174,7 @@ public class ResultVo<T> implements Serializable {
 		ResultVo<T> ret = new ResultVo<>();
 		ret.setMsg(msg);
 		ret.setCode(code);
-		ret.put(data);
+		ret.setData(data);
 		ret.setSuccess(false);
 		return ret;
 	}

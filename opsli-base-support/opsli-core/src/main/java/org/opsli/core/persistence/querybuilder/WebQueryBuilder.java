@@ -1,10 +1,8 @@
-package org.opsli.core.persistence;
+package org.opsli.core.persistence.querybuilder;
 
 import cn.hutool.core.util.ReflectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.opsli.api.base.warpper.ApiWrapper;
 import org.opsli.common.constants.MyBatisConstants;
 import org.opsli.common.utils.HumpUtil;
 import org.opsli.core.base.entity.BaseEntity;
@@ -13,20 +11,12 @@ import java.util.Map;
 
 /**
  * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.core.persistence
+ * @BelongsPackage: org.opsli.core.persistence.querybuilder
  * @Author: Parker
- * @CreateTime: 2020-09-19 21:15
- * @Description: 查询构建器
- *
- * 针对分页查询 无非也就是
- * 全值匹配 eq
- * 模糊匹配 like
- * 日期 begin end 匹配
- *
+ * @CreateTime: 2020-09-21 23:57
+ * @Description: Web 条件构造器
  */
-@Slf4j
-public class PageQueryBuilder<E extends ApiWrapper,T extends BaseEntity>{
-
+public class WebQueryBuilder<T extends BaseEntity> implements QueryBuilder<T>{
 
     // == 匹配条件 ==
     /** 全值匹配 */
@@ -41,66 +31,48 @@ public class PageQueryBuilder<E extends ApiWrapper,T extends BaseEntity>{
     private static final String ORDER_ASC = "ASC";
     private static final String ORDER_DESC = "DESC";
 
-
-    /** 当前页 */
-    private Integer pageNo;
-    /** 每页数量 */
-    private Integer pageSize;
     /** 参数 */
     private Map<String, String[]> parameterMap;
     /** Entity Clazz */
-    private Class<T> entityClazz;
-
-    /**
-     * 构造函数
-     * @param entityClazz Entity 的 clazz
-     * @param pageNo 当前页
-     * @param pageSize 每页显示条数
-     * @param parameterMap request 参数
-     */
-    public PageQueryBuilder(Class<T> entityClazz, Integer pageNo, Integer pageSize, Map<String, String[]> parameterMap){
-        this.pageNo = pageNo;
-        this.pageSize = pageSize;
-        this.parameterMap = parameterMap;
-        this.entityClazz = entityClazz;
-    }
+    private Class<? extends BaseEntity> entityClazz;
+    /** 默认排序字段 */
+    private String defaultOrderField;
 
     /**
      * 构造函数 只是生产 查询器
      * @param entityClazz Entity 的 clazz
      * @param parameterMap request 参数
      */
-    public PageQueryBuilder(Class<T> entityClazz, Map<String, String[]> parameterMap){
+    public WebQueryBuilder(Class<T> entityClazz, Map<String, String[]> parameterMap){
         this.parameterMap = parameterMap;
         this.entityClazz = entityClazz;
-    }
-
-
-    /**
-     * 构建builderPage
-     * @return
-     */
-    public Page<E,T>  builderPage(){
-        Page<E,T> page = new Page<>(this.pageNo,this.pageSize);
-        QueryWrapper<T> queryWrapper = this.createQueryWrapper();
-        page.setQueryWrapper(queryWrapper);
-        return page;
+        this.defaultOrderField = MyBatisConstants.FIELD_UPDATE_TIME;
     }
 
     /**
-     * 创建 查询条件构造器
-     * @return
+     * 构造函数 只是生产 查询器
+     * @param entityClazz Entity 的 clazz
+     * @param parameterMap request 参数
+     * @param defaultOrderField 默认排序字段
      */
-    public QueryWrapper<T> builderQueryWrapper(){
-        return this.createQueryWrapper();
+    public WebQueryBuilder(Class<T> entityClazz, Map<String, String[]> parameterMap,
+                                                  String defaultOrderField){
+        this.parameterMap = parameterMap;
+        this.entityClazz = entityClazz;
+        this.defaultOrderField = defaultOrderField;
     }
 
-    /**
-     * 创建 查询条件构造器
-     * @return
-     */
-    private QueryWrapper<T> createQueryWrapper(){
+    @Override
+    public QueryWrapper<T> build() {
         QueryWrapper<T> queryWrapper = new QueryWrapper<>();
+        return this.createQueryWrapper(queryWrapper);
+    }
+
+    /**
+     * 创建 查询条件构造器
+     * @return
+     */
+    private  <T extends BaseEntity> QueryWrapper<T> createQueryWrapper(QueryWrapper<T> queryWrapper){
         if(this.parameterMap == null){
             return queryWrapper;
         }
@@ -142,7 +114,7 @@ public class PageQueryBuilder<E extends ApiWrapper,T extends BaseEntity>{
         }
         // 如果没有排序 默认按照 修改时间倒叙排序
         if(orderCount == 0){
-            queryWrapper.orderByDesc(HumpUtil.humpToUnderline(MyBatisConstants.FIELD_UPDATE_TIME));
+            queryWrapper.orderByDesc(HumpUtil.humpToUnderline(this.defaultOrderField));
         }
         return queryWrapper;
     }
@@ -155,10 +127,10 @@ public class PageQueryBuilder<E extends ApiWrapper,T extends BaseEntity>{
      * @param value 值
      * @return
      */
-    private void handlerValue(QueryWrapper<T> queryWrapper, String handle, String key, String value){
+    private <T extends BaseEntity> void handlerValue(QueryWrapper<T> queryWrapper, String handle, String key, String value){
         if(queryWrapper == null || StringUtils.isEmpty(handle)
-               || StringUtils.isEmpty(key) || StringUtils.isEmpty(value)
-            ){
+                || StringUtils.isEmpty(key) || StringUtils.isEmpty(value)
+        ){
             return;
         }
         // 转换驼峰 为 数据库下划线字段
@@ -224,5 +196,4 @@ public class PageQueryBuilder<E extends ApiWrapper,T extends BaseEntity>{
         }
         return false;
     }
-
 }
