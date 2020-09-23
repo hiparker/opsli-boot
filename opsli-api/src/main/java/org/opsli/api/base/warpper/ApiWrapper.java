@@ -46,35 +46,40 @@ public abstract class ApiWrapper implements Serializable {
 
 	/** ID */
 	@TableId
-	@ApiModelProperty(value = "ID")
-	@ExcelProperty(value = "ID", order = 1000)
+	@ExcelIgnore
+	//@ApiModelProperty(value = "ID")
+	//@ExcelProperty(value = "ID", order = 1000)
 	@CellStyleFormat
 	private String id;
 
 	/** 创建人 */
-	@ApiModelProperty(value = "创建人")
-	@ExcelProperty(value = "创建人", order = 1001)
+	@ExcelIgnore
+	//@ApiModelProperty(value = "创建人")
+	//@ExcelProperty(value = "创建人", order = 1001)
 	@CellStyleFormat
 	private String createBy;
 
 	/** 创建时间 */
 	@ApiModelProperty(value = "创建时间")
-	@ExcelProperty(value = "创建时间", order = 1002)
-	@CellStyleFormat
+	@ExcelIgnore
+	//@ExcelProperty(value = "创建时间", order = 1002)
+	//@CellStyleFormat
 	@JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
 	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date createTime;
 
 	/** 更新人 */
 	@ApiModelProperty(value = "修改人")
-	@ExcelProperty(value = "修改人", order = 1003)
-	@CellStyleFormat
+	@ExcelIgnore
+	//@ExcelProperty(value = "修改人", order = 1003)
+	//@CellStyleFormat
 	private String updateBy;
 
 	/** 更新时间 */
 	@ApiModelProperty(value = "修改时间")
-	@ExcelProperty(value = "修改时间", order = 1004)
-	@CellStyleFormat
+	@ExcelIgnore
+	//@ExcelProperty(value = "修改时间", order = 1004)
+	//@CellStyleFormat
 	@JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
 	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date updateTime;

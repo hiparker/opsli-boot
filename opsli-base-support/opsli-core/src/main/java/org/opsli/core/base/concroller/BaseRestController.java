@@ -21,7 +21,7 @@ import org.opsli.core.base.entity.BaseEntity;
 import org.opsli.core.base.service.interfaces.CrudServiceInterface;
 import org.opsli.core.cache.local.CacheUtil;
 import org.opsli.core.msg.CoreMsg;
-import org.opsli.plugins.excel.ExcelUtil;
+import org.opsli.core.utils.ExcelUtil;
 import org.opsli.plugins.excel.exception.ExcelPluginException;
 import org.opsli.plugins.redis.RedisLockPlugins;
 import org.opsli.plugins.redis.lock.RedisLock;
@@ -50,24 +50,26 @@ import java.util.List;
  */
 @Slf4j
 @RestController
-public abstract class BaseRestController <E extends ApiWrapper, T extends BaseEntity, S extends CrudServiceInterface<E,T>>{
+public abstract class BaseRestController <T extends BaseEntity, E extends ApiWrapper, S extends CrudServiceInterface<T,E>>{
 
     /** 开启热点数据状态 */
     protected boolean hotDataFlag = false;
 
-    /** Model Clazz 类 */
-    protected Class<E> modelClazz;
-    /** Model 泛型游标 */
-    private static final int modelIndex = 0;
     /** Entity Clazz 类 */
     protected Class<T> entityClazz;
     /** Entity 泛型游标 */
-    private static final int entityIndex = 1;
+    private static final int entityIndex = 0;
+    /** Model Clazz 类 */
+    protected Class<E> modelClazz;
+    /** Model 泛型游标 */
+    private static final int modelIndex = 1;
 
     @Autowired(required = false)
     protected S IService;
     @Autowired
     private RedisLockPlugins redisLockPlugins;
+    @Autowired
+    private ExcelUtil excelUtil;
 
     /**
      * 默认 直接设置 传入数据的
@@ -159,8 +161,10 @@ public abstract class BaseRestController <E extends ApiWrapper, T extends BaseEn
             return ResultVo.error(CoreMsg.EXCEL_FILE_NULL.getCode(),
                     CoreMsg.EXCEL_FILE_NULL.getMessage());
         }
+        ResultVo<?> resultVo;
+        String msgInfo = "";
         try {
-            List<E> modelList = ExcelUtil.readExcel(files.get(0), modelClazz);
+            List<E> modelList = excelUtil.readExcel(files.get(0), modelClazz);
             boolean ret = IService.insertBatch(modelList);
             if(!ret){
                 throw new ExcelPluginException(CoreMsg.EXCEL_IMPORT_NO);
@@ -168,18 +172,21 @@ public abstract class BaseRestController <E extends ApiWrapper, T extends BaseEn
             // 花费毫秒数
             long timerCount = timer.interval();
             // 提示信息
-            String msg = StrUtil.format(CoreMsg.EXCEL_IMPORT_SUCCESS.getMessage(), modelList.size(), timerCount);
-            // 导入成功
-            return ResultVo.success(msg);
+            msgInfo = StrUtil.format(CoreMsg.EXCEL_IMPORT_SUCCESS.getMessage(), timerCount);
+            // 导出成功
+            resultVo = ResultVo.success(msgInfo);
+            resultVo.setCode(CoreMsg.EXCEL_IMPORT_SUCCESS.getCode());
         } catch (ExcelPluginException e) {
             // 花费毫秒数
             long timerCount = timer.interval();
-            log.error(e.getMessage(),e);
             // 提示信息
-            String msg = StrUtil.format(CoreMsg.EXCEL_IMPORT_ERROR.getMessage(), e.getMessage(), timerCount);
+            msgInfo = StrUtil.format(CoreMsg.EXCEL_IMPORT_ERROR.getMessage(), timerCount, e.getMessage());
             // 导入失败
-            return ResultVo.error(CoreMsg.EXCEL_IMPORT_ERROR.getCode(), msg);
+            resultVo = ResultVo.error(CoreMsg.EXCEL_IMPORT_ERROR.getCode(), msgInfo);
         }
+        // 记录导出日志
+        log.info(msgInfo);
+        return resultVo;
     }
 
     /**
@@ -198,6 +205,10 @@ public abstract class BaseRestController <E extends ApiWrapper, T extends BaseEn
      * @param response
      */
     protected ResultVo<?> excelExport(String fileName, QueryWrapper<T> queryWrapper, HttpServletResponse response){
+        // 计时器
+        TimeInterval timer = DateUtil.timer();
+        String msgInfo = "";
+        ResultVo<?> resultVo;
         try {
             List<E> modelList = Lists.newArrayList();
             if(queryWrapper != null){
@@ -206,16 +217,25 @@ public abstract class BaseRestController <E extends ApiWrapper, T extends BaseEn
                 modelList = WrapperUtil.transformInstance(entityList, modelClazz);
             }
             // 导出Excel
-            ExcelUtil.writeExcel(response, modelList ,fileName,"sheet", modelClazz ,ExcelTypeEnum.XLSX);
-            // 导出成功
-            return ResultVo.success(CoreMsg.EXCEL_EXPORT_SUCCESS.getMessage());
-        } catch (ExcelPluginException e) {
-            log.error(e.getMessage(),e);
+            excelUtil.writeExcel(response, modelList ,fileName,"sheet", modelClazz ,ExcelTypeEnum.XLSX);
+            // 花费毫秒数
+            long timerCount = timer.interval();
             // 提示信息
-            String msg = StrUtil.format(CoreMsg.EXCEL_EXPORT_ERROR.getMessage(), e.getMessage());
+            msgInfo = StrUtil.format(CoreMsg.EXCEL_EXPORT_SUCCESS.getMessage(), modelList.size(), timerCount);
+            // 导出成功
+            resultVo = ResultVo.success(msgInfo);
+            resultVo.setCode(CoreMsg.EXCEL_EXPORT_SUCCESS.getCode());
+        } catch (ExcelPluginException e) {
+            // 花费毫秒数
+            long timerCount = timer.interval();
+            // 提示信息
+            msgInfo = StrUtil.format(CoreMsg.EXCEL_EXPORT_ERROR.getMessage(), timerCount, e.getMessage());
             // 导出失败
-            return ResultVo.error(CoreMsg.EXCEL_EXPORT_ERROR.getCode(),msg);
+            resultVo = ResultVo.error(CoreMsg.EXCEL_EXPORT_ERROR.getCode(), msgInfo);
         }
+        // 记录导出日志
+        log.info(msgInfo);
+        return resultVo;
     }
 
     // =================================================

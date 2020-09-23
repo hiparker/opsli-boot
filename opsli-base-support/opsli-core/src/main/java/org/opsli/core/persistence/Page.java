@@ -8,7 +8,7 @@ import com.github.pagehelper.PageSerializable;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Page<E,T> extends PageSerializable<E>{
+public class Page<T,E> extends PageSerializable<E>{
 
 
     private int pageNo = 1;

@@ -29,7 +29,7 @@ import java.util.List;
  */
 @Slf4j
 @ApiRestController("/dict/detail")
-public class DictDetailRestController extends BaseRestController<SysDictDetailModel, SysDictDetail, IDictDetailService>
+public class DictDetailRestController extends BaseRestController<SysDictDetail, SysDictDetailModel, IDictDetailService>
         implements DictDetailApi {
 
 
@@ -56,7 +56,7 @@ public class DictDetailRestController extends BaseRestController<SysDictDetailMo
     public ResultVo<?> findPage(Integer pageNo, Integer pageSize, HttpServletRequest request) {
 
         QueryBuilder<SysDictDetail> queryBuilder = new WebQueryBuilder<>(SysDictDetail.class, request.getParameterMap());
-        Page<SysDictDetailModel, SysDictDetail> page = new Page<>(pageNo, pageSize);
+        Page<SysDictDetail, SysDictDetailModel> page = new Page<>(pageNo, pageSize);
         page.setQueryWrapper(queryBuilder.build());
         page = IService.findPage(page);
 

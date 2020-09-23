@@ -18,6 +18,9 @@ public class TestEntity extends BaseEntity {
     /** 名称 */
     private String name;
 
+    /** 分类 */
+    private String type;
+
     /** 备注 */
     private String remark;
 

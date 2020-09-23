@@ -43,19 +43,18 @@ import java.util.List;
  */
 @Slf4j
 @Transactional(readOnly = true)
-public abstract class CrudServiceImpl<M extends BaseMapper<T>, E extends ApiWrapper, T extends BaseEntity>
-        extends BaseService<M, T> implements CrudServiceInterface<E,T> {
+public abstract class CrudServiceImpl<M extends BaseMapper<T>, T extends BaseEntity, E extends ApiWrapper>
+        extends BaseService<M, T> implements CrudServiceInterface<T,E> {
 
 
-    /** Model Clazz 类 */
-    protected Class<E> modelClazz;
-    /** Model 泛型游标 */
-    private static final int modelIndex = 1;
     /** Entity Clazz 类 */
     protected Class<T> entityClazz;
     /** Entity 泛型游标 */
-    private static final int entityIndex = 2;
-
+    private static final int entityIndex = 1;
+    /** Model Clazz 类 */
+    protected Class<E> modelClazz;
+    /** Model 泛型游标 */
+    private static final int modelIndex = 2;
 
     @Override
     public E get(String id) {
@@ -154,7 +153,7 @@ public abstract class CrudServiceImpl<M extends BaseMapper<T>, E extends ApiWrap
     }
 
     @Override
-    public Page<E,T> findPage(Page<E,T> page) {
+    public Page<T,E> findPage(Page<T,E> page) {
         page.pageHelperBegin();
         try{
             List<T> list = this.findList(page.getQueryWrapper());
@@ -217,8 +216,8 @@ public abstract class CrudServiceImpl<M extends BaseMapper<T>, E extends ApiWrap
     @PostConstruct
     public void init(){
         try {
-            this.modelClazz = this.getModelClass();
-            this.entityClazz = this.getEntityClass();
+            this.modelClazz = this.getModelClazz();
+            this.entityClazz = this.getEntityClazz();
         }catch (Exception e){
             log.error(e.getMessage(),e);
         }
@@ -229,7 +228,7 @@ public abstract class CrudServiceImpl<M extends BaseMapper<T>, E extends ApiWrap
      * 获得 泛型 Clazz
      * @return
      */
-    private Class<E> getModelClass(){
+    private Class<E> getModelClazz(){
         Class<E> tClass = null;
         Type typeArgument = TypeUtil.getTypeArgument(getClass().getGenericSuperclass(), modelIndex);
         if(typeArgument != null){
@@ -242,7 +241,7 @@ public abstract class CrudServiceImpl<M extends BaseMapper<T>, E extends ApiWrap
      * 获得 泛型 Clazz
      * @return
      */
-    private Class<T> getEntityClass(){
+    private Class<T> getEntityClazz(){
         Class<T> tClass = null;
         Type typeArgument = TypeUtil.getTypeArgument(getClass().getGenericSuperclass(), entityIndex);
         if(typeArgument != null){

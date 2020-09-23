@@ -1,5 +1,6 @@
 package org.opsli.core.utils;
 
+import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -7,6 +8,7 @@ import org.opsli.api.base.result.ResultVo;
 import org.opsli.api.web.system.dict.DictDetailApi;
 import org.opsli.api.wrapper.system.dict.DictModel;
 import org.opsli.api.wrapper.system.dict.SysDictDetailModel;
+import org.opsli.common.constants.CacheConstants;
 import org.opsli.common.constants.DictConstants;
 import org.opsli.core.cache.local.CacheUtil;
 import org.opsli.plugins.redis.RedisLockPlugins;
@@ -195,11 +197,16 @@ public class DictUtil {
     public static List<DictModel> getDictList(String typeCode){
         List<DictModel> dictModels = Lists.newArrayList();
         try {
-            Map<Object, Object> dictMap = redisPlugin.hGetAll(DictConstants.CACHE_PREFIX_VALUE + typeCode);
+            String key = CacheUtil.handleKey(CacheConstants.EDEN_HASH_DATA, DictConstants.CACHE_PREFIX_VALUE + typeCode);
+            Map<Object, Object> dictMap = redisPlugin.hGetAll(key);
             Set<Map.Entry<Object, Object>> entries = dictMap.entrySet();
             for (Map.Entry<Object, Object> entry : entries) {
                 // 赋值
-                SysDictDetailModel model = (SysDictDetailModel) entry.getValue();
+                JSONObject jsonObject = (JSONObject) entry.getValue();
+                if(jsonObject == null){
+                    continue;
+                }
+                SysDictDetailModel model = jsonObject.toJavaObject(SysDictDetailModel.class);
                 DictModel dictModel = new DictModel();
                 dictModel.setTypeCode(typeCode);
                 dictModel.setDictName(model.getDictName());

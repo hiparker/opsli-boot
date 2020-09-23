@@ -30,11 +30,7 @@ import java.util.List;
  * @author parker
  */
 @Slf4j
-public final class ExcelUtil {
-    /**
-     * 私有化构造方法
-     */
-    private ExcelUtil(){}
+public class ExcelPlugin {
 
     /**
      * 读取 Excel(多个 sheet)
@@ -45,7 +41,7 @@ public final class ExcelUtil {
      * @param rowModel 实体类映射，继承 BaseRowModel 类
      * @return Excel 数据 list
      */
-    public static <T> List<T> readExcel(MultipartFile excel,Class<T>  rowModel)
+    public <T> List<T> readExcel(MultipartFile excel,Class<T>  rowModel)
             throws ExcelPluginException {
         return readExcel(excel, rowModel, null, 1);
     }
@@ -57,7 +53,7 @@ public final class ExcelUtil {
      * @param sheetName  sheet 的序号 从1开始
      * @return Excel 数据 list
      */
-    public static <T> List<T> readExcel(MultipartFile excel, Class<T>  rowModel, String sheetName)
+    public <T> List<T> readExcel(MultipartFile excel, Class<T>  rowModel, String sheetName)
             throws ExcelPluginException{
         return readExcel(excel, rowModel, sheetName, 1);
     }
@@ -70,7 +66,7 @@ public final class ExcelUtil {
      * @param headLineNum 表头行数，默认为1
      * @return Excel 数据 list
      */
-    public static <T> List<T> readExcel(MultipartFile excel, Class<T>  rowModel, String sheetName,
+    public <T> List<T> readExcel(MultipartFile excel, Class<T>  rowModel, String sheetName,
                                                              int headLineNum) throws ExcelPluginException {
         ExcelListener excelListener = new ExcelListener();
         InputStream inputStream = null;
@@ -111,7 +107,7 @@ public final class ExcelUtil {
      * @param fileName  导出的文件名
      * @param sheetName 导入文件的 sheet 名
      */
-    public static <T> void writeExcel(HttpServletResponse response, List<T> list,
+    public <T> void writeExcel(HttpServletResponse response, List<T> list,
                                                            String fileName, String sheetName,
                                                            Class<T> classType, ExcelTypeEnum excelTypeEnum)
             throws ExcelPluginException{
@@ -141,7 +137,7 @@ public final class ExcelUtil {
     /**
      * 导出文件时为Writer生成OutputStream
      */
-    private static OutputStream getOutputStream(String fileName, HttpServletResponse response,
+    private OutputStream getOutputStream(String fileName, HttpServletResponse response,
                                                 ExcelTypeEnum excelTypeEnum)
             throws ExcelPluginException{
         //创建本地文件
@@ -161,7 +157,7 @@ public final class ExcelUtil {
      * @param excel         需要解析的 Excel 文件
      * @param excelListener new ExcelListener()
      */
-    private static ExcelReader getReader(MultipartFile excel,
+    private ExcelReader getReader(MultipartFile excel,
                                          ExcelListener excelListener) throws ExcelPluginException{
         String fileName = excel.getOriginalFilename();
         if (fileName == null ) {
@@ -187,7 +183,7 @@ public final class ExcelUtil {
     /**
      * 利用BeanCopy转换list
      */
-    public static <T> List<T> getExtendsBeanList(List<?> list,Class<T> typeClazz){
+    public <T> List<T> getExtendsBeanList(List<?> list,Class<T> typeClazz){
         return WrapperUtil.cloneTransformInstance(list,typeClazz);
     }
 }

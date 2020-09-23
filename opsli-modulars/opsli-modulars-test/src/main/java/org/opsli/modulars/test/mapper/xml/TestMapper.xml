@@ -6,6 +6,7 @@
     <sql id="TestEntityColumns">
 		a.id as id,
         a.name as name,
+        a.type as type,
         a.remark as remark,
         a.create_by as createBy,
         a.create_time as createTime,

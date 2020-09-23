@@ -12,7 +12,7 @@ import org.opsli.modulars.system.dict.entity.SysDict;
  * @CreateTime: 2020-09-17 13:07
  * @Description: 数据字典 接口
  */
-public interface IDictService extends CrudServiceInterface<SysDictModel, SysDict> {
+public interface IDictService extends CrudServiceInterface<SysDict, SysDictModel> {
 
 
 }

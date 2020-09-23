@@ -13,7 +13,7 @@ import java.util.List;
  * @CreateTime: 2020-09-17 13:07
  * @Description: 数据字典 明细 接口
  */
-public interface IDictDetailService extends CrudServiceInterface<SysDictDetailModel, SysDictDetail> {
+public interface IDictDetailService extends CrudServiceInterface<SysDictDetail, SysDictDetailModel> {
 
     /**
      * 根据父类ID 删除

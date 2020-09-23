@@ -33,8 +33,9 @@
         (
         a.dict_name = #{dictName}
         or
-        a.type_code = #{typeCode}
+        a.dict_value = #{dictValue}
         )
+        and a.type_code = #{typeCode}
         and a.deleted = 0
         <if test="id != null and id != ''">
             and a.id != #{id}

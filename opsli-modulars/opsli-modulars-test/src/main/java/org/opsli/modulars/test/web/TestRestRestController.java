@@ -1,6 +1,7 @@
 package org.opsli.modulars.test.web;
 
 import cn.hutool.core.thread.ThreadUtil;
+import cn.hutool.core.util.RandomUtil;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
@@ -49,7 +50,7 @@ import java.util.concurrent.TimeUnit;
  */
 @Slf4j
 @ApiRestController("/test")
-public class TestRestRestController extends BaseRestController<TestModel, TestEntity, ITestService>
+public class TestRestRestController extends BaseRestController<TestEntity, TestModel, ITestService>
         implements TestApi {
 
 
@@ -267,7 +268,7 @@ public class TestRestRestController extends BaseRestController<TestModel, TestEn
     public ResultVo<?> findPage(Integer pageNo, Integer pageSize, HttpServletRequest request) {
 
         QueryBuilder<TestEntity> queryBuilder = new WebQueryBuilder<>(TestEntity.class, request.getParameterMap());
-        Page<TestModel, TestEntity> page = new Page<>(pageNo, pageSize);
+        Page<TestEntity,TestModel> page = new Page<>(pageNo, pageSize);
         page.setQueryWrapper(queryBuilder.build());
         page = IService.findPage(page);
 
@@ -293,6 +294,31 @@ public class TestRestRestController extends BaseRestController<TestModel, TestEn
         return super.importTemplate("测试", response);
     }
 
+
+    /**
+     * 新增数据
+     * @return
+     */
+    @ApiOperation(value = "批量插入1000个随机新增数据", notes = "批量插入1000个随机新增数据")
+    @GetMapping("/insertAll")
+    public ResultVo<Boolean> insertAll(){
+        List<DictModel> testType = DictUtil.getDictList("testType");
+
+        List<TestModel> datas = new ArrayList<>();
+        // 转化对象 处理 ApiModel 与 本地对象
+        for (int i = 0; i < 1000; i++) {
+            int randomNum = RandomUtil.randomInt(0, testType.size());
+            TestModel model = new TestModel();
+            model.setName("测试名称"+random.nextInt());
+            model.setType(testType.get(randomNum).getDictValue());
+            model.setRemark("测试备注"+random.nextInt());
+            datas.add(model);
+        }
+
+        // 调用新增方法
+        boolean b = IService.insertBatch(datas);
+        return ResultVo.success("新增成功",b);
+    }
 
 
     @ApiOperation(value = "获得字典 - By Name", notes = "获得字典 - By Name")

@@ -39,7 +39,7 @@ import java.util.List;
  * @Description: 数据字典 明细 接口实现类
  */
 @Service
-public class DictDetailServiceImpl extends CrudServiceImpl<DictDetailMapper, SysDictDetailModel, SysDictDetail> implements IDictDetailService {
+public class DictDetailServiceImpl extends CrudServiceImpl<DictDetailMapper, SysDictDetail, SysDictDetailModel> implements IDictDetailService {
 
     @Autowired(required = false)
     private DictDetailMapper mapper;
@@ -62,7 +62,7 @@ public class DictDetailServiceImpl extends CrudServiceImpl<DictDetailMapper, Sys
         Integer count = mapper.uniqueVerificationByNameOrValue(entity);
         if(count != null && count > 0){
             // 重复
-            throw new ServiceException(SystemMsg.EXCEL_DICT_UNIQUE);
+            throw new ServiceException(SystemMsg.EXCEL_DICT_DETAIL_UNIQUE);
         }
 
         SysDictDetailModel ret = super.insert(model);

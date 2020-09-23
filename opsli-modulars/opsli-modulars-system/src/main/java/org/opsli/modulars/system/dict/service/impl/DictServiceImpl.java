@@ -27,7 +27,7 @@ import java.util.List;
  * @Description: 数据字典 接口实现类
  */
 @Service
-public class DictServiceImpl extends CrudServiceImpl<DictMapper, SysDictModel, SysDict> implements IDictService {
+public class DictServiceImpl extends CrudServiceImpl<DictMapper, SysDict, SysDictModel> implements IDictService {
 
     @Autowired(required = false)
     private DictMapper mapper;

@@ -11,7 +11,7 @@ import org.opsli.modulars.test.entity.TestEntity;
  * @CreateTime: 2020-09-17 13:07
  * @Description: 测试接口
  */
-public interface ITestService extends CrudServiceInterface<TestModel,TestEntity> {
+public interface ITestService extends CrudServiceInterface<TestEntity,TestModel> {
 
     /**
      * 根据名称 获得对象

@@ -28,10 +28,10 @@ public enum CoreMsg implements BaseMsg {
     /**
      * Excel
      */
-    EXCEL_EXPORT_SUCCESS(10300,"Excel 导出成功！"),
-    EXCEL_EXPORT_ERROR(10301,"Excel 导出失败！{}"),
-    EXCEL_IMPORT_SUCCESS(10302,"EXCEL 导入成功！数据行数：{}  耗时(秒)：{}"),
-    EXCEL_IMPORT_ERROR(10303,"Excel导入失败：{}  耗时(秒)：{}"),
+    EXCEL_EXPORT_SUCCESS(10300,"Excel 导出成功！  -  数据行数：{}  -  耗时：{}毫秒"),
+    EXCEL_EXPORT_ERROR(10301,"Excel 导出失败！  -  耗时：{}毫秒  -  失败信息：{}"),
+    EXCEL_IMPORT_SUCCESS(10302,"EXCEL 导入成功！  -  耗时：{}毫秒"),
+    EXCEL_IMPORT_ERROR(10303,"Excel导入失败!   -  耗时：{}毫秒  -  失败信息：{}"),
     EXCEL_IMPORT_NO(10304,""),
     EXCEL_FILE_NULL(10305,"请选择文件"),
 

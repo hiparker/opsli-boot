@@ -18,10 +18,10 @@ import java.util.List;
  *      能往下走的只能是成功
  *      异常问题 已经统一被处理
  *
- * @param <E>
  * @param <T>
+ * @param <E>
  */
-public interface CrudServiceInterface<E,T> extends BaseServiceInterface<T> {
+public interface CrudServiceInterface<T,E> extends BaseServiceInterface<T> {
 
 
     /**
@@ -158,7 +158,7 @@ public interface CrudServiceInterface<E,T> extends BaseServiceInterface<T> {
      *
      * @return  Page<T>
      */
-    Page<E,T> findPage(Page<E,T> page);
+    Page<T,E> findPage(Page<T,E> page);
 
 
 }

@@ -28,7 +28,7 @@ import javax.servlet.http.HttpServletResponse;
  */
 @Slf4j
 @ApiRestController("/dict")
-public class DictRestController extends BaseRestController<SysDictModel, SysDict, IDictService>
+public class DictRestController extends BaseRestController<SysDict, SysDictModel, IDictService>
         implements DictApi {
 
 
@@ -55,7 +55,7 @@ public class DictRestController extends BaseRestController<SysDictModel, SysDict
     public ResultVo<?> findPage(Integer pageNo, Integer pageSize, HttpServletRequest request) {
 
         QueryBuilder<SysDict> queryBuilder = new WebQueryBuilder<>(SysDict.class, request.getParameterMap());
-        Page<SysDictModel, SysDict> page = new Page<>(pageNo, pageSize);
+        Page<SysDict, SysDictModel> page = new Page<>(pageNo, pageSize);
         page.setQueryWrapper(queryBuilder.build());
         page = IService.findPage(page);
 
