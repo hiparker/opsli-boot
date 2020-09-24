@@ -11,7 +11,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 import org.apache.poi.ss.usermodel.FillPatternType;
-import org.opsli.plugins.excel.annotation.CellStyleFormat;
+import org.opsli.plugins.excel.annotation.ExcelInfo;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.Serializable;
@@ -46,24 +46,24 @@ public abstract class ApiWrapper implements Serializable {
 
 	/** ID */
 	@TableId
+	@ApiModelProperty(value = "ID")
 	@ExcelIgnore
-	//@ApiModelProperty(value = "ID")
 	//@ExcelProperty(value = "ID", order = 1000)
-	@CellStyleFormat
+	//@ExcelInfo
 	private String id;
 
 	/** 创建人 */
+	@ApiModelProperty(value = "创建人")
 	@ExcelIgnore
-	//@ApiModelProperty(value = "创建人")
 	//@ExcelProperty(value = "创建人", order = 1001)
-	@CellStyleFormat
+	//@ExcelInfo
 	private String createBy;
 
 	/** 创建时间 */
 	@ApiModelProperty(value = "创建时间")
 	@ExcelIgnore
 	//@ExcelProperty(value = "创建时间", order = 1002)
-	//@CellStyleFormat
+	//@ExcelInfo
 	@JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
 	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date createTime;
@@ -72,14 +72,14 @@ public abstract class ApiWrapper implements Serializable {
 	@ApiModelProperty(value = "修改人")
 	@ExcelIgnore
 	//@ExcelProperty(value = "修改人", order = 1003)
-	//@CellStyleFormat
+	//@ExcelInfo
 	private String updateBy;
 
 	/** 更新时间 */
 	@ApiModelProperty(value = "修改时间")
 	@ExcelIgnore
 	//@ExcelProperty(value = "修改时间", order = 1004)
-	//@CellStyleFormat
+	//@ExcelInfo
 	@JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
 	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date updateTime;
