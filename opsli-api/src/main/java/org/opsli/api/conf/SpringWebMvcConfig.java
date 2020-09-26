@@ -70,31 +70,9 @@ public class SpringWebMvcConfig implements WebMvcConfigurer {
 				.apis(RequestHandlerSelectors.withMethodAnnotation(ApiOperation.class))
 				.paths(PathSelectors.any())
 				.build();
-		//.securitySchemes(Collections.singletonList(securityScheme()));
-		//.globalOperationParameters(setHeaderToken());
 	}
 
-	/***
-	 * oauth2配置
-	 * 需要增加swagger授权回调地址
-	 * http://localhost:8888/webjars/springfox-swagger-ui/o2c.html
-	 * @return
-	 */
-//	@Bean
-//	SecurityScheme securityScheme() {
-//		return new ApiKey(DefContants.X_ACCESS_TOKEN, DefContants.X_ACCESS_TOKEN, "header");
-//	}
-	/**
-	 * JWT token
-	 * @return
-	 */
-//	private List<Parameter> setHeaderToken() {
-//        ParameterBuilder tokenPar = new ParameterBuilder();
-//        List<Parameter> pars = new ArrayList<>();
-//        tokenPar.name(DefContants.X_ACCESS_TOKEN).description("token").modelRef(new ModelRef("string")).parameterType("header").required(false).build();
-//        pars.add(tokenPar.build());
-//        return pars;
-//    }
+
 
 	/**
 	 * api文档的详细信息函数,注意这里的注解引用的是哪个
