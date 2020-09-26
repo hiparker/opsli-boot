@@ -3,7 +3,7 @@ package org.opsli.core.cache.pushsub.msgs;
 import com.alibaba.fastjson.JSONObject;
 import lombok.Data;
 import lombok.experimental.Accessors;
-import org.opsli.api.wrapper.system.dict.DictModel;
+import org.opsli.api.wrapper.system.dict.DictWrapper;
 import org.opsli.core.cache.pushsub.enums.CacheType;
 import org.opsli.core.cache.pushsub.enums.DictModelType;
 import org.opsli.core.cache.pushsub.enums.MsgArgsType;
@@ -33,11 +33,11 @@ public final class DictMsgFactory extends BaseSubMessage{
     /**
      * 构建消息
      */
-    public static BaseSubMessage createMsg(DictModel dictModel, CacheType cacheType){
+    public static BaseSubMessage createMsg(DictWrapper dictWrapperModel, CacheType cacheType){
         BaseSubMessage baseSubMessage = new BaseSubMessage();
         // 数据
         JSONObject jsonObj = new JSONObject();
-        jsonObj.put(MsgArgsType.DICT_MODEL.toString(),dictModel);
+        jsonObj.put(MsgArgsType.DICT_MODEL.toString(), dictWrapperModel);
         jsonObj.put(MsgArgsType.DICT_MODEL_TYPE.toString(), DictModelType.OBJECT);
         jsonObj.put(MsgArgsType.DICT_TYPE.toString(),cacheType.toString());
 
@@ -49,11 +49,11 @@ public final class DictMsgFactory extends BaseSubMessage{
     /**
      * 构建消息
      */
-    public static BaseSubMessage createMsg(List<DictModel> dictModels, CacheType cacheType){
+    public static BaseSubMessage createMsg(List<DictWrapper> dictWrapperModels, CacheType cacheType){
         BaseSubMessage baseSubMessage = new BaseSubMessage();
         // 数据
         JSONObject jsonObj = new JSONObject();
-        jsonObj.put(MsgArgsType.DICT_MODELS.toString(),dictModels);
+        jsonObj.put(MsgArgsType.DICT_MODELS.toString(), dictWrapperModels);
         jsonObj.put(MsgArgsType.DICT_MODEL_TYPE.toString(), DictModelType.COLLECTION);
         jsonObj.put(MsgArgsType.DICT_TYPE.toString(),cacheType.toString());
 

@@ -44,6 +44,9 @@ spring:
   autoconfigure:
     exclude:
       - com.alibaba.druid.spring.boot.autoconfigure.DruidDataSourceAutoConfigure
+  #
+  #main:
+  #  allow-bean-definition-overriding: true
   # 邮件设置
   mail:
     host: smtp.qq.com
@@ -142,3 +145,8 @@ mybatis-plus:
     call-setters-on-nulls: true
     # 打印SQL 开发测试使用 生产关闭 ***
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+# opsli 自定义配置
+opsli:
+  # token 有效时间 （分钟） 2小时
+  token-effective-time: 120

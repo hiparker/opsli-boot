@@ -1,4 +1,4 @@
-package org.opsli.common.annotation;
+package org.opsli.common.annotation.hotdata;
 
 import org.opsli.common.constants.CacheConstants;
 
@@ -24,7 +24,7 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 @Documented
-public @interface HotDataDel {
+public @interface HotDataPut {
 
     /** 缓存源名字 */
     String name() default CacheConstants.HOT_DATA;

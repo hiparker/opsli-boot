@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.opsli.modulars.system.user.mapper.UserMapper">
+
+    <!-- 数据库字段 -->
+    <sql id="SysDictColumns">
+		a.id as id,
+
+		a.username as username,
+        a.password as password,
+        a.secret_key as secretKey,
+        a.no as no,
+        a.real_name as realName,
+        a.locked as locked,
+        a.mobile as mobile,
+        a.email as email,
+        a.avatar as avatar,
+        a.login_ip as loginIp,
+        a.remark as remark,
+        a.tenant_id as tenantId,
+
+        a.create_by as createBy,
+        a.create_time as createTime,
+        a.update_by as updateBy,
+        a.update_time as updateTime,
+        a.version as version,
+        a.deleted as deleted
+	</sql>
+
+    <sql id="SysDictJoins">
+	</sql>
+
+    <select id="uniqueVerificationByUsername" parameterType="SysUser" resultType="Integer">
+        select
+            count(0)
+        from
+        sys_user a
+        where
+            a.username = #{username}
+            and a.deleted = 0
+            <if test="id != null and id != ''">
+                AND a.id != #{id}
+            </if>
+    </select>
+
+
+    <select id="queryAllPerms" resultType="String">
+        select
+            a.menu_code
+        from
+        sys_menu a,
+        sys_role_menu_ref b,
+        sys_user_role_ref c
+        where
+            a.id = b.module_id
+            and b.role_id = c.role_id
+            and a.type in ( '2', '3', '4' )
+            and c.user_id = #{userId}
+        where
+    </select>
+
+    <select id="getRoleCodeList"  resultType="String">
+        select
+            b.role_code
+        from
+        sys_user_role_ref a,
+        sys_role b
+        where
+            a.role_id = b.id
+            and a.user_id = #{userId}
+    </select>
+
+    <!--  根据用户id查询菜单列表-->
+    <select id="findMenuListByUserId" resultType="SysMenu">
+        select
+            c.id,
+            c.icon,
+            c.menu_name,
+            c.url,
+            c.parent_Id
+        from
+            sys_user_role_ref a,
+            sys_role_menu_ref b,
+            sys_menu c
+        where
+            a.role_Id = b.role_Id
+            and b.menu_id = c.id
+            and c.parent_id != -1
+            and a.user_id = #{userId}
+            and c.type = '1'
+        order by c.id
+    </select>
+
+</mapper>

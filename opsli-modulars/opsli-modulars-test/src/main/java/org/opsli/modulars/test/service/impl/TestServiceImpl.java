@@ -1,9 +1,9 @@
 package org.opsli.modulars.test.service.impl;
 
 import org.opsli.api.wrapper.test.TestModel;
-import org.opsli.common.annotation.EnableHotData;
-import org.opsli.common.annotation.HotDataDel;
-import org.opsli.common.annotation.HotDataPut;
+import org.opsli.common.annotation.hotdata.EnableHotData;
+import org.opsli.common.annotation.hotdata.HotDataDel;
+import org.opsli.common.annotation.hotdata.HotDataPut;
 import org.opsli.core.base.service.impl.CrudServiceImpl;
 import org.opsli.modulars.test.entity.TestEntity;
 import org.opsli.modulars.test.mapper.TestMapper;

@@ -1,7 +1,7 @@
 package org.opsli.api.web.system.dict;
 
 import org.opsli.api.base.result.ResultVo;
-import org.opsli.api.wrapper.system.dict.SysDictDetailModel;
+import org.opsli.api.wrapper.system.dict.DictDetailModel;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -28,7 +28,6 @@ import java.util.List;
  */
 public interface DictDetailApi {
 
-    /** 标题 */
     String TITLE = "数据字典明细";
 
     /**
@@ -37,7 +36,7 @@ public interface DictDetailApi {
      * @return ResultVo
      */
     @GetMapping("/get")
-    ResultVo<SysDictDetailModel> get(SysDictDetailModel model);
+    ResultVo<DictDetailModel> get(DictDetailModel model);
 
     /**
      * 数据字典 查询分页
@@ -59,7 +58,7 @@ public interface DictDetailApi {
      * @return ResultVo
      */
     @PostMapping("/insert")
-    ResultVo<?> insert(SysDictDetailModel model);
+    ResultVo<?> insert(DictDetailModel model);
 
     /**
      * 数据字典 修改
@@ -67,7 +66,7 @@ public interface DictDetailApi {
      * @return ResultVo
      */
     @PostMapping("/update")
-    ResultVo<?> update(SysDictDetailModel model);
+    ResultVo<?> update(DictDetailModel model);
 
     /**
      * 数据字典 删除
@@ -120,6 +119,6 @@ public interface DictDetailApi {
      * @return
      */
     @GetMapping("/findListByTypeCode")
-    ResultVo<List<SysDictDetailModel>> findListByTypeCode(String typeCode);
+    ResultVo<List<DictDetailModel>> findListByTypeCode(String typeCode);
 
 }

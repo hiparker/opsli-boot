@@ -1,10 +1,9 @@
 package org.opsli.modulars.system.dict.service.impl;
 
 import org.apache.commons.lang3.StringUtils;
-import org.opsli.api.wrapper.system.dict.SysDictDetailModel;
-import org.opsli.api.wrapper.system.dict.SysDictModel;
+import org.opsli.api.wrapper.system.dict.DictDetailModel;
+import org.opsli.api.wrapper.system.dict.DictModel;
 import org.opsli.common.exception.ServiceException;
-import org.opsli.common.utils.WrapperUtil;
 import org.opsli.core.base.service.impl.CrudServiceImpl;
 import org.opsli.modulars.system.SystemMsg;
 import org.opsli.modulars.system.dict.entity.SysDict;
@@ -27,7 +26,7 @@ import java.util.List;
  * @Description: 数据字典 接口实现类
  */
 @Service
-public class DictServiceImpl extends CrudServiceImpl<DictMapper, SysDict, SysDictModel> implements IDictService {
+public class DictServiceImpl extends CrudServiceImpl<DictMapper, SysDict, DictModel> implements IDictService {
 
     @Autowired(required = false)
     private DictMapper mapper;
@@ -35,15 +34,15 @@ public class DictServiceImpl extends CrudServiceImpl<DictMapper, SysDict, SysDic
     private IDictDetailService iDictDetailService;
 
     @Override
-    public SysDictModel insert(SysDictModel model) {
+    public DictModel insert(DictModel model) {
         if(model == null) return null;
 
-        SysDict entity = WrapperUtil.transformInstance(model, SysDict.class);
+        SysDict entity = super.transformM2T(model);
         // 唯一验证
         Integer count = mapper.uniqueVerificationByCode(entity);
         if(count != null && count > 0){
             // 重复
-            throw new ServiceException(SystemMsg.EXCEL_DICT_UNIQUE);
+            throw new ServiceException(SystemMsg.EXCEPTION_DICT_UNIQUE);
         }
 
         return super.insert(model);
@@ -51,28 +50,28 @@ public class DictServiceImpl extends CrudServiceImpl<DictMapper, SysDict, SysDic
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public SysDictModel update(SysDictModel model) {
+    public DictModel update(DictModel model) {
         if(model == null) return null;
 
-        SysDict entity = WrapperUtil.transformInstance(model, SysDict.class);
+        SysDict entity = super.transformM2T(model);
         // 唯一验证
         Integer count = mapper.uniqueVerificationByCode(entity);
         if(count != null && count > 0){
             // 重复
-            throw new ServiceException(SystemMsg.EXCEL_DICT_UNIQUE);
+            throw new ServiceException(SystemMsg.EXCEPTION_DICT_UNIQUE);
         }
 
-        SysDictModel updateRet = super.update(model);
+        DictModel updateRet = super.update(model);
 
         // 字典主表修改 子表跟着联动 （验证是否改了编号）/ 或者修改不允许改编号
-        List<SysDictDetailModel> listByTypeCode = null;
+        List<DictDetailModel> listByTypeCode = null;
         if(StringUtils.isNotEmpty(model.getTypeCode())){
             listByTypeCode = iDictDetailService.findListByTypeCode(model.getTypeCode());
         }
         if(listByTypeCode != null && listByTypeCode.size() > 0){
-            for (SysDictDetailModel sysDictDetailModel : listByTypeCode) {
-                sysDictDetailModel.setTypeCode(updateRet.getTypeCode());
-                iDictDetailService.update(sysDictDetailModel);
+            for (DictDetailModel dictDetailModel : listByTypeCode) {
+                dictDetailModel.setTypeCode(updateRet.getTypeCode());
+                iDictDetailService.update(dictDetailModel);
             }
         }
 
@@ -91,7 +90,7 @@ public class DictServiceImpl extends CrudServiceImpl<DictMapper, SysDict, SysDic
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public boolean delete(SysDictModel model) {
+    public boolean delete(DictModel model) {
         if(model == null || StringUtils.isEmpty(model.getId())){
             return false;
         }
@@ -118,11 +117,11 @@ public class DictServiceImpl extends CrudServiceImpl<DictMapper, SysDict, SysDic
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public boolean deleteAll(Collection<SysDictModel> models) {
+    public boolean deleteAll(Collection<DictModel> models) {
         if(models == null || models.isEmpty()) return false;
 
         // 删除字典明细表
-        for (SysDictModel model : models) {
+        for (DictModel model : models) {
             if(model == null || StringUtils.isEmpty(model.getId())){
                 continue;
             }

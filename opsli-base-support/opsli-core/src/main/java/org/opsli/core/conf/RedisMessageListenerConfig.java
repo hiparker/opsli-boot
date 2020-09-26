@@ -2,7 +2,8 @@ package org.opsli.core.conf;
 
 import lombok.extern.slf4j.Slf4j;
 import org.opsli.core.cache.pushsub.receiver.RedisPushSubReceiver;
-import org.opsli.plugins.redis.pushsub.receiver.BaseReceiver;
+import org.opsli.plugins.redis.conf.RedisPluginConfig;
+import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,7 +12,6 @@ import org.springframework.data.redis.listener.PatternTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
 
-import javax.annotation.Resource;
 
 /**
  * @author  : parker
@@ -22,11 +22,10 @@ import javax.annotation.Resource;
  **/
 @Slf4j
 @Configuration
+@AutoConfigureAfter(RedisPluginConfig.class)
 @ConditionalOnProperty(name = "spring.redis.pushsub.enable", havingValue = "true")
 public class RedisMessageListenerConfig {
 
-    @Resource
-    private LettuceConnectionFactory factory;
 
     /**
      * redis消息监听器容器
@@ -36,10 +35,10 @@ public class RedisMessageListenerConfig {
      */
  
     @Bean
-    public RedisMessageListenerContainer container() {
+    public RedisMessageListenerContainer container(LettuceConnectionFactory lettuceConnectionFactory) {
         RedisPushSubReceiver receiver = new RedisPushSubReceiver();
         RedisMessageListenerContainer container = new RedisMessageListenerContainer();
-        container.setConnectionFactory(factory);
+        container.setConnectionFactory(lettuceConnectionFactory);
 
         //订阅了的通道
         container.addMessageListener(listenerAdapter(new RedisPushSubReceiver()), new PatternTopic(receiver.getListenerChannel()));

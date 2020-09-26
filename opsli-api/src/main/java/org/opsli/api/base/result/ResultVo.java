@@ -139,8 +139,8 @@ public class ResultVo<T> implements Serializable {
 	 * @return ResultVo<Object>
 	 */
 	@JsonIgnore//返回对象时忽略此属性
-	public static ResultVo<Object> error(String msg) {
-		ResultVo<Object> ret = new ResultVo<>();
+	public static <T> ResultVo<T> error(String msg) {
+		ResultVo<T> ret = new ResultVo<>();
 		ret.setMsg(msg);
 		ret.setCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
 		ret.setSuccess(false);
@@ -154,8 +154,8 @@ public class ResultVo<T> implements Serializable {
 	 * @return ResultVo<T>
 	 */
 	@JsonIgnore//返回对象时忽略此属性
-	public static ResultVo<Object> error(int code, String msg) {
-		ResultVo<Object> ret = new ResultVo<>();
+	public static <T> ResultVo<T> error(int code, String msg) {
+		ResultVo<T> ret = new ResultVo<>();
 		ret.setMsg(msg);
 		ret.setCode(code);
 		ret.setSuccess(false);

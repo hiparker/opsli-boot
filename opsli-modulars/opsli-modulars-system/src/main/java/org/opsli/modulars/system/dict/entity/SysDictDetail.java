@@ -29,7 +29,7 @@ public class SysDictDetail extends BaseEntity {
     /** 字典值 */
     private String dictValue;
 
-    /** 是否内置数据 */
+    /** 是否内置数据 0是  1否*/
     private Character izLock;
 
     /** 排序 */

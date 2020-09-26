@@ -6,7 +6,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.opsli.api.msg.ValidationMsg;
-import org.opsli.api.wrapper.system.dict.SysDictModel;
+import org.opsli.api.wrapper.system.dict.DictModel;
 import org.opsli.common.annotation.validation.ValidationArgs;
 import org.opsli.common.annotation.validation.ValidationArgsMax;
 import org.opsli.common.annotation.validation.ValidationArgsMin;
@@ -334,13 +334,13 @@ public final class ValidationUtil {
     }
 
     public static void main(String[] args) {
-        SysDictModel sysDictModel = new SysDictModel();
-        sysDictModel.setTypeCode("asdsa");
-        sysDictModel.setTypeName("阿哈哈哈哈");
-        sysDictModel.setRemark("测试11232131231231223123");
-        sysDictModel.setIzLock('1');
+        DictModel dictModel = new DictModel();
+        dictModel.setTypeCode("asdsa");
+        dictModel.setTypeName("阿哈哈哈哈");
+        dictModel.setRemark("测试11232131231231223123");
+        dictModel.setIzLock('1');
 
-        ValidationUtil.verify(sysDictModel);
+        ValidationUtil.verify(dictModel);
     }
 
 

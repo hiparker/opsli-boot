@@ -8,9 +8,9 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.opsli.api.base.warpper.ApiWrapper;
-import org.opsli.common.annotation.EnableHotData;
-import org.opsli.common.annotation.HotDataDel;
-import org.opsli.common.annotation.HotDataPut;
+import org.opsli.common.annotation.hotdata.EnableHotData;
+import org.opsli.common.annotation.hotdata.HotDataDel;
+import org.opsli.common.annotation.hotdata.HotDataPut;
 import org.opsli.common.constants.CacheConstants;
 import org.opsli.core.cache.local.CacheUtil;
 import org.opsli.core.cache.pushsub.entity.CacheDataEntity;
@@ -47,11 +47,11 @@ public class CacheDataAop {
     @Autowired
     private RedisPlugin redisPlugin;
 
-    @Pointcut("@annotation(org.opsli.common.annotation.HotDataPut)")
+    @Pointcut("@annotation(org.opsli.common.annotation.hotdata.HotDataPut)")
     public void hotDataPut() {
     }
 
-    @Pointcut("@annotation(org.opsli.common.annotation.HotDataDel)")
+    @Pointcut("@annotation(org.opsli.common.annotation.hotdata.HotDataDel)")
     public void hotDataDel() {
     }
 

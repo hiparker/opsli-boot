@@ -1,6 +1,6 @@
 package org.opsli.modulars.system.dict.service;
 
-import org.opsli.api.wrapper.system.dict.SysDictDetailModel;
+import org.opsli.api.wrapper.system.dict.DictDetailModel;
 import org.opsli.core.base.service.interfaces.CrudServiceInterface;
 import org.opsli.modulars.system.dict.entity.SysDictDetail;
 
@@ -13,7 +13,7 @@ import java.util.List;
  * @CreateTime: 2020-09-17 13:07
  * @Description: 数据字典 明细 接口
  */
-public interface IDictDetailService extends CrudServiceInterface<SysDictDetail, SysDictDetailModel> {
+public interface IDictDetailService extends CrudServiceInterface<SysDictDetail, DictDetailModel> {
 
     /**
      * 根据父类ID 删除
@@ -28,6 +28,6 @@ public interface IDictDetailService extends CrudServiceInterface<SysDictDetail, 
      * @param typeCode 字典类型编号
      * @return
      */
-    List<SysDictDetailModel> findListByTypeCode(String typeCode);
+    List<DictDetailModel> findListByTypeCode(String typeCode);
 
 }

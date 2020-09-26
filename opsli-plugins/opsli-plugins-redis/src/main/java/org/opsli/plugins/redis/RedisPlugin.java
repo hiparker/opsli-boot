@@ -430,9 +430,38 @@ public class RedisPlugin {
 	 * @return
 	 */
 	public boolean hPut(String key, String field, Object value) {
+		return this.hPut(key, field, value, -1, TimeUnit.SECONDS);
+	}
+
+	/**
+	 * 添加一个Hash 数据
+	 * @param key
+	 * @param field
+	 * @param value
+	 * @return
+	 */
+	public boolean hPut(String key, String field, Object value, long timeout) {
+		return this.hPut(key, field, value, timeout, TimeUnit.SECONDS);
+	}
+
+	/**
+	 * 存入普通对象
+	 *	有时间限制
+	 *
+	 * @param key Redis键
+	 * @param field
+	 * @param value 值
+	 * @param timeout 有效期，单位秒
+	 * @param unit 时间单位
+	 * @return boolean
+	 */
+	public boolean hPut(String key, String field, Object value, long timeout, TimeUnit unit) {
 		boolean ret = false;
 		try {
 			redisTemplate.opsForHash().put(key, field, value);
+			if (timeout > 0) {
+				expire(key, timeout, unit);
+			}
 			ret = true;
 		} catch (Exception e) {
 			log.error(e.getMessage(),e);

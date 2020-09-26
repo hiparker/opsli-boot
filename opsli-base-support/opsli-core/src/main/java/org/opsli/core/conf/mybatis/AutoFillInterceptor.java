@@ -8,6 +8,7 @@ import org.apache.ibatis.executor.Executor;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.mapping.SqlCommandType;
 import org.apache.ibatis.plugin.*;
+import org.opsli.api.wrapper.system.user.UserModel;
 import org.opsli.common.constants.MyBatisConstants;
 import org.opsli.core.utils.UserUtil;
 import org.springframework.stereotype.Component;
@@ -79,13 +80,14 @@ public class AutoFillInterceptor implements Interceptor {
      * @param arg
      */
     public void insertFill(Object arg) {
+        UserModel userModel = UserUtil.getUser();
         Field[] fields = ReflectUtil.getFields(arg.getClass());
         for (Field f : fields) {
             f.setAccessible(true);
             switch (f.getName()) {
                 // 创建人
                 case MyBatisConstants.FIELD_CREATE_BY:
-                    setProperty(arg, MyBatisConstants.FIELD_CREATE_BY, "测试");
+                    setProperty(arg, MyBatisConstants.FIELD_CREATE_BY, userModel.getId());
                     break;
                 // 创建日期
                 case MyBatisConstants.FIELD_CREATE_TIME:
@@ -93,7 +95,7 @@ public class AutoFillInterceptor implements Interceptor {
                     break;
                 // 更新人
                 case MyBatisConstants.FIELD_UPDATE_BY:
-                    setProperty(arg, MyBatisConstants.FIELD_UPDATE_BY, "测试");
+                    setProperty(arg, MyBatisConstants.FIELD_UPDATE_BY, userModel.getId());
                     break;
                 // 更新日期
                 case MyBatisConstants.FIELD_UPDATE_TIME:
@@ -123,6 +125,7 @@ public class AutoFillInterceptor implements Interceptor {
      * @param arg
      */
     public void updateFill(Object arg) {
+        UserModel userModel = UserUtil.getUser();
         // 2020-09-19
         // 修改这儿 有可能会拿到一个 MapperMethod，需要特殊处理
         Field[] fields;
@@ -145,7 +148,7 @@ public class AutoFillInterceptor implements Interceptor {
             switch (f.getName()) {
                 // 更新人
                 case MyBatisConstants.FIELD_UPDATE_BY:
-                    setProperty(arg, MyBatisConstants.FIELD_UPDATE_BY, "测试修改");
+                    setProperty(arg, MyBatisConstants.FIELD_UPDATE_BY, userModel.getId());
                     break;
                 // 更新日期
                 case MyBatisConstants.FIELD_UPDATE_TIME:

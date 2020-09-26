@@ -2,7 +2,7 @@ package org.opsli.core.cache.pushsub.handler;
 
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
-import org.opsli.api.wrapper.system.dict.DictModel;
+import org.opsli.api.wrapper.system.dict.DictWrapper;
 import org.opsli.common.constants.CacheConstants;
 import org.opsli.common.constants.DictConstants;
 import org.opsli.core.cache.local.CacheUtil;
@@ -14,7 +14,6 @@ import org.opsli.plugins.cache.EhCachePlugin;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Collection;
-import java.util.List;
 
 /**
  * @BelongsProject: opsli-boot
@@ -43,30 +42,30 @@ public class DictHandler implements RedisPushSubHandler{
             Collection<Object> dicts = (Collection<Object>) msgJson.get(MsgArgsType.DICT_MODELS.toString());
             for (Object dictObj : dicts) {
                 JSONObject jsonObject = (JSONObject) dictObj;
-                DictModel dictModel = JSONObject.toJavaObject(jsonObject, DictModel.class);
-                this.handler(dictModel, type);
+                DictWrapper dictWrapperModel = JSONObject.toJavaObject(jsonObject, DictWrapper.class);
+                this.handler(dictWrapperModel, type);
             }
         } else if(DictModelType.OBJECT == dictModelType){
             Object dictObj = msgJson.get(MsgArgsType.DICT_MODEL.toString());
             JSONObject jsonObject = (JSONObject) dictObj;
-            DictModel dictModel = JSONObject.toJavaObject(jsonObject, DictModel.class);
-            this.handler(dictModel, type);
+            DictWrapper dictWrapperModel = JSONObject.toJavaObject(jsonObject, DictWrapper.class);
+            this.handler(dictWrapperModel, type);
         }
     }
 
 
     /**
      * 真正处理 - 只是处理自己本地的缓存
-     * @param dictModel
+     * @param dictWrapperModel
      * @param type
      */
-    private void handler(DictModel dictModel, CacheType type){
+    private void handler(DictWrapper dictWrapperModel, CacheType type){
 
         // 解析 key
         String ehKeyByName = CacheUtil.handleKey(CacheConstants.EDEN_HASH_DATA,
-                DictConstants.CACHE_PREFIX_NAME + dictModel.getTypeCode() + ":" + dictModel.getDictName());
+                DictConstants.CACHE_PREFIX_NAME + dictWrapperModel.getTypeCode() + ":" + dictWrapperModel.getDictName());
         String ehKeyByValue = CacheUtil.handleKey(CacheConstants.EDEN_HASH_DATA,
-                DictConstants.CACHE_PREFIX_VALUE + dictModel.getTypeCode() + ":" + dictModel.getDictValue());
+                DictConstants.CACHE_PREFIX_VALUE + dictWrapperModel.getTypeCode() + ":" + dictWrapperModel.getDictValue());
 
         // 缓存更新
         if(CacheType.UPDATE == type){
@@ -74,7 +73,7 @@ public class DictHandler implements RedisPushSubHandler{
             ehCachePlugin.delete(CacheConstants.HOT_DATA, ehKeyByValue);
 
             // 统一转换为 JSONObject
-            String jsonStr = JSONObject.toJSONString(dictModel.getModel());
+            String jsonStr = JSONObject.toJSONString(dictWrapperModel.getModel());
             JSONObject value = JSONObject.parseObject(jsonStr);
             ehCachePlugin.put(CacheConstants.HOT_DATA, ehKeyByName, value);
             ehCachePlugin.put(CacheConstants.HOT_DATA, ehKeyByValue, value);

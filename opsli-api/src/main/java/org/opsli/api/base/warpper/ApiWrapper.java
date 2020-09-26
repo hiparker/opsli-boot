@@ -3,6 +3,7 @@ package org.opsli.api.base.warpper;
 import com.alibaba.excel.annotation.ExcelIgnore;
 import com.alibaba.excel.annotation.ExcelProperty;
 import com.alibaba.excel.annotation.write.style.*;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.Version;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -90,4 +91,7 @@ public abstract class ApiWrapper implements Serializable {
 	@Version
 	private Integer version;
 
+	/** 是否是内部Api调用 */
+	@TableField(exist = false)
+	private Boolean izApi = false;
 }

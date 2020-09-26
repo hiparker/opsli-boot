@@ -9,7 +9,7 @@ import org.opsli.api.base.warpper.ApiWrapper;
 import org.opsli.common.annotation.validation.ValidationArgs;
 import org.opsli.common.annotation.validation.ValidationArgsMax;
 import org.opsli.common.enums.ValiArgsType;
-import org.opsli.plugins.excel.annotation.CellStyleFormat;
+import org.opsli.plugins.excel.annotation.ExcelInfo;
 
 /**
  * @BelongsProject: opsli-boot
@@ -20,7 +20,7 @@ import org.opsli.plugins.excel.annotation.CellStyleFormat;
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class SysDictDetailModel extends ApiWrapper {
+public class DictDetailModel extends ApiWrapper {
 
 
     /** 字典ID */
@@ -40,7 +40,7 @@ public class SysDictDetailModel extends ApiWrapper {
     /** 字典名称 */
     @ApiModelProperty(value = "字典名称")
     @ExcelProperty(value = "字典名称", order = 1)
-    @CellStyleFormat
+    @ExcelInfo
     // 验证器
     @ValidationArgs({ValiArgsType.IS_NOT_NULL, ValiArgsType.IS_GENERAL_WITH_CHINESE})
     @ValidationArgsMax(120)
@@ -49,32 +49,34 @@ public class SysDictDetailModel extends ApiWrapper {
     /** 字典值 */
     @ApiModelProperty(value = "字典值")
     @ExcelProperty(value = "字典值", order = 2)
-    @CellStyleFormat
+    @ExcelInfo
     // 验证器
     @ValidationArgs({ValiArgsType.IS_NOT_NULL})
     @ValidationArgsMax(120)
     private String dictValue;
 
-    /** 是否内置数据 */
-    @ApiModelProperty(value = "是否内置数据")
+    /** 是否内置数据 0是  1否*/
+    @ApiModelProperty(value = "是否内置数据 0是  1否")
     @ExcelProperty(value = "是否内置数据", order = 2)
-    @CellStyleFormat
+    @ExcelInfo(dictType = "yes_no")
     // 验证器
     @ValidationArgs({ValiArgsType.IS_NOT_NULL})
+    @ValidationArgsMax(1)
     private Character izLock;
 
     /** 排序 */
     @ApiModelProperty(value = "排序")
     @ExcelProperty(value = "排序", order = 2)
-    @CellStyleFormat
+    @ExcelInfo
     // 验证器
     @ValidationArgs({ValiArgsType.IS_NOT_NULL, ValiArgsType.IS_NUMBER})
+    @ValidationArgsMax(10)
     private Integer sortNo;
 
     /** 备注 */
     @ApiModelProperty(value = "备注")
     @ExcelProperty(value = "备注", order = 2)
-    @CellStyleFormat
+    @ExcelInfo
     // 验证器
     @ValidationArgsMax(255)
     private String remark;

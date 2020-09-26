@@ -1,7 +1,7 @@
 package org.opsli.api.web.system.dict;
 
 import org.opsli.api.base.result.ResultVo;
-import org.opsli.api.wrapper.system.dict.SysDictModel;
+import org.opsli.api.wrapper.system.dict.DictModel;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -36,7 +36,7 @@ public interface DictApi {
      * @return ResultVo
      */
     @GetMapping("/get")
-    ResultVo<SysDictModel> get(SysDictModel model);
+    ResultVo<DictModel> get(DictModel model);
 
     /**
      * 数据字典 查询分页
@@ -58,7 +58,7 @@ public interface DictApi {
      * @return ResultVo
      */
     @PostMapping("/insert")
-    ResultVo<?> insert(SysDictModel model);
+    ResultVo<?> insert(DictModel model);
 
     /**
      * 数据字典 修改
@@ -66,7 +66,7 @@ public interface DictApi {
      * @return ResultVo
      */
     @PostMapping("/update")
-    ResultVo<?> update(SysDictModel model);
+    ResultVo<?> update(DictModel model);
 
     /**
      * 数据字典 删除

@@ -4,9 +4,9 @@ import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.opsli.api.base.result.ResultVo;
 import org.opsli.api.web.system.dict.DictApi;
-import org.opsli.api.web.system.dict.DictDetailApi;
-import org.opsli.api.wrapper.system.dict.SysDictModel;
+import org.opsli.api.wrapper.system.dict.DictModel;
 import org.opsli.common.annotation.ApiRestController;
+import org.opsli.common.api.TokenThreadLocal;
 import org.opsli.core.base.concroller.BaseRestController;
 import org.opsli.core.persistence.Page;
 import org.opsli.core.persistence.querybuilder.QueryBuilder;
@@ -27,8 +27,8 @@ import javax.servlet.http.HttpServletResponse;
  * @Description: 数据字典
  */
 @Slf4j
-@ApiRestController("/dict")
-public class DictRestController extends BaseRestController<SysDict, SysDictModel, IDictService>
+@ApiRestController("/sys/dict")
+public class DictRestController extends BaseRestController<SysDict, DictModel, IDictService>
         implements DictApi {
 
 
@@ -39,7 +39,12 @@ public class DictRestController extends BaseRestController<SysDict, SysDictModel
      */
     @ApiOperation(value = "获得单条字典明细数据", notes = "获得单条字典明细数据 - ID")
     @Override
-    public ResultVo<SysDictModel> get(SysDictModel model) {
+    public ResultVo<DictModel> get(DictModel model) {
+        // 如果系统内部调用 则直接查数据库
+        if(model != null && model.getIzApi() != null && model.getIzApi()){
+            model = IService.get(model);
+        }
+        System.out.println(TokenThreadLocal.get());
         return ResultVo.success(model);
     }
 
@@ -55,7 +60,7 @@ public class DictRestController extends BaseRestController<SysDict, SysDictModel
     public ResultVo<?> findPage(Integer pageNo, Integer pageSize, HttpServletRequest request) {
 
         QueryBuilder<SysDict> queryBuilder = new WebQueryBuilder<>(SysDict.class, request.getParameterMap());
-        Page<SysDict, SysDictModel> page = new Page<>(pageNo, pageSize);
+        Page<SysDict, DictModel> page = new Page<>(pageNo, pageSize);
         page.setQueryWrapper(queryBuilder.build());
         page = IService.findPage(page);
 
@@ -69,7 +74,7 @@ public class DictRestController extends BaseRestController<SysDict, SysDictModel
      */
     @ApiOperation(value = "新增字典明细数据", notes = "新增字典明细数据")
     @Override
-    public ResultVo<?> insert(SysDictModel model) {
+    public ResultVo<?> insert(DictModel model) {
         // 调用新增方法
         IService.insert(model);
         return ResultVo.success("新增字典明细数据成功");
@@ -82,7 +87,7 @@ public class DictRestController extends BaseRestController<SysDict, SysDictModel
      */
     @ApiOperation(value = "修改字典明细数据", notes = "修改字典明细数据")
     @Override
-    public ResultVo<?> update(SysDictModel model) {
+    public ResultVo<?> update(DictModel model) {
         // 调用修改方法
         IService.update(model);
         return ResultVo.success("修改字典明细数据成功");
@@ -125,7 +130,7 @@ public class DictRestController extends BaseRestController<SysDict, SysDictModel
     @Override
     public ResultVo<?> exportExcel(HttpServletRequest request, HttpServletResponse response) {
         QueryBuilder<SysDict> queryBuilder = new WebQueryBuilder<>(SysDict.class, request.getParameterMap());
-        return super.excelExport(DictDetailApi.TITLE, queryBuilder.build(), response);
+        return super.excelExport(DictApi.TITLE, queryBuilder.build(), response);
     }
 
     /**
@@ -147,7 +152,7 @@ public class DictRestController extends BaseRestController<SysDict, SysDictModel
     @ApiOperation(value = "导出Excel模版", notes = "导出Excel模版")
     @Override
     public ResultVo<?> importTemplate(HttpServletResponse response) {
-        return super.importTemplate(DictDetailApi.TITLE, response);
+        return super.importTemplate(DictApi.TITLE, response);
     }
 
 }

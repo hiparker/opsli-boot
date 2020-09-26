@@ -1,4 +1,4 @@
-package org.opsli.general;
+package org.opsli.core.general;
 
 import cn.hutool.core.lang.Console;
 import cn.hutool.core.thread.ThreadUtil;
@@ -23,9 +23,10 @@ public enum StartPrint {
     INSTANCE;
 
     /**
+     * 成功
      * 打印启动日志
      */
-    public void print(Environment env){
+    public void successPrint(Environment env){
         // 睡一秒打印
         ThreadUtil.sleep(1, TimeUnit.SECONDS);
         String ip = "localhost";
@@ -38,9 +39,23 @@ public enum StartPrint {
         String contextPath = env.getProperty("server.servlet.context-path");
         StringBuilder printStr = new StringBuilder();
         printStr.append("\n----------------------------------------------------------\n")
-                .append("Opsli-Boot 框架已启动! 相关URLs:\n")
+                .append("Opsli-Boot 框架启动成功! 相关URLs:\n")
                 .append("项目地址: \t\thttp://" + ip + ":" + serverPort + contextPath + "/\n")
                 .append("Doc文档: \t\thttp://" + ip + ":" + serverPort + contextPath + "/doc.html\n")
+                .append("----------------------------------------------------------\n");
+        Console.log(printStr.toString());
+    }
+
+    /**
+     * 势必啊
+     * 打印启动日志
+     */
+    public void errorPrint(){
+        // 睡一秒打印
+        ThreadUtil.sleep(1, TimeUnit.SECONDS);
+        StringBuilder printStr = new StringBuilder();
+        printStr.append("\n----------------------------------------------------------\n")
+                .append("Opsli-Boot 框架启动失败! 请检查相关配置！\n")
                 .append("----------------------------------------------------------\n");
         Console.log(printStr.toString());
     }

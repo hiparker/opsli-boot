@@ -1,6 +1,6 @@
 package org.opsli.modulars.system.dict.service;
 
-import org.opsli.api.wrapper.system.dict.SysDictModel;
+import org.opsli.api.wrapper.system.dict.DictModel;
 import org.opsli.core.base.service.interfaces.CrudServiceInterface;
 import org.opsli.modulars.system.dict.entity.SysDict;
 
@@ -12,7 +12,7 @@ import org.opsli.modulars.system.dict.entity.SysDict;
  * @CreateTime: 2020-09-17 13:07
  * @Description: 数据字典 接口
  */
-public interface IDictService extends CrudServiceInterface<SysDict, SysDictModel> {
+public interface IDictService extends CrudServiceInterface<SysDict, DictModel> {
 
 
 }

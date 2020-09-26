@@ -5,7 +5,7 @@ import com.alibaba.excel.support.ExcelTypeEnum;
 import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.opsli.api.wrapper.system.dict.DictModel;
+import org.opsli.api.wrapper.system.dict.DictWrapper;
 import org.opsli.common.enums.ExcelOperate;
 import org.opsli.plugins.excel.ExcelPlugin;
 import org.opsli.plugins.excel.annotation.ExcelInfo;
@@ -75,7 +75,7 @@ public class ExcelUtil extends ExcelPlugin {
         // 字段名 - 字典code
         Map<String,String> fieldAndTypeCode = Maps.newHashMap();
         // 字典code - 字典值
-        Map<String,List<DictModel>> typeCodeAndValue = null;
+        Map<String,List<DictWrapper>> typeCodeAndValue = null;
 
         Field[] fields = ReflectUtil.getFields(typeClazz);
         for (Field field : fields) {
@@ -116,7 +116,7 @@ public class ExcelUtil extends ExcelPlugin {
      * @return
      */
     private <T> void handleDict(T data, ExcelOperate operate, Map<String,String> fieldAndTypeCode,
-                    Map<String,List<DictModel>> typeCodeAndValue
+                    Map<String,List<DictWrapper>> typeCodeAndValue
                 ){
         // 如果没有字典 则直接退出
         if(fieldAndTypeCode.size() == 0 || typeCodeAndValue == null || typeCodeAndValue.size() == 0){
@@ -129,9 +129,9 @@ public class ExcelUtil extends ExcelPlugin {
                 String fieldName = entry.getKey();
                 String typeCode = entry.getValue();
                 String fieldValue = (String) ReflectUtil.getFieldValue(data, fieldName);
-                List<DictModel> dictModels = typeCodeAndValue.get(typeCode);
+                List<DictWrapper> dictWrapperModels = typeCodeAndValue.get(typeCode);
                 // 匹配字典
-                String dictVal = this.matchingDict(dictModels, fieldValue, operate);
+                String dictVal = this.matchingDict(dictWrapperModels, fieldValue, operate);
                 if(StringUtils.isEmpty(dictVal)){
                     continue;
                 }
@@ -148,43 +148,43 @@ public class ExcelUtil extends ExcelPlugin {
      * @param fieldAndTypeCode
      * @return
      */
-    public Map<String,List<DictModel>> getDictMap(Map<String,String> fieldAndTypeCode){
+    public Map<String,List<DictWrapper>> getDictMap(Map<String,String> fieldAndTypeCode){
         // 字典code - 字典值
-        Map<String,List<DictModel>> typeCodeAndValue = Maps.newHashMap();
+        Map<String,List<DictWrapper>> typeCodeAndValue = Maps.newHashMap();
         // 取Redis 值
         for (Map.Entry<String, String> entry : fieldAndTypeCode.entrySet()) {
             String typeCode = entry.getValue();
-            List<DictModel> dictList = DictUtil.getDictList(typeCode);
+            List<DictWrapper> dictWrapperList = DictUtil.getDictList(typeCode);
             // 如果字典 List 为空 则走下一个
-            if(dictList == null || dictList.size() == 0) continue;
-            typeCodeAndValue.put(typeCode, dictList);
+            if(dictWrapperList == null || dictWrapperList.size() == 0) continue;
+            typeCodeAndValue.put(typeCode, dictWrapperList);
         }
         return typeCodeAndValue;
     }
 
     /**
      * 匹配字典数据
-     * @param dictModels
+     * @param dictWrapperModels
      * @param fieldValue
      * @param operate
      * @return
      */
-    private String matchingDict(List<DictModel> dictModels, String fieldValue, ExcelOperate operate){
+    private String matchingDict(List<DictWrapper> dictWrapperModels, String fieldValue, ExcelOperate operate){
         String val = "";
-        for (DictModel dictModel : dictModels) {
+        for (DictWrapper dictWrapperModel : dictWrapperModels) {
             // 读操作
             if(ExcelOperate.READ == operate){
                 // 判断 Excel 读入 字典名称是否与 当前字典匹配
-                if(dictModel.getDictName().equals(fieldValue)){
-                    val = dictModel.getDictValue();
+                if(dictWrapperModel.getDictName().equals(fieldValue)){
+                    val = dictWrapperModel.getDictValue();
                     break;
                 }
             }
             // 写操作
             else if(ExcelOperate.WRITE == operate){
                 // 判断 Excel 写出 字典值是否与 当前字典匹配
-                if(dictModel.getDictValue().equals(fieldValue)){
-                    val = dictModel.getDictName();
+                if(dictWrapperModel.getDictValue().equals(fieldValue)){
+                    val = dictWrapperModel.getDictName();
                     break;
                 }
             }

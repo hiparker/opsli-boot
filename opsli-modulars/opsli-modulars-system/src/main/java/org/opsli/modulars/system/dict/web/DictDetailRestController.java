@@ -4,7 +4,7 @@ import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.opsli.api.base.result.ResultVo;
 import org.opsli.api.web.system.dict.DictDetailApi;
-import org.opsli.api.wrapper.system.dict.SysDictDetailModel;
+import org.opsli.api.wrapper.system.dict.DictDetailModel;
 import org.opsli.common.annotation.ApiRestController;
 import org.opsli.core.base.concroller.BaseRestController;
 import org.opsli.core.persistence.Page;
@@ -27,8 +27,8 @@ import java.util.List;
  * @Description: 数据字典明细
  */
 @Slf4j
-@ApiRestController("/dict/detail")
-public class DictDetailRestController extends BaseRestController<SysDictDetail, SysDictDetailModel, IDictDetailService>
+@ApiRestController("/sys/dict/detail")
+public class DictDetailRestController extends BaseRestController<SysDictDetail, DictDetailModel, IDictDetailService>
         implements DictDetailApi {
 
 
@@ -39,7 +39,11 @@ public class DictDetailRestController extends BaseRestController<SysDictDetail, 
      */
     @ApiOperation(value = "获得单条字典数据", notes = "获得单条字典数据 - ID")
     @Override
-    public ResultVo<SysDictDetailModel> get(SysDictDetailModel model) {
+    public ResultVo<DictDetailModel> get(DictDetailModel model) {
+        // 如果系统内部调用 则直接查数据库
+        if(model != null && model.getIzApi() != null && model.getIzApi()){
+            model = IService.get(model);
+        }
         return ResultVo.success(model);
     }
 
@@ -55,7 +59,7 @@ public class DictDetailRestController extends BaseRestController<SysDictDetail, 
     public ResultVo<?> findPage(Integer pageNo, Integer pageSize, HttpServletRequest request) {
 
         QueryBuilder<SysDictDetail> queryBuilder = new WebQueryBuilder<>(SysDictDetail.class, request.getParameterMap());
-        Page<SysDictDetail, SysDictDetailModel> page = new Page<>(pageNo, pageSize);
+        Page<SysDictDetail, DictDetailModel> page = new Page<>(pageNo, pageSize);
         page.setQueryWrapper(queryBuilder.build());
         page = IService.findPage(page);
 
@@ -69,7 +73,7 @@ public class DictDetailRestController extends BaseRestController<SysDictDetail, 
      */
     @ApiOperation(value = "新增字典数据", notes = "新增字典数据")
     @Override
-    public ResultVo<?> insert(SysDictDetailModel model) {
+    public ResultVo<?> insert(DictDetailModel model) {
         // 调用新增方法
         IService.insert(model);
         return ResultVo.success("新增字典数据成功");
@@ -82,7 +86,7 @@ public class DictDetailRestController extends BaseRestController<SysDictDetail, 
      */
     @ApiOperation(value = "修改字典数据", notes = "修改字典数据")
     @Override
-    public ResultVo<?> update(SysDictDetailModel model) {
+    public ResultVo<?> update(DictDetailModel model) {
         // 调用修改方法
         IService.update(model);
         return ResultVo.success("修改字典数据");
@@ -159,7 +163,7 @@ public class DictDetailRestController extends BaseRestController<SysDictDetail, 
     @ApiOperation(value = "根据字典类型编号 查询出所有字典", notes = "根据字典类型编号 查询出所有字典")
     // 权限
     @Override
-    public ResultVo<List<SysDictDetailModel>> findListByTypeCode(String typeCode) {
+    public ResultVo<List<DictDetailModel>> findListByTypeCode(String typeCode) {
         return ResultVo.success(IService.findListByTypeCode(typeCode));
     }
 }

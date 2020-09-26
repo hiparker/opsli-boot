@@ -1,4 +1,4 @@
-package org.opsli.common.annotation;
+package org.opsli.common.annotation.hotdata;
 
 import java.lang.annotation.*;
 

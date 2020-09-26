@@ -3,17 +3,15 @@ package org.opsli.modulars.test.web;
 import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.core.util.RandomUtil;
 import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.opsli.api.base.result.ResultVo;
 import org.opsli.api.web.test.TestApi;
-import org.opsli.api.wrapper.system.dict.DictModel;
+import org.opsli.api.wrapper.system.dict.DictWrapper;
 import org.opsli.api.wrapper.test.TestModel;
 import org.opsli.common.annotation.ApiRestController;
 import org.opsli.common.utils.WrapperUtil;
 import org.opsli.core.base.concroller.BaseRestController;
-import org.opsli.core.cache.local.CacheUtil;
 import org.opsli.core.cache.pushsub.enums.CacheType;
 import org.opsli.core.cache.pushsub.msgs.DictMsgFactory;
 import org.opsli.core.persistence.Page;
@@ -84,7 +82,7 @@ public class TestRestRestController extends BaseRestController<TestEntity, TestM
     @ApiOperation(value = "发送 Redis 订阅消息", notes = "发送 Redis 订阅消息")
     @Override
     public ResultVo<?> sendMsg(){
-        DictModel model = new DictModel();
+        DictWrapper model = new DictWrapper();
 
         BaseSubMessage msg = DictMsgFactory.createMsg(model, CacheType.UPDATE);
 
@@ -302,7 +300,7 @@ public class TestRestRestController extends BaseRestController<TestEntity, TestM
     @ApiOperation(value = "批量插入1000个随机新增数据", notes = "批量插入1000个随机新增数据")
     @GetMapping("/insertAll")
     public ResultVo<Boolean> insertAll(){
-        List<DictModel> testType = DictUtil.getDictList("testType");
+        List<DictWrapper> testType = DictUtil.getDictList("testType");
 
         List<TestModel> datas = new ArrayList<>();
         // 转化对象 处理 ApiModel 与 本地对象

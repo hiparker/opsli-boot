@@ -13,7 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.opsli.api.base.result.ResultVo;
 import org.opsli.api.base.warpper.ApiWrapper;
-import org.opsli.common.annotation.EnableHotData;
+import org.opsli.common.annotation.hotdata.EnableHotData;
 import org.opsli.common.exception.ServiceException;
 import org.opsli.common.msg.CommonMsg;
 import org.opsli.common.utils.WrapperUtil;
@@ -104,16 +104,21 @@ public abstract class BaseRestController <T extends BaseEntity, E extends ApiWra
                         .setLockTimeOut(10000L);
                 // 这里增加分布式锁 防止缓存击穿
                 if(hotDataFlag){
-                    // 加锁
-                    redisLock = redisLockPlugins.tryLock(redisLock);
-                    if(redisLock == null){
-                        throw new ServiceException(CoreMsg.CACHE_PUNCTURE_EXCEPTION);
+                    try {
+                        // 加锁
+                        redisLock = redisLockPlugins.tryLock(redisLock);
+                        if(redisLock == null){
+                            throw new ServiceException(CoreMsg.CACHE_PUNCTURE_EXCEPTION);
+                        }
+                        // 如果缓存没读到 则去数据库读
+                        model = WrapperUtil.transformInstance(IService.get(id),modelClazz);
+                    }catch (Exception e){
+                        log.error(e.getMessage(), e);
+                    }finally {
+                        // 释放锁
+                        redisLockPlugins.unLock(redisLock);
+                        redisLock = null;
                     }
-                    // 如果缓存没读到 则去数据库读
-                    model = WrapperUtil.transformInstance(IService.get(id),modelClazz);
-                    // 释放锁
-                    redisLockPlugins.unLock(redisLock);
-                    redisLock = null;
                 }else{
                     // 如果缓存没读到 则去数据库读
                     model = WrapperUtil.transformInstance(IService.get(id),modelClazz);
