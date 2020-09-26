@@ -38,7 +38,7 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
      * @param model 模型
      * @return ResultVo
      */
-    @ApiOperation(value = "获得单条字典明细数据", notes = "获得单条字典明细数据 - ID")
+    @ApiOperation(value = "获得单条用户信息", notes = "获得单条用户信息 - ID")
     @Override
     public ResultVo<UserModel> get(UserModel model) {
         // 如果系统内部调用 则直接查数据库
@@ -72,12 +72,12 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
      * @param model 模型
      * @return ResultVo
      */
-    @ApiOperation(value = "新增字典明细数据", notes = "新增字典明细数据")
+    @ApiOperation(value = "新增用户信息", notes = "新增用户信息")
     @Override
     public ResultVo<?> insert(UserModel model) {
         // 调用新增方法
         IService.insert(model);
-        return ResultVo.success("新增字典明细数据成功");
+        return ResultVo.success("新增用户信息成功");
     }
 
     /**
@@ -85,12 +85,12 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
      * @param model 模型
      * @return ResultVo
      */
-    @ApiOperation(value = "修改字典明细数据", notes = "修改字典明细数据")
+    @ApiOperation(value = "修改用户信息", notes = "修改用户信息")
     @Override
     public ResultVo<?> update(UserModel model) {
         // 调用修改方法
         IService.update(model);
-        return ResultVo.success("修改字典明细数据成功");
+        return ResultVo.success("修改用户信息成功");
     }
 
 
@@ -99,11 +99,11 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
      * @param id ID
      * @return ResultVo
      */
-    @ApiOperation(value = "删除字典明细数据数据", notes = "删除字典明细数据数据")
+    @ApiOperation(value = "删除用户信息数据", notes = "删除用户信息数据")
     @Override
     public ResultVo<?> del(String id){
         IService.delete(id);
-        return ResultVo.success("删除字典明细数据成功");
+        return ResultVo.success("删除用户信息成功");
     }
 
 
@@ -112,11 +112,11 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
      * @param ids ID 数组
      * @return ResultVo
      */
-    @ApiOperation(value = "批量删除字典明细数据数据", notes = "批量删除字典明细数据数据")
+    @ApiOperation(value = "批量删除用户信息数据", notes = "批量删除用户信息数据")
     @Override
     public ResultVo<?> delAll(String[] ids){
         IService.deleteAll(ids);
-        return ResultVo.success("批量删除字典明细数据成功");
+        return ResultVo.success("批量删除用户信息成功");
     }
 
 

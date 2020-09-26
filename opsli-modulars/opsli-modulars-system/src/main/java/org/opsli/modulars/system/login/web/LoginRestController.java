@@ -8,9 +8,11 @@ import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.opsli.api.base.result.ResultVo;
 import org.opsli.api.wrapper.system.user.UserModel;
 import org.opsli.common.api.TokenThreadLocal;
+import org.opsli.core.msg.TokenMsg;
 import org.opsli.core.utils.CaptchaUtil;
 import org.opsli.core.utils.UserTokenUtil;
 import org.opsli.core.utils.UserUtil;
+import org.opsli.modulars.system.SystemMsg;
 import org.opsli.modulars.system.login.entity.LoginForm;
 import org.springframework.web.bind.annotation.*;
 
@@ -41,8 +43,9 @@ public class LoginRestController {
     @PostMapping("/sys/login")
     public ResultVo<?> login(@RequestBody LoginForm form){
         boolean captcha = CaptchaUtil.validate(form.getUuid(), form.getCaptcha());
+        // 验证码不正确
         if(!captcha){
-            return ResultVo.error("验证码不正确");
+            return ResultVo.error(TokenMsg.EXCEPTION_LOGIN_CAPTCHA.getMessage());
         }
 
         //用户信息
@@ -51,12 +54,12 @@ public class LoginRestController {
         //账号不存在、密码错误
         if(user == null ||
                 !user.getPassword().equals(new Md5Hash(form.getPassword(), user.getSecretkey()).toHex())) {
-            return ResultVo.error("账号或密码不正确");
+            return ResultVo.error(TokenMsg.EXCEPTION_LOGIN_ACCOUNT_NO.getMessage());
         }
 
         //账号锁定
         if(user.getLocked() == 1){
-            return ResultVo.error("账号已被锁定,请联系管理员");
+            return ResultVo.error(TokenMsg.EXCEPTION_LOGIN_ACCOUNT_LOCKED.getMessage());
         }
 
         //生成token，并保存到Redis
@@ -71,11 +74,12 @@ public class LoginRestController {
     @PostMapping("/sys/logout")
     public ResultVo<?> logout() {
         String token = TokenThreadLocal.get();
+        // 登出失败，没有授权Token
         if(StringUtils.isEmpty(token)){
-            return ResultVo.success("登出失败，没有授权Token！");
+            return ResultVo.error(TokenMsg.EXCEPTION_LOGOUT_ERROR.getMessage());
         }
         UserTokenUtil.logout(token);
-        return ResultVo.success("登出成功！");
+        return ResultVo.success(TokenMsg.EXCEPTION_LOGOUT_SUCCESS.getMessage());
     }
 
     /**

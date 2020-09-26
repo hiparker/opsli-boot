@@ -36,6 +36,7 @@ public class CaptchaUtil{
         if(StringUtils.isBlank(uuid)){
             throw new RuntimeException("uuid不能为空");
         }
+
         //生成文字验证码
         String code = producer.createText();
 

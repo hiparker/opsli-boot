@@ -1,6 +1,9 @@
 package org.opsli.core.utils;
 
 
+import org.opsli.common.exception.TokenException;
+import org.opsli.core.msg.TokenMsg;
+
 import java.security.MessageDigest;
 import java.util.UUID;
 
@@ -33,7 +36,8 @@ public final class TokenGenerator {
             byte[] messageDigest = algorithm.digest();
             return toHexString(messageDigest);
         } catch (Exception e) {
-            throw new RuntimeException("生成Token失败", e);
+            // 生成Token失败
+            throw new TokenException(TokenMsg.EXCEPTION_TOKEN_CREATE_ERROR);
         }
     }
 

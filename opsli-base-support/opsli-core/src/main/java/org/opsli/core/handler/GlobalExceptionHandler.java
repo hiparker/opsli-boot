@@ -3,9 +3,13 @@ package org.opsli.core.handler;
 import cn.hutool.core.text.StrFormatter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.shiro.authc.IncorrectCredentialsException;
+import org.apache.shiro.authc.LockedAccountException;
 import org.opsli.api.base.result.ResultVo;
 import org.opsli.common.exception.EmptyException;
+import org.opsli.common.exception.JwtException;
 import org.opsli.common.exception.ServiceException;
+import org.opsli.common.exception.TokenException;
 import org.opsli.core.msg.CoreMsg;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
@@ -79,6 +83,51 @@ public class GlobalExceptionHandler {
     }
 
     /**
+     * 拦截 自定义 Jwt 认证异常
+     */
+    @ExceptionHandler(JwtException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ResponseBody
+    public ResultVo<?> jwtException(JwtException e) {
+        return ResultVo.error(e.getCode(), e.getMessage());
+    }
+
+    /**
+     * 拦截 自定义 Shiro 认证异常
+     */
+    @ExceptionHandler(IncorrectCredentialsException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ResponseBody
+    public ResultVo<?> incorrectCredentialsException(IncorrectCredentialsException e) {
+        // token失效，请重新登录
+        return ResultVo.error(e.getMessage());
+    }
+
+    /**
+     * 拦截 自定义 Shiro 认证异常
+     */
+    @ExceptionHandler(LockedAccountException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ResponseBody
+    public ResultVo<?> lockedAccountException(LockedAccountException e) {
+        // 账号已被锁定,请联系管理员
+        return ResultVo.error(e.getMessage());
+    }
+
+    /**
+     * 拦截 自定义 Token 认证异常
+     */
+    @ExceptionHandler(TokenException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ResponseBody
+    public ResultVo<?> tokenException(LockedAccountException e) {
+        // Token 异常
+        return ResultVo.error(e.getMessage());
+    }
+
+    // ============================
+
+    /**
      * 拦截 系统空指针异常
      */
     @ExceptionHandler(NullPointerException.class)
@@ -87,6 +136,7 @@ public class GlobalExceptionHandler {
     public ResultVo<?> nullPointerException(EmptyException e) {
         return ResultVo.error(e.getCode(), e.getMessage());
     }
+
 
     /**
      * 拦截 数据库主键冲突

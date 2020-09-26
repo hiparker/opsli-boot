@@ -6,6 +6,7 @@ import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.opsli.api.wrapper.system.user.UserModel;
+import org.opsli.core.msg.TokenMsg;
 import org.opsli.core.security.shiro.token.OAuth2Token;
 import org.opsli.core.utils.UserTokenUtil;
 import org.opsli.core.utils.UserUtil;
@@ -53,13 +54,17 @@ public class OAuth2Realm extends AuthorizingRealm {
      * 认证(登录时调用)
      */
     @Override
-    protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token) throws AuthenticationException {
+    protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token)
+            throws AuthenticationException {
+
         String accessToken = (String) token.getPrincipal();
 
         // 1. 校验 token 是否有效
         boolean verify = UserTokenUtil.verify(accessToken);
         if(!verify){
-            throw new IncorrectCredentialsException("token失效，请重新登录");
+            // token失效，请重新登录
+            throw new IncorrectCredentialsException(
+                    TokenMsg.EXCEPTION_TOKEN_LOSE_EFFICACY.getMessage());
         }
 
         // 2. 查询 用户信息
@@ -68,7 +73,9 @@ public class OAuth2Realm extends AuthorizingRealm {
 
         // 3. 校验账户是否锁定
         if(user == null || user.getLocked().equals('1')){
-            throw new LockedAccountException("账号已被锁定,请联系管理员");
+            // 账号已被锁定,请联系管理员
+            throw new LockedAccountException(
+                    TokenMsg.EXCEPTION_LOGIN_ACCOUNT_LOCKED.getMessage());
         }
 
         return new SimpleAuthenticationInfo(user, accessToken, getName());

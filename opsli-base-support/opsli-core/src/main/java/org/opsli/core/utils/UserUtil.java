@@ -9,7 +9,9 @@ import org.opsli.api.web.system.user.UserApi;
 import org.opsli.api.wrapper.system.menu.MenuModel;
 import org.opsli.api.wrapper.system.user.UserModel;
 import org.opsli.common.api.TokenThreadLocal;
+import org.opsli.common.exception.TokenException;
 import org.opsli.core.cache.local.CacheUtil;
+import org.opsli.core.msg.TokenMsg;
 import org.opsli.plugins.redis.RedisLockPlugins;
 import org.opsli.plugins.redis.lock.RedisLock;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,7 +62,8 @@ public class UserUtil {
         String userId = UserTokenUtil.getUserIdByToken(token);
         UserModel user = getUser(userId);
         if(user == null){
-            throw new RuntimeException("Token 失效");
+            // Token失效，请重新登录
+            throw new TokenException(TokenMsg.EXCEPTION_TOKEN_LOSE_EFFICACY);
         }
         return user;
     }
@@ -481,7 +484,8 @@ public class UserUtil {
 
         UserModel user = getUser();
         if(user == null){
-            throw new RuntimeException("用户为空");
+            // 用户为空
+            throw new TokenException(TokenMsg.EXCEPTION_USER_NULL);
         }
 
         // 如果是超级管理员 则不进行租户处理

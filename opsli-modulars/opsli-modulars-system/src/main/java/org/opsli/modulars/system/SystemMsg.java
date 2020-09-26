@@ -21,12 +21,15 @@ public enum SystemMsg implements BaseMsg {
     /**
      * 角色
      */
-    EXCEPTION_ROLE_UNIQUE(20000,"角色编号重复，该角色已存在！"),
+    EXCEPTION_ROLE_UNIQUE(20100,"角色编号重复，该角色已存在！"),
 
     /**
      * 用户
      */
-    EXCEPTION_USER_UNIQUE(20000,"该用户已存在！"),
+    EXCEPTION_USER_UNIQUE(20200,"该用户已存在！"),
+
+
+
 
     ;
 

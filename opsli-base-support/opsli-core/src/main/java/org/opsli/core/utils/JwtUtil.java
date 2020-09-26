@@ -1,5 +1,6 @@
 package org.opsli.core.utils;
 
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.setting.dialect.Props;
 import cn.hutool.setting.dialect.PropsUtil;
 import com.auth0.jwt.JWT;
@@ -9,6 +10,8 @@ import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import lombok.extern.slf4j.Slf4j;
 import org.opsli.common.constants.SignConstants;
+import org.opsli.common.exception.JwtException;
+import org.opsli.core.msg.JwtMsg;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Date;
@@ -52,7 +55,9 @@ public final class JwtUtil {
             verifier.verify(token);
             return true;
         } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException("认证解密异常:" + e.getMessage());
+            // 认证解密异常
+            String msg = StrUtil.format(JwtMsg.EXCEPTION_TOKEN.getMessage(), e.getMessage());
+            throw new JwtException(JwtMsg.EXCEPTION_TOKEN.getCode(), msg);
         }
     }
 
@@ -67,7 +72,9 @@ public final class JwtUtil {
             DecodedJWT jwt = JWT.decode(token);
             return jwt.getClaim(claim).asString();
         } catch (JWTDecodeException e) {
-            throw new RuntimeException("解密异常:" + e.getMessage());
+            // 解密异常
+            String msg = StrUtil.format(JwtMsg.EXCEPTION_DECODE.getMessage(), e.getMessage());
+            throw new JwtException(JwtMsg.EXCEPTION_DECODE.getCode(), msg);
         }
     }
 
@@ -92,7 +99,9 @@ public final class JwtUtil {
                     .withExpiresAt(date)
                     .sign(algorithm);
         } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException("加密异常:" + e.getMessage());
+            // 加密异常
+            String msg = StrUtil.format(JwtMsg.EXCEPTION_ENCODE.getMessage(), e.getMessage());
+            throw new JwtException(JwtMsg.EXCEPTION_ENCODE.getCode(), msg);
         }
     }
 

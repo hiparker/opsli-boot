@@ -10,6 +10,7 @@ import org.apache.shiro.crypto.hash.Md5Hash;
 import org.opsli.api.base.result.ResultVo;
 import org.opsli.api.wrapper.system.user.UserModel;
 import org.opsli.common.constants.SignConstants;
+import org.opsli.core.msg.TokenMsg;
 import org.opsli.plugins.redis.RedisPlugin;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -26,6 +27,8 @@ import java.util.Map;
 @Component
 public class UserTokenUtil {
 
+    /** token缓存名 */
+    private static final String TOKEN_NAME = "token";
 
     /** 缓存前缀 */
     private static final String PREFIX = "opsli:ticket:";
@@ -40,7 +43,8 @@ public class UserTokenUtil {
      */
     public static ResultVo<Map<String,Object>> createToken(UserModel user) {
         if (user == null) {
-            return ResultVo.error("生成Token失败");
+            // 生成Token失败
+            return ResultVo.error(TokenMsg.EXCEPTION_TOKEN_CREATE_ERROR.getMessage());
         }
 
         Map<String,Object> map = Maps.newHashMapWithExpectedSize(2);
@@ -73,7 +77,10 @@ public class UserTokenUtil {
                 map.put("expire", endTimestamp);
                 return ResultVo.success(map);
             }
-            return ResultVo.error("生成Token失败");
+
+            // 生成Token失败
+            return ResultVo.error(TokenMsg.EXCEPTION_TOKEN_CREATE_ERROR.getMessage());
+
         }catch (Exception e){
             log.error(e.getMessage() , e);
             return ResultVo.error(e.getMessage());
@@ -165,11 +172,11 @@ public class UserTokenUtil {
      */
     public static String getRequestToken(HttpServletRequest httpRequest){
         //从header中获取token
-        String token = httpRequest.getHeader("token");
+        String token = httpRequest.getHeader(TOKEN_NAME);
 
         //如果header中不存在token，则从参数中获取token
         if(StringUtils.isBlank(token)){
-            token = httpRequest.getParameter("token");
+            token = httpRequest.getParameter(TOKEN_NAME);
         }
 
         return token;
