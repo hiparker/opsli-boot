@@ -6,6 +6,7 @@ import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.opsli.api.wrapper.system.user.UserModel;
+import org.opsli.common.exception.TokenException;
 import org.opsli.core.msg.TokenMsg;
 import org.opsli.core.security.shiro.token.OAuth2Token;
 import org.opsli.core.utils.UserTokenUtil;
@@ -63,8 +64,8 @@ public class OAuth2Realm extends AuthorizingRealm {
         boolean verify = UserTokenUtil.verify(accessToken);
         if(!verify){
             // token失效，请重新登录
-            throw new IncorrectCredentialsException(
-                    TokenMsg.EXCEPTION_TOKEN_LOSE_EFFICACY.getMessage());
+            throw new TokenException(
+                    TokenMsg.EXCEPTION_TOKEN_LOSE_EFFICACY);
         }
 
         // 2. 查询 用户信息

@@ -5,6 +5,7 @@ import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.web.filter.authc.AuthenticatingFilter;
 import org.opsli.api.base.result.ResultVo;
+import org.opsli.core.msg.TokenMsg;
 import org.opsli.core.security.shiro.token.OAuth2Token;
 import org.opsli.core.utils.UserTokenUtil;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -60,8 +61,9 @@ public class OAuth2Filter extends AuthenticatingFilter {
             httpResponse.setHeader("Access-Control-Allow-Credentials", "true");
             httpResponse.setHeader("Access-Control-Allow-Origin", httpServletRequest.getHeader("Origin"));
             httpResponse.setContentType("application/json; charset=utf-8");
-
-            ResultVo<Object> error = ResultVo.error(401, "令牌失效");
+            // 401 Token失效，请重新登录
+            ResultVo<Object> error = ResultVo.error(TokenMsg.EXCEPTION_TOKEN_LOSE_EFFICACY.getCode(),
+                    TokenMsg.EXCEPTION_TOKEN_LOSE_EFFICACY.getMessage());
             httpResponse.getWriter().print(error.toJsonStr());
             return false;
         }
