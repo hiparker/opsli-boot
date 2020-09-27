@@ -3,6 +3,8 @@ package org.opsli.core.utils;
 import com.alibaba.fastjson.JSONObject;
 import com.google.code.kaptcha.Producer;
 import org.apache.commons.lang3.StringUtils;
+import org.opsli.common.exception.TokenException;
+import org.opsli.core.msg.TokenMsg;
 import org.opsli.plugins.redis.RedisPlugin;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -61,7 +63,7 @@ public class CaptchaUtil{
         String codeTemp = (String) redisPlugin.get(PREFIX + uuid);
 
         if(StringUtils.isEmpty(codeTemp)){
-            return false;
+            throw new TokenException(TokenMsg.EXCEPTION_CAPTCHA_NULL);
         }
 
         //删除验证码

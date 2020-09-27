@@ -31,6 +31,7 @@ public enum TokenMsg implements BaseMsg {
      * 其他
      */
     EXCEPTION_USER_NULL(12200, "用户为空"),
+    EXCEPTION_CAPTCHA_NULL(12201, "验证码已失效"),
 
     ;
 

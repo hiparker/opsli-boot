@@ -45,8 +45,19 @@ spring:
           #driver-class-name: com.mysql.jdbc.Driver
 
 
-# swagger 配置
-swagger:
+# knife4j 文档 配置
+knife4j:
+  basic:
+    ## 开启Swagger的Basic认证功能,默认是false
+    enable: true
+    ## Basic认证用户名
+    username: doc
+    ## Basic认证密码
+    password: 123456
+
+  # 是否生产环境 （生产环境默认屏蔽文档）
   production: false
+
+
 
 

@@ -120,7 +120,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(TokenException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ResponseBody
-    public ResultVo<?> tokenException(LockedAccountException e) {
+    public ResultVo<?> tokenException(TokenException e) {
         // Token 异常
         return ResultVo.error(e.getMessage());
     }

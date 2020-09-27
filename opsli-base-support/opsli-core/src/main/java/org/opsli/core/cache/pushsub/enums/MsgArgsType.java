@@ -18,6 +18,16 @@ public enum MsgArgsType {
     /** 字典操作类型 */
     DICT_TYPE,
 
+    /** 用户ID */
+    USER_ID,
+    /** 用户名 */
+    USER_USERNAME,
+    /** 用户数据类型 */
+    USER_MODEL_TYPE,
+    /** 用户数据*/
+    USER_MODEL_DATA,
+
+
     /** 缓存数据Key */
     CACHE_DATA_KEY,
     /** 缓存数据Value */

@@ -12,11 +12,14 @@ public enum PushSubType {
     /** 字典类型 */
     DICT,
 
+    /** 用户数据 */
+    USER,
+
     /** 热点数据 */
     HOT_DATA,
 
     /** 永久数据 */
-    EDEN_DATA
+    EDEN_DATA,
 
     ;
 

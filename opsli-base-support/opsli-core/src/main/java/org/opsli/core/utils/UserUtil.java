@@ -1,7 +1,5 @@
 package org.opsli.core.utils;
 
-import com.alibaba.fastjson.JSONObject;
-import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.opsli.api.base.result.ResultVo;
@@ -11,8 +9,10 @@ import org.opsli.api.wrapper.system.user.UserModel;
 import org.opsli.common.api.TokenThreadLocal;
 import org.opsli.common.exception.TokenException;
 import org.opsli.core.cache.local.CacheUtil;
+import org.opsli.core.cache.pushsub.msgs.UserMsgFactory;
 import org.opsli.core.msg.TokenMsg;
 import org.opsli.plugins.redis.RedisLockPlugins;
+import org.opsli.plugins.redis.RedisPlugin;
 import org.opsli.plugins.redis.lock.RedisLock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -31,15 +31,16 @@ import java.util.List;
 public class UserUtil {
 
     /** 超级管理员名称 */
-    private static final String SUPER_ADMIN = "system";
-    private static final String PREFIX_ID = "userId:";
-    private static final String PREFIX_ID_ROLES = "userId:roles:";
-    private static final String PREFIX_ID_PERMISSIONS = "userId:permissions:";
-    private static final String PREFIX_ID_MENUS = "userId:menus:";
-    private static final String PREFIX_USERNAME = "username:";
+    public static final String SUPER_ADMIN = "system";
+    public static final String PREFIX_ID = "userId:";
+    public static final String PREFIX_ID_ROLES = "userId:roles:";
+    public static final String PREFIX_ID_PERMISSIONS = "userId:permissions:";
+    public static final String PREFIX_ID_MENUS = "userId:menus:";
+    public static final String PREFIX_USERNAME = "username:";
 
 
-
+    /** Redis插件 */
+    private static RedisPlugin redisPlugin;
 
     /** Redis分布式锁 */
     private static RedisLockPlugins redisLockPlugins;
@@ -79,6 +80,7 @@ public class UserUtil {
         if (userModel != null){
             return userModel;
         }
+
 
         // 拿不到 --------
         // 防止缓存穿透判断
@@ -194,14 +196,15 @@ public class UserUtil {
      */
     public static List<String> getUserRolesByUserId(String userId){
         List<String> roles = null;
+
         // 先从缓存里拿
-        List rolesObj = CacheUtil.get(PREFIX_ID_ROLES + userId, List.class);
-        if (rolesObj != null && !rolesObj.isEmpty()){
-            roles = Lists.newArrayListWithCapacity(rolesObj.size());
-            for (Object role : rolesObj) {
-                roles.add((String) role);
+        try {
+            roles = (List<String>) CacheUtil.get(PREFIX_ID_ROLES + userId);
+            if (roles != null && !roles.isEmpty()){
+                return roles;
             }
-            return roles;
+        }catch (Exception e){
+            log.error(e.getMessage(), e);
         }
 
         // 拿不到 --------
@@ -257,15 +260,17 @@ public class UserUtil {
      */
     public static List<String> getUserAllPermsByUserId(String userId){
         List<String> permissions = null;
+
         // 先从缓存里拿
-        List permissionsObj = CacheUtil.get(PREFIX_ID_PERMISSIONS + userId, List.class);
-        if (permissionsObj != null && !permissionsObj.isEmpty()){
-            permissions = Lists.newArrayListWithCapacity(permissionsObj.size());
-            for (Object permission : permissionsObj) {
-                permissions.add((String) permission);
+        try {
+            permissions = (List<String>) CacheUtil.get(PREFIX_ID_PERMISSIONS + userId);
+            if (permissions != null && !permissions.isEmpty()){
+                return permissions;
             }
-            return permissions;
+        }catch (Exception e){
+            log.error(e.getMessage(), e);
         }
+
 
         // 拿不到 --------
         // 防止缓存穿透判断
@@ -319,18 +324,17 @@ public class UserUtil {
      */
     public static List<MenuModel> getMenuListByUserId(String userId){
         List<MenuModel> menus = null;
+
         // 先从缓存里拿
-        List menusObj = CacheUtil.get(PREFIX_ID_MENUS + userId, List.class);
-        if (menusObj != null && !menusObj.isEmpty()){
-            menus = Lists.newArrayListWithCapacity(menusObj.size());
-            for (Object menu : menusObj) {
-                JSONObject jsonObject = (JSONObject) menu;
-                if(jsonObject != null){
-                    menus.add(jsonObject.toJavaObject(MenuModel.class));
-                }
+        try {
+            menus = (List<MenuModel>) CacheUtil.get(PREFIX_ID_MENUS + userId);
+            if (menus != null && !menus.isEmpty()){
+                return menus;
             }
-            return menus;
+        }catch (Exception e){
+            log.error(e.getMessage(), e);
         }
+
 
         // 拿不到 --------
         // 防止缓存穿透判断
@@ -404,6 +408,11 @@ public class UserUtil {
             // 清除空拦截
             CacheUtil.putNilFlag(PREFIX_ID + user.getId());
             CacheUtil.putNilFlag(PREFIX_USERNAME + user.getUsername());
+
+            // 发送通知消息
+            redisPlugin.sendMessage(
+                    UserMsgFactory.createUserMsg(user)
+            );
         }
     }
 
@@ -419,14 +428,23 @@ public class UserUtil {
             return;
         }
 
-        List list = CacheUtil.get(PREFIX_ID_ROLES + userId, List.class);
-        if(list != null && !list.isEmpty()){
-            // 先删除
-            CacheUtil.del(PREFIX_ID_ROLES + userId);
-            // 存入缓存
-            CacheUtil.put(PREFIX_ID_ROLES + userId, list);
-            // 清除空拦截
-            CacheUtil.putNilFlag(PREFIX_ID_ROLES + userId);
+        try {
+            List<String> list = (List<String>) CacheUtil.get(PREFIX_ID_ROLES + userId);
+            if(list != null && !list.isEmpty()){
+                // 先删除
+                CacheUtil.del(PREFIX_ID_ROLES + userId);
+                // 存入缓存
+                CacheUtil.put(PREFIX_ID_ROLES + userId, list);
+                // 清除空拦截
+                CacheUtil.putNilFlag(PREFIX_ID_ROLES + userId);
+
+                // 发送通知消息
+                redisPlugin.sendMessage(
+                        UserMsgFactory.createUserRolesMsg(userId, roleCodes)
+                );
+            }
+        }catch (Exception e){
+            log.error(e.getMessage(), e);
         }
     }
 
@@ -441,14 +459,23 @@ public class UserUtil {
             return;
         }
 
-        List list = CacheUtil.get(PREFIX_ID_PERMISSIONS + userId, List.class);
-        if(list != null && !list.isEmpty()){
-            // 先删除
-            CacheUtil.del(PREFIX_ID_PERMISSIONS + userId);
-            // 存入缓存
-            CacheUtil.put(PREFIX_ID_PERMISSIONS + userId, list);
-            // 清除空拦截
-            CacheUtil.putNilFlag(PREFIX_ID_PERMISSIONS + userId);
+        try {
+            List<String> list = (List<String>) CacheUtil.get(PREFIX_ID_PERMISSIONS + userId);
+            if(list != null && !list.isEmpty()){
+                // 先删除
+                CacheUtil.del(PREFIX_ID_PERMISSIONS + userId);
+                // 存入缓存
+                CacheUtil.put(PREFIX_ID_PERMISSIONS + userId, permissions);
+                // 清除空拦截
+                CacheUtil.putNilFlag(PREFIX_ID_PERMISSIONS + userId);
+
+                // 发送通知消息
+                redisPlugin.sendMessage(
+                        UserMsgFactory.createUserPermsMsg(userId, permissions)
+                );
+            }
+        }catch (Exception e){
+            log.error(e.getMessage(), e);
         }
     }
 
@@ -463,14 +490,23 @@ public class UserUtil {
             return;
         }
 
-        List list = CacheUtil.get(PREFIX_ID_MENUS + userId, List.class);
-        if(list != null && !list.isEmpty()){
-            // 先删除
-            CacheUtil.del(PREFIX_ID_MENUS + userId);
-            // 存入缓存
-            CacheUtil.put(PREFIX_ID_MENUS + userId, list);
-            // 清除空拦截
-            CacheUtil.putNilFlag(PREFIX_ID_MENUS + userId);
+        try {
+            List<MenuModel> list = (List<MenuModel>) CacheUtil.get(PREFIX_ID_MENUS + userId);
+            if(list != null && !list.isEmpty()){
+                // 先删除
+                CacheUtil.del(PREFIX_ID_MENUS + userId);
+                // 存入缓存
+                CacheUtil.put(PREFIX_ID_MENUS + userId, menus);
+                // 清除空拦截
+                CacheUtil.putNilFlag(PREFIX_ID_MENUS + userId);
+
+                // 发送通知消息
+                redisPlugin.sendMessage(
+                        UserMsgFactory.createUserMenusMsg(userId, menus)
+                );
+            }
+        }catch (Exception e){
+            log.error(e.getMessage(), e);
         }
     }
 
@@ -497,6 +533,11 @@ public class UserUtil {
 
 
     // =====================================
+
+    @Autowired
+    public  void setRedisPlugin(RedisPlugin redisPlugin) {
+        UserUtil.redisPlugin = redisPlugin;
+    }
 
     @Autowired
     public  void setRedisLockPlugins(RedisLockPlugins redisLockPlugins) {

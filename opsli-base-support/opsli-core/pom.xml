@@ -54,24 +54,6 @@
             <version>3.3.1</version>
         </dependency>
 
-        <!--shiro-->
-<!--        <dependency>-->
-<!--            <groupId>org.apache.shiro</groupId>-->
-<!--            <artifactId>shiro-spring-boot-starter</artifactId>-->
-<!--        </dependency>-->
-
-<!--        &lt;!&ndash; shiro-redis &ndash;&gt;-->
-<!--        <dependency>-->
-<!--            <groupId>org.crazycake</groupId>-->
-<!--            <artifactId>shiro-redis</artifactId>-->
-<!--            <exclusions>-->
-<!--                <exclusion>-->
-<!--                    <groupId>org.apache.shiro</groupId>-->
-<!--                    <artifactId>shiro-core</artifactId>-->
-<!--                </exclusion>-->
-<!--            </exclusions>-->
-<!--        </dependency>-->
-
         <!-- kaptcha -->
         <dependency>
             <groupId>com.github.axet</groupId>

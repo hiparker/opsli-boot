@@ -100,7 +100,7 @@ public class RedisPushSubReceiver extends BaseReceiver {
         JSONObject msgJson = JSONObject.parseObject(substring);
         String type = (String) msgJson.get(BaseSubMessage.BASE_TYPE);
         String identifier = (String) msgJson.get(BaseSubMessage.BASE_ID);
-        // 本机不广播
+        // TODO 本机不广播
 //        if(SystemInfo.INSTANCE.getSystemID().equals(identifier)){
 //            return;
 //        }
