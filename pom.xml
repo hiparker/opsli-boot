@@ -163,6 +163,12 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId>
+        </dependency>
+
         <!-- 热部署 如果使用 Jrebel 忽略就好,如果不使用 Jrebel 则放开 -->
         <!--
         <dependency>
