@@ -1,0 +1,14 @@
+# 排除表 防止代码生成器直接 非法删除关键表
+opsli:
+  exclude-tables:
+    - creater_table
+    - creater_table_column
+    - sys_dict
+    - sys_dict_detail
+    - sys_logs
+    - sys_menu
+    - sys_role
+    - sys_role_menu_ref
+    - sys_tenant
+    - sys_user
+    - sys_user_role_ref

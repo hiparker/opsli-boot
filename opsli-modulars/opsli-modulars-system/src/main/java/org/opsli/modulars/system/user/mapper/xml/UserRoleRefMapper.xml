@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.opsli.modulars.system.user.mapper.UserRoleRefMapper">
+
+    <select id="getUserIdListByRoleId"  resultType="String">
+        select
+            a.user_id
+        from
+        sys_user_role_ref a
+        where
+            a.role_id = #{roleId}
+    </select>
+
+    <select id="getUserIdListByMenuId"  resultType="String">
+        select
+            a.user_id
+        from
+        sys_user_role_ref a
+        left join sys_role_menu_ref b on b.role_id = a.role_id
+        where
+            b.menu_id = #{menuId}
+    </select>
+
+
+</mapper>

@@ -18,6 +18,7 @@
     <modules>
         <module>opsli-modulars-test</module>
         <module>opsli-modulars-system</module>
+        <module>opsli-modulars-creater</module>
     </modules>
 
     <!-- 规定子类所引用的版本***** -->

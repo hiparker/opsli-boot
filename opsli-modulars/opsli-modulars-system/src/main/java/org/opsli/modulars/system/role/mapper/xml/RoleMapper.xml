@@ -22,17 +22,19 @@
     <sql id="SysRoleJoins">
 	</sql>
 
-    <select id="uniqueVerificationByCode" parameterType="SysRole" resultType="Integer">
+    <select id="uniqueVerificationByCode" resultType="Integer">
         select
             count(0)
         from
         sys_role a
-        where
-            a.role_code = #{roleCode}
+        <where>
+            ${ew.sqlSegment}
+            and a.role_code = #{entity.roleCode}
             and a.deleted = 0
-            <if test="id != null and id != ''">
-                AND a.id != #{id}
+            <if test="entity != null and entity.id != null and entity.id != ''">
+                and a.id != #{entity.id}
             </if>
+        </where>
     </select>
 
 </mapper>

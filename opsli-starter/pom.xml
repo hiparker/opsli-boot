@@ -41,6 +41,12 @@
             <artifactId>opsli-modulars-system</artifactId>
             <version>${modulars.version}</version>
         </dependency>
+        <!-- 代码生成器 -->
+        <dependency>
+            <groupId>org.opsliframework.boot</groupId>
+            <artifactId>opsli-modulars-creater</artifactId>
+            <version>${modulars.version}</version>
+        </dependency>
         <!-- 引入测试业务模块 -->
         <dependency>
             <groupId>org.opsliframework.boot</groupId>

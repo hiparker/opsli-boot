@@ -1,12 +1,29 @@
+/**
+ * Copyright 2020 OPSLI 快速开发平台 https://www.opsli.com
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ */
 package org.opsli.plugins.redis.conf;
 
 import cn.hutool.core.io.IoUtil;
 import com.alibaba.fastjson.support.spring.FastJsonRedisSerializer;
+import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 import org.opsli.plugins.redis.scripts.RedisScriptCache;
 import org.opsli.plugins.redis.scripts.enums.RedisScriptsEnum;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.RedisSerializer;
@@ -14,6 +31,8 @@ import org.springframework.data.redis.serializer.RedisSerializer;
 import javax.annotation.Resource;
 import java.io.BufferedReader;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 /**
  * @Author parker
@@ -70,25 +89,21 @@ public class RedisPluginConfig {
         RedisScriptsEnum[] scriptEnums = RedisScriptsEnum.values();
         for (RedisScriptsEnum scriptEnum : scriptEnums) {
             String path = scriptEnum.getPath();
-            InputStream resourceAsStream = null;
+
             try {
-                // IO流 读取lua脚本 存入缓存当中 提高访问效率 避免每次使用脚本还需要再开启IO流
-                StringBuffer stb = new StringBuffer();
-                resourceAsStream= RedisPluginConfig.class.getResourceAsStream(path);
-                BufferedReader br = IoUtil.getUtf8Reader(resourceAsStream);
-                String line = null;
-                while((line = br.readLine())!=null){
-                    stb.append(line);
-                    stb.append("\n");
-                }
+                ClassPathResource resource = new ClassPathResource(path);
+                InputStream inputStream = resource.getInputStream();
+//                List<String> readList = Lists.newArrayList();
+//                IoUtil.readLines(inputStream, StandardCharsets.UTF_8, readList);
+//                StringBuilder stb = new StringBuilder();
+//                for (String readLine : readList) {
+//                    stb.append(readLine);
+//                    stb.append("\n");
+//                }
+                String read = IoUtil.read(inputStream, StandardCharsets.UTF_8);
                 // 保存脚本到缓存中
-                redisScriptCache.putScript(scriptEnum,stb.toString());
-                br.close();
-            }catch (Exception e){
-                log.error(e.getMessage(),e);
-            }finally {
-                IoUtil.close(resourceAsStream);
-            }
+                redisScriptCache.putScript(scriptEnum,read);
+            }catch (Exception ignored){}
         }
 
 

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.opsli.modulars.system.logs.mapper.LogsMapper">
+
+    <!--清空 一个月以前的数据-->
+    <update id="emptyByOneMonth">
+        DELETE FROM sys_logs
+        WHERE create_time &lt; #{date}
+    </update>
+
+</mapper>

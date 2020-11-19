@@ -1,3 +1,18 @@
+/**
+ * Copyright 2020 OPSLI 快速开发平台 https://www.opsli.com
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ */
 package org.opsli.api.wrapper.system.dict;
 
 import com.alibaba.excel.annotation.ExcelIgnore;
@@ -7,7 +22,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.opsli.api.base.warpper.ApiWrapper;
 import org.opsli.common.annotation.validation.ValidationArgs;
-import org.opsli.common.annotation.validation.ValidationArgsMax;
+import org.opsli.common.annotation.validation.ValidationArgsLenMax;
 import org.opsli.common.enums.ValiArgsType;
 import org.opsli.plugins.excel.annotation.ExcelInfo;
 
@@ -34,7 +49,7 @@ public class DictDetailModel extends ApiWrapper {
     @ExcelIgnore
     // 验证器
     @ValidationArgs({ValiArgsType.IS_NOT_NULL, ValiArgsType.IS_GENERAL})
-    @ValidationArgsMax(120)
+    @ValidationArgsLenMax(120)
     private String typeCode;
 
     /** 字典名称 */
@@ -43,7 +58,7 @@ public class DictDetailModel extends ApiWrapper {
     @ExcelInfo
     // 验证器
     @ValidationArgs({ValiArgsType.IS_NOT_NULL, ValiArgsType.IS_GENERAL_WITH_CHINESE})
-    @ValidationArgsMax(120)
+    @ValidationArgsLenMax(120)
     private String dictName;
 
     /** 字典值 */
@@ -52,16 +67,16 @@ public class DictDetailModel extends ApiWrapper {
     @ExcelInfo
     // 验证器
     @ValidationArgs({ValiArgsType.IS_NOT_NULL})
-    @ValidationArgsMax(120)
+    @ValidationArgsLenMax(120)
     private String dictValue;
 
     /** 是否内置数据 0是  1否*/
     @ApiModelProperty(value = "是否内置数据 0是  1否")
     @ExcelProperty(value = "是否内置数据", order = 2)
-    @ExcelInfo(dictType = "yes_no")
+    @ExcelInfo(dictType = "no_yes")
     // 验证器
     @ValidationArgs({ValiArgsType.IS_NOT_NULL})
-    @ValidationArgsMax(1)
+    @ValidationArgsLenMax(1)
     private Character izLock;
 
     /** 排序 */
@@ -70,7 +85,7 @@ public class DictDetailModel extends ApiWrapper {
     @ExcelInfo
     // 验证器
     @ValidationArgs({ValiArgsType.IS_NOT_NULL, ValiArgsType.IS_NUMBER})
-    @ValidationArgsMax(10)
+    @ValidationArgsLenMax(10)
     private Integer sortNo;
 
     /** 备注 */
@@ -78,7 +93,7 @@ public class DictDetailModel extends ApiWrapper {
     @ExcelProperty(value = "备注", order = 2)
     @ExcelInfo
     // 验证器
-    @ValidationArgsMax(255)
+    @ValidationArgsLenMax(255)
     private String remark;
 
 

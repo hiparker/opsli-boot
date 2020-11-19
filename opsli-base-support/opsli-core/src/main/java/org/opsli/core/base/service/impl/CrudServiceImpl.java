@@ -1,3 +1,18 @@
+/**
+ * Copyright 2020 OPSLI 快速开发平台 https://www.opsli.com
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ */
 package org.opsli.core.base.service.impl;
 
 import cn.hutool.core.convert.Convert;
@@ -75,6 +90,15 @@ public abstract class CrudServiceImpl<M extends BaseMapper<T>, T extends BaseEnt
     @Transactional(readOnly = false)
     public E insert(E model) {
         if(model == null) return null;
+
+        // 默认清空 创建人和修改人
+        if(model.getIzManual() != null && !model.getIzManual()){
+            model.setCreateBy(null);
+            model.setCreateTime(null);
+            model.setUpdateBy(null);
+            model.setUpdateTime(null);
+        }
+
         T entity = transformM2T(model);
         boolean ret = super.save(entity);
         if(ret){
@@ -87,6 +111,18 @@ public abstract class CrudServiceImpl<M extends BaseMapper<T>, T extends BaseEnt
     @Transactional(readOnly = false)
     public boolean insertBatch(List<E> models) {
         if(models == null || models.size() == 0) return false;
+
+        for (E model : models) {
+            // 默认清空 创建人和修改人
+            if(model.getIzManual() != null && !model.getIzManual()){
+                model.setCreateBy(null);
+                model.setCreateTime(null);
+                model.setUpdateBy(null);
+                model.setUpdateTime(null);
+            }
+        }
+
+
         List<T> entitys = transformMs2Ts(models);
         return super.saveBatch(entitys);
     }
@@ -95,6 +131,13 @@ public abstract class CrudServiceImpl<M extends BaseMapper<T>, T extends BaseEnt
     @Transactional(readOnly = false)
     public E update(E model) {
         if(model == null) return null;
+
+        // 默认清空 创建人和修改人
+        if(model.getIzManual() != null && !model.getIzManual()){
+            model.setUpdateBy(null);
+            model.setUpdateTime(null);
+        }
+
         T entity = transformM2T(model);
         boolean ret = super.updateById(entity);
         if(ret){
@@ -157,9 +200,9 @@ public abstract class CrudServiceImpl<M extends BaseMapper<T>, T extends BaseEnt
         page.pageHelperBegin();
         try{
             List<T> list = this.findList(page.getQueryWrapper());
-            List<E> es = WrapperUtil.transformInstance(list, modelClazz);
-            PageInfo<E> pageInfo = new PageInfo<>(es);
-            page.instance(pageInfo);
+            PageInfo<T> pageInfo = new PageInfo<>(list);
+            List<E> es = transformTs2Ms(pageInfo.getList());
+            page.instance(pageInfo, es);
         } finally {
             page.pageHelperEnd();
         }

@@ -12,7 +12,11 @@
         a.icon as icon,
         a.type as type,
         a.url as url,
+        a.component as component,
+        a.redirect as redirect,
         a.iz_lock as izLock,
+        a.hidden as hidden,
+        a.sort_no as sortNo,
 
         a.create_by as createBy,
         a.create_time as createTime,
@@ -37,5 +41,6 @@
                 AND a.id != #{id}
             </if>
     </select>
+
 
 </mapper>

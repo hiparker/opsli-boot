@@ -1,3 +1,18 @@
+/**
+ * Copyright 2020 OPSLI 快速开发平台 https://www.opsli.com
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ */
 package org.opsli.common.api;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -13,11 +28,11 @@ import java.util.Map;
  *
  * @date 2020年5月15日10:40:54
  * @author Parker
- * 
+ *
  */
 public class ResultVoMap extends HashMap<String,Object> implements Serializable {
- 
- 
+
+
 	public ResultVoMap(){
 		this.put("success", true);
 		this.put("code", HttpStatus.OK.value());
@@ -33,7 +48,7 @@ public class ResultVoMap extends HashMap<String,Object> implements Serializable 
 	public String getMsg() {
 		return (String)this.get("msg");
 	}
- 
+
 	public void setMsg(String msg) {//向json中添加属性，在js中访问，请调用data.msg
 		this.put("msg", msg);
 	}
@@ -49,7 +64,7 @@ public class ResultVoMap extends HashMap<String,Object> implements Serializable 
 	public boolean isSuccess() {
 		return (boolean)this.get("success");
 	}
- 
+
 	public void setSuccess(boolean success) {
 		this.put("success", success);
 	}
@@ -81,14 +96,14 @@ public class ResultVoMap extends HashMap<String,Object> implements Serializable 
 	public static ResultVoMap success() {
 		return new ResultVoMap();
 	}
- 
- 
+
+
 	@Override
 	public ResultVoMap put(String key, Object value) {
 		super.put(key, value);
 		return this;
 	}
- 
+
 	public ResultVoMap putMap(Map m) {
 		super.putAll(m);
 		return this;

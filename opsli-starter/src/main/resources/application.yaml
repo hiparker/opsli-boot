@@ -1,7 +1,8 @@
 # tomcat 配置
 server:
   tomcat:
-    #basedir: /Users/xxx
+    # Tomcat 工作目录路径
+    #basedir:
     # Tomcat 编码
     uri-encoding: UTF-8
     # 对于 Tomcat 头文件不限制大小
@@ -12,7 +13,6 @@ server:
     api:
       path:
         global-prefix: /api/v1
-
   compression:
     enabled: true
     min-response-size: 1024
@@ -33,6 +33,9 @@ spring:
     multipart:
       max-file-size: 10MB
       max-request-size: 10MB
+  #静态资源
+  resources:
+    static-locations: classpath:/META-INF/resources/,classpath:/resources/, classpath:/static/, classpath:/public/,file:${opsli.web.upload-path}
   #json 时间戳统一转换
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss
@@ -137,16 +140,46 @@ mybatis-plus:
       logic-delete-field: deleted  # 全局逻辑删除的实体字段名(since 3.3.0,配置后可以忽略不配置步骤2)
       logic-delete-value: 1 # 逻辑已删除值(默认为 1)
       logic-not-delete-value: 0 # 逻辑未删除值(默认为 0)
-      # 更新策略 - 防止更新 null 值到数据字段中
+      # 更新策略 - 防止更新 null 值到数据字段中 空字符串可以更新
+      # 不要改！！！如果想要非空修改 直接在对应字段上加注解 全局不允许 可空数据修改
       update-strategy: not_empty
   configuration:
     map-underscore-to-camel-case: true
     cache-enabled: false
     call-setters-on-nulls: true
     # 打印SQL 开发测试使用 生产关闭 ***
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    #log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+
 
 # opsli 自定义配置
 opsli:
+  # Java 软防火墙
+  waf:
+    # 开启防护
+    enable: true
+    # 开启XSS 防护
+    xss-filter: true
+    # 开启sql注入防护 (目前用不着sql防护 mybatis-plus就已经很完善了)
+    sql-filter: false
+    # 设置xss防护过滤器的优先级，值越小优先级越高（不要超过 shiroFilter）
+    order: 0
+    # 设置xss防护的url拦截路径
+    url-patterns: "/*"
+    # 排除过滤url
+    url-exclusion:
+      - "/doc.html"
+      - "/static/file"
+
+  # 超级管理员账号
+  superadmin: system
   # token 有效时间 （分钟） 2小时
   token-effective-time: 120
+
+  # 登录设置
+  login:
+    # 失败次数
+    slip-count: 5
+    # 失败锁定时间(秒)
+    slip-lock-speed: 300
+

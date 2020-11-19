@@ -1,15 +1,31 @@
+/**
+ * Copyright 2020 OPSLI 快速开发平台 https://www.opsli.com
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ */
 package org.opsli.api.web.system.menu;
 
 import org.opsli.api.base.result.ResultVo;
 import org.opsli.api.wrapper.system.menu.MenuModel;
-import org.opsli.api.wrapper.system.user.UserModel;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 
 
 /**
@@ -30,6 +46,37 @@ public interface MenuApi {
 
     /** 标题 */
     String TITLE = "菜单";
+
+
+    /**
+     * 获得菜单
+     * @return ResultVo
+     */
+    @GetMapping("/findMenuTreePage")
+    ResultVo<?> findMenuTreePage(HttpServletRequest request);
+
+    /**
+     * 获得当前用户登录菜单
+     * @return ResultVo
+     */
+    @PostMapping("/findMenuTree")
+    ResultVo<?> findMenuTree();
+
+
+    /**
+     * 根据 获得用户 菜单 - 权限
+     * @return ResultVo
+     */
+    @GetMapping("/getMenuAndPermsTree")
+    ResultVo<?> getMenuAndPermsTree();
+
+    /**
+     * 获得集合
+     * @return ResultVo
+     */
+    @GetMapping("/findList")
+    ResultVo<List<MenuModel>> findList();
+
 
     /**
      * 菜单 查一条
@@ -59,7 +106,7 @@ public interface MenuApi {
      * @return ResultVo
      */
     @PostMapping("/insert")
-    ResultVo<?> insert(MenuModel model);
+    ResultVo<?> insert(@RequestBody MenuModel model);
 
     /**
      * 菜单 修改
@@ -67,7 +114,7 @@ public interface MenuApi {
      * @return ResultVo
      */
     @PostMapping("/update")
-    ResultVo<?> update(MenuModel model);
+    ResultVo<?> update(@RequestBody MenuModel model);
 
     /**
      * 菜单 删除
@@ -110,4 +157,13 @@ public interface MenuApi {
     @GetMapping("/exportImport/template")
     ResultVo<?> importTemplate(HttpServletResponse response);
 
+
+
+    // ================= 普通
+    /**
+     * 根据菜单编号 获得菜单
+     * @param menuCode 菜单编号
+     * @return ResultVo
+     */
+    ResultVo<MenuModel> getByCode(String menuCode);
 }

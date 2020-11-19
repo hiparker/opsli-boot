@@ -22,7 +22,7 @@ import java.util.List;
  * @CreateTime: 2020-09-13 17:40
  * @Description: 测试类
  */
-@ApiRestController("/test2")
+//@ApiRestController("/test2")
 public class TestRestRestController2{
 
     @Autowired

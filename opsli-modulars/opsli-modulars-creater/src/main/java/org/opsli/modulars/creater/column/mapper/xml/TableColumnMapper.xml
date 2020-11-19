@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.opsli.modulars.creater.column.mapper.TableColumnMapper">
+
+
+    <select id="uniqueVerificationByFieldName" resultType="Integer">
+        select
+            count(0)
+        from
+        creater_table_column a
+        <where>
+            a.field_name = #{fieldName}
+            and table_id = #{tableId}
+            <if test="id != null and id != ''">
+                and a.id != #{id}
+            </if>
+        </where>
+    </select>
+
+</mapper>

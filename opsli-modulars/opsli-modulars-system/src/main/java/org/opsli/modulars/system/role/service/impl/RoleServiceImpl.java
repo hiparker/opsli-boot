@@ -1,8 +1,27 @@
+/**
+ * Copyright 2020 OPSLI 快速开发平台 https://www.opsli.com
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ */
 package org.opsli.modulars.system.role.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.opsli.api.wrapper.system.role.RoleModel;
 import org.opsli.common.exception.ServiceException;
 import org.opsli.core.base.service.impl.CrudServiceImpl;
+import org.opsli.core.persistence.querybuilder.GenQueryBuilder;
+import org.opsli.core.persistence.querybuilder.QueryBuilder;
+import org.opsli.core.persistence.querybuilder.chain.TenantHandler;
 import org.opsli.modulars.system.SystemMsg;
 import org.opsli.modulars.system.role.entity.SysRole;
 import org.opsli.modulars.system.role.mapper.RoleMapper;
@@ -26,12 +45,17 @@ public class RoleServiceImpl extends CrudServiceImpl<RoleMapper, SysRole, RoleMo
     private RoleMapper mapper;
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public RoleModel insert(RoleModel model) {
         if(model == null) return null;
 
         SysRole entity = super.transformM2T(model);
         // 唯一验证
-        Integer count = mapper.uniqueVerificationByCode(entity);
+        QueryBuilder<SysRole> queryBuilder = new GenQueryBuilder<>();
+        // 多租户处理
+        TenantHandler tenantHandler = new TenantHandler();
+        QueryWrapper<SysRole> qWrapper = tenantHandler.handler(entityClazz, queryBuilder.build());
+        Integer count = mapper.uniqueVerificationByCode(entity,qWrapper);
         if(count != null && count > 0){
             // 重复
             throw new ServiceException(SystemMsg.EXCEPTION_ROLE_UNIQUE);
@@ -40,14 +64,18 @@ public class RoleServiceImpl extends CrudServiceImpl<RoleMapper, SysRole, RoleMo
         return super.insert(model);
     }
 
-    @Transactional(rollbackFor = Exception.class)
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public RoleModel update(RoleModel model) {
         if(model == null) return null;
 
         SysRole entity = super.transformM2T(model);
         // 唯一验证
-        Integer count = mapper.uniqueVerificationByCode(entity);
+        QueryBuilder<SysRole> queryBuilder = new GenQueryBuilder<>();
+        // 多租户处理
+        TenantHandler tenantHandler = new TenantHandler();
+        QueryWrapper<SysRole> qWrapper = tenantHandler.handler(entityClazz, queryBuilder.build());
+        Integer count = mapper.uniqueVerificationByCode(entity,qWrapper);
         if(count != null && count > 0){
             // 重复
             throw new ServiceException(SystemMsg.EXCEPTION_ROLE_UNIQUE);
@@ -55,6 +83,7 @@ public class RoleServiceImpl extends CrudServiceImpl<RoleMapper, SysRole, RoleMo
 
         return super.update(model);
     }
+
 
 }
 

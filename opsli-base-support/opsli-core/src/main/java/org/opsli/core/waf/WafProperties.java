@@ -1,3 +1,18 @@
+/**
+ * Copyright 2020 OPSLI 快速开发平台 https://www.opsli.com
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ */
 package org.opsli.core.waf;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -10,14 +25,21 @@ import java.util.List;
  * @author 毕子航 951755883@qq.com
  * @date 2018/10/26
  */
-@ConfigurationProperties(prefix = XssProperties.XSS)
-public class XssProperties {
-	public static final String XSS = "xss";
+@ConfigurationProperties(prefix = WafProperties.WAF)
+public class WafProperties {
+
+	public static final String WAF = "opsli.waf";
 
 	/**
-	 * xss 是否生效
+	 * 是否生效
 	 */
 	boolean enable = false;
+
+	/**
+	 * xss 过滤
+	 */
+	boolean xssFilter = false;
+
 	/**
 	 * sql 过滤
 	 */
@@ -77,6 +99,14 @@ public class XssProperties {
 
 	public void setEnable(boolean enable) {
 		this.enable = enable;
+	}
+
+	public boolean isXssFilter() {
+		return xssFilter;
+	}
+
+	public void setXssFilter(boolean xssFilter) {
+		this.xssFilter = xssFilter;
 	}
 
 	public boolean isSqlFilter() {

@@ -4,7 +4,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.opsli.core.general.StartPrint;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
-import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Component;
 
 /**
@@ -18,7 +17,7 @@ import org.springframework.stereotype.Component;
 public class ApplicationReadyEventListene implements ApplicationListener<ApplicationReadyEvent> {
     @Override
     public void onApplicationEvent(ApplicationReadyEvent event) {
-        ConfigurableApplicationContext applicationContext = event.getApplicationContext();
-        StartPrint.INSTANCE.successPrint(applicationContext.getEnvironment());
+        event.getApplicationContext();
+        StartPrint.INSTANCE.successPrint();
     }
 }

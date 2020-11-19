@@ -1,11 +1,24 @@
+/**
+ * Copyright 2020 OPSLI 快速开发平台 https://www.opsli.com
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ */
 package org.opsli.core.cache.pushsub.handler;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.opsli.api.wrapper.system.menu.MenuModel;
-import org.opsli.api.wrapper.system.user.UserModel;
 import org.opsli.common.constants.CacheConstants;
 import org.opsli.core.cache.local.CacheUtil;
 import org.opsli.core.cache.pushsub.enums.MsgArgsType;
@@ -14,9 +27,6 @@ import org.opsli.core.cache.pushsub.enums.UserModelType;
 import org.opsli.core.utils.UserUtil;
 import org.opsli.plugins.cache.EhCachePlugin;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @BelongsProject: opsli-boot
@@ -69,8 +79,6 @@ public class UserHandler implements RedisPushSubHandler{
         // 数据为空则不执行
         if(data == null) return;
 
-        // 获得数据
-        UserModel userModel = data.toJavaObject(UserModel.class);
         // 获得用户ID 和 用户名
         String userId = (String) msgJson.get(MsgArgsType.USER_ID.toString());
         String username = (String) msgJson.get(MsgArgsType.USER_USERNAME.toString());
@@ -81,12 +89,9 @@ public class UserHandler implements RedisPushSubHandler{
         // 先删除
         ehCachePlugin.delete(CacheConstants.HOT_DATA, UserUtil.PREFIX_ID + userId);
         ehCachePlugin.delete(CacheConstants.HOT_DATA, UserUtil.PREFIX_USERNAME + username);
-        // 再赋值
-        ehCachePlugin.put(CacheConstants.HOT_DATA, UserUtil.PREFIX_ID + userId, userModel);
-        ehCachePlugin.put(CacheConstants.HOT_DATA,UserUtil.PREFIX_USERNAME + username, userModel);
         // 清除空拦截
-        CacheUtil.putNilFlag(UserUtil.PREFIX_ID + userId);
-        CacheUtil.putNilFlag(UserUtil.PREFIX_USERNAME + username);
+        CacheUtil.delNilFlag(UserUtil.PREFIX_ID + userId);
+        CacheUtil.delNilFlag(UserUtil.PREFIX_USERNAME + username);
     }
 
     /**
@@ -104,19 +109,10 @@ public class UserHandler implements RedisPushSubHandler{
             return;
         }
 
-        // 用户角色列表
-        List<String> roleCodes = dataArray.toJavaList(String.class);
-        if(roleCodes == null || roleCodes.isEmpty()){
-            return;
-        }
-
         // 先删除
         ehCachePlugin.delete(CacheConstants.HOT_DATA, UserUtil.PREFIX_ID_ROLES + userId);
-        // 存入缓存
-        ehCachePlugin.put(CacheConstants.HOT_DATA, UserUtil.PREFIX_ID_ROLES + userId, roleCodes);
         // 清除空拦截
-        CacheUtil.putNilFlag(UserUtil.PREFIX_ID_ROLES + userId);
-
+        CacheUtil.delNilFlag(UserUtil.PREFIX_ID_ROLES + userId);
     }
 
     /**
@@ -133,18 +129,11 @@ public class UserHandler implements RedisPushSubHandler{
         if(StringUtils.isEmpty(userId)){
             return;
         }
-        // 用户权限列表
-        List<String> perms = dataArray.toJavaList(String.class);
-        if(perms == null || perms.isEmpty()){
-            return;
-        }
 
         // 先删除
         ehCachePlugin.delete(CacheConstants.HOT_DATA, UserUtil.PREFIX_ID_PERMISSIONS + userId);
-        // 存入缓存
-        ehCachePlugin.put(CacheConstants.HOT_DATA, UserUtil.PREFIX_ID_PERMISSIONS + userId, perms);
         // 清除空拦截
-        CacheUtil.putNilFlag(UserUtil.PREFIX_ID_PERMISSIONS + userId);
+        CacheUtil.delNilFlag(UserUtil.PREFIX_ID_PERMISSIONS + userId);
     }
 
     /**
@@ -161,18 +150,11 @@ public class UserHandler implements RedisPushSubHandler{
         if(StringUtils.isEmpty(userId)){
             return;
         }
-        // 用户菜单列表
-        List<MenuModel> menus = dataArray.toJavaList(MenuModel.class);
-        if(menus == null || menus.isEmpty()){
-            return;
-        }
 
         // 先删除
         ehCachePlugin.delete(CacheConstants.HOT_DATA, UserUtil.PREFIX_ID_MENUS + userId);
-        // 存入缓存
-        ehCachePlugin.put(CacheConstants.HOT_DATA, UserUtil.PREFIX_ID_MENUS + userId, menus);
         // 清除空拦截
-        CacheUtil.putNilFlag(UserUtil.PREFIX_ID_MENUS + userId);
+        CacheUtil.delNilFlag(UserUtil.PREFIX_ID_MENUS + userId);
     }
 
 

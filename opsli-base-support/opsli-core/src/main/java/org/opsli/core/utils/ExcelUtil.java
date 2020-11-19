@@ -1,3 +1,18 @@
+/**
+ * Copyright 2020 OPSLI 快速开发平台 https://www.opsli.com
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ */
 package org.opsli.core.utils;
 
 import cn.hutool.core.util.ReflectUtil;
@@ -10,6 +25,8 @@ import org.opsli.common.enums.ExcelOperate;
 import org.opsli.plugins.excel.ExcelPlugin;
 import org.opsli.plugins.excel.annotation.ExcelInfo;
 import org.opsli.plugins.excel.exception.ExcelPluginException;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -17,6 +34,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
+
+import static org.opsli.common.constants.OrderConstants.UTIL_ORDER;
 
 /**
  * @BelongsProject: opsli-boot
@@ -26,7 +45,9 @@ import java.util.Map;
  * @Description: ExcelUtil
  */
 @Slf4j
+@Order(UTIL_ORDER)
 @Component
+@Lazy(false)
 public class ExcelUtil extends ExcelPlugin {
 
     @Override

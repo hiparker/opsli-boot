@@ -56,7 +56,7 @@ public class OAuth2Realm extends AuthorizingRealm {
      */
     @Override
     protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token)
-            throws AuthenticationException {
+            throws AuthenticationException,TokenException {
 
         String accessToken = (String) token.getPrincipal();
 
@@ -75,8 +75,9 @@ public class OAuth2Realm extends AuthorizingRealm {
         // 3. 校验账户是否锁定
         if(user == null || user.getLocked().equals('1')){
             // 账号已被锁定,请联系管理员
-            throw new LockedAccountException(
-                    TokenMsg.EXCEPTION_LOGIN_ACCOUNT_LOCKED.getMessage());
+            // token失效，请重新登录
+            throw new TokenException(
+                    TokenMsg.EXCEPTION_LOGIN_ACCOUNT_LOCKED);
         }
 
         return new SimpleAuthenticationInfo(user, accessToken, getName());

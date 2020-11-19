@@ -1,3 +1,18 @@
+/**
+ * Copyright 2020 OPSLI 快速开发平台 https://www.opsli.com
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ */
 package org.opsli.core.persistence.querybuilder;
 
 import cn.hutool.core.util.ReflectUtil;
@@ -56,7 +71,7 @@ public class WebQueryBuilder<T extends BaseEntity> implements QueryBuilder<T>{
      * @param defaultOrderField 默认排序字段
      */
     public WebQueryBuilder(Class<T> entityClazz, Map<String, String[]> parameterMap,
-                                                  String defaultOrderField){
+                           String defaultOrderField){
         this.parameterMap = parameterMap;
         this.entityClazz = entityClazz;
         this.defaultOrderField = defaultOrderField;
@@ -114,7 +129,9 @@ public class WebQueryBuilder<T extends BaseEntity> implements QueryBuilder<T>{
         }
         // 如果没有排序 默认按照 修改时间倒叙排序
         if(orderCount == 0){
-            queryWrapper.orderByDesc(HumpUtil.humpToUnderline(this.defaultOrderField));
+            if(StringUtils.isNotEmpty(this.defaultOrderField)){
+                queryWrapper.orderByDesc(HumpUtil.humpToUnderline(this.defaultOrderField));
+            }
         }
         return queryWrapper;
     }

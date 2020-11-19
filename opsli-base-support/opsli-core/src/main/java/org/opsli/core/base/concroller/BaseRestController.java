@@ -1,3 +1,18 @@
+/**
+ * Copyright 2020 OPSLI 快速开发平台 https://www.opsli.com
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ */
 package org.opsli.core.base.concroller;
 
 
@@ -13,6 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.opsli.api.base.result.ResultVo;
 import org.opsli.api.base.warpper.ApiWrapper;
+import org.opsli.api.wrapper.system.user.UserModel;
 import org.opsli.common.annotation.hotdata.EnableHotData;
 import org.opsli.common.exception.ServiceException;
 import org.opsli.common.msg.CommonMsg;
@@ -22,10 +38,12 @@ import org.opsli.core.base.service.interfaces.CrudServiceInterface;
 import org.opsli.core.cache.local.CacheUtil;
 import org.opsli.core.msg.CoreMsg;
 import org.opsli.core.utils.ExcelUtil;
+import org.opsli.core.utils.UserUtil;
 import org.opsli.plugins.excel.exception.ExcelPluginException;
 import org.opsli.plugins.redis.RedisLockPlugins;
 import org.opsli.plugins.redis.lock.RedisLock;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -51,6 +69,9 @@ import java.util.List;
 @Slf4j
 @RestController
 public abstract class BaseRestController <T extends BaseEntity, E extends ApiWrapper, S extends CrudServiceInterface<T,E>>{
+
+    @Value("${opsli.enable-demo}")
+    private boolean enableDemo;
 
     /** 开启热点数据状态 */
     protected boolean hotDataFlag = false;
@@ -241,6 +262,17 @@ public abstract class BaseRestController <T extends BaseEntity, E extends ApiWra
         // 记录导出日志
         log.info(msgInfo);
         return resultVo;
+    }
+
+    /**
+     * 演示模式
+     */
+    protected void demoError(){
+        UserModel user = UserUtil.getUser();
+        // 演示模式 不允许操作 （超级管理员可以操作）
+        if(enableDemo && !UserUtil.SUPER_ADMIN.equals(user.getUsername())){
+            throw new ServiceException(CoreMsg.EXCEPTION_ENABLE_DEMO);
+        }
     }
 
     // =================================================

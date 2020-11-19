@@ -1,3 +1,18 @@
+/**
+ * Copyright 2020 OPSLI 快速开发平台 https://www.opsli.com
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ */
 package org.opsli.modulars.system.dict.service.impl;
 
 import org.apache.commons.lang3.StringUtils;
@@ -61,17 +76,20 @@ public class DictServiceImpl extends CrudServiceImpl<DictMapper, SysDict, DictMo
             throw new ServiceException(SystemMsg.EXCEPTION_DICT_UNIQUE);
         }
 
+        DictModel dictModel = super.get(model.getId());
         DictModel updateRet = super.update(model);
 
-        // 字典主表修改 子表跟着联动 （验证是否改了编号）/ 或者修改不允许改编号
-        List<DictDetailModel> listByTypeCode = null;
-        if(StringUtils.isNotEmpty(model.getTypeCode())){
-            listByTypeCode = iDictDetailService.findListByTypeCode(model.getTypeCode());
-        }
-        if(listByTypeCode != null && listByTypeCode.size() > 0){
-            for (DictDetailModel dictDetailModel : listByTypeCode) {
-                dictDetailModel.setTypeCode(updateRet.getTypeCode());
-                iDictDetailService.update(dictDetailModel);
+        if(updateRet != null){
+            // 字典主表修改 子表跟着联动 （验证是否改了编号）/ 或者修改不允许改编号
+            List<DictDetailModel> listByTypeCode = null;
+            if(StringUtils.isNotEmpty(model.getTypeCode())){
+                listByTypeCode = iDictDetailService.findListByTypeCode(dictModel.getTypeCode());
+            }
+            if(listByTypeCode != null && listByTypeCode.size() > 0){
+                for (DictDetailModel dictDetailModel : listByTypeCode) {
+                    dictDetailModel.setTypeCode(updateRet.getTypeCode());
+                    iDictDetailService.update(dictDetailModel);
+                }
             }
         }
 

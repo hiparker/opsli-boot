@@ -80,10 +80,7 @@
         <kaptcha.version>0.0.9</kaptcha.version>
         <shiro.version>1.6.0</shiro.version>
         <shiro.redis.version>3.1.0</shiro.redis.version>
-
-        <!--        <aliyun-java-sdk-core.version>3.2.3</aliyun-java-sdk-core.version>-->
-<!--        <aliyun-java-sdk-dysmsapi.version>1.0.0</aliyun-java-sdk-dysmsapi.version>-->
-<!--        <aliyun.oss.version>3.6.0</aliyun.oss.version>-->
+        <snakeyaml.version>1.27</snakeyaml.version>
     </properties>
 
 
@@ -105,31 +102,6 @@
                 <version>${kaptcha.version}</version>
             </dependency>
 
-
-<!--            &lt;!&ndash;shiro&ndash;&gt;-->
-<!--            <dependency>-->
-<!--                <groupId>org.apache.shiro</groupId>-->
-<!--                <artifactId>shiro-spring-boot-starter</artifactId>-->
-<!--                <version>${shiro.version}</version>-->
-<!--            </dependency>-->
-
-<!--            &lt;!&ndash; shiro-redis &ndash;&gt;-->
-<!--            <dependency>-->
-<!--                <groupId>org.crazycake</groupId>-->
-<!--                <artifactId>shiro-redis-spring-boot-starter</artifactId>-->
-<!--                <version>${shiro.redis.version}</version>-->
-<!--            </dependency>-->
-<!--            <dependency>-->
-<!--                <groupId>org.crazycake</groupId>-->
-<!--                <artifactId>shiro-redis</artifactId>-->
-<!--                <version>${shiro.redis.version}</version>-->
-<!--                <exclusions>-->
-<!--                    <exclusion>-->
-<!--                        <groupId>org.apache.shiro</groupId>-->
-<!--                        <artifactId>shiro-core</artifactId>-->
-<!--                    </exclusion>-->
-<!--                </exclusions>-->
-<!--            </dependency>-->
 
             <!-- JWT -->
             <dependency>
@@ -283,6 +255,14 @@
             <artifactId>hutool-all</artifactId>
             <version>${hutool.version}</version>
         </dependency>
+
+        <!-- https://mvnrepository.com/artifact/org.yaml/snakeyaml -->
+        <dependency>
+            <groupId>org.yaml</groupId>
+            <artifactId>snakeyaml</artifactId>
+            <version>${snakeyaml.version}</version>
+        </dependency>
+
         <!-- ———————————————————— 集成工具 - 结束 ———————————————————— -->
 
     </dependencies>

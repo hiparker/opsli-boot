@@ -1,8 +1,22 @@
+/**
+ * Copyright 2020 OPSLI 快速开发平台 https://www.opsli.com
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ */
 package org.opsli.core.utils;
 
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
-import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -10,25 +24,35 @@ import org.apache.shiro.crypto.hash.Md5Hash;
 import org.opsli.api.base.result.ResultVo;
 import org.opsli.api.wrapper.system.user.UserModel;
 import org.opsli.common.constants.SignConstants;
+import org.opsli.common.constants.TokenConstants;
 import org.opsli.core.msg.TokenMsg;
 import org.opsli.plugins.redis.RedisPlugin;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.AutoConfigureAfter;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
+
+import static org.opsli.common.constants.OrderConstants.UTIL_ORDER;
 
 /**
  * User Token Util
  *
  * @author parker
  */
+
 @Slf4j
+@Order(UTIL_ORDER)
 @Component
+@AutoConfigureAfter({RedisPlugin.class})
+@Lazy(false)
 public class UserTokenUtil {
 
-    /** token缓存名 */
-    private static final String TOKEN_NAME = "token";
+    /** token 缓存名 */
+    public static final String TOKEN_NAME = TokenConstants.ACCESS_TOKEN;
 
     /** 缓存前缀 */
     private static final String PREFIX = "opsli:ticket:";
@@ -111,7 +135,7 @@ public class UserTokenUtil {
         String username = "";
         try {
             username = JwtUtil.getClaim(token, SignConstants.ACCOUNT);
-        }catch (Exception e){}
+        }catch (Exception ignored){}
         return username;
     }
 
@@ -128,7 +152,18 @@ public class UserTokenUtil {
             String signTokenHex = new Md5Hash(token).toHex();
 
             redisPlugin.del(PREFIX + signTokenHex);
-        }catch (Exception e){}
+
+            // 删除相关信息
+            String userId = getUserIdByToken(token);
+            UserModel user = UserUtil.getUser(userId);
+            if(user != null){
+                UserUtil.refreshUser(user);
+                UserUtil.refreshUserRoles(user.getId());
+                UserUtil.refreshUserAllPerms(user.getId());
+                UserUtil.refreshUserMenus(user.getId());
+            }
+
+        }catch (Exception ignored){}
     }
 
     /**
@@ -148,7 +183,6 @@ public class UserTokenUtil {
             // 2. 校验当前缓存中token是否失效
             // 生成MD5 16进制码 用于缩减存储
             String signTokenHex = new Md5Hash(token).toHex();
-
             Long  endTimestamp = (Long) redisPlugin.get(PREFIX + signTokenHex);
             if(endTimestamp == null){
                 return false;
@@ -156,9 +190,7 @@ public class UserTokenUtil {
 
             // JWT 自带过期校验 无需多做处理
 
-        }catch (TokenExpiredException e){
-            return false;
-        }catch (Exception e){
+        } catch (Exception e){
             return false;
         }
         return true;
@@ -171,6 +203,7 @@ public class UserTokenUtil {
      * 获取请求的token
      */
     public static String getRequestToken(HttpServletRequest httpRequest){
+
         //从header中获取token
         String token = httpRequest.getHeader(TOKEN_NAME);
 

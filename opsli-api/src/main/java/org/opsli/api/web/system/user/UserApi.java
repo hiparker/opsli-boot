@@ -1,12 +1,31 @@
+/**
+ * Copyright 2020 OPSLI 快速开发平台 https://www.opsli.com
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ */
 package org.opsli.api.web.system.user;
 
 import org.opsli.api.base.result.ResultVo;
 import org.opsli.api.wrapper.system.menu.MenuModel;
 import org.opsli.api.wrapper.system.role.RoleModel;
+import org.opsli.api.wrapper.system.user.UserInfo;
 import org.opsli.api.wrapper.system.user.UserModel;
+import org.opsli.api.wrapper.system.user.UserPassword;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import javax.servlet.http.HttpServletRequest;
@@ -32,6 +51,53 @@ public interface UserApi {
 
     /** 标题 */
     String TITLE = "用户信息";
+
+    /**
+     * 当前登陆用户信息
+     * @return ResultVo
+     */
+    @GetMapping("/getInfo")
+    ResultVo<UserInfo> getInfo(HttpServletRequest request);
+
+    /**
+     * 当前登陆用户信息
+     * @return ResultVo
+     */
+    @GetMapping("/getInfoById")
+    ResultVo<UserInfo> getInfoById(@RequestParam(name = "userId") String userId);
+
+    /**
+     * 根据 userId 获得用户角色Id集合
+     * @param userId 用户Id
+     * @return ResultVo
+     */
+    @GetMapping("/getRoleIdsByUserId")
+    ResultVo<List<String>> getRoleIdsByUserId(String userId);
+
+
+    /**
+     * 修改密码
+     * @return ResultVo
+     */
+    @PostMapping("/updatePassword")
+    ResultVo<?> updatePassword(@RequestBody UserPassword userPassword);
+
+    /**
+     * 修改密码 ID
+     * @return ResultVo
+     */
+    @PostMapping("/updatePasswordById")
+    ResultVo<?> updatePasswordById(@RequestBody UserPassword userPassword);
+
+
+    /**
+     * 上传头像
+     * @param request 文件流 request
+     * @return ResultVo
+     */
+    @PostMapping("/updateAvatar")
+    ResultVo<?> updateAvatar(MultipartHttpServletRequest request);
+
 
     /**
      * 用户信息 查一条
@@ -61,7 +127,7 @@ public interface UserApi {
      * @return ResultVo
      */
     @PostMapping("/insert")
-    ResultVo<?> insert(UserModel model);
+    ResultVo<?> insert(@RequestBody UserModel model);
 
     /**
      * 用户信息 修改
@@ -69,7 +135,7 @@ public interface UserApi {
      * @return ResultVo
      */
     @PostMapping("/update")
-    ResultVo<?> update(UserModel model);
+    ResultVo<?> update(@RequestBody UserModel model);
 
     /**
      * 用户信息 删除
@@ -103,6 +169,7 @@ public interface UserApi {
      */
     @GetMapping("/exportImport")
     ResultVo<?> excelImport(MultipartHttpServletRequest request);
+
 
     /**
      * 用户信息 Excel 下载导入模版

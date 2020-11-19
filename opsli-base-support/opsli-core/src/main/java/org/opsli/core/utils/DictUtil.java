@@ -1,3 +1,18 @@
+/**
+ * Copyright 2020 OPSLI 快速开发平台 https://www.opsli.com
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ */
 package org.opsli.core.utils;
 
 import com.alibaba.fastjson.JSONObject;
@@ -6,6 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.opsli.api.base.result.ResultVo;
 import org.opsli.api.web.system.dict.DictDetailApi;
+import org.opsli.api.web.system.menu.MenuApi;
 import org.opsli.api.wrapper.system.dict.DictWrapper;
 import org.opsli.api.wrapper.system.dict.DictDetailModel;
 import org.opsli.common.constants.CacheConstants;
@@ -15,11 +31,16 @@ import org.opsli.plugins.redis.RedisLockPlugins;
 import org.opsli.plugins.redis.RedisPlugin;
 import org.opsli.plugins.redis.lock.RedisLock;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.AutoConfigureAfter;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import static org.opsli.common.constants.OrderConstants.UTIL_ORDER;
 
 /**
  * @BelongsProject: opsli-boot
@@ -29,7 +50,10 @@ import java.util.Set;
  * @Description: 字典工具类
  */
 @Slf4j
+@Order(UTIL_ORDER)
 @Component
+@AutoConfigureAfter({RedisPlugin.class , RedisLockPlugins.class, DictDetailApi.class})
+@Lazy(false)
 public class DictUtil {
 
     /** Redis插件 */
@@ -61,7 +85,7 @@ public class DictUtil {
 
 
         // 防止缓存穿透判断
-        boolean hasNilFlag = CacheUtil.hasNilFlag("dict:" + typeCode + ":" + dictValue);
+        boolean hasNilFlag = CacheUtil.hasNilFlag(DictConstants.CACHE_PREFIX_VALUE + typeCode + ":" + dictValue);
         if(hasNilFlag){
             return defaultVal;
         }
@@ -70,7 +94,7 @@ public class DictUtil {
 
         // 锁凭证 redisLock 贯穿全程
         RedisLock redisLock = new RedisLock();
-        redisLock.setLockName("dictLock:" + typeCode + ":" + dictValue)
+        redisLock.setLockName(DictConstants.CACHE_PREFIX_VALUE + typeCode + ":" + dictValue)
                 .setAcquireTimeOut(3000L)
                 .setLockTimeOut(5000L);
 
@@ -115,7 +139,7 @@ public class DictUtil {
         if(StringUtils.isEmpty(dictName)){
             // 加入缓存防穿透
             // 设置空变量 用于防止穿透判断
-            CacheUtil.putNilFlag("dict:" + typeCode + ":" + dictValue);
+            CacheUtil.putNilFlag(DictConstants.CACHE_PREFIX_VALUE + typeCode + ":" + dictValue);
             dictName = defaultVal;
         }
         return dictName;
@@ -139,14 +163,14 @@ public class DictUtil {
         if (StringUtils.isNotEmpty(dictValue)) return dictValue;
 
         // 防止缓存穿透判断
-        boolean hasNilFlag = CacheUtil.hasNilFlag("dict:" + typeCode + ":" + dictName);
+        boolean hasNilFlag = CacheUtil.hasNilFlag(DictConstants.CACHE_PREFIX_NAME + typeCode + ":" + dictName);
         if(hasNilFlag){
             return defaultVal;
         }
 
         // 锁凭证 redisLock 贯穿全程
         RedisLock redisLock = new RedisLock();
-        redisLock.setLockName("dictLock:" + typeCode + ":" + dictName)
+        redisLock.setLockName(DictConstants.CACHE_PREFIX_NAME + typeCode + ":" + dictName)
                 .setAcquireTimeOut(3000L)
                 .setLockTimeOut(10000L);
 
@@ -192,7 +216,7 @@ public class DictUtil {
         if(StringUtils.isEmpty(dictValue)){
             // 加入缓存防穿透
             // 设置空变量 用于防止穿透判断
-            CacheUtil.putNilFlag("dict:" + typeCode + ":" + dictName);
+            CacheUtil.putNilFlag(DictConstants.CACHE_PREFIX_NAME + typeCode + ":" + dictName);
             dictValue = defaultVal;
         }
         return dictValue;
@@ -215,12 +239,72 @@ public class DictUtil {
                 if(jsonObject == null){
                     continue;
                 }
-                DictDetailModel model = jsonObject.toJavaObject(DictDetailModel.class);
+                JSONObject dataJson = jsonObject.getJSONObject(CacheUtil.JSON_KEY);
+                if(dataJson == null){
+                    continue;
+                }
+                DictDetailModel model = dataJson.toJavaObject(DictDetailModel.class);
                 DictWrapper dictWrapperModel = new DictWrapper();
                 dictWrapperModel.setTypeCode(typeCode);
                 dictWrapperModel.setDictName(model.getDictName());
                 dictWrapperModel.setDictValue(model.getDictValue());
                 dictWrapperModels.add(dictWrapperModel);
+            }
+
+            if(dictWrapperModels.isEmpty()){
+                // 防止缓存穿透判断
+                boolean hasNilFlag = CacheUtil.hasNilFlag(DictConstants.CACHE_PREFIX_LIST + typeCode);
+                if(hasNilFlag){
+                    return dictWrapperModels;
+                }
+
+                // 锁凭证 redisLock 贯穿全程
+                RedisLock redisLock = new RedisLock();
+                redisLock.setLockName(DictConstants.CACHE_PREFIX_LIST + typeCode)
+                        .setAcquireTimeOut(3000L)
+                        .setLockTimeOut(10000L);
+
+                try {
+                    // 这里增加分布式锁 防止缓存击穿
+                    // ============ 尝试加锁
+                    redisLock = redisLockPlugins.tryLock(redisLock);
+                    if(redisLock == null){
+                        return dictWrapperModels;
+                    }
+
+                    // 查询数据库 并保存到缓存内
+                    ResultVo<List<DictDetailModel>> resultVo = dictDetailApi.findListByTypeCode(typeCode);
+                    if(resultVo.isSuccess()){
+                        List<DictDetailModel> dictDetailModels = resultVo.getData();
+                        for (DictDetailModel model : dictDetailModels) {
+                            DictWrapper dictWrapperModel = new DictWrapper();
+                            dictWrapperModel.setTypeCode(model.getTypeCode());
+                            dictWrapperModel.setDictName(model.getDictName());
+                            dictWrapperModel.setDictValue(model.getDictValue());
+                            dictWrapperModel.setModel(model);
+                            dictWrapperModels.add(dictWrapperModel);
+                            // 保存至缓存
+                            DictUtil.put(dictWrapperModel);
+                        }
+                    }
+
+                }catch (Exception e){
+                    log.error(e.getMessage(),e);
+                    return dictWrapperModels;
+                }finally {
+                    // ============ 释放锁
+                    redisLockPlugins.unLock(redisLock);
+                    redisLock = null;
+                }
+
+
+                // 如果值还是 为空 则赋默认值
+                if(dictWrapperModels.isEmpty()){
+                    // 加入缓存防穿透
+                    // 设置空变量 用于防止穿透判断
+                    CacheUtil.putNilFlag(DictConstants.CACHE_PREFIX_LIST + typeCode );
+                }
+
             }
         }catch (Exception e){
             log.error(e.getMessage(),e);
@@ -244,8 +328,8 @@ public class DictUtil {
         CacheUtil.putEdenHash(DictConstants.CACHE_PREFIX_VALUE + model.getTypeCode(),
                 model.getDictValue(), model.getModel());
         // 删除 空属性 拦截
-        CacheUtil.putNilFlag("dict:" + model.getTypeCode() + ":" + model.getDictName());
-        CacheUtil.putNilFlag("dict:" + model.getTypeCode() + ":" + model.getTypeCode());
+        CacheUtil.delNilFlag(DictConstants.CACHE_PREFIX_NAME + model.getTypeCode() + ":" + model.getDictName());
+        CacheUtil.delNilFlag(DictConstants.CACHE_PREFIX_VALUE + model.getTypeCode() + ":" + model.getTypeCode());
     }
 
     /**
@@ -256,6 +340,9 @@ public class DictUtil {
     public static void del(DictWrapper model){
         CacheUtil.delEdenHash(DictConstants.CACHE_PREFIX_NAME + model.getTypeCode(), model.getDictName());
         CacheUtil.delEdenHash(DictConstants.CACHE_PREFIX_VALUE + model.getTypeCode(), model.getDictValue());
+        // 删除 空属性 拦截
+        CacheUtil.delNilFlag(DictConstants.CACHE_PREFIX_NAME + model.getTypeCode() + ":" + model.getDictName());
+        CacheUtil.delNilFlag(DictConstants.CACHE_PREFIX_VALUE + model.getTypeCode() + ":" + model.getTypeCode());
     }
 
     /**
@@ -285,6 +372,6 @@ public class DictUtil {
 
     @Autowired
     public  void setDictDetailApi(DictDetailApi dictDetailApi) {
-        // DictUtil.dictDetailApi = dictDetailApi;
+        DictUtil.dictDetailApi = dictDetailApi;
     }
 }

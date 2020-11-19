@@ -1,6 +1,23 @@
+/**
+ * Copyright 2020 OPSLI 快速开发平台 https://www.opsli.com
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ */
 package org.opsli.plugins.cache.service;
 
+import cn.hutool.core.util.ObjectUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.opsli.common.utils.WrapperUtil;
 import org.opsli.plugins.cache.msg.EhCacheMsg;
 import org.springframework.cache.Cache;
 import org.opsli.plugins.cache.EhCachePlugin;
@@ -49,7 +66,8 @@ public class EhCachePluginImpl implements EhCachePlugin {
         try {
             Cache cache = cacheManager.getCache(cacheName);
             if(cache != null){
-                return cache.get(key);
+                // 深克隆数据 防止 ehcache在jvm数据串行
+                return ObjectUtil.cloneByStream(cache.get(key));
             }
         } catch (Exception e) {
             log.error(EhCacheMsg.EXCEPTION_GET.getMessage()+"：{}",e.getMessage());
@@ -65,7 +83,9 @@ public class EhCachePluginImpl implements EhCachePlugin {
         try {
             Cache cache = cacheManager.getCache(cacheName);
             if(cache != null){
-                return cache.get(key,vClass);
+                // 深克隆数据 防止 ehcache在jvm数据串行
+                Object obj = ObjectUtil.cloneByStream(cache.get(key,vClass));
+                return WrapperUtil.transformInstance(obj, vClass);
             }
         } catch (Exception e) {
             log.error(EhCacheMsg.EXCEPTION_GET.getMessage()+"：{}", e.getMessage());

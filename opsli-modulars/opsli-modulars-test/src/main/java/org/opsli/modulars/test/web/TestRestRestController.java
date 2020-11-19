@@ -47,7 +47,7 @@ import java.util.concurrent.TimeUnit;
  * @Description: 测试类
  */
 @Slf4j
-@ApiRestController("/test")
+//@ApiRestController("/test")
 public class TestRestRestController extends BaseRestController<TestEntity, TestModel, ITestService>
         implements TestApi {
 

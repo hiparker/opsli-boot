@@ -1,3 +1,18 @@
+/**
+ * Copyright 2020 OPSLI 快速开发平台 https://www.opsli.com
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ */
 package org.opsli.api.wrapper.system.menu;
 
 import com.alibaba.excel.annotation.ExcelProperty;
@@ -6,7 +21,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.opsli.api.base.warpper.ApiWrapper;
 import org.opsli.common.annotation.validation.ValidationArgs;
-import org.opsli.common.annotation.validation.ValidationArgsMax;
+import org.opsli.common.annotation.validation.ValidationArgsLenMax;
 import org.opsli.common.enums.ValiArgsType;
 import org.opsli.plugins.excel.annotation.ExcelInfo;
 
@@ -26,26 +41,25 @@ public class MenuModel extends ApiWrapper {
     @ExcelProperty(value = "父级主键", order = 1)
     @ExcelInfo
     // 验证器
-    @ValidationArgs(ValiArgsType.IS_NOT_NULL)
-    @ValidationArgsMax(20)
+    @ValidationArgsLenMax(20)
     private String parentId;
 
     /** 菜单编号 */
-    @ApiModelProperty(value = "菜单编号")
-    @ExcelProperty(value = "菜单编号", order = 2)
+    @ApiModelProperty(value = "编号")
+    @ExcelProperty(value = "编号", order = 2)
     @ExcelInfo
     // 验证器
     @ValidationArgs({ValiArgsType.IS_NOT_NULL,ValiArgsType.IS_GENERAL})
-    @ValidationArgsMax(50)
+    @ValidationArgsLenMax(50)
     private String menuCode;
 
     /** 菜单名称 */
-    @ApiModelProperty(value = "菜单名称")
-    @ExcelProperty(value = "菜单名称", order = 3)
+    @ApiModelProperty(value = "名称")
+    @ExcelProperty(value = "名称", order = 3)
     @ExcelInfo
     // 验证器
     @ValidationArgs({ValiArgsType.IS_NOT_NULL,ValiArgsType.IS_GENERAL_WITH_CHINESE})
-    @ValidationArgsMax(50)
+    @ValidationArgsLenMax(50)
     private String menuName;
 
     /** 图标 */
@@ -53,16 +67,16 @@ public class MenuModel extends ApiWrapper {
     @ExcelProperty(value = "图标", order = 4)
     @ExcelInfo
     // 验证器
-    @ValidationArgsMax(50)
+    @ValidationArgsLenMax(50)
     private String icon;
 
-    /** 项目类型:1-菜单2-按钮3-链接4-表单 */
-    @ApiModelProperty(value = "项目类型:1-菜单2-按钮3-链接4-表单")
+    /** 项目类型: 1-菜单 2-按钮 3-链接 */
+    @ApiModelProperty(value = "项目类型")
     @ExcelProperty(value = "项目类型", order = 5)
-    @ExcelInfo(dictType = "menuType")
+    @ExcelInfo(dictType = "menu_type")
     // 验证器
     @ValidationArgs({ValiArgsType.IS_NOT_NULL})
-    @ValidationArgsMax(20)
+    @ValidationArgsLenMax(20)
     private String type;
 
     /** url地址 */
@@ -70,8 +84,39 @@ public class MenuModel extends ApiWrapper {
     @ExcelProperty(value = "url地址", order = 6)
     @ExcelInfo
     // 验证器
-    @ValidationArgsMax(200)
+    @ValidationArgsLenMax(200)
     private String url;
 
+    /** 组件 - vue 对应组件 */
+    @ApiModelProperty(value = "组件")
+    @ExcelProperty(value = "组件", order = 7)
+    @ExcelInfo
+    // 验证器
+    @ValidationArgsLenMax(200)
+    private String component;
+
+    /** 重定向 */
+    @ApiModelProperty(value = "重定向")
+    @ExcelProperty(value = "重定向", order = 8)
+    @ExcelInfo
+    // 验证器
+    @ValidationArgsLenMax(200)
+    private String redirect;
+
+    /** 排序 */
+    @ApiModelProperty(value = "排序")
+    @ExcelProperty(value = "排序", order = 8)
+    @ExcelInfo
+    // 验证器
+    @ValidationArgs({ValiArgsType.IS_NOT_NULL})
+    private Integer sortNo;
+
+    /** 是否隐藏 0为否 1为是 */
+    @ApiModelProperty(value = "是否隐藏")
+    @ExcelProperty(value = "是否隐藏", order = 8)
+    @ExcelInfo(dictType = "no_yes")
+    // 验证器
+    @ValidationArgs({ValiArgsType.IS_NOT_NULL})
+    private String hidden;
 
 }

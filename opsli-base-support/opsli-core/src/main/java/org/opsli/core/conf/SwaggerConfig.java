@@ -1,10 +1,25 @@
+/**
+ * Copyright 2020 OPSLI 快速开发平台 https://www.opsli.com
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ */
 package org.opsli.core.conf;
 
 import com.fasterxml.classmate.TypeResolver;
 import com.github.xiaoymin.knife4j.spring.annotations.EnableKnife4j;
 import com.google.common.collect.Lists;
 import io.swagger.annotations.ApiOperation;
-import org.opsli.common.constants.TokenConstants;
+import org.opsli.core.utils.UserTokenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,6 +38,9 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 import java.util.List;
 
+/**
+ * @author parker
+ */
 @Configuration
 @EnableSwagger2
 @EnableKnife4j
@@ -100,7 +118,7 @@ public class SwaggerConfig {
     private List<Parameter> defaultToken() {
         ParameterBuilder parameterBuilder = new ParameterBuilder();
         List<Parameter> parameters= Lists.newArrayList();
-        parameterBuilder.name(TokenConstants.ACCESS_TOKEN)
+        parameterBuilder.name(UserTokenUtil.TOKEN_NAME)
                 .description("Token 令牌")
                 .modelRef(new ModelRef("String"))
                 .parameterType("header")
@@ -117,11 +135,11 @@ public class SwaggerConfig {
         AuthorizationScope authorizationScope = new AuthorizationScope("global", "accessEverything");
         AuthorizationScope[] authorizationScopes = new AuthorizationScope[1];
         authorizationScopes[0] = authorizationScope;
-        return Lists.newArrayList(new SecurityReference(TokenConstants.ACCESS_TOKEN, authorizationScopes));
+        return Lists.newArrayList(new SecurityReference(UserTokenUtil.TOKEN_NAME, authorizationScopes));
     }
 
     private ApiKey apiKey() {
-        return new ApiKey(TokenConstants.ACCESS_TOKEN, TokenConstants.ACCESS_TOKEN, "header");
+        return new ApiKey(UserTokenUtil.TOKEN_NAME, UserTokenUtil.TOKEN_NAME, "header");
     }
 
 }

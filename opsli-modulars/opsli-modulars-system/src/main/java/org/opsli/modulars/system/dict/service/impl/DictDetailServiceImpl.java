@@ -1,3 +1,18 @@
+/**
+ * Copyright 2020 OPSLI 快速开发平台 https://www.opsli.com
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ */
 package org.opsli.modulars.system.dict.service.impl;
 
 import cn.hutool.core.convert.Convert;
@@ -78,11 +93,17 @@ public class DictDetailServiceImpl extends CrudServiceImpl<DictDetailMapper, Sys
                     DictMsgFactory.createMsg(dictWrapperModel, CacheType.DELETE)
             );
 
-            // 再存 防止脏数据
-            DictUtil.put(dictWrapperModel);
+            // 先删老缓存
+            DictWrapper currDictWrapperModel = new DictWrapper();
+            currDictWrapperModel.setTypeCode(ret.getTypeCode());
+            currDictWrapperModel.setDictName(ret.getDictName());
+            currDictWrapperModel.setDictValue(ret.getDictValue());
+            currDictWrapperModel.setModel(ret);
+            // 增加缓存
+            DictUtil.put(currDictWrapperModel);
             // 广播缓存数据 - 通知其他服务器同步数据
             redisPlugin.sendMessage(
-                    DictMsgFactory.createMsg(dictWrapperModel, CacheType.UPDATE)
+                    DictMsgFactory.createMsg(currDictWrapperModel, CacheType.UPDATE)
             );
         }
 
@@ -122,17 +143,17 @@ public class DictDetailServiceImpl extends CrudServiceImpl<DictDetailMapper, Sys
                     DictMsgFactory.createMsg(oldDictWrapperModel, CacheType.DELETE)
             );
 
-
-            // 再put新缓存
-            DictWrapper dictWrapperModel = new DictWrapper();
-            dictWrapperModel.setTypeCode(model.getTypeCode());
-            dictWrapperModel.setDictName(model.getDictName());
-            dictWrapperModel.setDictValue(model.getDictValue());
-            dictWrapperModel.setModel(ret);
-            DictUtil.put(dictWrapperModel);
+            // 先删老缓存
+            DictWrapper currDictWrapperModel = new DictWrapper();
+            currDictWrapperModel.setTypeCode(ret.getTypeCode());
+            currDictWrapperModel.setDictName(ret.getDictName());
+            currDictWrapperModel.setDictValue(ret.getDictValue());
+            currDictWrapperModel.setModel(ret);
+            // 增加缓存
+            DictUtil.put(currDictWrapperModel);
             // 广播缓存数据 - 通知其他服务器同步数据
             redisPlugin.sendMessage(
-                    DictMsgFactory.createMsg(dictWrapperModel, CacheType.UPDATE)
+                    DictMsgFactory.createMsg(currDictWrapperModel, CacheType.UPDATE)
             );
         }
 

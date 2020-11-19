@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.opsli.modulars.system.role.mapper.RoleMenuRefMapper">
+
+    <select id="queryAllPerms" parameterType="String" resultType="SysMenu">
+        select
+            b.id,
+            b.parent_id
+        from
+            sys_role_menu_ref a,
+            sys_menu b
+        where
+            a.menu_id = b.id
+            and a.role_id = #{roleId}
+            and b.hidden = '0'
+            and b.deleted = '0'
+    </select>
+
+</mapper>

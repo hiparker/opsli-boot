@@ -1,3 +1,18 @@
+/**
+ * Copyright 2020 OPSLI 快速开发平台 https://www.opsli.com
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ */
 package org.opsli.core.handler;
 
 import cn.hutool.core.text.StrFormatter;
@@ -5,12 +20,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.authc.IncorrectCredentialsException;
 import org.apache.shiro.authc.LockedAccountException;
+import org.apache.shiro.authz.AuthorizationException;
 import org.opsli.api.base.result.ResultVo;
-import org.opsli.common.exception.EmptyException;
-import org.opsli.common.exception.JwtException;
-import org.opsli.common.exception.ServiceException;
-import org.opsli.common.exception.TokenException;
+import org.opsli.common.exception.*;
 import org.opsli.core.msg.CoreMsg;
+import org.opsli.core.msg.TokenMsg;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -96,7 +110,7 @@ public class GlobalExceptionHandler {
      * 拦截 自定义 Shiro 认证异常
      */
     @ExceptionHandler(IncorrectCredentialsException.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
     @ResponseBody
     public ResultVo<?> incorrectCredentialsException(IncorrectCredentialsException e) {
         // token失效，请重新登录
@@ -115,6 +129,20 @@ public class GlobalExceptionHandler {
     }
 
     /**
+     * 拦截 自定义 Shiro 认证异常
+     */
+    @ExceptionHandler(AuthorizationException.class)
+    @ResponseStatus(HttpStatus.NOT_ACCEPTABLE)
+    @ResponseBody
+    public ResultVo<?> authorizationException(AuthorizationException e) {
+        // 无权访问该方法
+        return ResultVo.error(TokenMsg.EXCEPTION_NOT_AUTH.getCode(),
+                TokenMsg.EXCEPTION_NOT_AUTH.getMessage()
+                );
+    }
+
+
+    /**
      * 拦截 自定义 Token 认证异常
      */
     @ExceptionHandler(TokenException.class)
@@ -122,7 +150,17 @@ public class GlobalExceptionHandler {
     @ResponseBody
     public ResultVo<?> tokenException(TokenException e) {
         // Token 异常
-        return ResultVo.error(e.getMessage());
+        return ResultVo.error(e.getCode(), e.getMessage());
+    }
+
+    /**
+     * 拦截 自定义 防火墙
+     */
+    @ExceptionHandler(WafException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    public ResultVo<?> wafException(WafException e) {
+        return ResultVo.error(e.getCode(), e.getMessage());
     }
 
     // ============================
@@ -133,8 +171,9 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(NullPointerException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ResponseBody
-    public ResultVo<?> nullPointerException(EmptyException e) {
-        return ResultVo.error(e.getCode(), e.getMessage());
+    public ResultVo<?> nullPointerException(NullPointerException e) {
+        log.error("空指针异常：{}",e.getMessage(),e);
+        return ResultVo.error(e.getMessage());
     }
 
 

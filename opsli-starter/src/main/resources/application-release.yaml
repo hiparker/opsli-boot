@@ -1,9 +1,4 @@
-## ---- 开发环境 ---- ##
-opsli:
-  # 前缀
-  prefix: api
-  # 版本
-  version: v1
+## ---- 生产环境 ---- ##
 
 # 端口设置
 server:
@@ -23,7 +18,7 @@ spring:
     druid:
       stat-view-servlet:
         # 数据库监控开关
-        enabled: true
+        enabled: false
         # 登录用户名/密码
         login-username: admin
         login-password: 123456
@@ -38,22 +33,42 @@ spring:
       #primary: master
       datasource:
         master:
-          url: jdbc:mysql://127.0.0.1:3306/opsli-boot?characterEncoding=UTF-8&useUnicode=true&useSSL=false&tinyInt1isBit=false
+          url: jdbc:mysql://127.0.0.1:3306/opsli-boot?characterEncoding=UTF-8&useUnicode=true&useSSL=false&tinyInt1isBit=false&serverTimezone=Asia/Shanghai
           username: root
           password: 12345678
           driver-class-name: com.mysql.jdbc.Driver
           # 多数据源配置
           #slave-datasource:
-          #url: jdbc:mysql://localhost:3306/opsli-boot?useUnicode=true&characterEncoding=utf8&autoReconnect=true&zeroDateTimeBehavior=convertToNull&transformedBitIsBoolean=true
+          #url: jdbc:mysql://127.0.0.1:3306/opsli-boot?characterEncoding=UTF-8&useUnicode=true&useSSL=false&tinyInt1isBit=false&serverTimezone=Asia/Shanghai
           #username: root
           #password: 12345678
           #driver-class-name: com.mysql.jdbc.Driver
 
-#Mybatis输出sql日志
-#logging:
-#  level:
-#    org.opsli.modulars.system.mapper : debug
 
-# swagger 配置
-swagger:
-  production: false
+# knife4j 文档 配置
+knife4j:
+  basic:
+    ## 开启Swagger的Basic认证功能,默认是false
+    enable: false
+    ## Basic认证用户名
+    username: admin
+    ## Basic认证密码
+    password: 123456
+
+  # 是否生产环境 （生产环境默认屏蔽文档）
+  production: true
+
+
+# opsli 自定义配置
+opsli:
+
+  # 演示模式
+  enable-demo: true
+
+  # web 上传文件路径
+  web:
+    upload-path: /Users/system/Documents/work/tmp/opsli
+
+# 系统日志
+log:
+  path: /var/log

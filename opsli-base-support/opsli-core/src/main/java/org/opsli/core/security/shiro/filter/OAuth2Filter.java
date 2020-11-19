@@ -59,7 +59,9 @@ public class OAuth2Filter extends AuthenticatingFilter {
         if(StringUtils.isBlank(token)){
             HttpServletResponse httpResponse = (HttpServletResponse) response;
             httpResponse.setHeader("Access-Control-Allow-Credentials", "true");
+            httpResponse.setHeader("Access-Control-Allow-Methods", "GET,POST,OPTIONS,PUT,DELETE");
             httpResponse.setHeader("Access-Control-Allow-Origin", httpServletRequest.getHeader("Origin"));
+            httpResponse.setHeader("Access-Control-Allow-Headers", httpServletRequest.getHeader("Access-Control-Request-Headers"));
             httpResponse.setContentType("application/json; charset=utf-8");
             // 401 Token失效，请重新登录
             ResultVo<Object> error = ResultVo.error(TokenMsg.EXCEPTION_TOKEN_LOSE_EFFICACY.getCode(),
@@ -75,9 +77,10 @@ public class OAuth2Filter extends AuthenticatingFilter {
     protected boolean onLoginFailure(AuthenticationToken token, AuthenticationException e, ServletRequest request, ServletResponse response) {
         HttpServletRequest httpServletRequest = (HttpServletRequest) request;
         HttpServletResponse httpResponse = (HttpServletResponse) response;
-        httpResponse.setContentType("application/json;charset=utf-8");
-        httpResponse.setHeader("Access-Control-Allow-Credentials", "true");
+        httpResponse.setHeader("Access-Control-Allow-Methods", "GET,POST,OPTIONS,PUT,DELETE");
         httpResponse.setHeader("Access-Control-Allow-Origin", httpServletRequest.getHeader("Origin"));
+        httpResponse.setHeader("Access-Control-Allow-Headers", httpServletRequest.getHeader("Access-Control-Request-Headers"));
+        httpResponse.setContentType("application/json; charset=utf-8");
 
         try {
             //处理登录失败的异常
@@ -89,6 +92,5 @@ public class OAuth2Filter extends AuthenticatingFilter {
         }
         return false;
     }
-
 
 }

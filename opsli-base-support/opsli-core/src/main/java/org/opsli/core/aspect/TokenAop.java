@@ -1,5 +1,22 @@
+/**
+ * Copyright 2020 OPSLI 快速开发平台 https://www.opsli.com
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ */
 package org.opsli.core.aspect;
 
+import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.date.TimeInterval;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -8,6 +25,7 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.opsli.common.api.TokenThreadLocal;
 import org.opsli.common.exception.ServiceException;
+import org.opsli.core.utils.LogUtil;
 import org.opsli.core.utils.UserTokenUtil;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -47,11 +65,13 @@ public class TokenAop {
         try {
             RequestAttributes ra = RequestContextHolder.getRequestAttributes();
             ServletRequestAttributes sra = (ServletRequestAttributes) ra;
-            HttpServletRequest request = sra.getRequest();
-            String requestToken = UserTokenUtil.getRequestToken(request);
-            if(StringUtils.isNotEmpty(requestToken)){
-                // 放入当前线程缓存中
-                TokenThreadLocal.put(requestToken);
+            if(sra != null) {
+                HttpServletRequest request = sra.getRequest();
+                String requestToken = UserTokenUtil.getRequestToken(request);
+                if(StringUtils.isNotEmpty(requestToken)){
+                    // 放入当前线程缓存中
+                    TokenThreadLocal.put(requestToken);
+                }
             }
         }catch (ServiceException e){
             throw e;
@@ -59,13 +79,23 @@ public class TokenAop {
             log.error(e.getMessage(),e);
         }
 
+        // 计时器
+        TimeInterval timer = DateUtil.timer();
+        // 执行
+        Exception exception = null;
         // 防止线程抛异常 线程变量不回收 导致oom
-        Object returnValue = null;
+        Object returnValue;
         try {
             // 执行正常操作
-            Object[] args= point.getArgs();
-            returnValue = point.proceed(args);
+            returnValue = point.proceed();
+        }catch (Exception e){
+            exception = e;
+            throw e;
         } finally {
+            // 花费毫秒数
+            long timerCount = timer.interval();
+            //保存日志
+            LogUtil.saveLog(point, exception, timerCount);
             // 线程销毁时 删除 token
             TokenThreadLocal.remove();
         }

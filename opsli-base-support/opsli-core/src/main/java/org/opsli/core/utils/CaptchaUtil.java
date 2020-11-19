@@ -1,15 +1,36 @@
+/**
+ * Copyright 2020 OPSLI 快速开发平台 https://www.opsli.com
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ */
 package org.opsli.core.utils;
 
-import com.alibaba.fastjson.JSONObject;
 import com.google.code.kaptcha.Producer;
 import org.apache.commons.lang3.StringUtils;
+import org.opsli.api.web.system.dict.DictDetailApi;
 import org.opsli.common.exception.TokenException;
 import org.opsli.core.msg.TokenMsg;
+import org.opsli.plugins.redis.RedisLockPlugins;
 import org.opsli.plugins.redis.RedisPlugin;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.AutoConfigureAfter;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import java.awt.image.BufferedImage;
+
+import static org.opsli.common.constants.OrderConstants.UTIL_ORDER;
 
 /**
  * 验证码
@@ -18,6 +39,9 @@ import java.awt.image.BufferedImage;
  * @since 2.0.0 2018-02-10
  */
 @Component
+@Order(UTIL_ORDER)
+@AutoConfigureAfter({RedisPlugin.class})
+@Lazy(false)
 public class CaptchaUtil{
 
     /** 缓存前缀 */
@@ -66,14 +90,24 @@ public class CaptchaUtil{
             throw new TokenException(TokenMsg.EXCEPTION_CAPTCHA_NULL);
         }
 
-        //删除验证码
-        redisPlugin.del(PREFIX + uuid);
+        // 删除验证码
+        //redisPlugin.del(PREFIX + uuid);
 
         return codeTemp.equalsIgnoreCase(code);
     }
 
 
+    /**
+     * 删除验证码
+     * @param uuid
+     * @return
+     */
+    public static boolean delCaptcha(String uuid) {
+        if(StringUtils.isEmpty(uuid)) return false;
 
+        //删除验证码
+        return redisPlugin.del(PREFIX + uuid);
+    }
 
 
 

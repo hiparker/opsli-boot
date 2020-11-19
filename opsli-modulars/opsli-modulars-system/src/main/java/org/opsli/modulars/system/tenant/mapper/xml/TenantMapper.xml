@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.opsli.modulars.system.tenant.mapper.TenantMapper">
+
+
+    <select id="uniqueVerificationByName" resultType="Integer">
+        select
+            count(0)
+        from
+        sys_tenant a
+        <where>
+            a.tenant_name = #{tenantName}
+            and a.deleted = 0
+            <if test="id != null and id != ''">
+                and a.id != #{id}
+            </if>
+        </where>
+    </select>
+
+</mapper>

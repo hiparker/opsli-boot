@@ -1,25 +1,48 @@
+/**
+ * Copyright 2020 OPSLI 快速开发平台 https://www.opsli.com
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ */
 package org.opsli.core.cache.local;
 
+import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.io.file.FileReader;
 import cn.hutool.core.util.XmlUtil;
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.opsli.common.constants.CacheConstants;
 import org.opsli.core.aspect.CacheDataAop;
 import org.opsli.plugins.cache.EhCachePlugin;
 import org.opsli.plugins.redis.RedisPlugin;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.AutoConfigureAfter;
+import org.springframework.core.annotation.Order;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import java.io.BufferedInputStream;
+import java.io.IOException;
 import java.util.List;
 
+import static org.opsli.common.constants.OrderConstants.UTIL_ORDER;
 
 /**
  * @BelongsProject: opsli-boot
@@ -37,23 +60,27 @@ import java.util.List;
  *
  */
 @Slf4j
+@Order(UTIL_ORDER)
 @Component
+@AutoConfigureAfter({RedisPlugin.class , EhCachePlugin.class})
 public class CacheUtil {
 
-    private static final String JSON_KEY = "data";
+    public static final String JSON_KEY = "data";
     /** 空状态 key 前缀 */
     private static final String NIL_FLAG_PREFIX = "opsli:nil:";
 
     /** 热点数据缓存时间 秒 */
-    private static int ttlHotData;
+    private static int ttlHotData = 60000;
     /** Redis插件 */
     private static RedisPlugin redisPlugin;
     /** EhCache插件 */
     private static EhCachePlugin ehCachePlugin;
 
     static {
-        // 读取配置信息
-        CacheUtil.readPropertyXML();
+        try {
+            // 读取配置信息
+            CacheUtil.readPropertyXML();
+        }catch (Exception ignored){}
     }
 
     /**
@@ -842,7 +869,7 @@ public class CacheUtil {
             jsonObject.put(JSON_KEY, value);
 
             // 存入EhCache
-            ehCachePlugin.put(CacheConstants.HOT_DATA,key, jsonObject);
+            ehCachePlugin.put(CacheConstants.HOT_DATA, key, jsonObject);
 
             if(timeFlag){
 
@@ -1057,8 +1084,10 @@ public class CacheUtil {
     /**
      * 读配置文件
      */
-    private static void readPropertyXML(){
-        Document document = XmlUtil.readXML("config/ehcache-opsli.xml");
+    private static void readPropertyXML() throws IOException {
+        // 有坑 读 xml
+        ClassPathResource resource = new ClassPathResource("config/ehcache-opsli.xml");
+        Document document = XmlUtil.readXML(resource.getInputStream());
         NodeList nodeList = document.getElementsByTagName("cache");
         if(nodeList != null){
             for (int i = 0; i < nodeList.getLength(); i++) {

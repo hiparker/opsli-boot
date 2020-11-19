@@ -1,3 +1,18 @@
+/**
+ * Copyright 2020 OPSLI 快速开发平台 https://www.opsli.com
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ */
 package org.opsli.core.conf.mybatis;
 
 import cn.hutool.core.bean.BeanUtil;
@@ -80,14 +95,19 @@ public class AutoFillInterceptor implements Interceptor {
      * @param arg
      */
     public void insertFill(Object arg) {
-        UserModel userModel = UserUtil.getUser();
+        if(arg == null ) return;
+
         Field[] fields = ReflectUtil.getFields(arg.getClass());
         for (Field f : fields) {
             f.setAccessible(true);
             switch (f.getName()) {
                 // 创建人
                 case MyBatisConstants.FIELD_CREATE_BY:
-                    setProperty(arg, MyBatisConstants.FIELD_CREATE_BY, userModel.getId());
+                    // 如果创建人 为空则进行默认赋值
+                    Object createValue = ReflectUtil.getFieldValue(arg, f.getName());
+                    if(createValue == null){
+                        setProperty(arg, MyBatisConstants.FIELD_CREATE_BY, UserUtil.getUser().getId());
+                    }
                     break;
                 // 创建日期
                 case MyBatisConstants.FIELD_CREATE_TIME:
@@ -95,7 +115,11 @@ public class AutoFillInterceptor implements Interceptor {
                     break;
                 // 更新人
                 case MyBatisConstants.FIELD_UPDATE_BY:
-                    setProperty(arg, MyBatisConstants.FIELD_UPDATE_BY, userModel.getId());
+                    // 如果更新人 为空则进行默认赋值
+                    Object updateValue = ReflectUtil.getFieldValue(arg, f.getName());
+                    if(updateValue == null){
+                        setProperty(arg, MyBatisConstants.FIELD_UPDATE_BY, UserUtil.getUser().getId());
+                    }
                     break;
                 // 更新日期
                 case MyBatisConstants.FIELD_UPDATE_TIME:
@@ -111,7 +135,11 @@ public class AutoFillInterceptor implements Interceptor {
                     break;
                 // 多租户设置
                 case MyBatisConstants.FIELD_TENANT:
-                    setProperty(arg, MyBatisConstants.FIELD_TENANT,  UserUtil.getTenantId());
+                    // 如果租户ID 为空则进行默认赋值
+                    Object tenantValue = ReflectUtil.getFieldValue(arg, f.getName());
+                    if(tenantValue == null){
+                        setProperty(arg, MyBatisConstants.FIELD_TENANT,  UserUtil.getTenantId());
+                    }
                     break;
                 default:
                     break;
@@ -125,7 +153,8 @@ public class AutoFillInterceptor implements Interceptor {
      * @param arg
      */
     public void updateFill(Object arg) {
-        UserModel userModel = UserUtil.getUser();
+        if(arg == null ) return;
+
         // 2020-09-19
         // 修改这儿 有可能会拿到一个 MapperMethod，需要特殊处理
         Field[] fields;
@@ -139,16 +168,18 @@ public class AutoFillInterceptor implements Interceptor {
             if (arg == null) {
                 return;
             }
-            fields = ReflectUtil.getFields(arg.getClass());
-        } else {
-            fields = ReflectUtil.getFields(arg.getClass());
         }
+        fields = ReflectUtil.getFields(arg.getClass());
         for (Field f : fields) {
             f.setAccessible(true);
             switch (f.getName()) {
                 // 更新人
                 case MyBatisConstants.FIELD_UPDATE_BY:
-                    setProperty(arg, MyBatisConstants.FIELD_UPDATE_BY, userModel.getId());
+                    // 如果更新人 为空则进行默认赋值
+                    Object updateValue = ReflectUtil.getFieldValue(arg, f.getName());
+                    if(updateValue == null){
+                        setProperty(arg, MyBatisConstants.FIELD_UPDATE_BY, UserUtil.getUser().getId());
+                    }
                     break;
                 // 更新日期
                 case MyBatisConstants.FIELD_UPDATE_TIME:
