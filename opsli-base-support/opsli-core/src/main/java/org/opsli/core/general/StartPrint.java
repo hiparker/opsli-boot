@@ -47,7 +47,7 @@ public class StartPrint {
         StartPrint.serverPort = serverPort;
     }
 
-    @Value("${server.servlet.context-path:/think-bboss}")
+    @Value("${server.servlet.context-path:/opsli-boot}")
     public void setServerContextPath(String serverContextPath) {
         StartPrint.serverContextPath = serverContextPath;
     }
@@ -62,7 +62,7 @@ public class StartPrint {
         String basePath = getBasePath();
         StringBuilder printStr = new StringBuilder();
         printStr.append("\n----------------------------------------------------------\n")
-                .append("Think-BBoss 框架启动成功! 相关URLs:\n")
+                .append("OPSLI 快速开发平台 框架启动成功! 相关URLs:\n")
                 .append("项目地址: \t\thttp://" + basePath + "/\n")
                 .append("Doc文档: \t\thttp://" + basePath + "/doc.html\n")
                 .append("----------------------------------------------------------\n");
@@ -78,7 +78,7 @@ public class StartPrint {
         ThreadUtil.sleep(1, TimeUnit.SECONDS);
         StringBuilder printStr = new StringBuilder();
         printStr.append("\n----------------------------------------------------------\n")
-                .append("Think-BBoss 框架启动失败! 请检查相关配置！\n")
+                .append("OPSLI 快速开发平台 框架启动失败! 请检查相关配置！\n")
                 .append("----------------------------------------------------------\n");
         Console.log(printStr.toString());
     }
