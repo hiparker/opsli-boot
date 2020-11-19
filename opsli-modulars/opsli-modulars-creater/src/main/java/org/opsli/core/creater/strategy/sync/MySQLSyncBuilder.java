@@ -1,7 +1,9 @@
 package org.opsli.core.creater.strategy.sync;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.opsli.common.exception.ServiceException;
+import org.opsli.common.utils.Props;
 import org.opsli.core.creater.msg.CreaterMsg;
 import org.opsli.core.creater.strategy.sync.mysql.entity.FieldTypeAttribute;
 import org.opsli.core.creater.strategy.sync.mysql.enums.MySQLSyncColumnType;
@@ -38,6 +40,13 @@ public class MySQLSyncBuilder implements SyncStrategy {
     private static final char YES = '1';
     /** 否 */
     private static final char NO = '0';
+    /** 排除表 */
+    private static final List<String> EXCLUDE_TABLES;
+
+    static {
+        Props props = new Props("creater.yaml");
+        EXCLUDE_TABLES = props.getList("opsli.exclude-tables");
+    }
 
     @Autowired(required = false)
     private SQLActuator sqlActuator;
@@ -66,9 +75,7 @@ public class MySQLSyncBuilder implements SyncStrategy {
         }
 
         // 排查该表 是否是 在排除外的表， 如果是则不允许同步
-        List<String> excludeTables = new ArrayList<>();
-        excludeTables.add("creater_table");
-        if(excludeTables.contains(currTable.getOldTableName()) || excludeTables.contains(currTable.getTableName())){
+        if(EXCLUDE_TABLES.contains(currTable.getOldTableName()) || EXCLUDE_TABLES.contains(currTable.getTableName())){
             // 同步表失败 系统核心关键表不允许同步
             throw new ServiceException(CreaterMsg.EXCEPTION_SYNC_CORE);
         }
@@ -123,10 +130,13 @@ public class MySQLSyncBuilder implements SyncStrategy {
             if(fieldAttr != null){
                 // 字段有长度
                 if(fieldAttr.isIzLength()){
-                    str.append("(").append(tmp.getFieldLength());
+                    Integer len = tmp.getFieldLength();
+                    str.append("(");
                     // 字段有精度
                     if(fieldAttr.isIzPrecision()){
-                        str.append(",").append(tmp.getFieldPrecision());
+                        str.append( len + tmp.getFieldPrecision() ).append(",").append(tmp.getFieldPrecision());
+                    } else {
+                        str.append(len);
                     }
                     str.append(")");
                 }

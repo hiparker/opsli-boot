@@ -1,5 +1,9 @@
 # 排除表 防止代码生成器直接 非法删除关键表
 opsli:
+  # 数据库类型 mysql oracle
+  db-type: mysql
+  # 数据库名
+  db-name: opsli-boot
   exclude-tables:
     - creater_table
     - creater_table_column

@@ -20,6 +20,8 @@ import org.opsli.modulars.creater.table.entity.CreaterTable;
 import org.opsli.modulars.creater.table.wrapper.CreaterTableAndColumnModel;
 import org.opsli.modulars.creater.table.wrapper.CreaterTableModel;
 
+import java.util.List;
+
 
 /**
  * @BelongsProject: opsli-boot
@@ -62,5 +64,17 @@ public interface ITableService extends CrudServiceInterface<CreaterTable, Create
      * @param id
      */
     void renewSyncState(String id);
+
+    /**
+     * 获得当前 生成器中所有表名
+     * @return
+     */
+    List<String> findAllByTableName();
+
+    /**
+     * 导入数据库表
+     * @param tableNames
+     */
+    void importTables(String[] tableNames);
 
 }

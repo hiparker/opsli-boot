@@ -15,6 +15,7 @@
  */
 package org.opsli.modulars.creater.table.service.impl;
 
+import cn.hutool.core.util.StrUtil;
 import org.opsli.common.enums.DictType;
 import org.opsli.common.exception.ServiceException;
 import org.opsli.common.utils.WrapperUtil;
@@ -22,7 +23,9 @@ import org.opsli.core.base.service.impl.CrudServiceImpl;
 import org.opsli.core.creater.msg.CreaterMsg;
 import org.opsli.modulars.creater.column.service.ITableColumnService;
 import org.opsli.modulars.creater.column.wrapper.CreaterTableColumnModel;
-import org.opsli.modulars.creater.general.actuator.SQLActuator;
+import org.opsli.modulars.creater.importable.ImportTableUtil;
+import org.opsli.modulars.creater.importable.entity.DatabaseColumn;
+import org.opsli.modulars.creater.importable.entity.DatabaseTable;
 import org.opsli.modulars.creater.table.entity.CreaterTable;
 import org.opsli.modulars.creater.table.mapper.TableMapper;
 import org.opsli.modulars.creater.table.service.ITableService;
@@ -32,6 +35,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -51,9 +55,6 @@ public class TableServiceImpl extends CrudServiceImpl<TableMapper, CreaterTable,
     @Autowired
     private ITableColumnService iTableColumnService;
 
-    @Autowired(required = false)
-    private SQLActuator sqlActuator;
-
     @Override
     @Transactional(rollbackFor = Exception.class)
     public CreaterTableModel insert(CreaterTableModel model) {
@@ -67,9 +68,11 @@ public class TableServiceImpl extends CrudServiceImpl<TableMapper, CreaterTable,
             throw new ServiceException(CreaterMsg.EXCEPTION_TABLE_NAME_REPEAT);
         }
 
-        // 新增后 默认未同步
-        model.setIzSync(
-                DictType.NO_YES_NO.getCode().charAt(0));
+        if(!model.getIzApi()){
+            // 新增后 默认未同步
+            model.setIzSync(
+                    DictType.NO_YES_NO.getCode().charAt(0));
+        }
 
         // 默认旧表名称为当前新增名称（用于删除表操作）
         model.setOldTableName(model.getTableName());
@@ -140,9 +143,6 @@ public class TableServiceImpl extends CrudServiceImpl<TableMapper, CreaterTable,
             }
             iTableColumnService.insertBatch(columnList);
         }
-
-        sqlActuator.execute("select * from sys_user");
-
     }
 
     @Override
@@ -175,6 +175,61 @@ public class TableServiceImpl extends CrudServiceImpl<TableMapper, CreaterTable,
         mapper.renewSyncState(id);
     }
 
+
+    @Override
+    public List<String> findAllByTableName() {
+        return mapper.findAllByTableName();
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void importTables(String[] tableNames) {
+        for (String tableName : tableNames) {
+            // 获得当前表
+            DatabaseTable table = null;
+            List<DatabaseTable> tables = ImportTableUtil.findTables(tableName);
+            if(tables != null && !tables.isEmpty()){
+                table = tables.get(0);
+            }
+
+            if(table == null){
+                String msg = StrUtil.format(CreaterMsg.EXCEPTION_IMPORT_TABLE_NULL.getMessage(), tableName);
+                // 暂无该表
+                throw new ServiceException(CreaterMsg.EXCEPTION_IMPORT_TABLE_NULL.getCode(), msg);
+            }
+
+            // 获得表字段
+            List<DatabaseColumn> columns = ImportTableUtil.findColumns(tableName);
+            List<CreaterTableColumnModel> columnModels = new ArrayList<>();
+            for (int i = 0; i < columns.size(); i++) {
+                DatabaseColumn column = columns.get(i);
+                CreaterTableColumnModel columnModel = new CreaterTableColumnModel();
+                columnModel.setFieldName(column.getColumnName());
+                columnModel.setFieldType(column.getColumnType());
+                columnModel.setFieldLength(column.getColumnLength());
+                columnModel.setFieldPrecision(column.getColumnScale());
+                columnModel.setFieldComments(column.getColumnComment());
+                columnModel.setIzPk(column.getIzPk());
+                columnModel.setIzNull(column.getIzNull());
+                columnModel.setSort(i);
+                // 赋默认值
+                columnModel.setJavaType("String");
+                columnModels.add(columnModel);
+            }
+
+            // 生成本地数据
+            CreaterTableAndColumnModel createrTableModel = new CreaterTableAndColumnModel();
+            createrTableModel.setComments(table.getTableComments());
+            createrTableModel.setTableName(table.getTableName());
+            createrTableModel.setOldTableName(table.getTableName());
+            createrTableModel.setIzSync('1');
+            createrTableModel.setJdbcType(ImportTableUtil.DB_TYPE);
+            createrTableModel.setTableType('0');
+            createrTableModel.setColumnList(columnModels);
+            createrTableModel.setIzApi(true);
+            this.insertAny(createrTableModel);
+        }
+    }
 }
 
 

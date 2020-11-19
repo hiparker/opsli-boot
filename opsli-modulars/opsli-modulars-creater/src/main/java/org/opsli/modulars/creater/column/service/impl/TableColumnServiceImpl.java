@@ -160,7 +160,7 @@ public class TableColumnServiceImpl extends CrudServiceImpl<TableColumnMapper, C
                 QueryBuilder<CreaterTableColumn> queryBuilder =
                         new GenQueryBuilder<>();
                 QueryWrapper<CreaterTableColumn> wrapper = queryBuilder.build();
-                wrapper.eq("tableId", tableId);
+                wrapper.eq("table_id", tableId);
                 super.remove(wrapper);
             }
         }

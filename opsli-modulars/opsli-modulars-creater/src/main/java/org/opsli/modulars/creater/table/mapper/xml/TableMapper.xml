@@ -16,6 +16,13 @@
         </where>
     </select>
 
+    <select id="findAllByTableName" resultType="String">
+        select
+         table_name AS tableName
+        from
+        creater_table
+    </select>
+
     <update id="renewSyncState">
         update creater_table
         set iz_sync = '1'

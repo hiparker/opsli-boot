@@ -13,11 +13,10 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.opsli.modulars.creater.table.mapper;
+package org.opsli.modulars.creater.importable.service;
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import org.apache.ibatis.annotations.Mapper;
-import org.opsli.modulars.creater.table.entity.CreaterTable;
+import org.opsli.modulars.creater.importable.entity.DatabaseColumn;
+import org.opsli.modulars.creater.importable.entity.DatabaseTable;
 
 import java.util.List;
 
@@ -25,29 +24,37 @@ import java.util.List;
 /**
  * @BelongsProject: opsli-boot
  * @Author: Parker
- * @CreateTime: 2020-09-17 13:01
- * @Description: 代码生成器 - 表 Mapper
+ * @CreateTime: 2020-09-17 13:07
+ * @Description: 代码生成器 - 数据库表
  */
-@Mapper
-public interface TableMapper extends BaseMapper<CreaterTable> {
+public interface DatabaseTableService {
 
     /**
-     * 唯一验证
-     * @param entity
+     * 获得类型
      * @return
      */
-    Integer uniqueVerificationByTableName(CreaterTable entity);
+    String getType();
 
     /**
-     * 更新同步状态 为 已同步
-     * @param id
-     */
-    void renewSyncState(String id);
-
-    /**
-     * 获得当前 生成器中所有表名
+     * 获得当前库中 所有表
+     * @param dbName
      * @return
      */
-    List<String> findAllByTableName();
+    List<DatabaseTable> findTables(String dbName);
+
+    /**
+     * 获得当前库中 所有表
+     * @param dbName
+     * @return
+     */
+    List<DatabaseTable> findTables(String dbName, String tableName);
+
+    /**
+     * 获得当前表中 所有字段
+     * @param dbName
+     * @param tableName
+     * @return
+     */
+    List<DatabaseColumn> findColumns(String dbName, String tableName);
 
 }

@@ -42,6 +42,12 @@ public enum CreaterMsg implements BaseMsg {
     EXCEPTION_SYNC_NULL(50100,"同步表失败，暂无该表"),
     EXCEPTION_SYNC_CORE(50101,"系统核心关键表不允许同步"),
 
+    /**
+     * 导入
+     */
+    EXCEPTION_IMPORT_NULL(50120,"未选中表，无法导入"),
+    EXCEPTION_IMPORT_TABLE_NULL(50121,"暂无{}该表"),
+
     ;
 
     private int code;

@@ -21,6 +21,7 @@ import org.yaml.snakeyaml.Yaml;
 
 import java.io.InputStream;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -162,6 +163,7 @@ public class Props {
         Object obj = this.getObject(keys);
 
         if(obj != null){
+            def = "";
             def = Convert.convert(def.getClass(), obj);
         }
         return def;
@@ -335,6 +337,34 @@ public class Props {
 
         if(obj != null){
             def = Convert.convert(def.getClass(), obj);
+        }
+        return def;
+    }
+
+    /**
+     * 获得 布尔类型对象
+     * @return
+     */
+    public List<String> getList(String key){
+        return this.getList(key, null);
+    }
+
+    /**
+     * 获得 布尔类型对象
+     * @return
+     */
+    public List<String> getList(String key, List<String> def){
+        if(key == null || "".equals(key) ){
+            return def;
+        }
+        // key 集合
+        String[] keys = key.split("\\.");
+
+        // 获得对象
+        Object obj = this.getObject(keys);
+
+        if(obj != null){
+            def = Convert.toList(String.class, obj);
         }
         return def;
     }

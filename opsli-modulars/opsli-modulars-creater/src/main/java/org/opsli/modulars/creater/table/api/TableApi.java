@@ -110,4 +110,18 @@ public interface TableApi {
     @PostMapping("/sync")
     ResultVo<?> sync(String id);
 
+    /**
+     * 获得当前数据库
+     * @return ResultVo
+     */
+    @GetMapping("/getTables")
+    ResultVo<?> getTables();
+
+    /**
+     * 导入选中表
+     * @return ResultVo
+     */
+    @PostMapping("/importTables")
+    ResultVo<?> importTables(String[] tableNames);
+
 }
