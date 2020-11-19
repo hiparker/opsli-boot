@@ -1,7 +1,7 @@
 /*
  Navicat Premium Data Transfer
 
- Source Server         : OPSLI快速开发平台 数据库文件
+ Source Server         : OPSLI 快速开发平台 数据库
  Source Server Type    : MySQL
  Source Server Version : 50729
  Source Host           : 127.0.0.1:3306
@@ -11,7 +11,7 @@
  Target Server Version : 50729
  File Encoding         : 65001
 
- Date: 19/11/2020 10:47:34
+ Date: 19/11/2020 19:54:55
 */
 
 SET NAMES utf8mb4;
@@ -22,16 +22,16 @@ SET FOREIGN_KEY_CHECKS = 0;
 -- ----------------------------
 DROP TABLE IF EXISTS `sys_dict`;
 CREATE TABLE `sys_dict` (
-  `id` bigint(20) NOT NULL COMMENT '字典主键',
+  `id` bigint(19) NOT NULL COMMENT '字典主键',
   `type_code` varchar(120) NOT NULL COMMENT '字典编号',
   `type_name` varchar(120) NOT NULL COMMENT '字典名称',
   `iz_lock` char(1) NOT NULL COMMENT '是否内置 0是  1否',
   `remark` varchar(255) DEFAULT NULL COMMENT '备注',
   `deleted` char(1) NOT NULL DEFAULT '0' COMMENT '删除标记:0未删除，1删除',
   `version` int(11) NOT NULL COMMENT '版本（乐观锁）',
-  `create_by` bigint(20) NOT NULL COMMENT '创建人',
+  `create_by` bigint(19) NOT NULL COMMENT '创建人',
   `create_time` datetime NOT NULL COMMENT '创建时间',
-  `update_by` bigint(20) NOT NULL COMMENT '修改人',
+  `update_by` bigint(19) NOT NULL COMMENT '修改人',
   `update_time` datetime NOT NULL COMMENT '修改时间',
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE KEY `type_code_typename_unique` (`type_code`,`type_name`) USING BTREE
@@ -53,7 +53,7 @@ COMMIT;
 -- ----------------------------
 DROP TABLE IF EXISTS `sys_dict_detail`;
 CREATE TABLE `sys_dict_detail` (
-  `id` bigint(20) NOT NULL COMMENT '字典明细主键',
+  `id` bigint(19) NOT NULL COMMENT '字典明细主键',
   `type_id` varchar(32) NOT NULL COMMENT '类型ID',
   `type_code` varchar(120) NOT NULL COMMENT '类型code 冗余字段',
   `dict_name` varchar(120) NOT NULL COMMENT '字典名称',
@@ -63,9 +63,9 @@ CREATE TABLE `sys_dict_detail` (
   `remark` varchar(255) DEFAULT NULL COMMENT '备注',
   `deleted` char(1) NOT NULL DEFAULT '0' COMMENT '删除状态',
   `version` int(11) NOT NULL COMMENT '版本（乐观锁）',
-  `create_by` bigint(20) NOT NULL COMMENT '创建人',
+  `create_by` bigint(19) NOT NULL COMMENT '创建人',
   `create_time` datetime NOT NULL COMMENT '创建时间',
-  `update_by` bigint(20) NOT NULL COMMENT '修改人',
+  `update_by` bigint(19) NOT NULL COMMENT '修改人',
   `update_time` datetime NOT NULL COMMENT '修改时间',
   PRIMARY KEY (`id`) USING BTREE,
   KEY `dict_detail` (`type_code`,`dict_value`,`dict_name`) USING BTREE
@@ -102,7 +102,7 @@ COMMIT;
 -- ----------------------------
 DROP TABLE IF EXISTS `sys_logs`;
 CREATE TABLE `sys_logs` (
-  `id` bigint(20) NOT NULL COMMENT '唯一主键',
+  `id` bigint(19) NOT NULL COMMENT '唯一主键',
   `type` char(1) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT '1' COMMENT '日志类型',
   `title` varchar(255) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL COMMENT '日志标题',
   `remote_addr` varchar(255) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL COMMENT '操作IP地址',
@@ -113,9 +113,9 @@ CREATE TABLE `sys_logs` (
   `params` text CHARACTER SET utf8 COLLATE utf8_bin COMMENT '操作提交的数据',
   `exception` text CHARACTER SET utf8 COLLATE utf8_bin COMMENT '异常信息',
   `version` int(11) NOT NULL COMMENT '版本（乐观锁）',
-  `create_by` bigint(20) NOT NULL COMMENT '创建者',
+  `create_by` bigint(19) NOT NULL COMMENT '创建者',
   `create_time` datetime NOT NULL COMMENT '创建时间',
-  `update_by` bigint(20) NOT NULL COMMENT '修改人',
+  `update_by` bigint(19) NOT NULL COMMENT '修改人',
   `update_time` datetime NOT NULL COMMENT '修改时间',
   PRIMARY KEY (`id`) USING BTREE,
   KEY `sys_log_create_by` (`create_by`) USING BTREE,
@@ -263,8 +263,8 @@ COMMIT;
 -- ----------------------------
 DROP TABLE IF EXISTS `sys_menu`;
 CREATE TABLE `sys_menu` (
-  `id` bigint(20) NOT NULL COMMENT '功能主键',
-  `parent_id` bigint(20) DEFAULT '0' COMMENT '父级主键',
+  `id` bigint(19) NOT NULL COMMENT '功能主键',
+  `parent_id` bigint(19) DEFAULT '0' COMMENT '父级主键',
   `menu_code` varchar(50) NOT NULL COMMENT '编码',
   `menu_name` varchar(50) NOT NULL COMMENT '名称',
   `icon` varchar(50) DEFAULT NULL COMMENT '图标',
@@ -276,9 +276,9 @@ CREATE TABLE `sys_menu` (
   `hidden` char(1) NOT NULL DEFAULT '0' COMMENT '是否隐藏 0是  1否',
   `deleted` char(1) NOT NULL DEFAULT '0' COMMENT '删除状态',
   `version` int(11) NOT NULL COMMENT '版本（乐观锁）',
-  `create_by` bigint(20) NOT NULL COMMENT '创建用户',
+  `create_by` bigint(19) NOT NULL COMMENT '创建用户',
   `create_time` datetime NOT NULL COMMENT '创建日期',
-  `update_by` bigint(20) NOT NULL COMMENT '修改用户',
+  `update_by` bigint(19) NOT NULL COMMENT '修改用户',
   `update_time` datetime NOT NULL COMMENT '修改日期',
   PRIMARY KEY (`id`) USING BTREE,
   KEY `menu` (`menu_code`) USING BTREE COMMENT '菜单编号唯一'
@@ -401,7 +401,7 @@ COMMIT;
 -- ----------------------------
 DROP TABLE IF EXISTS `sys_role`;
 CREATE TABLE `sys_role` (
-  `id` bigint(20) NOT NULL COMMENT '角色主键',
+  `id` bigint(19) NOT NULL COMMENT '角色主键',
   `role_code` varchar(50) NOT NULL COMMENT '角色编码',
   `role_name` varchar(50) NOT NULL COMMENT '角色名称',
   `iz_lock` char(1) NOT NULL COMMENT '是否内置 0是  1否',
@@ -409,9 +409,9 @@ CREATE TABLE `sys_role` (
   `tenant_id` bigint(20) DEFAULT NULL COMMENT '多租户ID',
   `deleted` char(1) NOT NULL COMMENT '删除标记:0未删除，1删除',
   `version` int(11) NOT NULL COMMENT '版本（乐观锁）',
-  `create_by` bigint(20) NOT NULL COMMENT '创建用户',
+  `create_by` bigint(19) NOT NULL COMMENT '创建用户',
   `create_time` datetime NOT NULL COMMENT '创建日期',
-  `update_by` bigint(20) NOT NULL COMMENT '修改用户',
+  `update_by` bigint(19) NOT NULL COMMENT '修改用户',
   `update_time` datetime NOT NULL COMMENT '修改日期',
   PRIMARY KEY (`id`) USING BTREE,
   KEY `role_code` (`role_code`,`role_name`) USING BTREE
@@ -445,9 +445,9 @@ COMMIT;
 -- ----------------------------
 DROP TABLE IF EXISTS `sys_role_menu_ref`;
 CREATE TABLE `sys_role_menu_ref` (
-  `id` bigint(20) NOT NULL COMMENT '用户角色关联',
-  `menu_id` bigint(20) NOT NULL COMMENT '用户主键',
-  `role_id` bigint(20) NOT NULL COMMENT '角色主键',
+  `id` bigint(19) NOT NULL COMMENT '用户角色关联',
+  `menu_id` bigint(19) NOT NULL COMMENT '用户主键',
+  `role_id` bigint(19) NOT NULL COMMENT '角色主键',
   PRIMARY KEY (`id`) USING BTREE,
   KEY `sys_role_menu` (`menu_id`,`role_id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='角色功能关联表';
@@ -637,15 +637,15 @@ COMMIT;
 -- ----------------------------
 DROP TABLE IF EXISTS `sys_tenant`;
 CREATE TABLE `sys_tenant` (
-  `id` bigint(20) NOT NULL COMMENT '唯一主键',
+  `id` bigint(19) NOT NULL COMMENT '唯一主键',
   `tenant_name` varchar(50) NOT NULL COMMENT '租户名称',
   `iz_usable` char(1) NOT NULL COMMENT '是否启用  0是  1否',
-  `remark` varchar(20) DEFAULT NULL COMMENT '备注',
+  `remark` varchar(255) DEFAULT NULL COMMENT '备注',
   `deleted` char(1) NOT NULL COMMENT '删除标记:0未删除，1删除',
   `version` int(11) NOT NULL COMMENT '版本（乐观锁）',
-  `create_by` bigint(20) NOT NULL COMMENT '创建用户',
+  `create_by` bigint(19) NOT NULL COMMENT '创建用户',
   `create_time` datetime NOT NULL COMMENT '创建日期',
-  `update_by` bigint(20) NOT NULL COMMENT '修改用户',
+  `update_by` bigint(19) NOT NULL COMMENT '修改用户',
   `update_time` datetime NOT NULL COMMENT '修改日期',
   PRIMARY KEY (`id`) USING BTREE,
   KEY `role_code` (`tenant_name`) USING BTREE
@@ -665,7 +665,7 @@ COMMIT;
 -- ----------------------------
 DROP TABLE IF EXISTS `sys_user`;
 CREATE TABLE `sys_user` (
-  `id` bigint(20) NOT NULL COMMENT '用户主键',
+  `id` bigint(19) NOT NULL COMMENT '用户主键',
   `username` varchar(32) NOT NULL COMMENT '登录账户',
   `password` varchar(50) NOT NULL COMMENT '登录密码',
   `secret_key` varchar(50) NOT NULL COMMENT '盐值，密码秘钥',
@@ -678,12 +678,12 @@ CREATE TABLE `sys_user` (
   `email` varchar(100) DEFAULT NULL COMMENT '邮箱',
   `sign` varchar(255) DEFAULT NULL COMMENT '签名',
   `remark` varchar(255) DEFAULT NULL COMMENT '备注',
-  `tenant_id` bigint(20) DEFAULT NULL COMMENT '多租户ID',
+  `tenant_id` bigint(19) DEFAULT NULL COMMENT '多租户ID',
   `deleted` char(1) NOT NULL DEFAULT '0' COMMENT '删除状态',
   `version` int(11) NOT NULL COMMENT '版本（乐观锁）',
-  `create_by` bigint(20) NOT NULL COMMENT '创建人',
+  `create_by` bigint(19) NOT NULL COMMENT '创建人',
   `create_time` datetime NOT NULL COMMENT '创建时间',
-  `update_by` bigint(20) NOT NULL COMMENT '修改人',
+  `update_by` bigint(19) NOT NULL COMMENT '修改人',
   `update_time` datetime NOT NULL COMMENT '修改时间',
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE KEY `unique_username` (`username`) USING BTREE
@@ -694,7 +694,7 @@ CREATE TABLE `sys_user` (
 -- ----------------------------
 BEGIN;
 INSERT INTO `sys_user` VALUES (1, 'system', 'a6208a2ccc1541ff5a8030067da973a6', 'za86o3201o984liwdorp', '0', '超级管理员', '15321010110', '112', '/static/file/20201008/20201008235457-2fcb9a59a3334a2d966e41c341bc9756.jpg', '127.0.0.1', 'meet.parker@foxmail.com', '没有自学能力的人没有未来', '', 1315203865179602945, '0', 29, 1, '2020-09-25 15:03:22', 1, '2020-10-11 16:54:12');
-INSERT INTO `sys_user` VALUES (1313694379541635074, 'demo', '011eae89281e764ce9774b7f9b18b12a', '08oa2ktg9gi6vlv98f63', '0', '演示用户', '15321010110', 'test_001', '/static/file/20201113/20201113151850-ccaf9417c3da4a96942d11872f7a5ddb.jpg', '106.121.128.153', 'meet.parker@foxmail.com', '没有自学能力的人没有未来', NULL, 1, '0', 2, 1, '2020-10-06 23:15:22', 1, '2020-10-11 16:53:58');
+INSERT INTO `sys_user` VALUES (1313694379541635074, 'demo', '011eae89281e764ce9774b7f9b18b12a', '08oa2ktg9gi6vlv98f63', '0', '演示用户', '15321010110', 'test_001', '/static/file/20201113/20201113151850-ccaf9417c3da4a96942d11872f7a5ddb.jpg', '183.69.193.151', 'meet.parker@foxmail.com', '没有自学能力的人没有未来', NULL, 1, '0', 2, 1, '2020-10-06 23:15:22', 1, '2020-10-11 16:53:58');
 INSERT INTO `sys_user` VALUES (1315218541317750785, 'zhangsan', '386a1212b388a49d6cca827173824914', 'g6880o4q5k98w6a6hplu', '0', '张三', NULL, '123123', NULL, '127.0.0.1', NULL, NULL, NULL, NULL, '0', 0, 1, '2020-10-11 17:11:50', 1, '2020-10-11 17:11:50');
 INSERT INTO `sys_user` VALUES (1315224529580072961, 'test', '248b77e86f3137b0381e78a0050c8eab', 'x93jqlq94e7bmludjzxm', '0', '123', NULL, '123123123', NULL, NULL, NULL, NULL, NULL, NULL, '1', 0, 1, '2020-10-11 17:35:38', 1, '2020-10-11 17:35:38');
 INSERT INTO `sys_user` VALUES (1315224823500120066, 'lyf', 'e7f977aac0007f3ae2b36c46d5fdc5c9', '0ep05v5hl5q86lv0uprg', '0', '刘亦菲', NULL, '0101001', NULL, '127.0.0.1', NULL, NULL, NULL, 1, '0', 0, 1313694379541635074, '2020-10-11 17:36:48', 1313694379541635074, '2020-10-11 17:36:48');
@@ -705,9 +705,9 @@ COMMIT;
 -- ----------------------------
 DROP TABLE IF EXISTS `sys_user_role_ref`;
 CREATE TABLE `sys_user_role_ref` (
-  `id` bigint(20) NOT NULL COMMENT '用户角色关联',
-  `user_id` bigint(20) NOT NULL COMMENT '用户主键',
-  `role_id` bigint(20) NOT NULL COMMENT '角色主键',
+  `id` bigint(19) NOT NULL COMMENT '用户角色关联',
+  `user_id` bigint(19) NOT NULL COMMENT '用户主键',
+  `role_id` bigint(19) NOT NULL COMMENT '角色主键',
   PRIMARY KEY (`id`) USING BTREE,
   KEY `sys_user_role` (`user_id`,`role_id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户角色关联表';
@@ -731,14 +731,14 @@ COMMIT;
 -- ----------------------------
 DROP TABLE IF EXISTS `test_entity`;
 CREATE TABLE `test_entity` (
-  `id` bigint(20) NOT NULL,
+  `id` bigint(19) NOT NULL,
   `name` varchar(255) DEFAULT NULL,
   `type` varchar(120) NOT NULL,
   `remark` varchar(255) DEFAULT NULL,
-  `tenant_id` bigint(20) DEFAULT NULL COMMENT '多租户ID',
-  `create_by` bigint(20) NOT NULL,
+  `tenant_id` bigint(19) DEFAULT NULL COMMENT '多租户ID',
+  `create_by` bigint(19) NOT NULL,
   `create_time` datetime NOT NULL,
-  `update_by` bigint(20) NOT NULL,
+  `update_by` bigint(19) NOT NULL,
   `update_time` datetime NOT NULL,
   `version` int(11) NOT NULL,
   PRIMARY KEY (`id`) USING BTREE
