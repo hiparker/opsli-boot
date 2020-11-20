@@ -100,6 +100,21 @@ public interface CrudServiceInterface<T extends BaseEntity,E extends ApiWrapper>
 
 
     /**
+     * 保存数据
+     *
+     * 不需要做锁状态处理
+     * 不需要判断是否成功
+     * 能往下走的只能是成功
+     * 异常问题 已经统一被处理
+     *
+     * 注： 没有ID 则是 新增， 有ID 则默认进行保存
+     *
+     * @param model model 数据模型
+     * @return E
+     */
+    E save(E model);
+
+    /**
      * 删除数据（物理删除，从数据库中彻底删除）
      *
      * 不需要做锁状态处理

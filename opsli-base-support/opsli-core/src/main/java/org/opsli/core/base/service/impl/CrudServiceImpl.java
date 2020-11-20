@@ -22,6 +22,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.github.pagehelper.PageInfo;
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.opsli.api.base.warpper.ApiWrapper;
 import org.opsli.common.utils.WrapperUtil;
 import org.opsli.core.base.entity.BaseEntity;
@@ -144,6 +145,21 @@ public abstract class CrudServiceImpl<M extends BaseMapper<T>, T extends BaseEnt
             return transformT2M(entity);
         }
         return null;
+    }
+
+    @Override
+    @Transactional(readOnly = false)
+    public E save(E model) {
+        if(model == null) return null;
+
+        // 修改
+        if(StringUtils.isNotBlank(model.getId())){
+            return this.update(model);
+        }
+
+        // 新增
+        model.setId(null);
+        return this.insert(model);
     }
 
     @Override
