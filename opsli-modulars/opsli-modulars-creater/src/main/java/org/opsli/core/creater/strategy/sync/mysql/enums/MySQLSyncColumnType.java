@@ -9,7 +9,7 @@ import java.util.Map;
 
 /**
  * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.modulars.creater.strategy.sync.mysql
+ * @BelongsPackage: org.opsli.core.creater.strategy.sync.mysql.enums
  * @Author: Parker
  * @CreateTime: 2020-11-18 13:21
  * @Description: MySQL 字段类型 判断

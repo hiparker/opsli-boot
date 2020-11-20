@@ -24,6 +24,7 @@ import org.opsli.common.annotation.EnableLog;
 import org.opsli.common.exception.ServiceException;
 import org.opsli.common.utils.WrapperUtil;
 import org.opsli.core.base.concroller.BaseRestController;
+import org.opsli.core.creater.exception.CreaterException;
 import org.opsli.core.creater.msg.CreaterMsg;
 import org.opsli.core.creater.strategy.sync.util.SQLSyncUtil;
 import org.opsli.core.msg.CoreMsg;
@@ -241,7 +242,7 @@ public class TableRestController extends BaseRestController<CreaterTable, Create
     public ResultVo<?> importTables(String[] tableNames) {
         if(tableNames == null){
             // 未选中表，无法导入
-            throw new ServiceException(CreaterMsg.EXCEPTION_IMPORT_NULL);
+            throw new CreaterException(CreaterMsg.EXCEPTION_IMPORT_NULL);
         }
         IService.importTables(tableNames);
         return ResultVo.success("导入成功");

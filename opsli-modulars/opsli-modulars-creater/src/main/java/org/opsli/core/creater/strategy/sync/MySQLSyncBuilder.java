@@ -1,9 +1,8 @@
 package org.opsli.core.creater.strategy.sync;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.opsli.common.exception.ServiceException;
 import org.opsli.common.utils.Props;
+import org.opsli.core.creater.exception.CreaterException;
 import org.opsli.core.creater.msg.CreaterMsg;
 import org.opsli.core.creater.strategy.sync.mysql.entity.FieldTypeAttribute;
 import org.opsli.core.creater.strategy.sync.mysql.enums.MySQLSyncColumnType;
@@ -17,12 +16,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
  * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.modulars.creater.strategy.sync.mysql
+ * @BelongsPackage: org.opsli.modulars.creater.strategy.sync
  * @Author: Parker
  * @CreateTime: 2020-11-18 13:21
  * @Description: MySQL 同步构建器
@@ -71,13 +69,13 @@ public class MySQLSyncBuilder implements SyncStrategy {
         CreaterTableModel currTable = iTableService.get(model.getId());
         if(currTable == null){
             // 同步表失败，暂无该表
-            throw new ServiceException(CreaterMsg.EXCEPTION_SYNC_NULL);
+            throw new CreaterException(CreaterMsg.EXCEPTION_SYNC_NULL);
         }
 
         // 排查该表 是否是 在排除外的表， 如果是则不允许同步
         if(EXCLUDE_TABLES.contains(currTable.getOldTableName()) || EXCLUDE_TABLES.contains(currTable.getTableName())){
             // 同步表失败 系统核心关键表不允许同步
-            throw new ServiceException(CreaterMsg.EXCEPTION_SYNC_CORE);
+            throw new CreaterException(CreaterMsg.EXCEPTION_SYNC_CORE);
         }
 
         // 删除表

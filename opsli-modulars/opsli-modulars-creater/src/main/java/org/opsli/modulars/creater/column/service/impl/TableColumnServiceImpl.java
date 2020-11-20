@@ -20,6 +20,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.opsli.api.utils.ValidationUtil;
 import org.opsli.common.exception.ServiceException;
 import org.opsli.core.base.service.impl.CrudServiceImpl;
+import org.opsli.core.creater.exception.CreaterException;
 import org.opsli.core.creater.msg.CreaterMsg;
 import org.opsli.core.persistence.querybuilder.GenQueryBuilder;
 import org.opsli.core.persistence.querybuilder.QueryBuilder;
@@ -60,7 +61,7 @@ public class TableColumnServiceImpl extends CrudServiceImpl<TableColumnMapper, C
         Integer count = mapper.uniqueVerificationByFieldName(entity);
         if(count != null && count > 0){
             // 重复
-         throw new ServiceException(CreaterMsg.EXCEPTION_TABLE_COLUMN_FIELD_NAME_REPEAT);
+         throw new CreaterException(CreaterMsg.EXCEPTION_TABLE_COLUMN_FIELD_NAME_REPEAT);
         }
 
         return super.insert(model);
@@ -87,7 +88,7 @@ public class TableColumnServiceImpl extends CrudServiceImpl<TableColumnMapper, C
             Integer count = mapper.uniqueVerificationByFieldName(entity);
             if(count != null && count > 0){
                 // 重复
-                throw new ServiceException(CreaterMsg.EXCEPTION_TABLE_COLUMN_FIELD_NAME_REPEAT);
+                throw new CreaterException(CreaterMsg.EXCEPTION_TABLE_COLUMN_FIELD_NAME_REPEAT);
             }
 
             // 默认清空 创建人和修改人
@@ -119,7 +120,7 @@ public class TableColumnServiceImpl extends CrudServiceImpl<TableColumnMapper, C
         Integer count = mapper.uniqueVerificationByFieldName(entity);
         if(count != null && count > 0){
             // 重复
-            throw new ServiceException(CreaterMsg.EXCEPTION_TABLE_COLUMN_FIELD_NAME_REPEAT);
+            throw new CreaterException(CreaterMsg.EXCEPTION_TABLE_COLUMN_FIELD_NAME_REPEAT);
         }
 
         return super.update(model);

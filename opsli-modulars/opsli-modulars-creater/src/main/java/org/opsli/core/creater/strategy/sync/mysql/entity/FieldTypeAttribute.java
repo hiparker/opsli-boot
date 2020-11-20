@@ -6,7 +6,7 @@ import lombok.Data;
 
 /**
  * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.modulars.creater.strategy.sync.mysql
+ * @BelongsPackage: org.opsli.core.creater.strategy.sync.mysql.entity
  * @Author: Parker
  * @CreateTime: 2020-11-18 13:21
  * @Description: MySQL 字段类型 属性

@@ -20,6 +20,7 @@ import org.opsli.common.enums.DictType;
 import org.opsli.common.exception.ServiceException;
 import org.opsli.common.utils.WrapperUtil;
 import org.opsli.core.base.service.impl.CrudServiceImpl;
+import org.opsli.core.creater.exception.CreaterException;
 import org.opsli.core.creater.msg.CreaterMsg;
 import org.opsli.modulars.creater.column.service.ITableColumnService;
 import org.opsli.modulars.creater.column.wrapper.CreaterTableColumnModel;
@@ -65,7 +66,7 @@ public class TableServiceImpl extends CrudServiceImpl<TableMapper, CreaterTable,
         Integer count = mapper.uniqueVerificationByTableName(entity);
         if(count != null && count > 0){
             // 重复
-            throw new ServiceException(CreaterMsg.EXCEPTION_TABLE_NAME_REPEAT);
+            throw new CreaterException(CreaterMsg.EXCEPTION_TABLE_NAME_REPEAT);
         }
 
         if(!model.getIzApi()){
@@ -90,7 +91,7 @@ public class TableServiceImpl extends CrudServiceImpl<TableMapper, CreaterTable,
         Integer count = mapper.uniqueVerificationByTableName(entity);
         if(count != null && count > 0){
             // 重复
-            throw new ServiceException(CreaterMsg.EXCEPTION_TABLE_NAME_REPEAT);
+            throw new CreaterException(CreaterMsg.EXCEPTION_TABLE_NAME_REPEAT);
         }
 
         CreaterTableModel oldModel = this.get(model.getId());
@@ -195,7 +196,7 @@ public class TableServiceImpl extends CrudServiceImpl<TableMapper, CreaterTable,
             if(table == null){
                 String msg = StrUtil.format(CreaterMsg.EXCEPTION_IMPORT_TABLE_NULL.getMessage(), tableName);
                 // 暂无该表
-                throw new ServiceException(CreaterMsg.EXCEPTION_IMPORT_TABLE_NULL.getCode(), msg);
+                throw new CreaterException(CreaterMsg.EXCEPTION_IMPORT_TABLE_NULL.getCode(), msg);
             }
 
             // 获得表字段

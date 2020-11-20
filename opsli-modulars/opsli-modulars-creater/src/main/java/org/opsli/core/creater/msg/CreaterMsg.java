@@ -19,7 +19,7 @@ import org.opsli.common.base.msg.BaseMsg;
 
 /**
  * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.core.msg
+ * @BelongsPackage: org.opsli.core.creater.msg
  * @Author: Parker
  * @CreateTime: 2020-09-13 19:36
  * @Description: 代码生成器 - 消息

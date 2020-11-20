@@ -30,7 +30,7 @@ import java.util.concurrent.ConcurrentMap;
 
 /**
  * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.plugins.redis.entity
+ * @BelongsPackage: org.opsli.core.creater.strategy.sync.util
  * @Author: Parker
  * @CreateTime: 2020-09-15 14:50
  * @Description: 数据库同步策略 工具类
