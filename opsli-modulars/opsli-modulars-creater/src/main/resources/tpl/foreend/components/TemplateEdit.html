@@ -1,0 +1,195 @@
+<template>
+  <el-dialog
+    :title="title"
+    :visible.sync="dialogFormVisible"
+    width="800px"
+    @close="close"
+  >
+    <el-form ref="form" :model="form" :rules="rules" label-width="105px">
+      #for(columnList : formList)
+      #if(columnList != null && columnList.size() > 0)
+      <el-row>
+      #for(column : columnList)
+        ### 文本框
+        #if(column.showType == "0")
+        <el-col :span="12">
+          <el-form-item label="#(column.fieldComments)" prop="#(column.fieldName)">
+            <el-input v-model="form.#(column.fieldName)" autocomplete="off"></el-input>
+          </el-form-item>
+        </el-col>
+        ### 文本域
+        #else if(column.showType == "1")
+        <el-col :span="12">
+        <el-form-item label="#(column.fieldComments)" prop="#(column.fieldName)">
+          <el-input type="textarea" v-model="form.#(column.fieldName)" autocomplete="off"></el-input>
+        </el-form-item>
+        </el-col>
+        ### 字典
+        #else if(column.showType == "2")
+        <el-col :span="12">
+        <el-form-item label="#(column.fieldComments)" prop="#(column.fieldName)">
+          <el-select v-model="form.#(column.fieldName)" clearable
+                     placeholder="请选择" style="width: 100%">
+            <el-option
+                    v-for="item in dict.#(column.dictTypeCode)"
+                    :key="item.dictValue"
+                    :label="item.dictName"
+                    :value="item.dictValue"
+            ></el-option>
+          </el-select>
+        </el-form-item>
+        </el-col>
+        ### 日期
+        #else if(column.showType == "3")
+        <el-col :span="12">
+        <el-form-item label="#(column.fieldComments)" prop="#(column.fieldName)">
+          <el-date-picker
+                  v-model="form.#(column.fieldName)"
+                  type="datetime"
+                  placeholder="选择#(column.fieldComments)时间"
+                  style="width: 100%"
+          ></el-date-picker>
+        </el-form-item>
+        </el-col>
+        #end
+      #end
+      </el-row>
+      #end
+      #end
+
+    </el-form>
+    <div slot="footer" class="dialog-footer">
+      <el-button @click="close">取 消</el-button>
+      <el-button type="primary" @click="save">确 定</el-button>
+    </div>
+  </el-dialog>
+</template>
+
+<script>
+  #if(data.subModuleName != null && data.subModuleName != "")
+  import { doInsert, doUpdate } from "@/api/#(data.moduleName)/#(data.subModuleName)/#(data.model.tableName)Management";
+  #else
+  import { doInsert, doUpdate } from "@/api/#(data.moduleName)/#(data.model.tableName)Management";
+  #end
+  import { formateDate } from "@/utils/format";
+  import { isNull } from "@/utils/validate";
+  import { #(validataTypes) getMsg} from "@/utils/valiargs";
+
+  export default {
+    name: "#(data.model.tableName)ManagementEdit",
+    data() {
+
+      #for(columnList : formList)
+      #for(column : columnList)
+      #for(vali : valiDict[column.fieldName])
+      #if(vali != "isNotNull")
+      const validate_#(column.fieldName+'_'+vali) = (rule, value, callback) => {
+        if (!#(vali)(value)) {
+          callback(new Error(getMsg('#(vali)')));
+        } else {
+          callback();
+        }
+      };
+
+      #end
+      #end
+      #end
+      #end
+
+      return {
+        form: {
+          // 设置默认值
+          version: 0
+        },
+        dict: {},
+        rules: {
+          #for(columnList : formList)
+          #for(column : columnList)
+          #if(valiDict[column.fieldName] != null && valiDict[column.fieldName].size() > 0)
+          #(column.fieldName): [
+            #for(vali : valiDict[column.fieldName])
+            #if(vali == "isNotNull")
+            { required: true, trigger: "blur", message: "#(column.fieldComments)非空" },
+            #end
+            #end
+            #for(vali : valiDict[column.fieldName])
+            #if(vali != "isNotNull")
+            { required: false, trigger: "blur", validator: validate_#(column.fieldName+'_'+vali) },
+            #end
+            #end
+          ],
+          #end
+          #end
+          #end
+        },
+        title: "",
+        dialogFormVisible: false,
+      };
+    },
+    created() {
+
+    },
+    mounted() {
+      // 加载字典值
+      #for(column : data.model.columnList)
+      #if(column.dictTypeCode != null && column.dictTypeCode != "")
+      this.dict.#(column.dictTypeCode) = this.$getDictList("#(column.dictTypeCode)");
+      #end
+      #end
+    },
+    methods: {
+      showEdit(row) {
+        if (!row) {
+          this.title = "添加";
+        } else {
+          this.title = "编辑";
+          this.form = Object.assign({}, row);
+        }
+        this.dialogFormVisible = true;
+      },
+      close() {
+        this.dialogFormVisible = false;
+        this.$refs["form"].resetFields();
+        this.form = this.$options.data().form;
+        this.$emit("fetchData");
+      },
+      save() {
+        this.$refs["form"].validate(async (valid) => {
+          if (valid) {
+            // 处理数据
+            this.handlerFormData(this.form);
+
+            // 修改
+            if (!isNull(this.form.id)) {
+              const { success, msg } = await doUpdate(this.form);
+              if(success){
+                this.$baseMessage(msg, "success");
+              }
+            } else {
+              const { success, msg } = await doInsert(this.form);
+              if(success){
+                this.$baseMessage(msg, "success");
+              }
+            }
+
+            await this.$emit("fetchData");
+            this.close();
+          } else {
+            return false;
+          }
+        });
+      },
+      // 处理 form数据
+      handlerFormData(formData){
+        if(!isNull(formData)){
+          for(let key in formData){
+            // 对于时间类进行处理
+            if("[object Date]" === Object.prototype.toString.call(formData[key])){
+              formData[key] = formateDate(formData[key], 'yyyy-MM-dd hh:mm:ss');
+            }
+          }
+        }
+      },
+    },
+  };
+</script>

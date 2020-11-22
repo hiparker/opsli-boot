@@ -16,3 +16,12 @@ opsli:
     - sys_tenant
     - sys_user
     - sys_user_role_ref
+
+  # 排除字段
+  exclude-fields:
+    - id
+    - version
+    - create_by
+    - create_time
+    - update_by
+    - update_time

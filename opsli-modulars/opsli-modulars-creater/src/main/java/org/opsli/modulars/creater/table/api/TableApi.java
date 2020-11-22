@@ -49,7 +49,7 @@ public interface TableApi {
     String TITLE = "代码生成器 - 表";
 
     /**
-     * 租户 查一条
+     * 表 查一条
      * @param model 模型
      * @return ResultVo
      */
@@ -57,7 +57,7 @@ public interface TableApi {
     ResultVo<CreaterTableAndColumnModel> get(CreaterTableModel model);
 
     /**
-     * 租户 查询分页
+     * 表 查询分页
      * @param pageNo 当前页
      * @param pageSize 每页条数
      * @param request request
@@ -71,7 +71,7 @@ public interface TableApi {
     );
 
     /**
-     * 租户 新增
+     * 表 新增
      * @param model 模型
      * @return ResultVo
      */
@@ -79,7 +79,7 @@ public interface TableApi {
     ResultVo<?> insert(@RequestBody CreaterTableAndColumnModel model);
 
     /**
-     * 租户 修改
+     * 表 修改
      * @param model 模型
      * @return ResultVo
      */
@@ -87,7 +87,7 @@ public interface TableApi {
     ResultVo<?> update(@RequestBody CreaterTableAndColumnModel model);
 
     /**
-     * 租户 删除
+     * 表 删除
      * @param id ID
      * @return ResultVo
      */
@@ -95,7 +95,7 @@ public interface TableApi {
     ResultVo<?> del(String id);
 
     /**
-     * 租户 批量删除
+     * 表 批量删除
      * @param ids ID 数组
      * @return ResultVo
      */

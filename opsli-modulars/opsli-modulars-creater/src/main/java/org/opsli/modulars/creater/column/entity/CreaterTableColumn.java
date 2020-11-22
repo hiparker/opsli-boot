@@ -49,22 +49,22 @@ public class CreaterTableColumn extends BaseEntity {
     private String fieldComments;
 
     /** 是否主键 */
-    private Character izPk;
+    private String izPk;
 
     /** 是否可为空 */
-    private Character izNull;
+    private String izNotNull;
 
     /** 是否列表字段 */
-    private Character izShowList;
+    private String izShowList;
 
     /** 是否表单显示 */
-    private Character izShowForm;
+    private String izShowForm;
 
     /** Java字段类型 */
     private String javaType;
 
     /** 字段生成方案（文本框、文本域、字典选择） */
-    private Character showType;
+    private String showType;
 
     /** 字典类型编号 */
     private String dictTypeCode;
@@ -74,6 +74,9 @@ public class CreaterTableColumn extends BaseEntity {
 
     /** 验证类别 */
     private String validateType;
+
+    /** 检索类别 */
+    private String queryType;
 
 
     // ========================================

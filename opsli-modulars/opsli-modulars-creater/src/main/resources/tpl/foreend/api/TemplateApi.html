@@ -1,0 +1,63 @@
+import request from "@/utils/request";
+
+export function getList(data) {
+  return request({
+    #if(data.subModuleName != null && data.subModuleName != "")
+    url: "#(apiPath)/#(data.moduleName)/#(data.subModuleName)/findPage",
+    #else
+    url: "#(apiPath)/#(data.moduleName)/findPage",
+    #end
+    method: "get",
+    params: data,
+  });
+}
+
+
+export function doInsert(data) {
+  return request({
+    #if(data.subModuleName != null && data.subModuleName != "")
+    url: "#(apiPath)/#(data.moduleName)/#(data.subModuleName)/insert",
+    #else
+    url: "#(apiPath)/#(data.moduleName)/insert",
+    #end
+    method: "post",
+    data,
+  });
+}
+
+export function doUpdate(data) {
+  return request({
+    #if(data.subModuleName != null && data.subModuleName != "")
+    url: "#(apiPath)/#(data.moduleName)/#(data.subModuleName)/update",
+    #else
+    url: "#(apiPath)/#(data.moduleName)/update",
+    #end
+    method: "post",
+    data,
+  });
+}
+
+export function doDelete(data) {
+  return request({
+    #if(data.subModuleName != null && data.subModuleName != "")
+    url: "#(apiPath)/#(data.moduleName)/#(data.subModuleName)/del",
+    #else
+    url: "#(apiPath)/#(data.moduleName)/del",
+    #end
+    method: "post",
+    params: data,
+  });
+}
+
+export function doDeleteAll(data) {
+  return request({
+    #if(data.subModuleName != null && data.subModuleName != "")
+    url: "#(apiPath)/#(data.moduleName)/#(data.subModuleName)/delAll",
+    #else
+    url: "#(apiPath)/#(data.moduleName)/delAll",
+    #end
+    method: "post",
+    params: data,
+  });
+}
+

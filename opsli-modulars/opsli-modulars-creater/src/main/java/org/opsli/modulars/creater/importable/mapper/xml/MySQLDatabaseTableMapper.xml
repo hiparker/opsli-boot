@@ -27,7 +27,7 @@
             NUMERIC_PRECISION AS columnPrecision,
             NUMERIC_SCALE AS columnScale,
             COLUMN_COMMENT AS columnComment,
-            IF( IS_NULLABLE = 'NO', '1', '0' ) AS izNull,
+            IF( IS_NULLABLE = 'NO', '1', '0' ) AS izNotNull,
             IF( COLUMN_KEY = 'PRI', '1', '0' ) AS izPk
         FROM
             INFORMATION_SCHEMA.COLUMNS

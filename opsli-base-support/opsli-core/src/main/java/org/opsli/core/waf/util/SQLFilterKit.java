@@ -77,8 +77,10 @@ public final class SQLFilterKit {
 		//转换成小写
 		//str = str.toLowerCase();
 
-		//非法字符
-		String[] keywords = {"master", "truncate", "insert", "select", "delete", "update", "declare", "alter", "drop"};
+		// 非法字符
+		//String[] keywords = {"master", "truncate", "insert", "select", "delete", "update", "declare", "alter", "drop"};
+		// 非法字符（为了代码生成器 放开 delete update 扫描）
+		String[] keywords = {"master", "truncate", "insert", "select", "declare", "alter", "drop"};
 
 		// 替换非法字符
 		for (String keyword : keywords) {

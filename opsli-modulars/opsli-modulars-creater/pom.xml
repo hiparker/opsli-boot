@@ -11,5 +11,12 @@
 
     <artifactId>opsli-modulars-creater</artifactId>
 
+    <dependencies>
+        <dependency>
+            <groupId>com.jfinal</groupId>
+            <artifactId>enjoy</artifactId>
+            <version>4.9.03</version>
+        </dependency>
+    </dependencies>
 
 </project>

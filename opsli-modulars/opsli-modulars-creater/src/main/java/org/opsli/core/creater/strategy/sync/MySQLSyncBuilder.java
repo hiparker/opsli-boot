@@ -1,6 +1,22 @@
+/**
+ * Copyright 2020 OPSLI 快速开发平台 https://www.opsli.com
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ */
 package org.opsli.core.creater.strategy.sync;
 
 import org.apache.commons.lang3.StringUtils;
+import org.opsli.common.enums.DictType;
 import org.opsli.common.utils.Props;
 import org.opsli.core.creater.exception.CreaterException;
 import org.opsli.core.creater.msg.CreaterMsg;
@@ -34,10 +50,6 @@ public class MySQLSyncBuilder implements SyncStrategy {
     /** 字符格式 */
     private static final String CHARSET = "utf8mb4";
 
-    /** 是 */
-    private static final char YES = '1';
-    /** 否 */
-    private static final char NO = '0';
     /** 排除表 */
     private static final List<String> EXCLUDE_TABLES;
 
@@ -141,11 +153,11 @@ public class MySQLSyncBuilder implements SyncStrategy {
             }
 
             // 判断是否为主键
-            if(YES == tmp.getIzPk()){
+            if(DictType.NO_YES_YES.getCode().equals(tmp.getIzPk())){
                 str.append(" ").append("PRIMARY KEY");
             }else{
                 // 判断是否非空
-                if(YES == tmp.getIzNull()){
+                if(DictType.NO_YES_YES.getCode().equals(tmp.getIzNotNull())){
                     str.append(" ").append("NOT NULL");
                 }
             }

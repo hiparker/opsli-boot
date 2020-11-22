@@ -17,13 +17,13 @@ package org.opsli.modulars.creater.table.service.impl;
 
 import cn.hutool.core.util.StrUtil;
 import org.opsli.common.enums.DictType;
-import org.opsli.common.exception.ServiceException;
 import org.opsli.common.utils.WrapperUtil;
 import org.opsli.core.base.service.impl.CrudServiceImpl;
 import org.opsli.core.creater.exception.CreaterException;
 import org.opsli.core.creater.msg.CreaterMsg;
 import org.opsli.modulars.creater.column.service.ITableColumnService;
 import org.opsli.modulars.creater.column.wrapper.CreaterTableColumnModel;
+import org.opsli.modulars.creater.createrlogs.service.ICreateLogsService;
 import org.opsli.modulars.creater.importable.ImportTableUtil;
 import org.opsli.modulars.creater.importable.entity.DatabaseColumn;
 import org.opsli.modulars.creater.importable.entity.DatabaseTable;
@@ -56,6 +56,9 @@ public class TableServiceImpl extends CrudServiceImpl<TableMapper, CreaterTable,
     @Autowired
     private ITableColumnService iTableColumnService;
 
+    @Autowired
+    private ICreateLogsService iCreateLogsService;
+
     @Override
     @Transactional(rollbackFor = Exception.class)
     public CreaterTableModel insert(CreaterTableModel model) {
@@ -72,7 +75,7 @@ public class TableServiceImpl extends CrudServiceImpl<TableMapper, CreaterTable,
         if(!model.getIzApi()){
             // 新增后 默认未同步
             model.setIzSync(
-                    DictType.NO_YES_NO.getCode().charAt(0));
+                    DictType.NO_YES_NO.getCode());
         }
 
         // 默认旧表名称为当前新增名称（用于删除表操作）
@@ -99,7 +102,7 @@ public class TableServiceImpl extends CrudServiceImpl<TableMapper, CreaterTable,
 
         // 修改后 默认未同步
         model.setIzSync(
-                DictType.NO_YES_NO.getCode().charAt(0));
+                DictType.NO_YES_NO.getCode());
 
         // 默认旧表名称为 修改前表名 便于改表后删除操作
         model.setOldTableName(oldModel.getTableName());
@@ -156,6 +159,9 @@ public class TableServiceImpl extends CrudServiceImpl<TableMapper, CreaterTable,
         }
         // 删除字段
         iTableColumnService.delByTableId(id);
+
+        // 删除生成记录
+        iCreateLogsService.delByTableId(id);
     }
 
     @Override
@@ -169,6 +175,9 @@ public class TableServiceImpl extends CrudServiceImpl<TableMapper, CreaterTable,
 
         // 删除字段
         iTableColumnService.delByTableIds(ids);
+
+        // 删除生成记录
+        iCreateLogsService.delByTableIds(ids);
     }
 
     @Override
@@ -211,7 +220,7 @@ public class TableServiceImpl extends CrudServiceImpl<TableMapper, CreaterTable,
                 columnModel.setFieldPrecision(column.getColumnScale());
                 columnModel.setFieldComments(column.getColumnComment());
                 columnModel.setIzPk(column.getIzPk());
-                columnModel.setIzNull(column.getIzNull());
+                columnModel.setIzNotNull(column.getIzNotNull());
                 columnModel.setSort(i);
                 // 赋默认值
                 columnModel.setJavaType("String");
@@ -223,9 +232,9 @@ public class TableServiceImpl extends CrudServiceImpl<TableMapper, CreaterTable,
             createrTableModel.setComments(table.getTableComments());
             createrTableModel.setTableName(table.getTableName());
             createrTableModel.setOldTableName(table.getTableName());
-            createrTableModel.setIzSync('1');
+            createrTableModel.setIzSync("1");
             createrTableModel.setJdbcType(ImportTableUtil.DB_TYPE);
-            createrTableModel.setTableType('0');
+            createrTableModel.setTableType("0");
             createrTableModel.setColumnList(columnModels);
             createrTableModel.setIzApi(true);
             this.insertAny(createrTableModel);

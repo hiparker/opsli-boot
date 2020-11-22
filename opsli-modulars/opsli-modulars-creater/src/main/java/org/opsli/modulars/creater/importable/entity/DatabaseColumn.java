@@ -54,10 +54,10 @@ public class DatabaseColumn {
     private String columnComment;
 
     /** 是否主键 */
-    private Character izPk;
+    private String izPk;
 
     /** 是否可为空 */
-    private Character izNull;
+    private String izNotNull;
 
     // ========================================
 

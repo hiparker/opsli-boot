@@ -76,6 +76,17 @@ public final class HumpUtil {
         return sb.toString().toLowerCase();
     }
 
+    /**
+     * 首字母大写
+     * @param str
+     * @return
+     */
+    public static String captureName(String str) {
+        char[] cs = str.toCharArray();
+        cs[0] -= 32;
+        return String.valueOf(cs);
+    }
+
     public static void main(String[] args) {
         String aa = HumpUtil.humpToUnderline("tenantId");
         String bb = HumpUtil.underlineToHump(aa);

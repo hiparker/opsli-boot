@@ -16,10 +16,13 @@
 package org.opsli.common.utils;
 
 import cn.hutool.core.convert.Convert;
+import cn.hutool.core.io.IoUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.io.ClassPathResource;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -94,7 +97,8 @@ public class Props {
             return;
         }
 
-        try (InputStream inputStream = Props.class.getResourceAsStream("/" + this.fileName)) {
+        ClassPathResource resource = new ClassPathResource("/" + this.fileName);
+        try (InputStream inputStream = resource.getInputStream()) {
             Yaml yaml = new Yaml();
             temp = yaml.load(inputStream);
 

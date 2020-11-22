@@ -59,7 +59,7 @@ public class CreaterTableModel extends ApiWrapper {
     // 验证器
     @ValidationArgs({ValiArgsType.IS_NOT_NULL})
     @ValidationArgsLenMax(1)
-    private Character tableType;
+    private String tableType;
 
     /** 数据库类型 */
     @ApiModelProperty(value = "数据库类型")
@@ -84,7 +84,7 @@ public class CreaterTableModel extends ApiWrapper {
     @ExcelInfo(dictType = "no_yes")
     // 验证器
     @ValidationArgsLenMax(1)
-    private Character izSync;
+    private String izSync;
 
     /** 备注 */
     @ApiModelProperty(value = "备注")

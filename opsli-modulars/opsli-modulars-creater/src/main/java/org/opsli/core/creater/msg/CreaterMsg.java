@@ -48,6 +48,14 @@ public enum CreaterMsg implements BaseMsg {
     EXCEPTION_IMPORT_NULL(50120,"未选中表，无法导入"),
     EXCEPTION_IMPORT_TABLE_NULL(50121,"暂无{}该表"),
 
+    /**
+     * 生成
+     */
+    EXCEPTION_CREATE_NULL(50140,"生成失败，数据为空"),
+    EXCEPTION_CREATE_TABLE_NULL(50140,"生成失败，暂无表数据"),
+    EXCEPTION_CREATE_FIELD_NULL(50121,"生成失败，暂无表字段"),
+
+
     ;
 
     private int code;

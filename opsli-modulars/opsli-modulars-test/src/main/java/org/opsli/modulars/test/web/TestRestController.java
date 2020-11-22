@@ -39,7 +39,7 @@ public class TestRestController extends BaseRestController<TestEntity, TestModel
      * @return ResultVo
      */
     @ApiOperation(value = "获得单条测试", notes = "获得单条测试 - ID")
-    @RequiresPermissions("modules_test_select")
+    @RequiresPermissions("gentest_test_select")
     @Override
     public ResultVo<TestModel> get(TestModel model) {
         // 如果系统内部调用 则直接查数据库
@@ -57,6 +57,7 @@ public class TestRestController extends BaseRestController<TestEntity, TestModel
      * @return ResultVo
      */
     @ApiOperation(value = "获得分页数据", notes = "获得分页数据 - 查询构造器")
+    @RequiresPermissions("gentest_test_select")
     @Override
     public ResultVo<?> findPage(Integer pageNo, Integer pageSize, HttpServletRequest request) {
 
@@ -74,7 +75,7 @@ public class TestRestController extends BaseRestController<TestEntity, TestModel
      * @return ResultVo
      */
     @ApiOperation(value = "新增测试", notes = "新增测试")
-    @RequiresPermissions("modules_test_insert")
+    @RequiresPermissions("gentest_test_insert")
     @EnableLog
     @Override
     public ResultVo<?> insert(TestModel model) {
@@ -89,7 +90,7 @@ public class TestRestController extends BaseRestController<TestEntity, TestModel
      * @return ResultVo
      */
     @ApiOperation(value = "修改测试", notes = "修改测试")
-    @RequiresPermissions("modules_test_update")
+    @RequiresPermissions("gentest_test_update")
     @EnableLog
     @Override
     public ResultVo<?> update(TestModel model) {
@@ -105,7 +106,7 @@ public class TestRestController extends BaseRestController<TestEntity, TestModel
      * @return ResultVo
      */
     @ApiOperation(value = "删除测试数据", notes = "删除测试数据")
-    @RequiresPermissions("modules_test_delete")
+    @RequiresPermissions("gentest_test_delete")
     @EnableLog
     @Override
     public ResultVo<?> del(String id){
@@ -120,7 +121,7 @@ public class TestRestController extends BaseRestController<TestEntity, TestModel
      * @return ResultVo
      */
     @ApiOperation(value = "批量删除测试数据", notes = "批量删除测试数据")
-    @RequiresPermissions("modules_test_delete")
+    @RequiresPermissions("gentest_test_delete")
     @EnableLog
     @Override
     public ResultVo<?> delAll(String[] ids){
@@ -136,7 +137,7 @@ public class TestRestController extends BaseRestController<TestEntity, TestModel
      * @return ResultVo
      */
     @ApiOperation(value = "导出Excel", notes = "导出Excel")
-    @RequiresPermissions("modules_test_export")
+    @RequiresPermissions("gentest_test_export")
     @EnableLog
     @Override
     public ResultVo<?> exportExcel(HttpServletRequest request, HttpServletResponse response) {
@@ -150,7 +151,7 @@ public class TestRestController extends BaseRestController<TestEntity, TestModel
      * @return ResultVo
      */
     @ApiOperation(value = "导入Excel", notes = "导入Excel")
-    @RequiresPermissions("modules_test_import")
+    @RequiresPermissions("gentest_test_import")
     @EnableLog
     @Override
     public ResultVo<?> excelImport(MultipartHttpServletRequest request) {
@@ -163,7 +164,7 @@ public class TestRestController extends BaseRestController<TestEntity, TestModel
      * @return ResultVo
      */
     @ApiOperation(value = "导出Excel模版", notes = "导出Excel模版")
-    @RequiresPermissions("modules_test_import")
+    @RequiresPermissions("gentest_test_import")
     @Override
     public ResultVo<?> importTemplate(HttpServletResponse response) {
         return super.importTemplate(RoleApi.TITLE, response);

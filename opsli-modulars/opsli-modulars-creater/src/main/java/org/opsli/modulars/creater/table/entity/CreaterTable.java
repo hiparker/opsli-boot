@@ -40,7 +40,7 @@ public class CreaterTable extends BaseEntity {
     private String oldTableName;
 
     /** 表类型 */
-    private Character tableType;
+    private String tableType;
 
     /** 数据库类型 */
     private String jdbcType;
@@ -50,7 +50,7 @@ public class CreaterTable extends BaseEntity {
     private String comments;
 
     /** 同步 */
-    private Character izSync;
+    private String izSync;
 
     /** 备注 */
     @TableField(updateStrategy = FieldStrategy.IGNORED)

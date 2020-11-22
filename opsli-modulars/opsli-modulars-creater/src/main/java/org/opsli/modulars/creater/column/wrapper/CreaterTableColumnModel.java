@@ -15,7 +15,6 @@
  */
 package org.opsli.modulars.creater.column.wrapper;
 
-import com.alibaba.excel.annotation.ExcelIgnore;
 import com.alibaba.excel.annotation.ExcelProperty;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -90,7 +89,7 @@ public class CreaterTableColumnModel extends ApiWrapper {
     @ExcelInfo(dictType = "no_yes")
     // 验证器
     @ValidationArgsLenMax(1)
-    private Character izPk;
+    private String izPk;
 
     /** 是否可为空 */
     @ApiModelProperty(value = "是否可为空")
@@ -98,7 +97,7 @@ public class CreaterTableColumnModel extends ApiWrapper {
     @ExcelInfo(dictType = "no_yes")
     // 验证器
     @ValidationArgsLenMax(1)
-    private Character izNull;
+    private String izNotNull;
 
     /** 是否列表显示 */
     @ApiModelProperty(value = "是否列表显示")
@@ -106,7 +105,7 @@ public class CreaterTableColumnModel extends ApiWrapper {
     @ExcelInfo(dictType = "no_yes")
     // 验证器
     @ValidationArgsLenMax(1)
-    private Character izShowList;
+    private String izShowList;
 
     /** 是否表单显示 */
     @ApiModelProperty(value = "是否表单显示")
@@ -114,7 +113,7 @@ public class CreaterTableColumnModel extends ApiWrapper {
     @ExcelInfo(dictType = "no_yes")
     // 验证器
     @ValidationArgsLenMax(1)
-    private Character izShowForm;
+    private String izShowForm;
 
     /** Java字段类型 */
     @ApiModelProperty(value = "Java字段类型")
@@ -131,7 +130,7 @@ public class CreaterTableColumnModel extends ApiWrapper {
     @ExcelInfo(dictType = "show_type")
     // 验证器
     @ValidationArgsLenMax(1)
-    private Character showType;
+    private String showType;
 
     /** 字典类型编号 */
     @ApiModelProperty(value = "字典类型编号")
@@ -159,5 +158,14 @@ public class CreaterTableColumnModel extends ApiWrapper {
     @ValidationArgs({ValiArgsType.IS_GENERAL})
     @ValidationArgsLenMax(500)
     private String validateType;
+
+    /** 检索类别 */
+    @ApiModelProperty(value = "检索类别")
+    @ExcelProperty(value = "检索类别", order = 16)
+    @ExcelInfo
+    // 验证器
+    @ValidationArgs({ValiArgsType.IS_GENERAL})
+    @ValidationArgsLenMax(100)
+    private String queryType;
 
 }
