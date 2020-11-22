@@ -80,13 +80,6 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
     @Override
     public ResultVo<UserInfo> getInfo(HttpServletRequest request) {
         UserModel user = UserUtil.getUser();
-
-        // 保存用户最后登录IP
-        String clientIpAddress = IPUtil.getClientIpAddress(request);
-        user.setLoginIp(clientIpAddress);
-        IService.updateLoginIp(user);
-        UserUtil.refreshUser(user);
-
         return this.getInfoById(user.getId());
     }
 

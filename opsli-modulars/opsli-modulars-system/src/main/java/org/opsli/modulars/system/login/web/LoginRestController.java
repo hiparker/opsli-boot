@@ -20,6 +20,7 @@ import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.service.IService;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -29,6 +30,7 @@ import org.opsli.api.wrapper.system.user.UserModel;
 import org.opsli.common.api.TokenThreadLocal;
 import org.opsli.common.exception.ServiceException;
 import org.opsli.common.exception.TokenException;
+import org.opsli.common.utils.IPUtil;
 import org.opsli.core.msg.TokenMsg;
 import org.opsli.core.persistence.querybuilder.GenQueryBuilder;
 import org.opsli.core.persistence.querybuilder.QueryBuilder;
@@ -39,6 +41,7 @@ import org.opsli.modulars.system.SystemMsg;
 import org.opsli.modulars.system.login.entity.LoginForm;
 import org.opsli.modulars.system.tenant.entity.SysTenant;
 import org.opsli.modulars.system.tenant.service.ITenantService;
+import org.opsli.modulars.system.user.service.IUserService;
 import org.opsli.plugins.redis.RedisPlugin;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -49,11 +52,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.imageio.ImageIO;
 import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 登陆 / 登出 / 验证码
@@ -84,6 +89,8 @@ public class LoginRestController {
     private RedisPlugin redisPlugin;
     @Autowired
     private ITenantService iTenantService;
+    @Autowired
+    private IUserService iUserService;
 
 
     /**
@@ -91,7 +98,7 @@ public class LoginRestController {
      */
     @ApiOperation(value = "登录", notes = "登录")
     @PostMapping("/sys/login")
-    public ResultVo<?> login(@RequestBody LoginForm form){
+    public ResultVo<?> login(@RequestBody LoginForm form, HttpServletRequest request){
         boolean captcha = CaptchaUtil.validate(form.getUuid(), form.getCaptcha());
         // 验证码不正确
         if(!captcha){
@@ -171,7 +178,23 @@ public class LoginRestController {
         CaptchaUtil.delCaptcha(form.getUuid());
 
         //生成token，并保存到Redis
-        return UserTokenUtil.createToken(user);
+        ResultVo<Map<String, Object>> resultVo = UserTokenUtil.createToken(user);
+        if(resultVo.isSuccess()){
+            try {
+                // 临时设置 token缓存
+                TokenThreadLocal.put(String.valueOf(resultVo.getData().get("token")));
+                // 保存用户最后登录IP
+                String clientIpAddress = IPUtil.getClientIpAddress(request);
+                user.setLoginIp(clientIpAddress);
+                iUserService.updateLoginIp(user);
+            }catch (Exception ignored){}
+            finally {
+                // 清空 token缓存
+                TokenThreadLocal.remove();
+            }
+        }
+
+        return resultVo;
     }
 
 
