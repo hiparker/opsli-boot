@@ -121,7 +121,7 @@ public class TableRestController extends BaseRestController<CreaterTable, Create
     @Override
     public ResultVo<?> insert(CreaterTableAndColumnModel model) {
         // 演示模式 不允许操作
-        super.demoError();
+        //super.demoError();
 
         // 调用新增方法
         IService.insertAny(model);
@@ -140,7 +140,7 @@ public class TableRestController extends BaseRestController<CreaterTable, Create
     @Override
     public ResultVo<?> update(CreaterTableAndColumnModel model) {
         // 演示模式 不允许操作
-        super.demoError();
+        //super.demoError();
 
         // 调用修改方法
         IService.updateAny(model);
@@ -160,7 +160,8 @@ public class TableRestController extends BaseRestController<CreaterTable, Create
     @Override
     public ResultVo<?> del(String id){
         // 演示模式 不允许操作
-        super.demoError();
+        //super.demoError();
+
         try {
             IService.removeByIdAny(id);
         } catch (ServiceException e){
@@ -183,7 +184,7 @@ public class TableRestController extends BaseRestController<CreaterTable, Create
     @Override
     public ResultVo<?> delAll(String[] ids){
         // 演示模式 不允许操作
-        super.demoError();
+        //super.demoError();
 
         try {
             IService.removeByIdsAny(ids);
