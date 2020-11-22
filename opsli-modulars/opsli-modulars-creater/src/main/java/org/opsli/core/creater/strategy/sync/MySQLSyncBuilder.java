@@ -49,7 +49,8 @@ public class MySQLSyncBuilder implements SyncStrategy {
     private static final String ENGINE = "InnoDB";
     /** 字符格式 */
     private static final String CHARSET = "utf8mb4";
-
+    /** 默认排序规则 */
+    private static final String COLLATE = "utf8mb4_general_ci";
     /** 排除表 */
     private static final List<String> EXCLUDE_TABLES;
 
@@ -180,6 +181,7 @@ public class MySQLSyncBuilder implements SyncStrategy {
         str.append(" ENGINE=").append(ENGINE);
         str.append(" DEFAULT");
         str.append(" CHARSET=").append(CHARSET);
+        str.append(" COLLATE=").append(COLLATE);
         str.append(" COMMENT='").append(SQLFilterKit.replaceSQL(model.getComments()))
                 .append("'");
         str.append(";");
