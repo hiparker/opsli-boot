@@ -7,6 +7,7 @@ opsli:
   exclude-tables:
     - creater_table
     - creater_table_column
+    - creater_logs
     - sys_dict
     - sys_dict_detail
     - sys_logs
