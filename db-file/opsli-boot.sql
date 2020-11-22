@@ -1853,7 +1853,7 @@ CREATE TABLE `test_3` (
   `birth` date NOT NULL COMMENT '生日',
   `iz_usable` char(1) NOT NULL COMMENT '是否启用',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='测试';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='测试';
 
 -- ----------------------------
 -- Table structure for test_3_copy1
@@ -1867,7 +1867,7 @@ CREATE TABLE `test_3_copy1` (
   `money` double(10,2) NOT NULL COMMENT '金钱',
   `iz_usable` char(1) NOT NULL COMMENT '是否启用',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='测试';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='测试';
 
 -- ----------------------------
 -- Table structure for test_3_copy3
@@ -1881,7 +1881,7 @@ CREATE TABLE `test_3_copy3` (
   `birth` date NOT NULL COMMENT '生日',
   `iz_usable` char(1) NOT NULL COMMENT '是否启用',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='测试';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='测试';
 
 -- ----------------------------
 -- Table structure for test_3_copy4
@@ -1895,7 +1895,7 @@ CREATE TABLE `test_3_copy4` (
   `birth` date NOT NULL COMMENT '生日',
   `iz_usable` char(1) NOT NULL COMMENT '是否启用',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='测试';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='测试';
 
 -- ----------------------------
 -- Table structure for test_3_copy5
@@ -1909,7 +1909,7 @@ CREATE TABLE `test_3_copy5` (
   `birth` date NOT NULL COMMENT '生日',
   `iz_usable` char(1) NOT NULL COMMENT '是否启用',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='测试';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='测试';
 
 -- ----------------------------
 -- Table structure for test_entity
@@ -11953,7 +11953,7 @@ CREATE TABLE `test_user` (
   `update_by` bigint(19) NOT NULL COMMENT '修改用户',
   `update_time` datetime NOT NULL COMMENT '修改日期',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='某系统用户';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='某系统用户';
 
 -- ----------------------------
 -- Records of test_user
