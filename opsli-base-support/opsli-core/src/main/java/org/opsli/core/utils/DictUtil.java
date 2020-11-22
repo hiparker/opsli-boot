@@ -106,6 +106,14 @@ public class DictUtil {
                 return defaultVal;
             }
 
+            // 如果获得锁 则 再次检查缓存里有没有， 如果有则直接退出， 没有的话才发起数据库请求
+            cacheModel = CacheUtil.getHash(DictConstants.CACHE_PREFIX_VALUE + typeCode,
+                    dictValue, DictDetailModel.class);
+            if (cacheModel != null){
+                dictName = cacheModel.getDictName();
+            }
+            if (StringUtils.isNotEmpty(dictName)) return dictName;
+
             // 查询数据库 并保存到缓存内
             ResultVo<List<DictDetailModel>> resultVo = dictDetailApi.findListByTypeCode(typeCode);
             if(resultVo.isSuccess()){
@@ -182,6 +190,14 @@ public class DictUtil {
                 return defaultVal;
             }
 
+            // 如果获得锁 则 再次检查缓存里有没有， 如果有则直接退出， 没有的话才发起数据库请求
+            cacheModel = CacheUtil.getHash(DictConstants.CACHE_PREFIX_NAME + typeCode,
+                    dictName, DictDetailModel.class);
+            if (cacheModel != null){
+                dictValue = cacheModel.getDictValue();
+            }
+            if (StringUtils.isNotEmpty(dictValue)) return dictValue;
+
             // 查询数据库 并保存到缓存内
             ResultVo<List<DictDetailModel>> resultVo = dictDetailApi.findListByTypeCode(typeCode);
             if(resultVo.isSuccess()){
@@ -250,62 +266,89 @@ public class DictUtil {
                 dictWrapperModel.setDictValue(model.getDictValue());
                 dictWrapperModels.add(dictWrapperModel);
             }
-
-            if(dictWrapperModels.isEmpty()){
-                // 防止缓存穿透判断
-                boolean hasNilFlag = CacheUtil.hasNilFlag(DictConstants.CACHE_PREFIX_LIST + typeCode);
-                if(hasNilFlag){
-                    return dictWrapperModels;
-                }
-
-                // 锁凭证 redisLock 贯穿全程
-                RedisLock redisLock = new RedisLock();
-                redisLock.setLockName(DictConstants.CACHE_PREFIX_LIST + typeCode)
-                        .setAcquireTimeOut(3000L)
-                        .setLockTimeOut(10000L);
-
-                try {
-                    // 这里增加分布式锁 防止缓存击穿
-                    // ============ 尝试加锁
-                    redisLock = redisLockPlugins.tryLock(redisLock);
-                    if(redisLock == null){
-                        return dictWrapperModels;
-                    }
-
-                    // 查询数据库 并保存到缓存内
-                    ResultVo<List<DictDetailModel>> resultVo = dictDetailApi.findListByTypeCode(typeCode);
-                    if(resultVo.isSuccess()){
-                        List<DictDetailModel> dictDetailModels = resultVo.getData();
-                        for (DictDetailModel model : dictDetailModels) {
-                            DictWrapper dictWrapperModel = new DictWrapper();
-                            dictWrapperModel.setTypeCode(model.getTypeCode());
-                            dictWrapperModel.setDictName(model.getDictName());
-                            dictWrapperModel.setDictValue(model.getDictValue());
-                            dictWrapperModel.setModel(model);
-                            dictWrapperModels.add(dictWrapperModel);
-                            // 保存至缓存
-                            DictUtil.put(dictWrapperModel);
-                        }
-                    }
-
-                }catch (Exception e){
-                    log.error(e.getMessage(),e);
-                    return dictWrapperModels;
-                }finally {
-                    // ============ 释放锁
-                    redisLockPlugins.unLock(redisLock);
-                    redisLock = null;
-                }
-
-
-                // 如果值还是 为空 则赋默认值
-                if(dictWrapperModels.isEmpty()){
-                    // 加入缓存防穿透
-                    // 设置空变量 用于防止穿透判断
-                    CacheUtil.putNilFlag(DictConstants.CACHE_PREFIX_LIST + typeCode );
-                }
-
+            if(!dictWrapperModels.isEmpty()){
+                return dictWrapperModels;
             }
+
+            // 防止缓存穿透判断
+            boolean hasNilFlag = CacheUtil.hasNilFlag(DictConstants.CACHE_PREFIX_LIST + typeCode);
+            if(hasNilFlag){
+                return dictWrapperModels;
+            }
+
+            // 锁凭证 redisLock 贯穿全程
+            RedisLock redisLock = new RedisLock();
+            redisLock.setLockName(DictConstants.CACHE_PREFIX_LIST + typeCode)
+                    .setAcquireTimeOut(3000L)
+                    .setLockTimeOut(10000L);
+
+            try {
+                // 这里增加分布式锁 防止缓存击穿
+                // ============ 尝试加锁
+                redisLock = redisLockPlugins.tryLock(redisLock);
+                if(redisLock == null){
+                    return dictWrapperModels;
+                }
+
+                // 如果获得锁 则 再次检查缓存里有没有， 如果有则直接退出， 没有的话才发起数据库请求
+                key = CacheUtil.handleKey(CacheConstants.EDEN_HASH_DATA, DictConstants.CACHE_PREFIX_VALUE + typeCode);
+                dictMap = redisPlugin.hGetAll(key);
+                entries = dictMap.entrySet();
+                for (Map.Entry<Object, Object> entry : entries) {
+                    // 赋值
+                    JSONObject jsonObject = (JSONObject) entry.getValue();
+                    if(jsonObject == null){
+                        continue;
+                    }
+                    JSONObject dataJson = jsonObject.getJSONObject(CacheUtil.JSON_KEY);
+                    if(dataJson == null){
+                        continue;
+                    }
+                    DictDetailModel model = dataJson.toJavaObject(DictDetailModel.class);
+                    DictWrapper dictWrapperModel = new DictWrapper();
+                    dictWrapperModel.setTypeCode(typeCode);
+                    dictWrapperModel.setDictName(model.getDictName());
+                    dictWrapperModel.setDictValue(model.getDictValue());
+                    dictWrapperModels.add(dictWrapperModel);
+                }
+                if(!dictWrapperModels.isEmpty()){
+                    return dictWrapperModels;
+                }
+
+
+                // 查询数据库 并保存到缓存内
+                ResultVo<List<DictDetailModel>> resultVo = dictDetailApi.findListByTypeCode(typeCode);
+                if(resultVo.isSuccess()){
+                    List<DictDetailModel> dictDetailModels = resultVo.getData();
+                    for (DictDetailModel model : dictDetailModels) {
+                        DictWrapper dictWrapperModel = new DictWrapper();
+                        dictWrapperModel.setTypeCode(model.getTypeCode());
+                        dictWrapperModel.setDictName(model.getDictName());
+                        dictWrapperModel.setDictValue(model.getDictValue());
+                        dictWrapperModel.setModel(model);
+                        dictWrapperModels.add(dictWrapperModel);
+                        // 保存至缓存
+                        DictUtil.put(dictWrapperModel);
+                    }
+                }
+
+            }catch (Exception e){
+                log.error(e.getMessage(),e);
+                return dictWrapperModels;
+            }finally {
+                // ============ 释放锁
+                redisLockPlugins.unLock(redisLock);
+                redisLock = null;
+            }
+
+
+            // 如果值还是 为空 则赋默认值
+            if(dictWrapperModels.isEmpty()){
+                // 加入缓存防穿透
+                // 设置空变量 用于防止穿透判断
+                CacheUtil.putNilFlag(DictConstants.CACHE_PREFIX_LIST + typeCode );
+            }
+
         }catch (Exception e){
             log.error(e.getMessage(),e);
             dictWrapperModels = Lists.newArrayList();

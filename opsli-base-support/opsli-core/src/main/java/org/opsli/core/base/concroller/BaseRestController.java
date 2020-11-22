@@ -131,6 +131,14 @@ public abstract class BaseRestController <T extends BaseEntity, E extends ApiWra
                         if(redisLock == null){
                             throw new ServiceException(CoreMsg.CACHE_PUNCTURE_EXCEPTION);
                         }
+
+                        // 如果获得锁 则 再次检查缓存里有没有， 如果有则直接退出， 没有的话才发起数据库请求
+                        model = WrapperUtil.transformInstance(
+                                CacheUtil.get(id, entityClazz),modelClazz);
+                        if(model != null){
+                            return model;
+                        }
+
                         // 如果缓存没读到 则去数据库读
                         model = WrapperUtil.transformInstance(IService.get(id),modelClazz);
                     }catch (Exception e){

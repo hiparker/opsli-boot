@@ -95,6 +95,12 @@ public class MenuUtil {
                 return null;
             }
 
+            // 如果获得锁 则 再次检查缓存里有没有， 如果有则直接退出， 没有的话才发起数据库请求
+            menuModel = CacheUtil.get(PREFIX_CODE + menuCode, MenuModel.class);
+            if (menuModel != null){
+                return menuModel;
+            }
+
             // 查询数据库
             ResultVo<MenuModel> resultVo = menuApi.getByCode(menuCode);
             if(resultVo.isSuccess()){

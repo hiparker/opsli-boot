@@ -139,6 +139,12 @@ public class UserUtil {
                 return null;
             }
 
+            // 如果获得锁 则 再次检查缓存里有没有， 如果有则直接退出， 没有的话才发起数据库请求
+            userModel = CacheUtil.get(PREFIX_ID + userId, UserModel.class);
+            if (userModel != null){
+                return userModel;
+            }
+
             // 查询数据库
             UserModel userModelTemp = new UserModel();
             userModelTemp.setId(userId);
@@ -199,6 +205,12 @@ public class UserUtil {
             redisLock = redisLockPlugins.tryLock(redisLock);
             if(redisLock == null){
                 return null;
+            }
+
+            // 如果获得锁 则 再次检查缓存里有没有， 如果有则直接退出， 没有的话才发起数据库请求
+            userModel = CacheUtil.get(PREFIX_USERNAME + userName, UserModel.class);
+            if (userModel != null){
+                return userModel;
             }
 
             // 查询数据库
@@ -272,6 +284,22 @@ public class UserUtil {
                 return null;
             }
 
+            // 如果获得锁 则 再次检查缓存里有没有， 如果有则直接退出， 没有的话才发起数据库请求
+            try {
+                Object obj = CacheUtil.get(PREFIX_ID_ROLES + userId);
+                if(obj instanceof List){
+                    List<String> list = (List<String>) obj;
+                    if (!list.isEmpty()) {
+                        return list;
+                    }
+                }else {
+                    JSONArray jsonArray = (JSONArray) obj;
+                    if (jsonArray != null && !jsonArray.isEmpty()) {
+                        return jsonArray.toJavaList(String.class);
+                    }
+                }
+            }catch (Exception ignored){}
+
             // 查询数据库
             ResultVo<List<String>> resultVo = userApi.getRolesByUserId(userId);
             if(resultVo.isSuccess()){
@@ -344,6 +372,22 @@ public class UserUtil {
             if(redisLock == null){
                 return null;
             }
+
+            // 如果获得锁 则 再次检查缓存里有没有， 如果有则直接退出， 没有的话才发起数据库请求
+            try {
+                Object obj = CacheUtil.get(PREFIX_ID_PERMISSIONS + userId);
+                if(obj instanceof List){
+                    List<String> list = (List<String>) obj;
+                    if (!list.isEmpty()) {
+                        return list;
+                    }
+                }else {
+                    JSONArray jsonArray = (JSONArray) obj;
+                    if (jsonArray != null && !jsonArray.isEmpty()) {
+                        return jsonArray.toJavaList(String.class);
+                    }
+                }
+            }catch (Exception ignored){}
 
             // 查询数据库
             ResultVo<List<String>> resultVo = userApi.getAllPerms(userId);
@@ -426,6 +470,32 @@ public class UserUtil {
             if(redisLock == null){
                 return null;
             }
+
+            // 如果获得锁 则 再次检查缓存里有没有， 如果有则直接退出， 没有的话才发起数据库请求
+            try {
+                Object obj = CacheUtil.get(PREFIX_ID_MENUS + userId);
+                if(obj instanceof List){
+                    List<Object> list = (List<Object>) obj;
+                    if (!list.isEmpty()) {
+                        List<MenuModel> menuModels = Lists.newArrayListWithCapacity(list.size());
+                        for (Object menuObj : list) {
+                            if(menuObj instanceof MenuModel){
+                                menuModels.add((MenuModel) menuObj);
+                            }else if(menuObj instanceof JSONObject){
+                                JSONObject jsonObject = (JSONObject) menuObj;
+                                MenuModel t = JSONObject.toJavaObject(jsonObject, MenuModel.class);
+                                menuModels.add(t);
+                            }
+                        }
+                        return menuModels;
+                    }
+                }else {
+                    JSONArray jsonArray = (JSONArray) obj;
+                    if (jsonArray != null && !jsonArray.isEmpty()) {
+                        return jsonArray.toJavaList(MenuModel.class);
+                    }
+                }
+            }catch (Exception ignored){}
 
             // 查询数据库
             ResultVo<List<MenuModel>> resultVo = userApi.getMenuListByUserId(userId);
