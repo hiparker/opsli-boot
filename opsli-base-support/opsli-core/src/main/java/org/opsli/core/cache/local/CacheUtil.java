@@ -1053,7 +1053,7 @@ public class CacheUtil {
      */
     public static boolean hasNilFlag(String key) {
         try {
-            // 存入Redis
+            // 判断Redis 是否 包含当前Nil值
             Object o = redisPlugin.get(NIL_FLAG_PREFIX + key);
             if(o != null){
                 return true;
