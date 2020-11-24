@@ -28,9 +28,10 @@ public enum EhCacheMsg implements BaseMsg {
 
     /** 缓存未开启 */
     EXCEPTION_ENABLE(90001,"本地缓存未开启！"),
-    EXCEPTION_PUT(90001,"添加缓存失败"),
-    EXCEPTION_GET(90001,"获取缓存数据失败"),
-    EXCEPTION_DEL(90001,"删除缓存数据失败"),
+    EXCEPTION_PUT(90002,"添加缓存失败"),
+    EXCEPTION_GET(90003,"获取缓存数据失败"),
+    EXCEPTION_GET_JAVA(90004,"获取缓存数据失败, 转化Java类型失败, 失败类型[{}]"),
+    EXCEPTION_DEL(90005,"删除缓存数据失败"),
 
 
     ;

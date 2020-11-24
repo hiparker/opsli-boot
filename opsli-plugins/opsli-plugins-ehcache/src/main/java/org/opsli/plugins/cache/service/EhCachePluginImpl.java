@@ -15,13 +15,13 @@
  */
 package org.opsli.plugins.cache.service;
 
-import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
+import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
-import org.opsli.common.utils.WrapperUtil;
-import org.opsli.plugins.cache.msg.EhCacheMsg;
-import org.springframework.cache.Cache;
 import org.opsli.plugins.cache.EhCachePlugin;
+import org.opsli.plugins.cache.msg.EhCacheMsg;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Service;
 
@@ -37,6 +37,9 @@ import org.springframework.stereotype.Service;
 @Service
 public class EhCachePluginImpl implements EhCachePlugin {
 
+    /** Ehcache Json Key */
+    private static final String EHCACHE_JSON_KEY = "ehcache_tmp_json";
+
     @Autowired(required = false)
     CacheManager cacheManager;
 
@@ -49,30 +52,17 @@ public class EhCachePluginImpl implements EhCachePlugin {
         try {
             Cache cache = cacheManager.getCache(cacheName);
             if(cache != null){
-                cache.put(key,value);
+                // 强制转化为 String 字符串 ， 用来解决EhCache jvm共用对象问题
+                // 则统一转换为 JSONObject
+                JSONObject jsonObject = new JSONObject();
+                jsonObject.put(EHCACHE_JSON_KEY, value);
+                cache.put(key,jsonObject.toJSONString());
                 ret = true;
             }
         } catch (Exception e) {
             log.error(EhCacheMsg.EXCEPTION_PUT.getMessage()+"：{}",e.getMessage());
         }
         return ret;
-    }
-
-    @Override
-    public Object get(String cacheName, String key) {
-        if(cacheManager == null){
-            return null;
-        }
-        try {
-            Cache cache = cacheManager.getCache(cacheName);
-            if(cache != null){
-                // 深克隆数据 防止 ehcache在jvm数据串行
-                return ObjectUtil.cloneByStream(cache.get(key));
-            }
-        } catch (Exception e) {
-            log.error(EhCacheMsg.EXCEPTION_GET.getMessage()+"：{}",e.getMessage());
-        }
-        return null;
     }
 
     @Override
@@ -83,9 +73,21 @@ public class EhCachePluginImpl implements EhCachePlugin {
         try {
             Cache cache = cacheManager.getCache(cacheName);
             if(cache != null){
-                // 深克隆数据 防止 ehcache在jvm数据串行
-                Object obj = ObjectUtil.cloneByStream(cache.get(key,vClass));
-                return WrapperUtil.transformInstance(obj, vClass);
+                V v = null;
+                String jsonStr = cache.get(key, String.class);
+                JSONObject jsonObject = JSONObject.parseObject(jsonStr);
+                if(jsonObject != null){
+                    JSONObject dataJson = jsonObject.getJSONObject(EHCACHE_JSON_KEY);
+                    if(dataJson != null){
+                        try {
+                            v = dataJson.toJavaObject(vClass);
+                        }catch (Exception e){
+                            String message = EhCacheMsg.EXCEPTION_GET_JAVA.getMessage();
+                            log.error(StrUtil.format(message, vClass.getName())+"：{}", e.getMessage());
+                        }
+                    }
+                }
+                return v;
             }
         } catch (Exception e) {
             log.error(EhCacheMsg.EXCEPTION_GET.getMessage()+"：{}", e.getMessage());

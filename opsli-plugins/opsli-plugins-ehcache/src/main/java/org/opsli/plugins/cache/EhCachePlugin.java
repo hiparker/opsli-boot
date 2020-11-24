@@ -39,14 +39,6 @@ public interface EhCachePlugin {
      * @param key
      * @return
      */
-    Object get(String cacheName, String key);
-
-    /**
-     * 获取缓存数据
-     * @param cacheName
-     * @param key
-     * @return
-     */
     <V> V get(String cacheName, String key ,Class<V> vClass);
 
 
