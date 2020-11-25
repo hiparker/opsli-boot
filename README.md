@@ -37,7 +37,7 @@
 | shiro-redis版本  | ^3.3.1  |      | jwt版本        | ^3.10.3        |
 | ehcache版本      | ^3.9.0  |      | easyexcel版本  | ^2.2.6         |
 | kaptcha版本      | ^0.0.9  |      | guava版本      | ^29.0-jre      |
-| comm...lang3版本 | ^3.11   |      | hutool版本     | ^5.4.2         |
+| enjoy版本        | ^4.9.03 |      | hutool版本     | ^5.4.2         |
 
 ## 在线演示
 
