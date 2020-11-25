@@ -24,7 +24,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * @author Parker
  * @date 2020-09-09
  */
-@SpringBootApplication()
+@SpringBootApplication
 public class OpsliApplication {
 
     public static void main(String[] args){
