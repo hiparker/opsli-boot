@@ -203,7 +203,7 @@ public class #(data.model.tableName)RestController extends BaseRestController<#(
     @Override
     public ResultVo<?> exportExcel(HttpServletRequest request, HttpServletResponse response) {
         QueryBuilder<#(data.model.tableName)> queryBuilder = new WebQueryBuilder<>(#(data.model.tableName).class, request.getParameterMap());
-        return super.excelExport(RoleApi.TITLE, queryBuilder.build(), response);
+        return super.excelExport(#(data.model.tableName)RestApi.TITLE, queryBuilder.build(), response);
     }
 
     /**
@@ -236,7 +236,7 @@ public class #(data.model.tableName)RestController extends BaseRestController<#(
     #end
     @Override
     public ResultVo<?> importTemplate(HttpServletResponse response) {
-        return super.importTemplate(RoleApi.TITLE, response);
+        return super.importTemplate(#(data.model.tableName)RestApi.TITLE, response);
     }
 
 }
