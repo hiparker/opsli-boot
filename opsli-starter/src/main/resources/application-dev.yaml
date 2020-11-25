@@ -36,13 +36,13 @@ spring:
           url: jdbc:mysql://127.0.0.1:3306/opsli-boot?characterEncoding=UTF-8&useUnicode=true&useSSL=false&tinyInt1isBit=false&serverTimezone=Asia/Shanghai
           username: root
           password: 12345678
-          driver-class-name: com.mysql.jdbc.Driver
+          driver-class-name: com.mysql.cj.jdbc.Driver
         # 多数据源配置
         #slave-datasource:
           #url: jdbc:mysql://127.0.0.1:3306/opsli-boot?characterEncoding=UTF-8&useUnicode=true&useSSL=false&tinyInt1isBit=false&serverTimezone=Asia/Shanghai
           #username: root
           #password: 12345678
-          #driver-class-name: com.mysql.jdbc.Driver
+          #driver-class-name: com.mysql.cj.jdbc.Driver
 
 
 # knife4j 文档 配置
