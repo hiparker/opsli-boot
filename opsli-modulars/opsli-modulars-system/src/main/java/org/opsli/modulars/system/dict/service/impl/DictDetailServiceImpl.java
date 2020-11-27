@@ -42,7 +42,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 
 /**
@@ -81,30 +83,23 @@ public class DictDetailServiceImpl extends CrudServiceImpl<DictDetailMapper, Sys
 
         DictDetailModel ret = super.insert(model);
         if(ret != null){
-            DictWrapper dictWrapperModel = new DictWrapper();
-            dictWrapperModel.setTypeCode(model.getTypeCode());
-            dictWrapperModel.setDictName(model.getDictName());
-            dictWrapperModel.setDictValue(model.getDictValue());
-            dictWrapperModel.setModel(ret);
-            // 先删老缓存
-            DictUtil.del(dictWrapperModel);
-            // 广播缓存数据 - 通知其他服务器同步数据
-            redisPlugin.sendMessage(
-                    DictMsgFactory.createMsg(dictWrapperModel, CacheType.DELETE)
-            );
-
-            // 先删老缓存
-            DictWrapper currDictWrapperModel = new DictWrapper();
-            currDictWrapperModel.setTypeCode(ret.getTypeCode());
-            currDictWrapperModel.setDictName(ret.getDictName());
-            currDictWrapperModel.setDictValue(ret.getDictValue());
-            currDictWrapperModel.setModel(ret);
-            // 增加缓存
-            DictUtil.put(currDictWrapperModel);
-            // 广播缓存数据 - 通知其他服务器同步数据
-            redisPlugin.sendMessage(
-                    DictMsgFactory.createMsg(currDictWrapperModel, CacheType.UPDATE)
-            );
+            List<DictDetailModel> listByTypeCode = this.findListByTypeCode(ret.getTypeCode());
+            if(listByTypeCode != null && listByTypeCode.size() > 0){
+                List<DictWrapper> dictWrapperList = Lists.newArrayListWithCapacity(listByTypeCode.size());
+                for (DictDetailModel dictDetailModel : listByTypeCode) {
+                    DictWrapper dictWrapperModel = new DictWrapper();
+                    dictWrapperModel.setTypeCode(dictDetailModel.getTypeCode());
+                    dictWrapperModel.setDictName(dictDetailModel.getDictName());
+                    dictWrapperModel.setDictValue(dictDetailModel.getDictValue());
+                    dictWrapperList.add(dictWrapperModel);
+                }
+                // 删除缓存
+                DictUtil.delAll(ret.getTypeCode());
+                // 广播缓存数据 - 通知其他服务器同步数据
+                redisPlugin.sendMessage(
+                        DictMsgFactory.createMsg(dictWrapperList, CacheType.DELETE)
+                );
+            }
         }
 
         return ret;
@@ -132,29 +127,23 @@ public class DictDetailServiceImpl extends CrudServiceImpl<DictDetailMapper, Sys
 
         DictDetailModel ret = super.update(model);
         if(ret != null){
-            // 先删老缓存
-            DictWrapper oldDictWrapperModel = new DictWrapper();
-            oldDictWrapperModel.setTypeCode(oldModel.getTypeCode());
-            oldDictWrapperModel.setDictName(oldModel.getDictName());
-            oldDictWrapperModel.setDictValue(oldModel.getDictValue());
-            DictUtil.del(oldDictWrapperModel);
-            // 广播缓存数据 - 通知其他服务器同步数据
-            redisPlugin.sendMessage(
-                    DictMsgFactory.createMsg(oldDictWrapperModel, CacheType.DELETE)
-            );
-
-            // 先删老缓存
-            DictWrapper currDictWrapperModel = new DictWrapper();
-            currDictWrapperModel.setTypeCode(ret.getTypeCode());
-            currDictWrapperModel.setDictName(ret.getDictName());
-            currDictWrapperModel.setDictValue(ret.getDictValue());
-            currDictWrapperModel.setModel(ret);
-            // 增加缓存
-            DictUtil.put(currDictWrapperModel);
-            // 广播缓存数据 - 通知其他服务器同步数据
-            redisPlugin.sendMessage(
-                    DictMsgFactory.createMsg(currDictWrapperModel, CacheType.UPDATE)
-            );
+            List<DictDetailModel> listByTypeCode = this.findListByTypeCode(oldModel.getTypeCode());
+            if(listByTypeCode != null && listByTypeCode.size() > 0){
+                List<DictWrapper> dictWrapperList = Lists.newArrayListWithCapacity(listByTypeCode.size());
+                for (DictDetailModel dictDetailModel : listByTypeCode) {
+                    DictWrapper dictWrapperModel = new DictWrapper();
+                    dictWrapperModel.setTypeCode(dictDetailModel.getTypeCode());
+                    dictWrapperModel.setDictName(dictDetailModel.getDictName());
+                    dictWrapperModel.setDictValue(dictDetailModel.getDictValue());
+                    dictWrapperList.add(dictWrapperModel);
+                }
+                // 删除缓存
+                DictUtil.delAll(oldModel.getTypeCode());
+                // 广播缓存数据 - 通知其他服务器同步数据
+                redisPlugin.sendMessage(
+                        DictMsgFactory.createMsg(dictWrapperList, CacheType.DELETE)
+                );
+            }
         }
 
         return ret;
@@ -168,19 +157,26 @@ public class DictDetailServiceImpl extends CrudServiceImpl<DictDetailMapper, Sys
      */
     @Override
     public boolean delete(String id) {
-        DictDetailModel dictDetailModel = this.get(id);
+        DictDetailModel dictModel = this.get(id);
         boolean ret = super.delete(id);
         if(ret){
-            DictWrapper dictWrapperModel = new DictWrapper();
-            dictWrapperModel.setTypeCode(dictDetailModel.getTypeCode());
-            dictWrapperModel.setDictName(dictDetailModel.getDictName());
-            dictWrapperModel.setDictValue(dictDetailModel.getDictValue());
-            // 删除缓存
-            DictUtil.del(dictWrapperModel);
-            // 广播缓存数据 - 通知其他服务器同步数据
-            redisPlugin.sendMessage(
-                    DictMsgFactory.createMsg(dictWrapperModel, CacheType.DELETE)
-            );
+            List<DictDetailModel> listByTypeCode = this.findListByTypeCode(dictModel.getTypeCode());
+            if(listByTypeCode != null && listByTypeCode.size() > 0){
+                List<DictWrapper> dictWrapperList = Lists.newArrayListWithCapacity(listByTypeCode.size());
+                for (DictDetailModel dictDetailModel : listByTypeCode) {
+                    DictWrapper dictWrapperModel = new DictWrapper();
+                    dictWrapperModel.setTypeCode(dictDetailModel.getTypeCode());
+                    dictWrapperModel.setDictName(dictDetailModel.getDictName());
+                    dictWrapperModel.setDictValue(dictDetailModel.getDictValue());
+                    dictWrapperList.add(dictWrapperModel);
+                }
+                // 删除缓存
+                DictUtil.delAll(dictModel.getTypeCode());
+                // 广播缓存数据 - 通知其他服务器同步数据
+                redisPlugin.sendMessage(
+                        DictMsgFactory.createMsg(dictWrapperList, CacheType.DELETE)
+                );
+            }
         }
         return ret;
     }
@@ -192,19 +188,26 @@ public class DictDetailServiceImpl extends CrudServiceImpl<DictDetailMapper, Sys
      */
     @Override
     public boolean delete(DictDetailModel model) {
-        DictDetailModel dictDetailModel = this.get(model);
+        DictDetailModel dictModel = this.get(model);
         boolean ret = super.delete(model);
         if(ret){
-            DictWrapper dictWrapperModel = new DictWrapper();
-            dictWrapperModel.setTypeCode(dictDetailModel.getTypeCode());
-            dictWrapperModel.setDictName(dictDetailModel.getDictName());
-            dictWrapperModel.setDictValue(dictDetailModel.getDictValue());
-            // 删除缓存
-            DictUtil.del(dictWrapperModel);
-            // 广播缓存数据 - 通知其他服务器同步数据
-            redisPlugin.sendMessage(
-                    DictMsgFactory.createMsg(dictWrapperModel, CacheType.DELETE)
-            );
+            List<DictDetailModel> listByTypeCode = this.findListByTypeCode(dictModel.getTypeCode());
+            if(listByTypeCode != null && listByTypeCode.size() > 0){
+                List<DictWrapper> dictWrapperList = Lists.newArrayListWithCapacity(listByTypeCode.size());
+                for (DictDetailModel dictDetailModel : listByTypeCode) {
+                    DictWrapper dictWrapperModel = new DictWrapper();
+                    dictWrapperModel.setTypeCode(dictDetailModel.getTypeCode());
+                    dictWrapperModel.setDictName(dictDetailModel.getDictName());
+                    dictWrapperModel.setDictValue(dictDetailModel.getDictValue());
+                    dictWrapperList.add(dictWrapperModel);
+                }
+                // 删除缓存
+                DictUtil.delAll(dictModel.getTypeCode());
+                // 广播缓存数据 - 通知其他服务器同步数据
+                redisPlugin.sendMessage(
+                        DictMsgFactory.createMsg(dictWrapperList, CacheType.DELETE)
+                );
+            }
         }
         return ret;
     }
@@ -226,16 +229,24 @@ public class DictDetailServiceImpl extends CrudServiceImpl<DictDetailMapper, Sys
         if(ret){
             if(list != null && list.size() > 0){
                 List<DictWrapper> dictWrapperModels = Lists.newArrayListWithCapacity(list.size());
-                // 删除缓存
+                Set<String> typeCodes = new HashSet<>();
+                // 封装数据
                 for (SysDictDetail sysDictDetail : list) {
                     DictWrapper dictWrapperModel = new DictWrapper();
                     dictWrapperModel.setTypeCode(sysDictDetail.getTypeCode());
                     dictWrapperModel.setDictName(sysDictDetail.getDictName());
                     dictWrapperModel.setDictValue(sysDictDetail.getDictValue());
-                    // 删除缓存
-                    DictUtil.del(dictWrapperModel);
+
                     dictWrapperModels.add(dictWrapperModel);
+
+                    typeCodes.add(dictWrapperModel.getTypeCode());
                 }
+
+                // 删除缓存
+                for (String typeCode : typeCodes) {
+                    DictUtil.delAll(typeCode);
+                }
+
                 // 广播缓存数据 - 通知其他服务器同步数据
                 redisPlugin.sendMessage(
                         DictMsgFactory.createMsg(dictWrapperModels, CacheType.DELETE)
@@ -270,16 +281,24 @@ public class DictDetailServiceImpl extends CrudServiceImpl<DictDetailMapper, Sys
         if(ret){
             if(list != null && list.size() > 0){
                 List<DictWrapper> dictWrapperModels = Lists.newArrayListWithCapacity(list.size());
-                // 删除缓存
+                Set<String> typeCodes = new HashSet<>();
+                // 封装数据
                 for (SysDictDetail sysDictDetail : list) {
                     DictWrapper dictWrapperModel = new DictWrapper();
                     dictWrapperModel.setTypeCode(sysDictDetail.getTypeCode());
                     dictWrapperModel.setDictName(sysDictDetail.getDictName());
                     dictWrapperModel.setDictValue(sysDictDetail.getDictValue());
-                    // 删除缓存
-                    DictUtil.del(dictWrapperModel);
+
                     dictWrapperModels.add(dictWrapperModel);
+
+                    typeCodes.add(dictWrapperModel.getTypeCode());
                 }
+
+                // 删除缓存
+                for (String typeCode : typeCodes) {
+                    DictUtil.delAll(typeCode);
+                }
+
                 // 广播缓存数据 - 通知其他服务器同步数据
                 redisPlugin.sendMessage(
                         DictMsgFactory.createMsg(dictWrapperModels, CacheType.DELETE)
