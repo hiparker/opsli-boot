@@ -73,8 +73,8 @@ public class TestUserModel extends ApiWrapper {
     @ExcelInfo
     // 验证器
     @ValidationArgs({ValiArgsType.IS_NOT_NULL, })
-    @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date birth;
 
     /** 是否启用 */

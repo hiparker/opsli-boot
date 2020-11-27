@@ -39,7 +39,7 @@
           </el-select>
         </el-form-item>
         </el-col>
-        ### 日期
+        ### 日期时间
         #else if(column.showType == "3")
         <el-col :span="12">
         <el-form-item label="#(column.fieldComments)" prop="#(column.fieldName)">
@@ -51,7 +51,20 @@
           ></el-date-picker>
         </el-form-item>
         </el-col>
+        ### 日期
+        #else if(column.showType == "4")
+        <el-col :span="12">
+          <el-form-item label="#(column.fieldComments)" prop="#(column.fieldName)">
+            <el-date-picker
+                    v-model="form.#(column.fieldName)"
+                    type="date"
+                    placeholder="选择#(column.fieldComments)日期"
+                    style="width: 100%"
+            ></el-date-picker>
+          </el-form-item>
+        </el-col>
         #end
+
       #end
       </el-row>
       #end

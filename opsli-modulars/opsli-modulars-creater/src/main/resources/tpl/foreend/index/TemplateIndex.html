@@ -22,7 +22,7 @@
               </el-select>
             </el-form-item>
             #else if(column.showType == "3")
-            ### 日期
+            ### 时间
             <el-form-item>
               <el-date-picker
                       v-model="#(column.fieldName)DatePicker"
@@ -33,6 +33,18 @@
                       end-placeholder="结束#(column.fieldComments)"
                       align="right">
               </el-date-picker>
+            </el-form-item>
+            #else if(column.showType == "4")
+            ### 日期
+            <el-form-item>
+              <el-date-picker
+                      v-model="#(column.fieldName)DatePicker"
+                      type="daterange"
+                      align="right"
+                      range-separator="至"
+                      start-placeholder="开始#(column.fieldComments)"
+                      end-placeholder="结束#(column.fieldComments)"
+              ></el-date-picker>
             </el-form-item>
             #else
             #if(column.queryType == "EQ" || column.queryType == "LIKE")
@@ -119,17 +131,29 @@
             </el-select>
           </el-form-item>
           #else if(column.showType == "3")
-          ### 日期
+          ### 时间
           <el-form-item>
             <el-date-picker
                     v-model="#(column.fieldName)DatePicker"
                     type="datetimerange"
                     :picker-options="pickerOptions"
                     range-separator="至"
-                    start-placeholder="开始日期"
-                    end-placeholder="结束日期"
+                    start-placeholder="开始#(column.fieldComments)"
+                    end-placeholder="结束#(column.fieldComments)"
                     align="right">
             </el-date-picker>
+          </el-form-item>
+          #else if(column.showType == "4")
+          ### 日期
+          <el-form-item>
+            <el-date-picker
+                    v-model="#(column.fieldName)DatePicker"
+                    type="daterange"
+                    align="right"
+                    range-separator="至"
+                    start-placeholder="开始#(column.fieldComments)"
+                    end-placeholder="结束#(column.fieldComments)"
+            ></el-date-picker>
           </el-form-item>
           #else
           #if(column.queryType == "EQ" || column.queryType == "LIKE")
@@ -299,7 +323,7 @@
           ### 字典
           #if(column.showType == "2")
           #(column.fieldName)_EQ: "",
-          #else if(column.showType == "3")
+          #else if(column.showType == "3" || column.showType == "4")
           ### 日期
           #(column.fieldName)_BEGIN: "",
           #(column.fieldName)_END: "",
@@ -317,7 +341,7 @@
           ### 字典
           #if(column.showType == "2")
           #(column.fieldName)_EQ: "",
-          #else if(column.showType == "3")
+          #else if(column.showType == "3" || column.showType == "4")
           ### 日期
           #(column.fieldName)_BEGIN: "",
           #(column.fieldName)_END: "",
@@ -334,14 +358,14 @@
         ### 代码生成器 简要2个
         #for(column : briefQueryList)
         ### 日期
-        #if(column.showType == "3")
+        #if(column.showType == "3" || column.showType == "4")
         #(column.fieldName)DatePicker: [],
         #end
         #end
         ### 代码生成器 更多
         #for(column : moreQueryList)
         ### 日期
-        #if(column.showType == "3")
+        #if(column.showType == "3" || column.showType == "4")
         #(column.fieldName)DatePicker: [],
         #end
         #end
@@ -433,7 +457,7 @@
         ### 代码生成器 简要2个
         #for(column : briefQueryList)
         ### 日期
-        #if(column.showType == "3")
+        #if(column.showType == "3" || column.showType == "4")
         if(isNotNull(this.#(column.fieldName)DatePicker) && this.#(column.fieldName)DatePicker.length === 2){
           this.queryForm.#(column.fieldName)_BEGIN =
                   this.#(column.fieldName)DatePicker.length === 0 ? "" : formateDate(this.#(column.fieldName)DatePicker[0], 'yyyy-MM-dd hh:mm:ss');
@@ -447,7 +471,7 @@
         ### 代码生成器 更多
         #for(column : moreQueryList)
         ### 日期
-        #if(column.showType == "3")
+        #if(column.showType == "3" || column.showType == "4")
         if(isNotNull(this.#(column.fieldName)DatePicker) && this.#(column.fieldName)DatePicker.length === 2){
           this.queryForm.#(column.fieldName)_BEGIN =
                   this.#(column.fieldName)DatePicker.length === 0 ? "" : formateDate(this.#(column.fieldName)DatePicker[0], 'yyyy-MM-dd hh:mm:ss');
