@@ -163,13 +163,6 @@ public class MenuRestController extends BaseRestController<SysMenu, MenuModel, I
                 StringUtils.isEmpty(menuModel.getUrl())
                         ));
 
-        // 处理系统根路径外链
-        for (MenuModel menuModel : menuList) {
-            if(StringUtils.isNotEmpty(menuModel.getUrl())){
-
-            }
-        }
-
         //配置
         TreeNodeConfig treeNodeConfig = new TreeNodeConfig();
         // 自定义属性名 都要默认值的
