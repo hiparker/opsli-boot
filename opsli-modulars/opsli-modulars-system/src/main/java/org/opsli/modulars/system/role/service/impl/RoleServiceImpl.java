@@ -16,11 +16,11 @@
 package org.opsli.modulars.system.role.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import org.apache.commons.lang3.StringUtils;
 import org.opsli.api.wrapper.system.role.RoleModel;
+import org.opsli.common.constants.MyBatisConstants;
 import org.opsli.common.exception.ServiceException;
 import org.opsli.core.base.service.impl.CrudServiceImpl;
-import org.opsli.core.persistence.querybuilder.GenQueryBuilder;
-import org.opsli.core.persistence.querybuilder.QueryBuilder;
 import org.opsli.core.persistence.querybuilder.chain.TenantHandler;
 import org.opsli.modulars.system.SystemMsg;
 import org.opsli.modulars.system.role.entity.SysRole;
@@ -51,11 +51,7 @@ public class RoleServiceImpl extends CrudServiceImpl<RoleMapper, SysRole, RoleMo
 
         SysRole entity = super.transformM2T(model);
         // 唯一验证
-        QueryBuilder<SysRole> queryBuilder = new GenQueryBuilder<>();
-        // 多租户处理
-        TenantHandler tenantHandler = new TenantHandler();
-        QueryWrapper<SysRole> qWrapper = tenantHandler.handler(entityClazz, queryBuilder.build());
-        Integer count = mapper.uniqueVerificationByCode(entity,qWrapper);
+        Integer count = this.uniqueVerificationByCode(entity);
         if(count != null && count > 0){
             // 重复
             throw new ServiceException(SystemMsg.EXCEPTION_ROLE_UNIQUE);
@@ -71,11 +67,7 @@ public class RoleServiceImpl extends CrudServiceImpl<RoleMapper, SysRole, RoleMo
 
         SysRole entity = super.transformM2T(model);
         // 唯一验证
-        QueryBuilder<SysRole> queryBuilder = new GenQueryBuilder<>();
-        // 多租户处理
-        TenantHandler tenantHandler = new TenantHandler();
-        QueryWrapper<SysRole> qWrapper = tenantHandler.handler(entityClazz, queryBuilder.build());
-        Integer count = mapper.uniqueVerificationByCode(entity,qWrapper);
+        Integer count = this.uniqueVerificationByCode(entity);
         if(count != null && count > 0){
             // 重复
             throw new ServiceException(SystemMsg.EXCEPTION_ROLE_UNIQUE);
@@ -84,6 +76,30 @@ public class RoleServiceImpl extends CrudServiceImpl<RoleMapper, SysRole, RoleMo
         return super.update(model);
     }
 
+
+    /**
+     * 唯一验证
+     * @param entity
+     * @return
+     */
+    @Transactional(readOnly = true)
+    public Integer uniqueVerificationByCode(SysRole entity){
+        QueryWrapper<SysRole> wrapper = new QueryWrapper<>();
+
+        // code 唯一
+        wrapper.eq("role_code", entity.getRoleCode())
+                .eq(MyBatisConstants.FIELD_DELETE_LOGIC, "0");
+
+        // 如果为修改 则跳过当前数据
+        if(StringUtils.isNotBlank(entity.getId())){
+            wrapper.notIn(MyBatisConstants.FIELD_ID, entity.getId());
+        }
+
+        // 租户检测
+        wrapper = new TenantHandler().handler(super.entityClazz, wrapper);
+
+        return mapper.uniqueVerificationByCode(wrapper);
+    }
 
 }
 

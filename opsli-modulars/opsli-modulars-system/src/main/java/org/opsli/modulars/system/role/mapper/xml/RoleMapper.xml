@@ -26,14 +26,9 @@
         select
             count(0)
         from
-        sys_role a
+            sys_role
         <where>
             ${ew.sqlSegment}
-            and a.role_code = #{entity.roleCode}
-            and a.deleted = 0
-            <if test="entity != null and entity.id != null and entity.id != ''">
-                and a.id != #{entity.id}
-            </if>
         </where>
     </select>
 

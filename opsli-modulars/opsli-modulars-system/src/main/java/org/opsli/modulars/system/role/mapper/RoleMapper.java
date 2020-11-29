@@ -34,10 +34,9 @@ public interface RoleMapper extends BaseMapper<SysRole> {
 
     /**
      * 唯一验证
-     * @param entity
      * @param wrapper
      * @return
      */
-    Integer uniqueVerificationByCode(@Param("entity") SysRole entity, @Param("ew") Wrapper<SysRole> wrapper);
+    Integer uniqueVerificationByCode(@Param("ew") Wrapper<SysRole> wrapper);
 
 }
