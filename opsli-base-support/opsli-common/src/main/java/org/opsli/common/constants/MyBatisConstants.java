@@ -38,6 +38,8 @@ public final class MyBatisConstants {
 
     /** ID */
     public static final String FIELD_ID = "id";
+    /** PID */
+    public static final String FIELD_PARENT_ID = "parentId";
     /** 创建人 */
     public static final String FIELD_CREATE_BY = "createBy";
     /** 更新时间 */

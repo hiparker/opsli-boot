@@ -21,6 +21,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.opsli.api.wrapper.system.menu.MenuModel;
 import org.opsli.common.constants.MyBatisConstants;
 import org.opsli.common.exception.ServiceException;
+import org.opsli.common.utils.HumpUtil;
 import org.opsli.common.utils.WrapperUtil;
 import org.opsli.core.base.service.impl.CrudServiceImpl;
 import org.opsli.core.persistence.querybuilder.GenQueryBuilder;
@@ -120,9 +121,14 @@ public class MenuServiceImpl extends CrudServiceImpl<MenuMapper, SysMenu, MenuMo
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public boolean delete(String id) {
         MenuModel menuModel = super.get(id);
         boolean ret = super.delete(id);
+        // 删除子数据
+        this.deleteByParentId(id);
+
+
         if(ret){
             // 清空编号缓存
             MenuUtil.refreshMenu(menuModel);
@@ -141,6 +147,7 @@ public class MenuServiceImpl extends CrudServiceImpl<MenuMapper, SysMenu, MenuMo
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public boolean deleteAll(String[] ids) {
         QueryBuilder<SysMenu> queryBuilder = new GenQueryBuilder<>();
         QueryWrapper<SysMenu> queryWrapper = queryBuilder.build();
@@ -148,6 +155,11 @@ public class MenuServiceImpl extends CrudServiceImpl<MenuMapper, SysMenu, MenuMo
         List<SysMenu> menuList = super.findList(queryWrapper);
 
         boolean ret = super.deleteAll(ids);
+        // 删除子数据
+        for (String id : ids) {
+            this.deleteByParentId(id);
+        }
+
         if(ret){
             // 清空编号缓存
             for (SysMenu sysMenu : menuList) {
@@ -168,6 +180,27 @@ public class MenuServiceImpl extends CrudServiceImpl<MenuMapper, SysMenu, MenuMo
                     }
                 }
             }
+        }
+        return ret;
+    }
+
+
+    /**
+     * 逐级删除子数据
+     * @param parentId
+     * @return
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public boolean deleteByParentId(String parentId) {
+        boolean ret = false;
+        QueryBuilder<SysMenu> queryBuilder = new GenQueryBuilder<>();
+        QueryWrapper<SysMenu> queryWrapper = queryBuilder.build();
+        queryWrapper.eq(HumpUtil.humpToUnderline(MyBatisConstants.FIELD_PARENT_ID), parentId);
+        List<SysMenu> menuList = super.findList(queryWrapper);
+        for (SysMenu sysMenu : menuList) {
+            super.delete(sysMenu.getId());
+            // 逐级删除子数据
+            ret = this.deleteByParentId(sysMenu.getId());
         }
         return ret;
     }

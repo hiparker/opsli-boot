@@ -197,8 +197,7 @@ public abstract class CrudServiceImpl<M extends BaseMapper<T>, T extends BaseEnt
     @Override
     public List<T> findList(QueryWrapper<T> queryWrapper) {
         // 多租户处理
-        TenantHandler tenantHandler = new TenantHandler();
-        QueryWrapper<T> qWrapper = tenantHandler.handler(entityClazz, queryWrapper);
+        QueryWrapper<T> qWrapper = new TenantHandler().handler(entityClazz, queryWrapper);
         return super.list(qWrapper);
     }
 
@@ -206,8 +205,7 @@ public abstract class CrudServiceImpl<M extends BaseMapper<T>, T extends BaseEnt
     public List<T> findAllList() {
         QueryBuilder<T> queryBuilder = new GenQueryBuilder<>();
         // 多租户处理
-        TenantHandler tenantHandler = new TenantHandler();
-        QueryWrapper<T> qWrapper = tenantHandler.handler(entityClazz, queryBuilder.build());
+        QueryWrapper<T> qWrapper = new TenantHandler().handler(entityClazz, queryBuilder.build());
         return super.list(qWrapper);
     }
 
