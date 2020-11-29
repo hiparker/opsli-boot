@@ -18,6 +18,7 @@ package org.opsli.core.conf.mybatis;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.ReflectUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.binding.MapperMethod;
 import org.apache.ibatis.executor.Executor;
 import org.apache.ibatis.mapping.MappedStatement;
@@ -139,6 +140,14 @@ public class AutoFillInterceptor implements Interceptor {
                     Object tenantValue = ReflectUtil.getFieldValue(arg, f.getName());
                     if(tenantValue == null){
                         setProperty(arg, MyBatisConstants.FIELD_TENANT,  UserUtil.getTenantId());
+                    }else{
+                        // 如果 tenantId 为空字符串 自动转换为 null
+                        if(tenantValue instanceof String){
+                            String tmp = String.valueOf(tenantValue);
+                            if(StringUtils.isBlank(tmp)){
+                                setProperty(arg, MyBatisConstants.FIELD_TENANT,  null);
+                            }
+                        }
                     }
                     break;
                 default:
