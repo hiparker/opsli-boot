@@ -61,6 +61,7 @@ public class #(data.model.tableName) extends BaseEntity {
     #for(column : data.model.columnList)
     #if(column.fieldName == "deleted")
     /** 逻辑删除字段 */
+    @TableLogic
     private Integer deleted;
     #else if(column.fieldName == "tenantId")
     /** 多租户字段 */
