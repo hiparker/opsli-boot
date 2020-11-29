@@ -18,9 +18,12 @@ package org.opsli.core.persistence.querybuilder.chain;
 import cn.hutool.core.util.ReflectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.apache.commons.lang3.StringUtils;
+import org.opsli.api.wrapper.system.user.UserModel;
 import org.opsli.common.constants.MyBatisConstants;
+import org.opsli.common.exception.ServiceException;
 import org.opsli.common.utils.HumpUtil;
 import org.opsli.core.base.entity.BaseEntity;
+import org.opsli.core.msg.CoreMsg;
 import org.opsli.core.utils.UserUtil;
 
 /**
@@ -57,21 +60,24 @@ public class TenantHandler implements QueryBuilderChain{
      */
     @Override
     public <T extends BaseEntity> QueryWrapper<T> handler(Class<T> entityClazz, QueryWrapper<T> wrapper) {
-        // 执行责任链
-        if(queryBuilderChain != null){
-            wrapper = queryBuilderChain.handler(entityClazz, wrapper);
-        }
-
-        // 判断多租户
+        // 自身责任 -- 判断多租户
         boolean tenantFlag = ReflectUtil.hasField(entityClazz, MyBatisConstants.FIELD_TENANT);
         if(tenantFlag) {
             String tenantId = UserUtil.getTenantId();
-            if (StringUtils.isNotEmpty(tenantId)) {
-                wrapper.eq(HumpUtil.humpToUnderline(MyBatisConstants.FIELD_TENANT), tenantId);
+            UserModel user = UserUtil.getUser();
+            // 超级管理员可以操作 无租户限制， 其余用户全部有租户限制
+            if(!UserUtil.SUPER_ADMIN.equals(user.getUsername()) &&
+                    StringUtils.isNotEmpty(tenantId)
+                ){
+                    wrapper.eq(HumpUtil.humpToUnderline(MyBatisConstants.FIELD_TENANT), tenantId);
             }
         }
-        return wrapper;
 
+        // 执行 子 责任链
+        if(queryBuilderChain != null){
+            wrapper = queryBuilderChain.handler(entityClazz, wrapper);
+        }
+        return wrapper;
     }
 
 }
