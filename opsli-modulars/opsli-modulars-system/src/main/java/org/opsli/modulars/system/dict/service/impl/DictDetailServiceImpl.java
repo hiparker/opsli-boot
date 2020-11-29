@@ -364,6 +364,7 @@ public class DictDetailServiceImpl extends CrudServiceImpl<DictDetailMapper, Sys
         QueryWrapper<SysDictDetail> queryWrapper = queryBuilder.build();
         queryWrapper.eq(key, typeCode);
         queryWrapper.eq(deleted, '0');
+        queryWrapper.orderByAsc("sort_no");
         List<SysDictDetail> list = this.findList(queryWrapper);
         // 转化对象
         return super.transformTs2Ms(list);
