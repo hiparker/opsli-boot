@@ -22,6 +22,7 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.Version;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -107,10 +108,12 @@ public abstract class ApiWrapper implements Serializable {
 	private Integer version;
 
 	/** 是否是内部Api调用 */
+	@JsonIgnore
 	@TableField(exist = false)
 	private Boolean izApi = false;
 
 	/** 是否 手动操控 （如果为true 则可以手动指定创建人和修改人 如果为空则默认） */
+	@JsonIgnore
 	@TableField(exist = false)
 	private Boolean izManual = false;
 }
