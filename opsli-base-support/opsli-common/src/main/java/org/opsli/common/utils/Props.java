@@ -138,7 +138,7 @@ public class Props {
         Object obj = this.getObject(keys);
 
         if(obj != null){
-            def = Convert.convert(def.getClass(), obj);
+            def = Convert.convert(Object.class, obj);
         }
         return def;
     }
@@ -168,7 +168,7 @@ public class Props {
 
         if(obj != null){
             def = "";
-            def = Convert.convert(def.getClass(), obj);
+            def = Convert.convert(String.class, obj);
         }
         return def;
     }
@@ -196,7 +196,7 @@ public class Props {
         Object obj = this.getObject(keys);
 
         if(obj != null){
-            def = Convert.convert(def.getClass(), obj);
+            def = Convert.convert(Integer.class, obj);
         }
         return def;
     }
@@ -224,7 +224,7 @@ public class Props {
         Object obj = this.getObject(keys);
 
         if(obj != null){
-            def = Convert.convert(def.getClass(), obj);
+            def = Convert.convert(Long.class, obj);
         }
         return def;
     }
@@ -253,7 +253,7 @@ public class Props {
         Object obj = this.getObject(keys);
 
         if(obj != null){
-            def = Convert.convert(def.getClass(), obj);
+            def = Convert.convert(Double.class, obj);
         }
         return def;
     }
@@ -283,7 +283,7 @@ public class Props {
         Object obj = this.getObject(keys);
 
         if(obj != null){
-            def = Convert.convert(def.getClass(), obj);
+            def = Convert.convert(Float.class, obj);
         }
         return def;
     }
@@ -312,7 +312,7 @@ public class Props {
         Object obj = this.getObject(keys);
 
         if(obj != null){
-            def = Convert.convert(def.getClass(), obj);
+            def = Convert.convert(Character.class, obj);
         }
         return def;
     }
@@ -340,7 +340,7 @@ public class Props {
         Object obj = this.getObject(keys);
 
         if(obj != null){
-            def = Convert.convert(def.getClass(), obj);
+            def = Convert.convert(Boolean.class, obj);
         }
         return def;
     }
