@@ -22,7 +22,7 @@ import java.util.List;
 /**
  * Xss过滤器配置属性
  *
- * @author 毕子航 951755883@qq.com
+ * @author Parker
  * @date 2018/10/26
  */
 @ConfigurationProperties(prefix = WafProperties.WAF)
