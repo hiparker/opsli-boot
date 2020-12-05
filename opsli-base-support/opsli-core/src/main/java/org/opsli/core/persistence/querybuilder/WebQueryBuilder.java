@@ -159,8 +159,8 @@ public class WebQueryBuilder<T extends BaseEntity> implements QueryBuilder<T>{
             // 模糊匹配
             queryWrapper.like(key,value);
         } else if (BEGIN.equals(handle)) {
-            // 大于
-            queryWrapper.gt(key,value);
+            // 大于等于
+            queryWrapper.ge(key,value);
         } else if (END.equals(handle)) {
             // 小于等于
             queryWrapper.le(key,value);
