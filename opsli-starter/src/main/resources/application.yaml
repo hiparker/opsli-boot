@@ -180,6 +180,8 @@ opsli:
   login:
     # 失败次数
     slip-count: 5
+    # 失败N次后弹出验证码 （超过验证码阈值 弹出验证码）
+    slip-verify-count: 3
     # 失败锁定时间(秒)
     slip-lock-speed: 300
 

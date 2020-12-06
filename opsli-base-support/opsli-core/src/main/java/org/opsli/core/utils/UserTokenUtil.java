@@ -15,8 +15,11 @@
  */
 package org.opsli.core.utils;
 
+import cn.hutool.core.convert.Convert;
 import cn.hutool.core.date.DateTime;
+import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.util.StrUtil;
 import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -25,15 +28,20 @@ import org.opsli.api.base.result.ResultVo;
 import org.opsli.api.wrapper.system.user.UserModel;
 import org.opsli.common.constants.SignConstants;
 import org.opsli.common.constants.TokenConstants;
+import org.opsli.common.exception.ServiceException;
+import org.opsli.common.exception.TokenException;
+import org.opsli.common.utils.Props;
 import org.opsli.core.msg.TokenMsg;
 import org.opsli.plugins.redis.RedisPlugin;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Date;
 import java.util.Map;
 
 import static org.opsli.common.constants.OrderConstants.UTIL_ORDER;
@@ -53,12 +61,30 @@ public class UserTokenUtil {
 
     /** token 缓存名 */
     public static final String TOKEN_NAME = TokenConstants.ACCESS_TOKEN;
-
     /** 缓存前缀 */
     private static final String PREFIX = "opsli:ticket:";
+    /** 账号失败次数 */
+    public static final String ACCOUNT_SLIP_COUNT_PREFIX = "opsli:account:slip:count:";
+    /** 账号失败锁定KEY */
+    public static final String ACCOUNT_SLIP_LOCK_PREFIX = "opsli:account:slip:lock:";
+    /** 账号失败阈值 */
+    public static final int ACCOUNT_SLIP_COUNT;
+    /** 账号失败N次后弹出验证码 */
+    public static final int ACCOUNT_SLIP_VERIFY_COUNT;
+    /** 账号锁定时间 */
+    public static final int ACCOUNT_SLIP_LOCK_SPEED;
 
     /** Redis插件 */
     private static RedisPlugin redisPlugin;
+
+
+
+    static {
+        Props props = new Props("application.yaml");
+        ACCOUNT_SLIP_COUNT = props.getInt("opsli.login.slip-count", 5);
+        ACCOUNT_SLIP_VERIFY_COUNT = props.getInt("opsli.login.slip-verify-count", 3);
+        ACCOUNT_SLIP_LOCK_SPEED = props.getInt("opsli.login.slip-lock-speed", 300);
+    }
 
     /**
      * 根据 user 创建Token
@@ -194,6 +220,95 @@ public class UserTokenUtil {
             return false;
         }
         return true;
+    }
+
+    // ============================ 锁账号 操作
+
+    /**
+     * 验证锁定账号
+     * @param username
+     */
+    public static void verifyLockAccount(String username){
+        // 判断账号是否临时锁定
+        Long loseTimeMillis = (Long) redisPlugin.get(ACCOUNT_SLIP_LOCK_PREFIX + username);
+        if(loseTimeMillis != null){
+            Date currDate = new Date();
+            DateTime loseDate = DateUtil.date(loseTimeMillis);
+            // 偏移5分钟
+            DateTime currLoseDate = DateUtil.offsetSecond(loseDate, ACCOUNT_SLIP_LOCK_SPEED);
+
+            // 计算失效剩余时间( 分 )
+            long betweenM = DateUtil.between(currLoseDate, currDate, DateUnit.MINUTE);
+            if(betweenM > 0){
+                String msg = StrUtil.format(TokenMsg.EXCEPTION_LOGIN_ACCOUNT_LOCK.getMessage()
+                        ,betweenM + "分钟");
+                throw new TokenException(TokenMsg.EXCEPTION_LOGIN_ACCOUNT_LOCK.getCode(), msg);
+            }else{
+                // 计算失效剩余时间( 秒 )
+                long betweenS = DateUtil.between(currLoseDate, currDate, DateUnit.SECOND);
+                String msg = StrUtil.format(TokenMsg.EXCEPTION_LOGIN_ACCOUNT_LOCK.getMessage()
+                        ,betweenS + "秒");
+                throw new TokenException(TokenMsg.EXCEPTION_LOGIN_ACCOUNT_LOCK.getCode(), msg);
+            }
+        }
+    }
+
+    /**
+     * 锁定账号
+     * @param username
+     */
+    public static ResultVo<?> lockAccount(String username){
+        // 如果失败次数 超过阈值 则锁定账号
+        Long slipNum = redisPlugin.increment(ACCOUNT_SLIP_COUNT_PREFIX + username);
+        if (slipNum != null){
+            // 设置失效时间为 5分钟
+            redisPlugin.expire(ACCOUNT_SLIP_COUNT_PREFIX + username, ACCOUNT_SLIP_LOCK_SPEED);
+
+            // 如果确认 都失败 则存入临时缓存
+            if(slipNum >= ACCOUNT_SLIP_COUNT){
+                long currentTimeMillis = System.currentTimeMillis();
+                // 存入Redis
+                redisPlugin.put(ACCOUNT_SLIP_LOCK_PREFIX + username,
+                        currentTimeMillis, ACCOUNT_SLIP_LOCK_SPEED);
+            }
+        }
+
+        Map<String,Boolean> flagMap = Maps.newHashMap();
+        flagMap.put("izVerify", false);
+        if(slipNum != null && slipNum >= ACCOUNT_SLIP_VERIFY_COUNT){
+            flagMap.put("izVerify", true);
+        }
+        return ResultVo.error(TokenMsg.EXCEPTION_LOGIN_ACCOUNT_NO.getCode(),
+                TokenMsg.EXCEPTION_LOGIN_ACCOUNT_NO.getMessage(),
+                flagMap
+                );
+    }
+
+    /**
+     * 获得当前失败次数
+     * @param username
+     */
+    public static long getSlipCount(String username){
+        long count = 0L;
+        Object obj = redisPlugin.get(ACCOUNT_SLIP_COUNT_PREFIX + username);
+        if(obj != null){
+            try {
+                count = Convert.convert(Long.class, obj);
+            }catch (Exception ignored){}
+        }
+        return count;
+    }
+
+
+    /**
+     * 清除锁定账号
+     * @param username
+     */
+    public static void clearLockAccount(String username){
+        // 删除失败次数记录
+        redisPlugin.del(ACCOUNT_SLIP_COUNT_PREFIX + username);
+        // 删除失败次数记录
+        redisPlugin.del(ACCOUNT_SLIP_LOCK_PREFIX + username);
     }
 
 
