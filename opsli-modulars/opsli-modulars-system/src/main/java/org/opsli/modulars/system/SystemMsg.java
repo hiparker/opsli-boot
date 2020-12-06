@@ -60,7 +60,17 @@ public enum SystemMsg implements BaseMsg {
     /**
      * 租户
      */
-    EXCEPTION_TENANT_UNIQUE(20200,"租户名称重复，该租户已存在！"),
+    EXCEPTION_TENANT_UNIQUE(20400,"租户名称重复，该租户已存在！"),
+
+    /**
+     * 组织机构
+     */
+    EXCEPTION_ORG_UNIQUE(20500,"组织机构编号重复，已存在！"),
+
+    /**
+     * 地域
+     */
+    EXCEPTION_AREA_UNIQUE(20600,"地域编号重复，已存在！"),
 
     ;
 
