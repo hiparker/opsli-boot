@@ -33,6 +33,9 @@ public enum PushSubType {
     /** 菜单数据 */
     MENU,
 
+    /** 组织数据 */
+    ORG,
+
     /** 热点数据 */
     HOT_DATA,
 

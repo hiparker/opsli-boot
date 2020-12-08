@@ -18,7 +18,9 @@ package org.opsli.core.utils;
 import com.google.code.kaptcha.Producer;
 import org.apache.commons.lang3.StringUtils;
 import org.opsli.api.web.system.dict.DictDetailApi;
+import org.opsli.common.constants.CacheConstants;
 import org.opsli.common.exception.TokenException;
+import org.opsli.common.utils.Props;
 import org.opsli.core.msg.TokenMsg;
 import org.opsli.plugins.redis.RedisLockPlugins;
 import org.opsli.plugins.redis.RedisPlugin;
@@ -45,13 +47,20 @@ import static org.opsli.common.constants.OrderConstants.UTIL_ORDER;
 public class CaptchaUtil{
 
     /** 缓存前缀 */
-    private static final String PREFIX = "opsli:temp:captcha:";
+    private static final String PREFIX = "temp:captcha:";
     /** 默认验证码保存 5 分钟 */
     private static final int TIME_OUT = 300;
     /** Redis插件 */
     private static RedisPlugin redisPlugin;
     /** 谷歌验证码 */
     private static  Producer producer;
+    /** 热点数据前缀 */
+    public static final String PREFIX_NAME;
+    static{
+        // 缓存前缀
+        Props props = new Props("application.yaml");
+        PREFIX_NAME = props.getStr("spring.cache-conf.prefix", CacheConstants.PREFIX_NAME) + ":";
+    }
 
     /**
      * 获得验证码
@@ -66,7 +75,7 @@ public class CaptchaUtil{
         //生成文字验证码
         String code = producer.createText();
 
-        boolean ret = redisPlugin.put(PREFIX + uuid, code, TIME_OUT);
+        boolean ret = redisPlugin.put(PREFIX_NAME + PREFIX + uuid, code, TIME_OUT);
 
         if(ret){
             return producer.createImage(code);
@@ -84,14 +93,14 @@ public class CaptchaUtil{
         if(StringUtils.isEmpty(uuid)) return false;
 
         // 验证码
-        String codeTemp = (String) redisPlugin.get(PREFIX + uuid);
+        String codeTemp = (String) redisPlugin.get(PREFIX_NAME + PREFIX + uuid);
 
         if(StringUtils.isEmpty(codeTemp)){
             throw new TokenException(TokenMsg.EXCEPTION_CAPTCHA_NULL);
         }
 
         // 删除验证码
-        //redisPlugin.del(PREFIX + uuid);
+        //redisPlugin.del(PREFIX_NAME + PREFIX + uuid);
 
         return codeTemp.equalsIgnoreCase(code);
     }
@@ -106,7 +115,7 @@ public class CaptchaUtil{
         if(StringUtils.isEmpty(uuid)) return false;
 
         //删除验证码
-        return redisPlugin.del(PREFIX + uuid);
+        return redisPlugin.del(PREFIX_NAME + PREFIX + uuid);
     }
 
 

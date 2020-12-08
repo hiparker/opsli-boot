@@ -17,6 +17,10 @@ opsli:
     - sys_tenant
     - sys_user
     - sys_user_role_ref
+    - sys_area
+    - sys_org
+    - sys_org_user_ref
+
 
   # 排除字段
   exclude-fields:

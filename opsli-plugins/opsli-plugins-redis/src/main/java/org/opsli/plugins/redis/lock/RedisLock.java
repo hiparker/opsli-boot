@@ -16,6 +16,9 @@
 package org.opsli.plugins.redis.lock;
 
 
+import org.opsli.common.constants.CacheConstants;
+import org.opsli.common.utils.Props;
+
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -27,7 +30,17 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class RedisLock {
 
-    private static final String LOCK_PREFIX = "opsli:lock:";
+    private static final String LOCK_PREFIX;
+
+    /** 热点数据前缀 */
+    public static final String PREFIX_NAME;
+
+    static {
+        // 缓存前缀
+        Props props = new Props("application.yaml");
+        PREFIX_NAME = props.getStr("spring.cache-conf.prefix", CacheConstants.PREFIX_NAME) + ":";
+        LOCK_PREFIX = PREFIX_NAME + "lock:";
+    }
 
     /** 锁名称 */
     private String lockName;
@@ -43,8 +56,6 @@ public class RedisLock {
 
     /** 线程锁 */
     private AtomicInteger atomicInteger;
-
-
 
     /**
      * 构造函数

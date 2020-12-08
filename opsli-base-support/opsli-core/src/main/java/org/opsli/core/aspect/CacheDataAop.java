@@ -15,6 +15,7 @@
  */
 package org.opsli.core.aspect;
 
+import cn.hutool.core.collection.CollUtil;
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -27,6 +28,7 @@ import org.opsli.common.annotation.hotdata.EnableHotData;
 import org.opsli.common.annotation.hotdata.HotDataDel;
 import org.opsli.common.annotation.hotdata.HotDataPut;
 import org.opsli.common.constants.CacheConstants;
+import org.opsli.common.utils.Props;
 import org.opsli.core.cache.local.CacheUtil;
 import org.opsli.core.cache.pushsub.entity.CacheDataEntity;
 import org.opsli.core.cache.pushsub.enums.CacheType;
@@ -57,7 +59,13 @@ import static org.opsli.common.constants.OrderConstants.HOT_DATA_ORDER;
 public class CacheDataAop {
 
     /** 热点数据前缀 */
-    public static final String PREFIX_NAME = "opsli:";
+    public static final String PREFIX_NAME;
+    static{
+        // 缓存前缀
+        Props props = new Props("application.yaml");
+        PREFIX_NAME = props.getStr("spring.cache-conf.prefix",CacheConstants.PREFIX_NAME) + ":";
+    }
+
 
     @Autowired
     private RedisPlugin redisPlugin;
@@ -80,33 +88,35 @@ public class CacheDataAop {
     public Object hotDataPutProcess(ProceedingJoinPoint point) throws Throwable {
         Object[] args= point.getArgs();
         Object returnValue = point.proceed(args);
-        // 判断 方法上是否使用 HotData注解 如果没有表示开启热数据 则直接跳过
+        // 判断 方法上是否使用 EnableHotData注解 如果没有表示开启热数据 则直接跳过
         Annotation annotation = point.getTarget().getClass().getAnnotation(EnableHotData.class);
         if(annotation == null){
             return returnValue;
         }
 
-        // ====== 如果 使用了 EnableHotData ，表示开启热数据加载 则执行下段代码
-        CacheDataEntity cacheDataEntity = this.putHandlerData(point, returnValue);
-        if(cacheDataEntity == null){
+        List<CacheDataEntity> cacheDataEntityList = this.putHandlerData(point, returnValue);
+        // 非法判断
+        if(CollUtil.isEmpty(cacheDataEntityList)){
             return returnValue;
         }
 
-        // 更新缓存数据
-        // 热点数据
-        if(CacheConstants.HOT_DATA.equals(cacheDataEntity.getCacheName())){
-            CacheUtil.putByKeyOriginal(cacheDataEntity.getKey(), returnValue);
-        }
-        // 永久数据
-        else if(CacheConstants.EDEN_DATA.equals(cacheDataEntity.getCacheName())) {
-            CacheUtil.putEdenByKeyOriginal(cacheDataEntity.getKey(), returnValue);
-        }
+        for (CacheDataEntity cacheDataEntity : cacheDataEntityList) {
+            // 更新缓存数据
+            // 热点数据
+            if(CacheConstants.HOT_DATA.equals(cacheDataEntity.getCacheName())){
+                CacheUtil.putByKeyOriginal(cacheDataEntity.getKey(), returnValue);
+            }
+            // 永久数据
+            else if(CacheConstants.EDEN_DATA.equals(cacheDataEntity.getCacheName())) {
+                CacheUtil.putEdenByKeyOriginal(cacheDataEntity.getKey(), returnValue);
+            }
 
-        // 广播缓存数据 - 通知其他服务器同步数据
-        redisPlugin.sendMessage(
-                CacheDataMsgFactory.createMsg(cacheDataEntity.getType(),
-                        cacheDataEntity.getKey(), returnValue, CacheType.UPDATE)
-        );
+            // 广播缓存数据 - 通知其他服务器同步数据
+            redisPlugin.sendMessage(
+                    CacheDataMsgFactory.createMsg(cacheDataEntity.getType(),
+                            cacheDataEntity.getKey(), returnValue, CacheType.UPDATE)
+            );
+        }
 
         return returnValue;
     }
@@ -122,7 +132,7 @@ public class CacheDataAop {
     public Object hotDataDelProcess(ProceedingJoinPoint point) throws Throwable {
         Object[] args= point.getArgs();
         Object returnValue = point.proceed(args);
-        // 判断 方法上是否使用 HotData注解 如果没有表示开启热数据 则直接跳过
+        // 判断 方法上是否使用 EnableHotData注解 如果没有表示开启热数据 则直接跳过
         Annotation annotation = point.getTarget().getClass().getAnnotation(EnableHotData.class);
         if(annotation == null){
             return returnValue;
@@ -139,9 +149,9 @@ public class CacheDataAop {
             return returnValue;
         }
 
-        // ====== 如果 使用了 EnableHotData ，表示开启热数据加载 则执行下段代码
         List<CacheDataEntity> cacheDataEntityList = this.delHandlerData(point, args);
-        if(cacheDataEntityList == null || cacheDataEntityList.size() == 0){
+        // 非法判断
+        if(CollUtil.isEmpty(cacheDataEntityList)){
             return returnValue;
         }
 
@@ -167,59 +177,44 @@ public class CacheDataAop {
      * PUT 处理数据
      * @param point
      */
-    private CacheDataEntity putHandlerData(ProceedingJoinPoint point, Object returnValue){
-        CacheDataEntity ret;
-        // 返回值为空直接
-        if(returnValue == null){
-            return null;
-        }
+    private List<CacheDataEntity> putHandlerData(ProceedingJoinPoint point, Object returnValue){
         // 这里 只对 继承了 ApiWrapper 的类做处理
         if(!(returnValue instanceof ApiWrapper)){
             return null;
         }
+
+        // 消息集合 后续可能会考虑 多消息存储
+        List<CacheDataEntity> cacheDataEntities = Lists.newArrayListWithCapacity(1);
+
         // 报错不处理
         try {
-            String methodName= point.getSignature().getName();
-            Class<?> classTarget= point.getTarget().getClass();
-            Class<?>[] par=((MethodSignature) point.getSignature()).getParameterTypes();
-            Method objMethod = classTarget.getMethod(methodName, par);
+            // 获得方法
+            Method objMethod = this.getMethod(point);
+            if(objMethod == null) return null;
+
             // 获取注解参数
             HotDataPut aCache= objMethod.getAnnotation(HotDataPut.class);
             if(aCache != null){
-                // 类型
-                PushSubType type;
-                // key 前缀
-                StringBuilder keyBuf = new StringBuilder(PREFIX_NAME);
-                // 热点数据
-                if(CacheConstants.HOT_DATA.equals(aCache.name())){
-                    keyBuf.append(CacheConstants.HOT_DATA).append(":");
-                    type = PushSubType.HOT_DATA;
-                }
-                // 系统数据
-                else if(CacheConstants.EDEN_DATA.equals(aCache.name())){
-                    keyBuf.append(CacheConstants.EDEN_DATA).append(":");
-                    type = PushSubType.EDEN_DATA;
-                } else {
+                // 获得缓存类型
+                PushSubType type = this.judgeCacheType(aCache.name());
+                if(type == null) {
                     // 如果都不是 则直接退出 不走缓存
                     return null;
                 }
+                // key 前缀
+                StringBuilder keyBuf = this.judgeCacheKeyBuf(aCache.name());
 
-                try {
-                    // 这里 只对 继承了 BaseEntity 的类做处理
-                    ApiWrapper apiWrapper = (ApiWrapper) returnValue;
+                // 这里 只对 继承了 BaseEntity 的类做处理
+                ApiWrapper apiWrapper = (ApiWrapper) returnValue;
 
-                    // key 存储ID
-                    String key = keyBuf.append(apiWrapper.getId()).toString();
+                // key 存储ID
+                String key = keyBuf.append(apiWrapper.getId()).toString();
 
-                    ret = new CacheDataEntity();
-                    ret.setKey(key);
-                    ret.setType(type);
-                    ret.setCacheName(aCache.name());
+                CacheDataEntity ret = new CacheDataEntity(key, type ,aCache.name());
+                // 存放数据
+                this.putCacheData(cacheDataEntities, ret);
 
-                    return ret;
-                }catch (Exception e){
-                    log.error(e.getMessage(),e);
-                }
+                return cacheDataEntities;
             }
         }catch (Exception e){
             log.error(e.getMessage(),e);
@@ -237,94 +232,141 @@ public class CacheDataAop {
             return null;
         }
 
-        // DEL 消息集合
+        // 消息集合
         List<CacheDataEntity> cacheDataEntities = Lists.newArrayListWithCapacity(args.length);
 
         // 报错不处理
         try {
-            String methodName= point.getSignature().getName();
-            Class<?> classTarget= point.getTarget().getClass();
-            Class<?>[] par=((MethodSignature) point.getSignature()).getParameterTypes();
-            Method objMethod = classTarget.getMethod(methodName, par);
+            // 获得方法
+            Method objMethod = this.getMethod(point);
+            if(objMethod == null) return null;
+
             // 获取注解参数
             HotDataDel aCache= objMethod.getAnnotation(HotDataDel.class);
             if(aCache != null){
-                // 类型
-                PushSubType type;
-                // key 前缀
-                StringBuilder keyBuf = new StringBuilder(PREFIX_NAME);
-                // 热点数据
-                if(CacheConstants.HOT_DATA.equals(aCache.name())){
-                    keyBuf.append(CacheConstants.HOT_DATA).append(":");
-                    type = PushSubType.HOT_DATA;
-                }
-                // 系统数据
-                else if(CacheConstants.EDEN_DATA.equals(aCache.name())){
-                    keyBuf.append(CacheConstants.EDEN_DATA).append(":");
-                    type = PushSubType.EDEN_DATA;
-                } else {
+                // 获得缓存类型
+                PushSubType type = this.judgeCacheType(aCache.name());
+                if(type == null) {
                     // 如果都不是 则直接退出 不走缓存
                     return null;
                 }
+                // key 前缀
+                StringBuilder keyBuf = this.judgeCacheKeyBuf(aCache.name());
 
-                try {
-
-                    // 处理数据
-                    for (Object arg : args) {
-                        if (arg instanceof String) {
+                // 处理数据
+                for (Object arg : args) {
+                    if (arg instanceof String) {
+                        // key 存储ID
+                        String key = keyBuf.toString() + arg;
+                        CacheDataEntity ret = new CacheDataEntity(key, type ,aCache.name());
+                        // 存放数据
+                        this.putCacheData(cacheDataEntities, ret);
+                    } else if (arg instanceof String[]) {
+                        String[] ids = (String[]) arg;
+                        for (String id : ids) {
                             // key 存储ID
-                            String key = keyBuf.toString() + arg;
-                            CacheDataEntity ret = new CacheDataEntity();
-                            ret.setKey(key);
-                            ret.setType(type);
-                            ret.setCacheName(aCache.name());
-                            cacheDataEntities.add(ret);
-                        } else if (arg instanceof String[]) {
-                            String[] ids = (String[]) arg;
-                            for (String id : ids) {
+                            String key = keyBuf.toString() + id;
+                            CacheDataEntity ret = new CacheDataEntity(key, type ,aCache.name());
+                            // 存放数据
+                            this.putCacheData(cacheDataEntities, ret);
+                        }
+                    } else if (arg instanceof ApiWrapper) {
+                        // key 存储ID
+                        ApiWrapper apiWrapper = (ApiWrapper) arg;
+                        String key = keyBuf.toString() + apiWrapper.getId();
+                        CacheDataEntity ret = new CacheDataEntity(key, type ,aCache.name());
+                        // 存放数据
+                        this.putCacheData(cacheDataEntities, ret);
+                    } else if (arg instanceof Collection) {
+                        try {
+                            Collection<ApiWrapper> baseEntityList = (Collection<ApiWrapper>) arg;
+                            for (ApiWrapper baseEntity : baseEntityList) {
                                 // key 存储ID
-                                String key = keyBuf.toString() + id;
-                                CacheDataEntity ret = new CacheDataEntity();
-                                ret.setKey(key);
-                                ret.setType(type);
-                                ret.setCacheName(aCache.name());
-                                cacheDataEntities.add(ret);
+                                String key = keyBuf.toString() + baseEntity.getId();
+                                CacheDataEntity ret = new CacheDataEntity(key, type ,aCache.name());
+                                // 存放数据
+                                this.putCacheData(cacheDataEntities, ret);
                             }
-                        } else if (arg instanceof ApiWrapper) {
-                            // key 存储ID
-                            ApiWrapper apiWrapper = (ApiWrapper) arg;
-                            String key = keyBuf.toString() + apiWrapper.getId();
-                            CacheDataEntity ret = new CacheDataEntity();
-                            ret.setKey(key);
-                            ret.setType(type);
-                            ret.setCacheName(aCache.name());
-                            cacheDataEntities.add(ret);
-                        } else if (arg instanceof Collection) {
-                            try {
-                                Collection<ApiWrapper> baseEntityList = (Collection<ApiWrapper>) arg;
-                                for (ApiWrapper baseEntity : baseEntityList) {
-                                    // key 存储ID
-                                    String key = keyBuf.toString() + baseEntity.getId();
-                                    CacheDataEntity ret = new CacheDataEntity();
-                                    ret.setKey(key);
-                                    ret.setType(type);
-                                    ret.setCacheName(aCache.name());
-                                    cacheDataEntities.add(ret);
-                                }
-                            }catch (Exception e){
-                                log.error(e.getMessage(),e);
-                            }
+                        }catch (Exception e){
+                            log.error(e.getMessage(),e);
                         }
                     }
-                    return cacheDataEntities;
-                }catch (Exception e){
-                    log.error(e.getMessage(),e);
                 }
+                return cacheDataEntities;
             }
         }catch (Exception e){
             log.error(e.getMessage(),e);
         }
         return null;
+    }
+
+
+    // =====================
+
+    /**
+     * 获得方法
+     * @param point
+     * @return
+     */
+    private Method getMethod(ProceedingJoinPoint point){
+        Method m = null;
+        try {
+            String methodName= point.getSignature().getName();
+            Class<?> classTarget= point.getTarget().getClass();
+            Class<?>[] par=((MethodSignature) point.getSignature()).getParameterTypes();
+            m = classTarget.getMethod(methodName, par);
+        }catch (Exception ignored){}
+        return m;
+    }
+
+    /**
+     * 存放数据
+     * @param cacheDataList
+     * @param cacheData
+     */
+    private void putCacheData(List<CacheDataEntity> cacheDataList, CacheDataEntity cacheData){
+        // 非法判断
+        if(CollUtil.isEmpty(cacheDataList)){
+            return;
+        }
+        cacheDataList.add(cacheData);
+    }
+
+    /**
+     * 判断缓存Key
+     * @param cacheName
+     * @return
+     */
+    private StringBuilder judgeCacheKeyBuf(String cacheName){
+        // key 前缀
+        StringBuilder keyBuf = new StringBuilder(PREFIX_NAME);
+        // 热点数据
+        if(CacheConstants.HOT_DATA.equals(cacheName)){
+            keyBuf.append(CacheConstants.HOT_DATA).append(":");
+        }
+        // 系统数据
+        else if(CacheConstants.EDEN_DATA.equals(cacheName)){
+            keyBuf.append(CacheConstants.EDEN_DATA).append(":");
+        }
+        return keyBuf;
+    }
+
+    /**
+     * 判断缓存类型
+     * @param cacheName
+     * @return
+     */
+    private PushSubType judgeCacheType(String cacheName){
+        PushSubType type = null;
+        // 热点数据
+        if(CacheConstants.HOT_DATA.equals(cacheName)){
+            type = PushSubType.HOT_DATA;
+        }
+        // 系统数据
+        else if(CacheConstants.EDEN_DATA.equals(cacheName)){
+            type = PushSubType.EDEN_DATA;
+        }
+        return type;
     }
 
 }

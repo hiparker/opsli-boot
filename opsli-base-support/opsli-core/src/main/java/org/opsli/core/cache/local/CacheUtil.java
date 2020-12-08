@@ -25,6 +25,7 @@ import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.opsli.common.constants.CacheConstants;
+import org.opsli.common.utils.Props;
 import org.opsli.core.aspect.CacheDataAop;
 import org.opsli.plugins.cache.EhCachePlugin;
 import org.opsli.plugins.redis.RedisPlugin;
@@ -65,18 +66,27 @@ import static org.opsli.common.constants.OrderConstants.UTIL_ORDER;
 @AutoConfigureAfter({RedisPlugin.class , EhCachePlugin.class})
 public class CacheUtil {
 
-    public static final String JSON_KEY = "data";
-    /** 空状态 key 前缀 */
-    private static final String NIL_FLAG_PREFIX = "opsli:nil:";
-
     /** 热点数据缓存时间 秒 */
     private static int ttlHotData = 60000;
     /** Redis插件 */
     private static RedisPlugin redisPlugin;
     /** EhCache插件 */
     private static EhCachePlugin ehCachePlugin;
+    /** Json key */
+    public static final String JSON_KEY = "data";
+    /** 空状态 key 前缀 */
+    private static final String NIL_FLAG_PREFIX;
+
+    /** 热点数据前缀 */
+    public static final String PREFIX_NAME;
 
     static {
+
+        // 缓存前缀
+        Props props = new Props("application.yaml");
+        PREFIX_NAME = props.getStr("spring.cache-conf.prefix",CacheConstants.PREFIX_NAME) + ":";
+        NIL_FLAG_PREFIX = PREFIX_NAME + "nil:";
+
         try {
             // 读取配置信息
             CacheUtil.readPropertyXML();

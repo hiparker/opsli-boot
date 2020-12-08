@@ -24,6 +24,8 @@ package org.opsli.common.constants;
  */
 public interface CacheConstants {
 
+    String PREFIX_NAME = "opsli";
+
     /** 热点数据 */
     String HOT_DATA = "hotData";
 

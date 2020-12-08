@@ -23,6 +23,7 @@ import org.opsli.core.cache.local.CacheUtil;
 import org.opsli.core.cache.pushsub.enums.MsgArgsType;
 import org.opsli.core.cache.pushsub.enums.PushSubType;
 import org.opsli.core.utils.MenuUtil;
+import org.opsli.core.utils.OrgUtil;
 import org.opsli.plugins.cache.EhCachePlugin;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -31,44 +32,44 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @BelongsPackage: org.opsli.core.cache.pushsub.handler
  * @Author: Parker
  * @CreateTime: 2020-09-15 16:24
- * @Description: 菜单消息处理
+ * @Description: 用户组织消息处理
  */
 @Slf4j
-public class MenuHandler implements RedisPushSubHandler{
+public class OrgHandler implements RedisPushSubHandler{
 
     @Autowired
     EhCachePlugin ehCachePlugin;
 
     @Override
     public PushSubType getType() {
-        return PushSubType.MENU;
+        return PushSubType.ORG;
     }
 
     @Override
     public void handler(JSONObject msgJson) {
-        // 菜单刷新
-        this.menuHandler(msgJson);
+        // 用户刷新
+        this.orgHandler(msgJson);
     }
 
     /**
-     * 用户数据处理
+     * 用户组织数据处理
      * @param msgJson
      */
-    private void menuHandler(JSONObject msgJson){
-        JSONObject data = msgJson.getJSONObject(MsgArgsType.MENU_MODEL_DATA.toString());
+    private void orgHandler(JSONObject msgJson){
+        JSONObject data = msgJson.getJSONObject(MsgArgsType.ORG_USER_DATA.toString());
         // 数据为空则不执行
         if(data == null) return;
 
-        // 获得菜单编号
-        String menuCode = (String) msgJson.get(MsgArgsType.MENU_CODE.toString());
-        if(StringUtils.isEmpty(menuCode)){
+        // 获得用户ID
+        String userId = (String) msgJson.get(MsgArgsType.ORG_USER_ID.toString());
+        if(StringUtils.isEmpty(userId)){
             return;
         }
 
         // 先删除
-        ehCachePlugin.delete(CacheConstants.HOT_DATA, MenuUtil.PREFIX_CODE + menuCode);
+        ehCachePlugin.delete(CacheConstants.HOT_DATA, OrgUtil.PREFIX_CODE + userId);
         // 清除空拦截
-        CacheUtil.delNilFlag(MenuUtil.PREFIX_CODE + menuCode);
+        CacheUtil.delNilFlag(OrgUtil.PREFIX_CODE + userId);
     }
 
 

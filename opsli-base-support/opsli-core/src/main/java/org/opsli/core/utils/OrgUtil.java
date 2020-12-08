@@ -21,6 +21,7 @@ import org.opsli.api.base.result.ResultVo;
 import org.opsli.api.web.system.menu.MenuApi;
 import org.opsli.api.web.system.user.UserApi;
 import org.opsli.api.wrapper.system.menu.MenuModel;
+import org.opsli.api.wrapper.system.user.UserOrgRefModel;
 import org.opsli.core.cache.local.CacheUtil;
 import org.opsli.core.cache.pushsub.msgs.MenuMsgFactory;
 import org.opsli.core.cache.pushsub.msgs.OrgMsgFactory;
@@ -40,17 +41,17 @@ import static org.opsli.common.constants.OrderConstants.UTIL_ORDER;
  * @BelongsPackage: org.opsli.core.utils
  * @Author: Parker
  * @CreateTime: 2020-09-19 20:03
- * @Description: 菜单工具类
+ * @Description: 组织机构工具类
  */
 @Slf4j
 @Order(UTIL_ORDER)
 @Component
-@AutoConfigureAfter({RedisPlugin.class , RedisLockPlugins.class, MenuApi.class})
+@AutoConfigureAfter({RedisPlugin.class , RedisLockPlugins.class, UserApi.class})
 @Lazy(false)
-public class MenuUtil {
+public class OrgUtil {
 
     /** 前缀 */
-    public static final String PREFIX_CODE = "menu:code:";
+    public static final String PREFIX_CODE = "org:userId:";
 
 
     /** Redis插件 */
@@ -59,32 +60,32 @@ public class MenuUtil {
     /** Redis分布式锁 */
     private static RedisLockPlugins redisLockPlugins;
 
-    /** 菜单 Api */
-    private static MenuApi menuApi;
+    /** 用户 Api */
+    private static UserApi userApi;
 
 
     /**
-     * 根据 userName 获得用户
-     * @param menuCode
+     * 根据 userId 获得用户组织
+     * @param userId
      * @return
      */
-    public static MenuModel getMenuByCode(String menuCode){
+    public static UserOrgRefModel getOrgByUserId(String userId){
         // 先从缓存里拿
-        MenuModel menuModel = CacheUtil.get(PREFIX_CODE + menuCode, MenuModel.class);
-        if (menuModel != null){
-            return menuModel;
+        UserOrgRefModel orgRefModel = CacheUtil.get(PREFIX_CODE + userId, UserOrgRefModel.class);
+        if (orgRefModel != null){
+            return orgRefModel;
         }
 
         // 拿不到 --------
         // 防止缓存穿透判断
-        boolean hasNilFlag = CacheUtil.hasNilFlag(PREFIX_CODE + menuCode);
+        boolean hasNilFlag = CacheUtil.hasNilFlag(PREFIX_CODE + userId);
         if(hasNilFlag){
             return null;
         }
 
         // 锁凭证 redisLock 贯穿全程
         RedisLock redisLock = new RedisLock();
-        redisLock.setLockName(PREFIX_CODE + menuCode)
+        redisLock.setLockName(PREFIX_CODE + userId)
                 .setAcquireTimeOut(3000L)
                 .setLockTimeOut(5000L);
 
@@ -97,17 +98,17 @@ public class MenuUtil {
             }
 
             // 如果获得锁 则 再次检查缓存里有没有， 如果有则直接退出， 没有的话才发起数据库请求
-            menuModel = CacheUtil.get(PREFIX_CODE + menuCode, MenuModel.class);
-            if (menuModel != null){
-                return menuModel;
+            orgRefModel = CacheUtil.get(PREFIX_CODE + userId, UserOrgRefModel.class);
+            if (orgRefModel != null){
+                return orgRefModel;
             }
 
             // 查询数据库
-            ResultVo<MenuModel> resultVo = menuApi.getByCode(menuCode);
+            ResultVo<UserOrgRefModel> resultVo = userApi.getOrgInfoByUserId(userId);
             if(resultVo.isSuccess()){
-                menuModel = resultVo.getData();
+                orgRefModel = resultVo.getData();
                 // 存入缓存
-                CacheUtil.put(PREFIX_CODE + menuCode, menuModel);
+                CacheUtil.put(PREFIX_CODE + userId, orgRefModel);
             }
         }catch (Exception e){
             log.error(e.getMessage(),e);
@@ -117,44 +118,44 @@ public class MenuUtil {
             redisLock = null;
         }
 
-        if(menuModel == null){
+        if(orgRefModel == null){
             // 设置空变量 用于防止穿透判断
-            CacheUtil.putNilFlag(PREFIX_CODE + menuCode);
+            CacheUtil.putNilFlag(PREFIX_CODE + userId);
             return null;
         }
 
-        return menuModel;
+        return orgRefModel;
     }
 
 
     // ============== 刷新缓存 ==============
 
     /**
-     * 刷新用户 - 删就完了
-     * @param menu
+     * 刷新用户组织 - 删就完了
+     * @param userId
      * @return
      */
-    public static void refreshMenu(MenuModel menu){
-        if(menu == null || StringUtils.isEmpty(menu.getMenuCode())){
+    public static void refreshMenu(String userId){
+        if(StringUtils.isEmpty(userId)){
             return;
         }
 
-        MenuModel menuModel = CacheUtil.get(PREFIX_CODE + menu.getMenuCode(), MenuModel.class);
-        boolean hasNilFlag = CacheUtil.hasNilFlag(PREFIX_CODE + menu.getMenuCode());
+        UserOrgRefModel orgRefModel = CacheUtil.get(PREFIX_CODE + userId, UserOrgRefModel.class);
+        boolean hasNilFlag = CacheUtil.hasNilFlag(PREFIX_CODE + userId);
 
         // 只要不为空 则执行刷新
         if (hasNilFlag){
             // 清除空拦截
-            CacheUtil.delNilFlag(PREFIX_CODE + menu.getMenuCode());
+            CacheUtil.delNilFlag(PREFIX_CODE + userId);
         }
 
-        if(menuModel != null){
+        if(orgRefModel != null){
             // 先删除
-            CacheUtil.del(PREFIX_CODE + menu.getMenuCode());
+            CacheUtil.del(PREFIX_CODE + userId);
 
             // 发送通知消息
             redisPlugin.sendMessage(
-                    MenuMsgFactory.createMenuMsg(menu)
+                    OrgMsgFactory.createOrgMsg(orgRefModel)
             );
         }
     }
@@ -166,16 +167,17 @@ public class MenuUtil {
 
     @Autowired
     public  void setRedisPlugin(RedisPlugin redisPlugin) {
-        MenuUtil.redisPlugin = redisPlugin;
+        OrgUtil.redisPlugin = redisPlugin;
     }
 
     @Autowired
     public  void setRedisLockPlugins(RedisLockPlugins redisLockPlugins) {
-        MenuUtil.redisLockPlugins = redisLockPlugins;
+        OrgUtil.redisLockPlugins = redisLockPlugins;
     }
 
     @Autowired
-    public  void setMenuApi(MenuApi menuApi) {
-        MenuUtil.menuApi = menuApi;
+    public void setUserApi(UserApi userApi) {
+        OrgUtil.userApi = userApi;
     }
+
 }

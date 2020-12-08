@@ -13,29 +13,27 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.opsli.modulars.system.area.entity;
+package org.opsli.core.base.entity;
 
-import com.baomidou.mybatisplus.annotation.TableLogic;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.opsli.core.base.entity.BaseEntity;
 
 /**
  * @BelongsProject: opsli-boot
  * @BelongsPackage: org.opsli.modulars.system.area.entity
  * @Author: Parker
  * @CreateTime: 2020-11-28 18:59:59
- * @Description: 地域表
+ * @Description: Tree表
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class HasChildren{
+public class HasChildren {
 
 
     /** 父级主键 */
     private String parentId;
 
-    /** 地域名称 */
+    /** 下级数量 */
     private Integer count;
 
 

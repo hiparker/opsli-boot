@@ -15,7 +15,10 @@
  */
 package org.opsli.core.cache.pushsub.entity;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.opsli.core.cache.pushsub.enums.PushSubType;
 
 /**
@@ -26,6 +29,8 @@ import org.opsli.core.cache.pushsub.enums.PushSubType;
  * @Description: 热点数据处理 Entity
  */
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class CacheDataEntity {
 
     /** key */
@@ -37,4 +42,9 @@ public class CacheDataEntity {
     /** 缓存名称 */
     private String cacheName;
 
+
+    public static void main(String[] args) {
+        CacheDataEntity ret = new CacheDataEntity("123", PushSubType.EDEN_DATA, "12aaaa");
+        System.out.println(ToStringBuilder.reflectionToString(ret));
+    }
 }

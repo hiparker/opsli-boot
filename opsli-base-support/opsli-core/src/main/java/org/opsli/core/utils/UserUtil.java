@@ -29,6 +29,7 @@ import org.opsli.common.api.TokenThreadLocal;
 import org.opsli.common.exception.TokenException;
 import org.opsli.common.utils.Props;
 import org.opsli.core.cache.local.CacheUtil;
+import org.opsli.core.cache.pushsub.msgs.MenuMsgFactory;
 import org.opsli.core.cache.pushsub.msgs.UserMsgFactory;
 import org.opsli.core.msg.TokenMsg;
 import org.opsli.plugins.redis.RedisLockPlugins;
@@ -537,6 +538,16 @@ public class UserUtil {
         UserModel userModelByUsername = CacheUtil.get(PREFIX_USERNAME + user.getUsername(),
                                                             UserModel.class);
 
+        boolean hasNilFlagById = CacheUtil.hasNilFlag(PREFIX_ID + user.getId());
+        boolean hasNilFlagByName = CacheUtil.hasNilFlag(PREFIX_USERNAME + user.getUsername());
+
+        // 只要有一个不为空 则执行刷新
+        if (hasNilFlagById || hasNilFlagByName){
+            // 清除空拦截
+            CacheUtil.delNilFlag(PREFIX_ID + user.getId());
+            CacheUtil.delNilFlag(PREFIX_USERNAME + user.getUsername());
+        }
+
         // 只要有一个不为空 则执行刷新
         if (userModelById != null || userModelByUsername != null){
             // 先删除
@@ -562,17 +573,24 @@ public class UserUtil {
     public static void refreshUserRoles(String userId){
         try {
             Object obj = CacheUtil.get(PREFIX_ID_ROLES + userId);
+            boolean hasNilFlag = CacheUtil.hasNilFlag(PREFIX_ID_ROLES + userId);
+
+            // 只要不为空 则执行刷新
+            if (hasNilFlag){
+                // 清除空拦截
+                CacheUtil.delNilFlag(PREFIX_ID_ROLES + userId);
+            }
+
             if(obj != null){
                 // 先删除
                 CacheUtil.del(PREFIX_ID_ROLES + userId);
-                // 清除空拦截
-                CacheUtil.delNilFlag(PREFIX_ID_ROLES + userId);
 
                 // 发送通知消息
                 redisPlugin.sendMessage(
                         UserMsgFactory.createUserRolesMsg(userId, null)
                 );
             }
+
         }catch (Exception e){
             log.error(e.getMessage(), e);
         }
@@ -586,11 +604,17 @@ public class UserUtil {
     public static void refreshUserAllPerms(String userId){
         try {
             Object obj = CacheUtil.get(PREFIX_ID_PERMISSIONS + userId);
+            boolean hasNilFlag = CacheUtil.hasNilFlag(PREFIX_ID_PERMISSIONS + userId);
+
+            // 只要不为空 则执行刷新
+            if (hasNilFlag){
+                // 清除空拦截
+                CacheUtil.delNilFlag(PREFIX_ID_PERMISSIONS + userId);
+            }
+
             if(obj != null){
                 // 先删除
                 CacheUtil.del(PREFIX_ID_PERMISSIONS + userId);
-                // 清除空拦截
-                CacheUtil.delNilFlag(PREFIX_ID_PERMISSIONS + userId);
 
                 // 发送通知消息
                 redisPlugin.sendMessage(
@@ -610,17 +634,24 @@ public class UserUtil {
     public static void refreshUserMenus(String userId){
         try {
             Object obj = CacheUtil.get(PREFIX_ID_MENUS + userId);
+            boolean hasNilFlag = CacheUtil.hasNilFlag(PREFIX_ID_MENUS + userId);
+
+            // 只要不为空 则执行刷新
+            if (hasNilFlag){
+                // 清除空拦截
+                CacheUtil.delNilFlag(PREFIX_ID_MENUS + userId);
+            }
+
             if(obj != null){
                 // 先删除
                 CacheUtil.del(PREFIX_ID_MENUS + userId);
-                // 清除空拦截
-                CacheUtil.delNilFlag(PREFIX_ID_MENUS + userId);
 
                 // 发送通知消息
                 redisPlugin.sendMessage(
                         UserMsgFactory.createUserMenusMsg(userId, null)
                 );
             }
+
         }catch (Exception e){
             log.error(e.getMessage(), e);
         }

@@ -66,7 +66,18 @@ spring:
     # 默认编码
     default-encoding: UTF-8
 
-  # 一级缓存  ---- redis 配置
+  # 缓存配置项
+  cache-conf:
+    # 前缀
+    prefix: opsli
+  # 一级缓存 ---- EhCache 配置
+  cache:
+    # 开启 是否启用本地缓存
+    enable: true
+    # 加载配置文件
+    jcache:
+      config: classpath:config/ehcache-opsli.xml
+  # 二级缓存  ---- Redis 配置
   redis:
     # 开启消息订阅
     pushsub:
@@ -78,13 +89,6 @@ spring:
         max-wait: -1ms  #最大建立连接等待时间。如果超过此时间将接到异常。设为-1表示无限制。
         min-idle: 0     #最小等待连接中的数量,设 0 为没有限制
       shutdown-timeout: 100ms
-  # 二级缓存 ---- EhCache 配置
-  cache:
-    # 开启 是否启用本地缓存
-    enable: true
-    # 加载配置文件
-    jcache:
-      config: classpath:config/ehcache-opsli.xml
 
   # 数据库配置
   datasource:

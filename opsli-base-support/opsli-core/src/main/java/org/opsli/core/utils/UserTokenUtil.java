@@ -26,6 +26,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.crypto.hash.Md5Hash;
 import org.opsli.api.base.result.ResultVo;
 import org.opsli.api.wrapper.system.user.UserModel;
+import org.opsli.common.constants.CacheConstants;
 import org.opsli.common.constants.SignConstants;
 import org.opsli.common.constants.TokenConstants;
 import org.opsli.common.exception.ServiceException;
@@ -62,11 +63,11 @@ public class UserTokenUtil {
     /** token 缓存名 */
     public static final String TOKEN_NAME = TokenConstants.ACCESS_TOKEN;
     /** 缓存前缀 */
-    private static final String PREFIX = "opsli:ticket:";
+    private static final String TICKET_PREFIX;
     /** 账号失败次数 */
-    public static final String ACCOUNT_SLIP_COUNT_PREFIX = "opsli:account:slip:count:";
+    public static final String ACCOUNT_SLIP_COUNT_PREFIX;
     /** 账号失败锁定KEY */
-    public static final String ACCOUNT_SLIP_LOCK_PREFIX = "opsli:account:slip:lock:";
+    public static final String ACCOUNT_SLIP_LOCK_PREFIX;
     /** 账号失败阈值 */
     public static final int ACCOUNT_SLIP_COUNT;
     /** 账号失败N次后弹出验证码 */
@@ -77,14 +78,23 @@ public class UserTokenUtil {
     /** Redis插件 */
     private static RedisPlugin redisPlugin;
 
+    /** 热点数据前缀 */
+    public static final String PREFIX_NAME;
 
-
-    static {
+    static{
+        // 缓存前缀
         Props props = new Props("application.yaml");
+        PREFIX_NAME = props.getStr("spring.cache-conf.prefix", CacheConstants.PREFIX_NAME) + ":";
+        TICKET_PREFIX = PREFIX_NAME + "ticket:";
+        ACCOUNT_SLIP_COUNT_PREFIX = PREFIX_NAME + "account:slip:count:";
+        ACCOUNT_SLIP_LOCK_PREFIX = PREFIX_NAME + "account:slip:lock:";
+
+        // 配置数据
         ACCOUNT_SLIP_COUNT = props.getInt("opsli.login.slip-count", 5);
         ACCOUNT_SLIP_VERIFY_COUNT = props.getInt("opsli.login.slip-verify-count", 3);
         ACCOUNT_SLIP_LOCK_SPEED = props.getInt("opsli.login.slip-lock-speed", 300);
     }
+
 
     /**
      * 根据 user 创建Token
@@ -121,7 +131,7 @@ public class UserTokenUtil {
 
             // token 缓存真实失效时间 建议大于 最终时间 -- 多加了20分钟的失效时间
             // 在redis存一份 token 是为了防止 认为造假
-            boolean tokenFlag = redisPlugin.put(PREFIX + signTokenHex, endTimestamp, expire + 20);
+            boolean tokenFlag = redisPlugin.put(TICKET_PREFIX + signTokenHex, endTimestamp, expire + 20);
             if(tokenFlag){
                 map.put("token", signToken);
                 map.put("expire", endTimestamp);
@@ -177,7 +187,7 @@ public class UserTokenUtil {
             // 生成MD5 16进制码 用于缩减存储
             String signTokenHex = new Md5Hash(token).toHex();
 
-            redisPlugin.del(PREFIX + signTokenHex);
+            redisPlugin.del(TICKET_PREFIX + signTokenHex);
 
             // 删除相关信息
             String userId = getUserIdByToken(token);
@@ -209,7 +219,7 @@ public class UserTokenUtil {
             // 2. 校验当前缓存中token是否失效
             // 生成MD5 16进制码 用于缩减存储
             String signTokenHex = new Md5Hash(token).toHex();
-            Long  endTimestamp = (Long) redisPlugin.get(PREFIX + signTokenHex);
+            Long  endTimestamp = (Long) redisPlugin.get(TICKET_PREFIX + signTokenHex);
             if(endTimestamp == null){
                 return false;
             }
