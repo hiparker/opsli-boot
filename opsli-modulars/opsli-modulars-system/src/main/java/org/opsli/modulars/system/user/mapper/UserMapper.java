@@ -15,12 +15,15 @@
  */
 package org.opsli.modulars.system.user.mapper;
 
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.opsli.api.wrapper.system.user.UserPassword;
 import org.opsli.modulars.system.menu.entity.SysMenu;
+import org.opsli.modulars.system.org.entity.SysOrg;
 import org.opsli.modulars.system.user.entity.SysUser;
+import org.opsli.modulars.system.user.entity.SysUserAndOrg;
 
 import java.util.List;
 
@@ -97,4 +100,11 @@ public interface UserMapper extends BaseMapper<SysUser> {
      * @return
      */
     boolean updateAvatar(SysUser entity);
+
+
+    /**
+     * 查询集合
+     * @return
+     */
+    List<SysUserAndOrg> findList(@Param("ew") Wrapper<SysUserAndOrg> wrapper);
 }

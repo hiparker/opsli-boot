@@ -13,30 +13,44 @@
 * License for the specific language governing permissions and limitations under
 * the License.
 */
-package org.opsli.modulars.system.area.service;
+package org.opsli.modulars.system.org.mapper;
 
-import org.opsli.api.wrapper.system.area.SysAreaModel;
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import org.opsli.core.base.entity.HasChildren;
-import org.opsli.core.base.service.interfaces.CrudServiceInterface;
-import org.opsli.modulars.system.area.entity.SysArea;
+import org.opsli.modulars.system.org.entity.SysOrg;
 
 import java.util.List;
-import java.util.Set;
 
 /**
 * @BelongsProject: opsli-boot
-* @BelongsPackage: org.opsli.modulars.system.area.service
+* @BelongsPackage: org.opsli.modulars.system.org.mapper
 * @Author: Parker
 * @CreateTime: 2020-11-28 18:59:59
-* @Description: 地域表 Service
+* @Description: 组织机构表 Mapper
 */
-public interface ISysAreaService extends CrudServiceInterface<SysArea, SysAreaModel> {
+@Mapper
+public interface SysOrgMapper extends BaseMapper<SysOrg> {
 
+    /**
+     * 唯一验证
+     * @return
+     */
+    Integer uniqueVerificationByCode(@Param("ew") Wrapper<SysOrg> wrapper);
 
     /**
      * 是否有下级
      * @return
      */
-    List<HasChildren> hasChildren(Set<String> parentIds);
+    List<HasChildren> hasChildren(@Param("ew") Wrapper<SysOrg> wrapper);
+
+
+    /**
+     * 是否被引用
+     * @return
+     */
+    Integer hasUse(@Param("ew") Wrapper<SysOrg> wrapper);
 
 }

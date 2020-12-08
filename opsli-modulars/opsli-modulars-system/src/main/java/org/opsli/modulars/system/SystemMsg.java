@@ -41,7 +41,7 @@ public enum SystemMsg implements BaseMsg {
     /**
      * 角色
      */
-    EXCEPTION_ROLE_UNIQUE(20200,"角色编号重复，该角色已存在！"),
+    EXCEPTION_ROLE_UNIQUE(20200,"角色编号重复，该角色已存在"),
     EXCEPTION_ROLE_ID_NOT_NULL(20201,"角色Id不可为空"),
     EXCEPTION_ROLE_PERMS_ERROR(20202,"角色权限设置失败"),
 
@@ -55,22 +55,26 @@ public enum SystemMsg implements BaseMsg {
     EXCEPTION_USER_ROLES_ERROR(20303,"用户角色设置失败"),
     EXCEPTION_USER_MENU_NOT_NULL(20304,"用户暂无角色菜单，请设置后登录"),
     EXCEPTION_USER_NO_UNIQUE(20305,"该工号已存在"),
+    EXCEPTION_ORG_NOT_NULL(20306,"组织不可为空"),
+    EXCEPTION_USER_ORG_ERROR(20307,"用户组织设置失败"),
+
 
 
     /**
      * 租户
      */
-    EXCEPTION_TENANT_UNIQUE(20400,"租户名称重复，该租户已存在！"),
+    EXCEPTION_TENANT_UNIQUE(20400,"租户名称重复，该租户已存在"),
 
     /**
      * 组织机构
      */
-    EXCEPTION_ORG_UNIQUE(20500,"组织机构编号重复，已存在！"),
+    EXCEPTION_ORG_UNIQUE(20500,"组织机构编号重复，已存在"),
+    EXCEPTION_ORG_USE(20501,"组织机构已被引用，不能删除"),
 
     /**
      * 地域
      */
-    EXCEPTION_AREA_UNIQUE(20600,"地域编号重复，已存在！"),
+    EXCEPTION_AREA_UNIQUE(20600,"地域编号重复，已存在"),
 
     ;
 

@@ -13,13 +13,15 @@
 * License for the specific language governing permissions and limitations under
 * the License.
 */
-package org.opsli.modulars.system.area.service.impl;
+package org.opsli.modulars.system.org.service.impl;
 
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.convert.Convert;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.opsli.api.wrapper.system.area.SysAreaModel;
+import org.opsli.api.wrapper.system.org.SysOrgModel;
 import org.opsli.common.constants.MyBatisConstants;
 import org.opsli.common.exception.ServiceException;
 import org.opsli.common.utils.HumpUtil;
@@ -27,10 +29,11 @@ import org.opsli.core.base.entity.HasChildren;
 import org.opsli.core.base.service.impl.CrudServiceImpl;
 import org.opsli.core.persistence.querybuilder.GenQueryBuilder;
 import org.opsli.core.persistence.querybuilder.QueryBuilder;
+import org.opsli.core.persistence.querybuilder.chain.TenantHandler;
 import org.opsli.modulars.system.SystemMsg;
-import org.opsli.modulars.system.area.entity.SysArea;
-import org.opsli.modulars.system.area.mapper.SysAreaMapper;
-import org.opsli.modulars.system.area.service.ISysAreaService;
+import org.opsli.modulars.system.org.entity.SysOrg;
+import org.opsli.modulars.system.org.mapper.SysOrgMapper;
+import org.opsli.modulars.system.org.service.ISysOrgService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,30 +44,30 @@ import java.util.Set;
 
 /**
 * @BelongsProject: opsli-boot
-* @BelongsPackage: org.opsli.modulars.system.area.service.impl
+* @BelongsPackage: org.opsli.modulars.system.org.service.impl
 * @Author: Parker
 * @CreateTime: 2020-11-28 18:59:59
-* @Description: 地域表 Service Impl
+* @Description: 组织机构表 Service Impl
 */
 @Service
-public class SysAreaServiceImpl extends CrudServiceImpl<SysAreaMapper, SysArea, SysAreaModel>
-    implements ISysAreaService {
+public class SysOrgServiceImpl extends CrudServiceImpl<SysOrgMapper, SysOrg, SysOrgModel>
+    implements ISysOrgService {
 
     @Autowired(required = false)
-    private SysAreaMapper mapper;
+    private SysOrgMapper mapper;
 
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public SysAreaModel insert(SysAreaModel model) {
+    public SysOrgModel insert(SysOrgModel model) {
         if(model == null) return null;
 
-        SysArea entity = super.transformM2T(model);
+        SysOrg entity = super.transformM2T(model);
         // 唯一验证
         Integer count = this.uniqueVerificationByCode(entity);
         if(count != null && count > 0){
             // 重复
-            throw new ServiceException(SystemMsg.EXCEPTION_AREA_UNIQUE);
+            throw new ServiceException(SystemMsg.EXCEPTION_ORG_UNIQUE);
         }
 
         // 如果上级ID 为空 则默认为 0
@@ -77,15 +80,15 @@ public class SysAreaServiceImpl extends CrudServiceImpl<SysAreaMapper, SysArea, 
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public SysAreaModel update(SysAreaModel model) {
+    public SysOrgModel update(SysOrgModel model) {
         if(model == null) return null;
 
-        SysArea entity = super.transformM2T(model);
+        SysOrg entity = super.transformM2T(model);
         // 唯一验证
         Integer count = this.uniqueVerificationByCode(entity);
         if(count != null && count > 0){
             // 重复
-            throw new ServiceException(SystemMsg.EXCEPTION_AREA_UNIQUE);
+            throw new ServiceException(SystemMsg.EXCEPTION_ORG_UNIQUE);
         }
 
         return super.update(model);
@@ -95,17 +98,42 @@ public class SysAreaServiceImpl extends CrudServiceImpl<SysAreaMapper, SysArea, 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean delete(String id) {
-        boolean ret = super.delete(id);
+        boolean ret;
+        if(StringUtils.isEmpty(id)){
+            return false;
+        }
+
+        QueryWrapper<SysOrg> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("org_id", id);
+        Integer count = mapper.hasUse(queryWrapper);
+        if(count > 0){
+            // 组织机构已被引用，不能删除
+            throw new ServiceException(SystemMsg.EXCEPTION_ORG_USE);
+        }
+
+        ret = super.delete(id);
         // 删除子数据
         this.deleteByParentId(id);
-
         return ret;
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean deleteAll(String[] ids) {
-        boolean ret = super.deleteAll(ids);
+        boolean ret;
+        if(ArrayUtils.isEmpty(ids)){
+            return false;
+        }
+
+        QueryWrapper<SysOrg> queryWrapper = new QueryWrapper<>();
+        queryWrapper.in("org_id", Convert.toList(String.class, ids));
+        Integer count = mapper.hasUse(queryWrapper);
+        if(count > 0){
+            // 组织机构已被引用，不能删除
+            throw new ServiceException(SystemMsg.EXCEPTION_ORG_USE);
+        }
+
+        ret = super.deleteAll(ids);
         // 删除子数据
         for (String id : ids) {
             this.deleteByParentId(id);
@@ -122,14 +150,14 @@ public class SysAreaServiceImpl extends CrudServiceImpl<SysAreaMapper, SysArea, 
     @Transactional(rollbackFor = Exception.class)
     public boolean deleteByParentId(String parentId) {
         boolean ret = false;
-        QueryBuilder<SysArea> queryBuilder = new GenQueryBuilder<>();
-        QueryWrapper<SysArea> queryWrapper = queryBuilder.build();
+        QueryBuilder<SysOrg> queryBuilder = new GenQueryBuilder<>();
+        QueryWrapper<SysOrg> queryWrapper = queryBuilder.build();
         queryWrapper.eq(HumpUtil.humpToUnderline(MyBatisConstants.FIELD_PARENT_ID), parentId);
-        List<SysArea> childList = super.findList(queryWrapper);
-        for (SysArea child : childList) {
-            super.delete(child.getId());
+        List<SysOrg> menuList = super.findList(queryWrapper);
+        for (SysOrg sysOrg : menuList) {
+            super.delete(sysOrg.getId());
             // 逐级删除子数据
-            ret = this.deleteByParentId(child.getId());
+            ret = this.deleteByParentId(sysOrg.getId());
         }
         return ret;
     }
@@ -140,17 +168,20 @@ public class SysAreaServiceImpl extends CrudServiceImpl<SysAreaMapper, SysArea, 
      * @return
      */
     @Transactional(readOnly = true)
-    public Integer uniqueVerificationByCode(SysArea entity){
-        QueryWrapper<SysArea> wrapper = new QueryWrapper<>();
+    public Integer uniqueVerificationByCode(SysOrg entity){
+        QueryWrapper<SysOrg> wrapper = new QueryWrapper<>();
 
         // code 唯一
-        wrapper.eq("area_code", entity.getAreaCode())
+        wrapper.eq("org_code", entity.getOrgCode())
                .eq(MyBatisConstants.FIELD_DELETE_LOGIC, "0");
 
         // 如果为修改 则跳过当前数据
         if(StringUtils.isNotBlank(entity.getId())){
             wrapper.notIn(MyBatisConstants.FIELD_ID, entity.getId());
         }
+
+        // 租户检测
+        wrapper = new TenantHandler().handler(super.entityClazz, wrapper);
 
         return mapper.uniqueVerificationByCode(wrapper);
     }
@@ -167,7 +198,7 @@ public class SysAreaServiceImpl extends CrudServiceImpl<SysAreaMapper, SysArea, 
         if(CollUtil.isEmpty(parentIds)){
             return null;
         }
-        QueryWrapper<SysArea> wrapper = new QueryWrapper<>();
+        QueryWrapper<SysOrg> wrapper = new QueryWrapper<>();
 
         wrapper.in(HumpUtil.humpToUnderline(MyBatisConstants.FIELD_PARENT_ID), parentIds)
                 .eq(MyBatisConstants.FIELD_DELETE_LOGIC, "0")

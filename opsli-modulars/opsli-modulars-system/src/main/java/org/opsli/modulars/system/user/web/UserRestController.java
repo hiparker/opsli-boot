@@ -15,35 +15,46 @@
  */
 package org.opsli.modulars.system.user.web;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.RandomUtil;
 import com.alibaba.excel.util.CollectionUtils;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.opsli.api.base.result.ResultVo;
 import org.opsli.api.web.system.user.UserApi;
 import org.opsli.api.wrapper.system.menu.MenuModel;
-import org.opsli.api.wrapper.system.user.UserInfo;
-import org.opsli.api.wrapper.system.user.UserModel;
-import org.opsli.api.wrapper.system.user.UserPassword;
+import org.opsli.api.wrapper.system.org.SysOrgModel;
+import org.opsli.api.wrapper.system.user.*;
 import org.opsli.common.annotation.ApiRestController;
 import org.opsli.common.annotation.EnableLog;
+import org.opsli.common.constants.MyBatisConstants;
 import org.opsli.common.exception.TokenException;
-import org.opsli.common.utils.IPUtil;
+import org.opsli.common.utils.HumpUtil;
 import org.opsli.common.utils.WrapperUtil;
 import org.opsli.core.base.concroller.BaseRestController;
 import org.opsli.core.msg.CoreMsg;
 import org.opsli.core.msg.TokenMsg;
 import org.opsli.core.persistence.Page;
+import org.opsli.core.persistence.querybuilder.GenQueryBuilder;
 import org.opsli.core.persistence.querybuilder.QueryBuilder;
 import org.opsli.core.persistence.querybuilder.WebQueryBuilder;
+import org.opsli.core.utils.OrgUtil;
 import org.opsli.core.utils.UserUtil;
-import org.opsli.modulars.system.SystemMsg;
+import org.opsli.modulars.system.org.entity.SysOrg;
+import org.opsli.modulars.system.org.service.ISysOrgService;
+import org.opsli.modulars.system.org.web.SysOrgRestController;
 import org.opsli.modulars.system.user.entity.SysUser;
+import org.opsli.modulars.system.user.entity.SysUserAndOrg;
 import org.opsli.modulars.system.user.service.IUserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
@@ -54,6 +65,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -71,6 +83,8 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
     @Value("${opsli.web.upload-path}")
     private String basedir;
 
+    @Autowired
+    private ISysOrgService iSysOrgService;
 
     /**
      * 当前登陆用户信息
@@ -111,6 +125,29 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
         return ResultVo.success(userInfo);
     }
 
+
+    /**
+     * 当前登陆用户组织机构
+     * @return ResultVo
+     */
+    @ApiOperation(value = "当前登陆用户组织机构", notes = "当前登陆用户组织机构")
+    @Override
+    public ResultVo<UserOrgRefModel> getOrg() {
+        UserModel user = UserUtil.getUser();
+        return this.getOrgByUserId(user.getId());
+    }
+
+    /**
+     * 用户组织机构
+     * @param userId
+     * @return ResultVo
+     */
+    @ApiOperation(value = "用户组织机构", notes = "用户组织机构")
+    @Override
+    public ResultVo<UserOrgRefModel> getOrgByUserId(String userId) {
+        UserOrgRefModel orgRef = OrgUtil.getOrgByUserId(userId);
+        return ResultVo.success(orgRef);
+    }
 
     /**
      * 根据 userId 获得用户角色Id集合
@@ -236,14 +273,36 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
     @ApiOperation(value = "获得分页数据", notes = "获得分页数据 - 查询构造器")
     @RequiresPermissions("system_user_select")
     @Override
-    public ResultVo<?> findPage(Integer pageNo, Integer pageSize, HttpServletRequest request) {
+    public ResultVo<?> findPage(Integer pageNo, Integer pageSize, UserOrgRefModel org, HttpServletRequest request) {
+        QueryBuilder<SysUserAndOrg> queryBuilder = new WebQueryBuilder<>(SysUserAndOrg.class, request.getParameterMap());
+        Page<SysUserAndOrg, UserAndOrgModel> page = new Page<>(pageNo, pageSize);
+        QueryWrapper<SysUserAndOrg> queryWrapper = queryBuilder.build();
+        if(org != null){
+            // 公司ID
+            if(StringUtils.isNotBlank(org.getCompanyId())){
+                // 未分组判断
+                if(SysOrgRestController.ORG_NULL.equals(org.getCompanyId())){
+                    queryWrapper.isNull("b.org_id");
 
-        QueryBuilder<SysUser> queryBuilder = new WebQueryBuilder<>(SysUser.class, request.getParameterMap());
-        Page<SysUser, UserModel> page = new Page<>(pageNo, pageSize);
-        page.setQueryWrapper(queryBuilder.build());
-        page = IService.findPage(page);
+                }else{
+                    queryWrapper.eq("b.org_id", org.getCompanyId());
+                }
+            }
+
+            // 部门ID
+            if(StringUtils.isNotBlank(org.getDepartmentId())){
+                queryWrapper.eq("c.org_id", org.getDepartmentId());
+            }
+
+            // 岗位ID
+            if(StringUtils.isNotBlank(org.getPostId())){
+                queryWrapper.eq("d.org_id", org.getPostId());
+            }
+        }
+        page.setQueryWrapper(queryWrapper);
+        page = IService.findPageByCus(page);
         // 密码防止分页泄露处理
-        for (UserModel userModel : page.getList()) {
+        for (UserAndOrgModel userModel : page.getList()) {
             userModel.setSecretkey(null);
             userModel.setPassword(null);
         }
@@ -407,5 +466,72 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
     public ResultVo<List<MenuModel>> getMenuListByUserId(String userId) {
         List<MenuModel> menuModelList = IService.getMenuListByUserId(userId);
         return ResultVo.success(menuModelList);
+    }
+
+
+    /**
+     * 用户组织机构
+     * @param userId
+     * @return ResultVo
+     */
+    @ApiOperation(value = "用户组织机构", notes = "用户组织机构")
+    @Override
+    public ResultVo<UserOrgRefModel> getOrgInfoByUserId(String userId) {
+        UserOrgRefModel org = null;
+        // 不写SQL了 直接分页 第一页 取第一条
+        QueryBuilder<SysUserAndOrg> queryBuilder = new GenQueryBuilder<>();
+        Page<SysUserAndOrg, UserAndOrgModel> page = new Page<>(1, 1);
+        QueryWrapper<SysUserAndOrg> queryWrapper = queryBuilder.build();
+        queryWrapper.eq(
+                "a.id",
+                userId
+        );
+        page.setQueryWrapper(queryWrapper);
+        page = IService.findPageByCus(page);
+        List<UserAndOrgModel> list = page.getList();
+        if(CollUtil.isNotEmpty(list)){
+            UserAndOrgModel userAndOrgModel = list.get(0);
+            if(userAndOrgModel != null){
+                org  = userAndOrgModel.getOrg();
+                if(org != null){
+
+                    org.setUserId(userId);
+
+                    List<String> orgIds = Lists.newArrayListWithCapacity(3);
+                    orgIds.add(org.getCompanyId());
+                    orgIds.add(org.getDepartmentId());
+                    orgIds.add(org.getPostId());
+                    QueryWrapper<SysOrg> orgQueryWrapper = new QueryWrapper<>();
+                    orgQueryWrapper.in(
+                            HumpUtil.humpToUnderline(MyBatisConstants.FIELD_ID),
+                            orgIds);
+                    List<SysOrg> orgList = iSysOrgService.findList(orgQueryWrapper);
+                    if(CollUtil.isNotEmpty(orgList)){
+                        Map<String, SysOrg> tmp = Maps.newHashMap();
+                        for (SysOrg sysOrg : orgList) {
+                            tmp.put(sysOrg.getId(), sysOrg);
+                        }
+
+                        // 设置 名称
+                        SysOrg company = tmp.get(org.getCompanyId());
+                        if(company != null){
+                            org.setCompanyName(company.getOrgName());
+                        }
+
+                        SysOrg department = tmp.get(org.getDepartmentId());
+                        if(department != null){
+                            org.setDepartmentName(department.getOrgName());
+                        }
+
+                        SysOrg post = tmp.get(org.getPostId());
+                        if(post != null){
+                            org.setPostName(post.getOrgName());
+                        }
+                    }
+
+                }
+            }
+        }
+        return ResultVo.success(org);
     }
 }

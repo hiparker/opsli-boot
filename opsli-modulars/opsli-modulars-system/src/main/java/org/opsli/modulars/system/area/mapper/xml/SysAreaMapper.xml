@@ -12,7 +12,7 @@
         </where>
     </select>
 
-    <select id="hasChildren" parameterType="SysArea" resultType="org.opsli.modulars.system.area.entity.HasChildren">
+    <select id="hasChildren" parameterType="SysArea" resultType="org.opsli.core.base.entity.HasChildren">
         select
             parent_id as parentId,
             count(0) as `count`

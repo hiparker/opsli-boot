@@ -13,25 +13,26 @@
 * License for the specific language governing permissions and limitations under
 * the License.
 */
-package org.opsli.modulars.system.area.service;
+package org.opsli.modulars.system.org.service;
 
-import org.opsli.api.wrapper.system.area.SysAreaModel;
 import org.opsli.core.base.entity.HasChildren;
 import org.opsli.core.base.service.interfaces.CrudServiceInterface;
-import org.opsli.modulars.system.area.entity.SysArea;
+
+
+import org.opsli.modulars.system.org.entity.SysOrg;
+import org.opsli.api.wrapper.system.org.SysOrgModel;
 
 import java.util.List;
 import java.util.Set;
 
 /**
 * @BelongsProject: opsli-boot
-* @BelongsPackage: org.opsli.modulars.system.area.service
+* @BelongsPackage: org.opsli.modulars.system.org.service
 * @Author: Parker
 * @CreateTime: 2020-11-28 18:59:59
-* @Description: 地域表 Service
+* @Description: 组织机构表 Service
 */
-public interface ISysAreaService extends CrudServiceInterface<SysArea, SysAreaModel> {
-
+public interface ISysOrgService extends CrudServiceInterface<SysOrg, SysOrgModel> {
 
     /**
      * 是否有下级

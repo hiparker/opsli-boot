@@ -17,8 +17,11 @@ package org.opsli.modulars.system.user.service.impl;
 
 import cn.hutool.core.util.RandomUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.github.pagehelper.PageInfo;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.ss.formula.functions.T;
 import org.opsli.api.wrapper.system.menu.MenuModel;
+import org.opsli.api.wrapper.system.user.UserAndOrgModel;
 import org.opsli.api.wrapper.system.user.UserModel;
 import org.opsli.api.wrapper.system.user.UserPassword;
 import org.opsli.common.constants.MyBatisConstants;
@@ -29,10 +32,12 @@ import org.opsli.core.base.service.impl.CrudServiceImpl;
 import org.opsli.core.persistence.Page;
 import org.opsli.core.persistence.querybuilder.GenQueryBuilder;
 import org.opsli.core.persistence.querybuilder.QueryBuilder;
+import org.opsli.core.persistence.querybuilder.chain.TenantHandler;
 import org.opsli.core.utils.UserUtil;
 import org.opsli.modulars.system.SystemMsg;
 import org.opsli.modulars.system.menu.entity.SysMenu;
 import org.opsli.modulars.system.user.entity.SysUser;
+import org.opsli.modulars.system.user.entity.SysUserAndOrg;
 import org.opsli.modulars.system.user.mapper.UserMapper;
 import org.opsli.modulars.system.user.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -255,6 +260,31 @@ public class UserServiceImpl extends CrudServiceImpl<UserMapper, SysUser, UserMo
         sysUser.setAvatar(model.getAvatar());
         return mapper.updateAvatar(sysUser);
     }
+
+
+    public List<SysUserAndOrg> findListByCus(QueryWrapper<SysUserAndOrg> queryWrapper) {
+        // 多租户处理
+        QueryWrapper<SysUserAndOrg> qWrapper = new TenantHandler().handler(SysUserAndOrg.class, queryWrapper);
+        // 逻辑删除 查询未删除数据
+        qWrapper.eq(HumpUtil.humpToUnderline(MyBatisConstants.FIELD_DELETE_LOGIC),
+            "0"
+        );
+        return mapper.findList(qWrapper);
+    }
+
+    public Page<SysUserAndOrg,UserAndOrgModel> findPageByCus(Page<SysUserAndOrg,UserAndOrgModel> page) {
+        page.pageHelperBegin();
+        try{
+            List<SysUserAndOrg> list = this.findListByCus(page.getQueryWrapper());
+            PageInfo<SysUserAndOrg> pageInfo = new PageInfo<>(list);
+            List<UserAndOrgModel> es = WrapperUtil.transformInstance(pageInfo.getList(), UserAndOrgModel.class);
+            page.instance(pageInfo, es);
+        } finally {
+            page.pageHelperEnd();
+        }
+        return page;
+    }
+
 }
 
 

@@ -17,15 +17,14 @@ package org.opsli.api.web.system.user;
 
 import org.opsli.api.base.result.ResultVo;
 import org.opsli.api.wrapper.system.menu.MenuModel;
-import org.opsli.api.wrapper.system.role.RoleModel;
 import org.opsli.api.wrapper.system.user.UserInfo;
 import org.opsli.api.wrapper.system.user.UserModel;
+import org.opsli.api.wrapper.system.user.UserOrgRefModel;
 import org.opsli.api.wrapper.system.user.UserPassword;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import javax.servlet.http.HttpServletRequest;
@@ -65,6 +64,20 @@ public interface UserApi {
      */
     @GetMapping("/getInfoById")
     ResultVo<UserInfo> getInfoById(@RequestParam(name = "userId") String userId);
+
+    /**
+     * 当前登陆用户信息
+     * @return ResultVo
+     */
+    @GetMapping("/getOrg")
+    ResultVo<UserOrgRefModel> getOrg();
+
+    /**
+     * 当前登陆用户信息
+     * @return ResultVo
+     */
+    @GetMapping("/getOrgByUserId")
+    ResultVo<UserOrgRefModel> getOrgByUserId(@RequestParam(name = "userId") String userId);
 
     /**
      * 根据 userId 获得用户角色Id集合
@@ -118,6 +131,7 @@ public interface UserApi {
     ResultVo<?> findPage(
             @RequestParam(name = "pageNo", defaultValue = "1") Integer pageNo,
             @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize,
+            UserOrgRefModel org,
             HttpServletRequest request
     );
 
@@ -211,5 +225,13 @@ public interface UserApi {
      */
     //@GetMapping("/queryAllPerms")
     ResultVo<List<MenuModel>> getMenuListByUserId(String userId);
+
+
+    /**
+     * 当前登陆用户信息
+     * @return ResultVo
+     */
+    ResultVo<UserOrgRefModel> getOrgInfoByUserId(String userId);
+
 
 }

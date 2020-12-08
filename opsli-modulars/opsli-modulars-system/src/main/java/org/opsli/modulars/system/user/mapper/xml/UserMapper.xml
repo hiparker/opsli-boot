@@ -3,7 +3,7 @@
 <mapper namespace="org.opsli.modulars.system.user.mapper.UserMapper">
 
     <!-- 数据库字段 -->
-    <sql id="SysDictColumns">
+    <sql id="columns">
 		a.id as id,
 
 		a.username as username,
@@ -27,8 +27,29 @@
         a.deleted as deleted
 	</sql>
 
-    <sql id="SysDictJoins">
+    <sql id="joinsColumns">
+		,b.org_id as 'org.companyId',
+		c.org_id as 'org.departmentId',
+		d.org_id as 'org.postId'
 	</sql>
+
+    <sql id="joins">
+        left join sys_user_org_ref b on b.user_id = a.id and b.org_type = '1'
+        left join sys_user_org_ref c on c.user_id = a.id and c.org_type = '2'
+        left join sys_user_org_ref d on d.user_id = a.id and d.org_type = '3'
+	</sql>
+
+    <select id="findList" parameterType="SysUser" resultType="SysUserAndOrg">
+        select
+            <include refid="columns"></include>
+            <include refid="joinsColumns"></include>
+        from
+        sys_user a
+        <include refid="joins"></include>
+        <where>
+            ${ew.sqlSegment}
+        </where>
+    </select>
 
     <select id="uniqueVerificationByUsername" parameterType="SysUser" resultType="Integer">
         select
