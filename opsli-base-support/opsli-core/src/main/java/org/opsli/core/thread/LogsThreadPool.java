@@ -2,15 +2,11 @@ package org.opsli.core.thread;
 
 import lombok.extern.slf4j.Slf4j;
 import org.opsli.api.base.result.ResultVo;
-import org.opsli.api.thread.factory.NameableThreadFactory;
 import org.opsli.api.web.system.logs.LogsApi;
 import org.opsli.api.wrapper.system.logs.LogsModel;
-import org.opsli.common.api.TokenThreadLocal;
+import org.opsli.common.thread.AsyncProcessQueue;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 /**
  * @BelongsProject: tank-design
@@ -24,10 +20,6 @@ import java.util.concurrent.Executors;
 public class LogsThreadPool {
 
 
-    private static final ExecutorService EXECUTOR_SERVICE = Executors.newFixedThreadPool(4,
-            new NameableThreadFactory("日志保存线程"));
-
-
     /** 日志API */
     private static LogsApi logsApi;
 
@@ -39,16 +31,13 @@ public class LogsThreadPool {
         if(logsModel == null){
             return;
         }
-        EXECUTOR_SERVICE.submit(()->{
+
+        AsyncProcessQueue.execute(()->{
             // 存储临时 token
-           try {
-               ResultVo<?> ret = logsApi.insert(logsModel);
-               if(!ret.isSuccess()){
-                   log.error(ret.getMsg());
-               }
-           }catch (Exception e){
-               log.error(e.getMessage(), e);
-           }
+            ResultVo<?> ret = logsApi.insert(logsModel);
+            if(!ret.isSuccess()){
+                log.error(ret.getMsg());
+            }
         });
     }
 
