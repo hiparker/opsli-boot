@@ -318,6 +318,9 @@ public class MenuRestController extends BaseRestController<SysMenu, MenuModel, I
     @EnableLog
     @Override
     public ResultVo<?> insert(MenuModel model) {
+        // 演示模式 不允许操作
+        super.demoError();
+
         // 调用新增方法
         IService.insert(model);
         return ResultVo.success("新增菜单成功");
