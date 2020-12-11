@@ -158,6 +158,12 @@ mybatis-plus:
 
 # opsli 自定义配置
 opsli:
+  # token 认证
+  token-auth:
+    # 排除过滤url 格式 - List
+    url-exclusion:
+      - "/test.html"
+
   # Java 软防火墙
   waf:
     # 开启防护

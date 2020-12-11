@@ -15,6 +15,7 @@
  */
 package org.opsli.core.conf;
 
+import cn.hutool.core.collection.CollUtil;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.session.mgt.SessionManager;
 import org.apache.shiro.spring.LifecycleBeanPostProcessor;
@@ -22,6 +23,7 @@ import org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSource
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
+import org.opsli.common.utils.Props;
 import org.opsli.core.security.shiro.filter.OAuth2Filter;
 import org.opsli.core.security.shiro.realm.OAuth2Realm;
 import org.opsli.plugins.redis.conf.RedisPluginConfig;
@@ -35,6 +37,7 @@ import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactor
 import javax.servlet.Filter;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -49,6 +52,13 @@ import java.util.Map;
 @AutoConfigureAfter(RedisPluginConfig.class)
 public class ShiroConfig {
 
+    /** 获得排除URL */
+    private static final List<String> URL_EXCLUSION;
+
+    static{
+        Props props = new Props("application.yaml");
+        URL_EXCLUSION = props.getList("opsli.token-auth.url-exclusion");
+    }
 
     /**
      * filer
@@ -80,6 +90,14 @@ public class ShiroConfig {
         filterMap.put("/ueditor/**", "anon");
         filterMap.put("/static/file/**", "anon");
         filterMap.put("/**", "oauth2");
+
+        // 加载排除URL
+        if(CollUtil.isNotEmpty(URL_EXCLUSION)){
+            for (String excUrl : URL_EXCLUSION) {
+                filterMap.put(excUrl, "anon");
+            }
+        }
+
         shiroFilter.setFilterChainDefinitionMap(filterMap);
 
         return shiroFilter;
