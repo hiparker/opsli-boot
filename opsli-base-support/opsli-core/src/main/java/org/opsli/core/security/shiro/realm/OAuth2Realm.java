@@ -25,6 +25,9 @@ import java.util.List;
 @Component
 public class OAuth2Realm extends AuthorizingRealm {
 
+    /** 账号锁定状态 */
+    private static final char LOCK_VAL = '1';
+
     @Override
     public boolean supports(AuthenticationToken token) {
         return token instanceof OAuth2Token;
@@ -73,7 +76,7 @@ public class OAuth2Realm extends AuthorizingRealm {
         UserModel user = UserUtil.getUser(userId);
 
         // 3. 校验账户是否锁定
-        if(user == null || user.getLocked().equals('1')){
+        if(user == null || user.getLocked().equals(LOCK_VAL)){
             // 账号已被锁定,请联系管理员
             // token失效，请重新登录
             throw new TokenException(

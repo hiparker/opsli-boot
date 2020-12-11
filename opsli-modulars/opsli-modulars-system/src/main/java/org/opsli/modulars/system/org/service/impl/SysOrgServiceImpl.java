@@ -60,7 +60,9 @@ public class SysOrgServiceImpl extends CrudServiceImpl<SysOrgMapper, SysOrg, Sys
     @Override
     @Transactional(rollbackFor = Exception.class)
     public SysOrgModel insert(SysOrgModel model) {
-        if(model == null) return null;
+        if(model == null){
+            return null;
+        }
 
         SysOrg entity = super.transformM2T(model);
         // 唯一验证
@@ -81,7 +83,9 @@ public class SysOrgServiceImpl extends CrudServiceImpl<SysOrgMapper, SysOrg, Sys
     @Transactional(rollbackFor = Exception.class)
     @Override
     public SysOrgModel update(SysOrgModel model) {
-        if(model == null) return null;
+        if(model == null){
+            return null;
+        }
 
         SysOrg entity = super.transformM2T(model);
         // 唯一验证

@@ -81,7 +81,9 @@ public class DictUtil {
         if (cacheModel != null){
             dictName = cacheModel.getDictName();
         }
-        if (StringUtils.isNotEmpty(dictName)) return dictName;
+        if (StringUtils.isNotEmpty(dictName)){
+            return dictName;
+        }
 
 
         // 防止缓存穿透判断
@@ -112,7 +114,9 @@ public class DictUtil {
             if (cacheModel != null){
                 dictName = cacheModel.getDictName();
             }
-            if (StringUtils.isNotEmpty(dictName)) return dictName;
+            if (StringUtils.isNotEmpty(dictName)){
+                return dictName;
+            }
 
             // 查询数据库 并保存到缓存内
             ResultVo<List<DictDetailModel>> resultVo = dictDetailApi.findListByTypeCode(typeCode);
@@ -168,7 +172,9 @@ public class DictUtil {
         if (cacheModel != null){
             dictValue = cacheModel.getDictValue();
         }
-        if (StringUtils.isNotEmpty(dictValue)) return dictValue;
+        if (StringUtils.isNotEmpty(dictValue)){
+            return dictValue;
+        }
 
         // 防止缓存穿透判断
         boolean hasNilFlag = CacheUtil.hasNilFlag(DictConstants.CACHE_PREFIX_NAME + typeCode + ":" + dictName);
@@ -196,7 +202,9 @@ public class DictUtil {
             if (cacheModel != null){
                 dictValue = cacheModel.getDictValue();
             }
-            if (StringUtils.isNotEmpty(dictValue)) return dictValue;
+            if (StringUtils.isNotEmpty(dictValue)){
+                return dictValue;
+            }
 
             // 查询数据库 并保存到缓存内
             ResultVo<List<DictDetailModel>> resultVo = dictDetailApi.findListByTypeCode(typeCode);

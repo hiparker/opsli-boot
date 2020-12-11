@@ -317,7 +317,9 @@ public class DictDetailServiceImpl extends CrudServiceImpl<DictDetailMapper, Sys
     @Transactional(rollbackFor = Exception.class)
     @Override
     public boolean delByParent(String parentId) {
-        if(StringUtils.isEmpty(parentId)) return false;
+        if(StringUtils.isEmpty(parentId)){
+            return false;
+        }
 
         String key = HumpUtil.humpToUnderline("typeId");
         QueryBuilder<SysDictDetail> queryBuilder = new GenQueryBuilder<>();
@@ -355,7 +357,9 @@ public class DictDetailServiceImpl extends CrudServiceImpl<DictDetailMapper, Sys
      */
     @Override
     public List<DictDetailModel> findListByTypeCode(String typeCode) {
-        if(StringUtils.isEmpty(typeCode)) return null;
+        if(StringUtils.isEmpty(typeCode)){
+            return null;
+        }
 
         String key = HumpUtil.humpToUnderline("typeCode");
         String deleted = HumpUtil.humpToUnderline("deleted");

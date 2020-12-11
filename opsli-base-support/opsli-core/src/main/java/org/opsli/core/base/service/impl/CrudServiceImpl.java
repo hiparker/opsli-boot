@@ -66,11 +66,11 @@ public abstract class CrudServiceImpl<M extends BaseMapper<T>, T extends BaseEnt
     /** Entity Clazz 类 */
     protected Class<T> entityClazz;
     /** Entity 泛型游标 */
-    private static final int entityIndex = 1;
+    private static final int ENTITY_INDEX = 1;
     /** Model Clazz 类 */
     protected Class<E> modelClazz;
     /** Model 泛型游标 */
-    private static final int modelIndex = 2;
+    private static final int MODEL_INDEX = 2;
 
     @Override
     public E get(String id) {
@@ -81,7 +81,9 @@ public abstract class CrudServiceImpl<M extends BaseMapper<T>, T extends BaseEnt
 
     @Override
     public E get(E model) {
-        if(model == null)  return null;
+        if(model == null){
+            return null;
+        }
         return transformT2M(
                 super.getById(model.getId())
         );
@@ -90,7 +92,9 @@ public abstract class CrudServiceImpl<M extends BaseMapper<T>, T extends BaseEnt
     @Override
     @Transactional(readOnly = false)
     public E insert(E model) {
-        if(model == null) return null;
+        if(model == null){
+            return null;
+        }
 
         // 默认清空 创建人和修改人
         if(model.getIzManual() != null && !model.getIzManual()){
@@ -111,7 +115,9 @@ public abstract class CrudServiceImpl<M extends BaseMapper<T>, T extends BaseEnt
     @Override
     @Transactional(readOnly = false)
     public boolean insertBatch(List<E> models) {
-        if(models == null || models.size() == 0) return false;
+        if(models == null || models.size() == 0){
+            return false;
+        }
 
         for (E model : models) {
             // 默认清空 创建人和修改人
@@ -131,7 +137,9 @@ public abstract class CrudServiceImpl<M extends BaseMapper<T>, T extends BaseEnt
     @Override
     @Transactional(readOnly = false)
     public E update(E model) {
-        if(model == null) return null;
+        if(model == null){
+            return null;
+        }
 
         // 默认清空 创建人和修改人
         if(model.getIzManual() != null && !model.getIzManual()){
@@ -150,7 +158,9 @@ public abstract class CrudServiceImpl<M extends BaseMapper<T>, T extends BaseEnt
     @Override
     @Transactional(readOnly = false)
     public E save(E model) {
-        if(model == null) return null;
+        if(model == null){
+            return null;
+        }
 
         // 修改
         if(StringUtils.isNotBlank(model.getId())){
@@ -171,14 +181,18 @@ public abstract class CrudServiceImpl<M extends BaseMapper<T>, T extends BaseEnt
     @Override
     @Transactional(readOnly = false)
     public boolean delete(E model) {
-        if(model == null) return false;
+        if(model == null){
+            return false;
+        }
         return super.removeById(model.getId());
     }
 
     @Override
     @Transactional(readOnly = false)
     public boolean deleteAll(String[] ids) {
-        if(ids == null) return false;
+        if(ids == null){
+            return false;
+        }
         List<String> idList = Convert.toList(String.class, ids);
         return super.removeByIds(idList);
     }
@@ -186,7 +200,9 @@ public abstract class CrudServiceImpl<M extends BaseMapper<T>, T extends BaseEnt
     @Override
     @Transactional(readOnly = false)
     public boolean deleteAll(Collection<E> models) {
-        if(models == null || models.isEmpty()) return false;
+        if(models == null || models.isEmpty()){
+            return false;
+        }
         List<String> idList = Lists.newArrayListWithCapacity(models.size());
         for (E entity : models) {
             idList.add(entity.getId());
@@ -287,7 +303,7 @@ public abstract class CrudServiceImpl<M extends BaseMapper<T>, T extends BaseEnt
      */
     private Class<E> getModelClazz(){
         Class<E> tClass = null;
-        Type typeArgument = TypeUtil.getTypeArgument(getClass().getGenericSuperclass(), modelIndex);
+        Type typeArgument = TypeUtil.getTypeArgument(getClass().getGenericSuperclass(), MODEL_INDEX);
         if(typeArgument != null){
             tClass = (Class<E>) typeArgument;
         }
@@ -300,7 +316,7 @@ public abstract class CrudServiceImpl<M extends BaseMapper<T>, T extends BaseEnt
      */
     private Class<T> getEntityClazz(){
         Class<T> tClass = null;
-        Type typeArgument = TypeUtil.getTypeArgument(getClass().getGenericSuperclass(), entityIndex);
+        Type typeArgument = TypeUtil.getTypeArgument(getClass().getGenericSuperclass(), ENTITY_INDEX);
         if(typeArgument != null){
             tClass = (Class<T>) typeArgument;
         }

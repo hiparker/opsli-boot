@@ -113,7 +113,7 @@ public class Page<T extends BaseEntity,E extends ApiWrapper> extends PageSeriali
      * @return map对象
      */
     public Map<String, Object> getBootstrapData(){
-        Map<String, Object> map = new HashMap<>();
+        Map<String, Object> map = new HashMap<>(2);
         map.put("rows", this.getList());
         map.put("total", this.getTotal());
         return map;

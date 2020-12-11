@@ -52,6 +52,7 @@ import java.util.Map;
  */
 public enum CodeBuilder {
 
+    /** 实例对象 */
     INSTANCE;
 
     /** 排除字段 */
@@ -74,7 +75,9 @@ public enum CodeBuilder {
      * 构建
      */
     public void build(CreaterBuilderModel builderModel, HttpServletResponse response){
-        if(builderModel == null) return;
+        if(builderModel == null){
+            return;
+        }
 
         String dataStr = DateUtil.format(DateUtil.date(), "yyyyMMddHHmmss");
 

@@ -27,14 +27,12 @@ import org.opsli.common.utils.Props;
  */
 public final class MyBatisConstants {
 
-    private static final Props prop = new Props("application.yaml");
 
     /** 逻辑删除值 */
-    public static final char  LOGIC_DELETE_VALUE =
-            prop.getChar("mybatis-plus.global-config.db-config.logic-delete-value",'1');
+    public static final char  LOGIC_DELETE_VALUE;
     /** 逻辑不删除值 */
-    public static final char  LOGIC_NOT_DELETE_VALUE =
-            prop.getChar("mybatis-plus.global-config.db-config.logic-not-delete-value",'0');
+    public static final char  LOGIC_NOT_DELETE_VALUE;
+
 
     /** ID */
     public static final String FIELD_ID = "id";
@@ -54,6 +52,13 @@ public final class MyBatisConstants {
     public static final String FIELD_OPTIMISTIC_LOCK = "version";
     /** 多租户字段 */
     public static final String FIELD_TENANT = "tenantId";
+
+
+    static {
+        Props props = new Props("application.yaml");
+        LOGIC_DELETE_VALUE = props.getChar("mybatis-plus.global-config.db-config.logic-delete-value",'1');
+        LOGIC_NOT_DELETE_VALUE = props.getChar("mybatis-plus.global-config.db-config.logic-not-delete-value",'0');
+    }
 
     private MyBatisConstants(){}
 }

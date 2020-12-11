@@ -51,6 +51,8 @@ import java.util.*;
 @Intercepts(@Signature(type = Executor.class, method = "update", args = {MappedStatement.class, Object.class}))
 public class AutoFillInterceptor implements Interceptor {
 
+    private static final String ET = "et";
+
     @Override
     public Object intercept(Invocation invocation) throws IllegalAccessException, InvocationTargetException {
         fillField(invocation);
@@ -69,11 +71,12 @@ public class AutoFillInterceptor implements Interceptor {
             //String className = arg.getClass().getName();
             //log.info(i + " 参数类型：" + className);
             //第一个参数处理。根据它判断是否给“操作属性”赋值。
-            if (arg instanceof MappedStatement) {//如果是第一个参数 MappedStatement
+            //如果是第一个参数 MappedStatement
+            if (arg instanceof MappedStatement) {
                 MappedStatement ms = (MappedStatement) arg;
                 sqlCommandType = ms.getSqlCommandType();
-                //log.info("操作类型：" + sqlCommandType);
-                if (sqlCommandType == SqlCommandType.INSERT || sqlCommandType == SqlCommandType.UPDATE) {//如果是“增加”或“更新”操作，则继续进行默认操作信息赋值。否则，则退出
+                //如果是“增加”或“更新”操作，则继续进行默认操作信息赋值。否则，则退出
+                if (sqlCommandType == SqlCommandType.INSERT || sqlCommandType == SqlCommandType.UPDATE) {
                     continue;
                 } else {
                     break;
@@ -96,7 +99,9 @@ public class AutoFillInterceptor implements Interceptor {
      * @param arg
      */
     public void insertFill(Object arg) {
-        if(arg == null ) return;
+        if(arg == null ){
+            return;
+        }
 
         Field[] fields = ReflectUtil.getFields(arg.getClass());
         for (Field f : fields) {
@@ -162,14 +167,16 @@ public class AutoFillInterceptor implements Interceptor {
      * @param arg
      */
     public void updateFill(Object arg) {
-        if(arg == null ) return;
+        if(arg == null ){
+            return;
+        }
 
         // 2020-09-19
         // 修改这儿 有可能会拿到一个 MapperMethod，需要特殊处理
         Field[] fields;
         if (arg instanceof MapperMethod.ParamMap) {
             MapperMethod.ParamMap<?> paramMap = (MapperMethod.ParamMap<?>) arg;
-            if (paramMap.containsKey("et")) {
+            if (paramMap.containsKey(ET)) {
                 arg = paramMap.get("et");
             } else {
                 arg = paramMap.get("param1");

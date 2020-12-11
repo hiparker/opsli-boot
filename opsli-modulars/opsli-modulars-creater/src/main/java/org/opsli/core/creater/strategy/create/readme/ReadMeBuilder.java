@@ -39,6 +39,7 @@ import java.util.Map;
  */
 public enum ReadMeBuilder {
 
+    /** 实例对象 */
     INSTANCE;
 
     /**

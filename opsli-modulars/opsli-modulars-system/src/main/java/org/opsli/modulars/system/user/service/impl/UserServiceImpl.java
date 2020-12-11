@@ -65,7 +65,9 @@ public class UserServiceImpl extends CrudServiceImpl<UserMapper, SysUser, UserMo
     @Override
     @Transactional(rollbackFor = Exception.class)
     public UserModel insert(UserModel model) {
-        if(model == null) return null;
+        if(model == null){
+            return null;
+        }
 
         SysUser entity = super.transformM2T(model);
         // 唯一验证
@@ -104,7 +106,9 @@ public class UserServiceImpl extends CrudServiceImpl<UserMapper, SysUser, UserMo
     @Override
     @Transactional(rollbackFor = Exception.class)
     public UserModel update(UserModel model) {
-        if(model == null) return null;
+        if(model == null){
+            return null;
+        }
 
         SysUser entity = super.transformM2T(model);
         // 唯一验证 - 用户名
@@ -272,6 +276,7 @@ public class UserServiceImpl extends CrudServiceImpl<UserMapper, SysUser, UserMo
         return mapper.findList(qWrapper);
     }
 
+    @Override
     public Page<SysUserAndOrg,UserAndOrgModel> findPageByCus(Page<SysUserAndOrg,UserAndOrgModel> page) {
         page.pageHelperBegin();
         try{

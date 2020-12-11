@@ -50,7 +50,9 @@ public class DictServiceImpl extends CrudServiceImpl<DictMapper, SysDict, DictMo
 
     @Override
     public DictModel insert(DictModel model) {
-        if(model == null) return null;
+        if(model == null){
+            return null;
+        }
 
         SysDict entity = super.transformM2T(model);
         // 唯一验证
@@ -66,7 +68,9 @@ public class DictServiceImpl extends CrudServiceImpl<DictMapper, SysDict, DictMo
     @Transactional(rollbackFor = Exception.class)
     @Override
     public DictModel update(DictModel model) {
-        if(model == null) return null;
+        if(model == null){
+            return null;
+        }
 
         SysDict entity = super.transformM2T(model);
         // 唯一验证
@@ -123,7 +127,9 @@ public class DictServiceImpl extends CrudServiceImpl<DictMapper, SysDict, DictMo
     @Transactional(rollbackFor = Exception.class)
     @Override
     public boolean deleteAll(String[] ids) {
-        if(ids == null) return false;
+        if(ids == null){
+            return false;
+        }
 
         // 删除字典明细表
         for (String id : ids) {
@@ -136,7 +142,9 @@ public class DictServiceImpl extends CrudServiceImpl<DictMapper, SysDict, DictMo
     @Transactional(rollbackFor = Exception.class)
     @Override
     public boolean deleteAll(Collection<DictModel> models) {
-        if(models == null || models.isEmpty()) return false;
+        if(models == null || models.isEmpty()){
+            return false;
+        }
 
         // 删除字典明细表
         for (DictModel model : models) {

@@ -60,6 +60,10 @@ import java.util.Map;
 @ApiRestController("/sys/menu")
 public class MenuRestController extends BaseRestController<SysMenu, MenuModel, IMenuService>
         implements MenuApi {
+
+    /** 外部链接值 */
+    private static final String EXTERNAL_LINKS_VAL = "3";
+
     /**
      * 根据 获得用户 菜单 - 权限
      * @return ResultVo
@@ -116,7 +120,7 @@ public class MenuRestController extends BaseRestController<SysMenu, MenuModel, I
                     tree.setName(treeNode.getMenuName());
                     // 扩展属性 ...
                     // 不是外链 则处理组件
-                    if(!"3".equals(treeNode.getType())){
+                    if(!EXTERNAL_LINKS_VAL.equals(treeNode.getType())){
                         tree.putExtra("component", treeNode.getComponent());
                     }
                     tree.putExtra("type", treeNode.getType());
@@ -127,7 +131,7 @@ public class MenuRestController extends BaseRestController<SysMenu, MenuModel, I
                     metaMap.put("title", treeNode.getMenuName());
                     metaMap.put("icon", treeNode.getIcon());
                     // 外链处理
-                    if("3".equals(treeNode.getType())){
+                    if(EXTERNAL_LINKS_VAL.equals(treeNode.getType())){
                         metaMap.put("target", "_blank");
                         metaMap.put("badge", "New");
                     }
@@ -179,7 +183,7 @@ public class MenuRestController extends BaseRestController<SysMenu, MenuModel, I
                     tree.setName(treeNode.getMenuCode());
                     // 扩展属性 ...
                     // 不是外链 则处理组件
-                    if(!"3".equals(treeNode.getType())){
+                    if(!EXTERNAL_LINKS_VAL.equals(treeNode.getType())){
                         tree.putExtra("component", treeNode.getComponent());
                     }else{
                         // 如果是外链 则判断是否存在 BASE_PATH
@@ -198,7 +202,7 @@ public class MenuRestController extends BaseRestController<SysMenu, MenuModel, I
                     metaMap.put("title", treeNode.getMenuName());
                     metaMap.put("icon", treeNode.getIcon());
                     // 外链处理
-                    if("3".equals(treeNode.getType())){
+                    if(EXTERNAL_LINKS_VAL.equals(treeNode.getType())){
                         metaMap.put("target", "_blank");
                     }
                     tree.putExtra("meta", metaMap);

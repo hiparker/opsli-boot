@@ -79,11 +79,11 @@ public abstract class BaseRestController <T extends BaseEntity, E extends ApiWra
     /** Entity Clazz 类 */
     protected Class<T> entityClazz;
     /** Entity 泛型游标 */
-    private static final int entityIndex = 0;
+    private static final int ENTITY_INDEX = 0;
     /** Model Clazz 类 */
     protected Class<E> modelClazz;
     /** Model 泛型游标 */
-    private static final int modelIndex = 1;
+    private static final int MODEL_INDEX = 1;
 
     @Autowired(required = false)
     protected S IService;
@@ -326,7 +326,7 @@ public abstract class BaseRestController <T extends BaseEntity, E extends ApiWra
      */
     private Class<E> getModelClass(){
         Class<E> tClass = null;
-        Type typeArgument = TypeUtil.getTypeArgument(getClass().getGenericSuperclass(), modelIndex);
+        Type typeArgument = TypeUtil.getTypeArgument(getClass().getGenericSuperclass(), MODEL_INDEX);
         if(typeArgument != null){
             tClass = (Class<E>) typeArgument;
         }
@@ -339,7 +339,7 @@ public abstract class BaseRestController <T extends BaseEntity, E extends ApiWra
      */
     private Class<T> getEntityClass(){
         Class<T> tClass = null;
-        Type typeArgument = TypeUtil.getTypeArgument(getClass().getGenericSuperclass(), entityIndex);
+        Type typeArgument = TypeUtil.getTypeArgument(getClass().getGenericSuperclass(), ENTITY_INDEX);
         if(typeArgument != null){
             tClass = (Class<T>) typeArgument;
         }

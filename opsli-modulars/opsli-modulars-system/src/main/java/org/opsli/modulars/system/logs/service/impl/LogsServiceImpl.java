@@ -38,6 +38,9 @@ import java.util.Date;
 @Service
 public class LogsServiceImpl extends CrudServiceImpl<LogsMapper, SysLogs, LogsModel> implements ILogsService {
 
+    /** Log 存储量阈值 */
+    private static final int LOG_BIG_COUNT = 10_0000;
+
     @Autowired(required = false)
     private LogsMapper mapper;
 
@@ -46,7 +49,7 @@ public class LogsServiceImpl extends CrudServiceImpl<LogsMapper, SysLogs, LogsMo
     public LogsModel insert(LogsModel model) {
         int count = super.count();
         // 如果日志存储量为10万 则自动清空上月前数据
-        if(count > 10_0000){
+        if(count > LOG_BIG_COUNT){
             this.emptyByOneMonth();
         }
         return super.insert(model);

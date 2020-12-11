@@ -90,7 +90,9 @@ public class CaptchaUtil{
      * @return
      */
     public static boolean validate(String uuid, String code) {
-        if(StringUtils.isEmpty(uuid)) return false;
+        if(StringUtils.isEmpty(uuid)){
+            return false;
+        }
 
         // 验证码
         String codeTemp = (String) redisPlugin.get(PREFIX_NAME + PREFIX + uuid);
@@ -112,7 +114,9 @@ public class CaptchaUtil{
      * @return
      */
     public static boolean delCaptcha(String uuid) {
-        if(StringUtils.isEmpty(uuid)) return false;
+        if(StringUtils.isEmpty(uuid)){
+            return false;
+        }
 
         //删除验证码
         return redisPlugin.del(PREFIX_NAME + PREFIX + uuid);

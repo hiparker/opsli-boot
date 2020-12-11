@@ -45,6 +45,8 @@ import static org.opsli.common.constants.OrderConstants.PARAM_VALIDATE_AOP_SORT;
 @Component
 public class ValitaionArgsAop {
 
+    /** post请求 */
+    private static final String POST_TYPE = "POST";
 
     @Pointcut("execution(public * org.opsli.modulars*..*.*Controller*.*(..))")
     public void requestMapping() {
@@ -60,12 +62,14 @@ public class ValitaionArgsAop {
         try {
             RequestAttributes ra = RequestContextHolder.getRequestAttributes();
             ServletRequestAttributes sra = (ServletRequestAttributes) ra;
-            if(sra == null) return;
+            if(sra == null){
+                return;
+            }
             HttpServletRequest request = sra.getRequest();
             String method = request.getMethod();
 
             // 只有 post 请求 才会去验证数据
-            if("POST".equals(method)){
+            if(POST_TYPE.equals(method)){
                 for (Object arg : args) {
                     // 参数校验
                     if(arg instanceof ApiWrapper){

@@ -70,7 +70,9 @@ public class MenuServiceImpl extends CrudServiceImpl<MenuMapper, SysMenu, MenuMo
     @Override
     @Transactional(rollbackFor = Exception.class)
     public MenuModel insert(MenuModel model) {
-        if(model == null) return null;
+        if(model == null){
+            return null;
+        }
 
         SysMenu entity = super.transformM2T(model);
         // 唯一验证
@@ -91,7 +93,9 @@ public class MenuServiceImpl extends CrudServiceImpl<MenuMapper, SysMenu, MenuMo
     @Transactional(rollbackFor = Exception.class)
     @Override
     public MenuModel update(MenuModel model) {
-        if(model == null) return null;
+        if(model == null){
+            return null;
+        }
 
         SysMenu entity = super.transformM2T(model);
         // 唯一验证

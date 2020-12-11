@@ -16,6 +16,7 @@
 package org.opsli.core.conf;
 
 import cn.hutool.core.collection.CollUtil;
+import com.google.common.collect.Maps;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.session.mgt.SessionManager;
 import org.apache.shiro.spring.LifecycleBeanPostProcessor;
@@ -71,11 +72,11 @@ public class ShiroConfig {
         shiroFilter.setSecurityManager(securityManager);
 
         //oauth过滤
-        Map<String, Filter> filters = new HashMap<>();
+        Map<String, Filter> filters = Maps.newHashMapWithExpectedSize(1);
         filters.put("oauth2", new OAuth2Filter());
         shiroFilter.setFilters(filters);
 
-        Map<String, String> filterMap = new LinkedHashMap<>();
+        Map<String, String> filterMap = Maps.newLinkedHashMap();
         filterMap.put("/webjars/**", "anon");
         filterMap.put("/druid/**", "anon");
         filterMap.put("/app/**", "anon");

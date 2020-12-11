@@ -77,7 +77,9 @@ public class UserHandler implements RedisPushSubHandler{
     private void userHandler(JSONObject msgJson){
         JSONObject data = msgJson.getJSONObject(MsgArgsType.USER_MODEL_DATA.toString());
         // 数据为空则不执行
-        if(data == null) return;
+        if(data == null){
+            return;
+        }
 
         // 获得用户ID 和 用户名
         String userId = (String) msgJson.get(MsgArgsType.USER_ID.toString());
@@ -101,7 +103,9 @@ public class UserHandler implements RedisPushSubHandler{
     private void userRolesHandler(JSONObject msgJson){
         JSONArray dataArray = msgJson.getJSONArray(MsgArgsType.USER_MODEL_DATA.toString());
         // 数据为空则不执行
-        if(dataArray == null || dataArray.isEmpty()) return;
+        if(dataArray == null || dataArray.isEmpty()){
+            return;
+        }
 
         // 获得用户ID
         String userId = (String) msgJson.get(MsgArgsType.USER_ID.toString());
@@ -122,7 +126,9 @@ public class UserHandler implements RedisPushSubHandler{
     private void userPermsHandler(JSONObject msgJson){
         JSONArray dataArray = msgJson.getJSONArray(MsgArgsType.USER_MODEL_DATA.toString());
         // 数据为空则不执行
-        if(dataArray == null || dataArray.isEmpty()) return;
+        if(dataArray == null || dataArray.isEmpty()){
+            return;
+        }
 
         // 获得用户ID
         String userId = (String) msgJson.get(MsgArgsType.USER_ID.toString());
@@ -143,7 +149,9 @@ public class UserHandler implements RedisPushSubHandler{
     private void userMenusHandler(JSONObject msgJson){
         JSONArray dataArray = msgJson.getJSONArray(MsgArgsType.USER_MODEL_DATA.toString());
         // 数据为空则不执行
-        if(dataArray == null || dataArray.isEmpty()) return;
+        if(dataArray == null || dataArray.isEmpty()){
+            return;
+        }
 
         // 获得用户ID
         String userId = (String) msgJson.get(MsgArgsType.USER_ID.toString());

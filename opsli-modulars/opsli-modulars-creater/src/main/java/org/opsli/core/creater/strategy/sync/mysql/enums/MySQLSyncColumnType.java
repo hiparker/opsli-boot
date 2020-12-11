@@ -31,39 +31,40 @@ import java.util.Map;
  */
 public enum MySQLSyncColumnType {
 
+    /** 实例对象 */
     INSTANCE;
 
-    private static final Map<String, FieldTypeAttribute> fieldTypeMap = new HashMap<>();
+    private static final Map<String, FieldTypeAttribute> FIELD_TYPE_MAP = new HashMap<>();
 
     static {
-        fieldTypeMap.put("tinyint", new FieldTypeAttribute(true, false));
-        fieldTypeMap.put("smallint", new FieldTypeAttribute(true, false));
-        fieldTypeMap.put("mediumint", new FieldTypeAttribute(true, false));
-        fieldTypeMap.put("int", new FieldTypeAttribute(true, false));
-        fieldTypeMap.put("integer", new FieldTypeAttribute(true, false));
-        fieldTypeMap.put("bigint", new FieldTypeAttribute(true, false));
-        fieldTypeMap.put("real", new FieldTypeAttribute(true, true));
-        fieldTypeMap.put("float", new FieldTypeAttribute(true, true));
-        fieldTypeMap.put("double", new FieldTypeAttribute(true, true));
-        fieldTypeMap.put("decimal", new FieldTypeAttribute(true, true));
-        fieldTypeMap.put("numeric", new FieldTypeAttribute(true, true));
-        fieldTypeMap.put("char", new FieldTypeAttribute(true, false));
-        fieldTypeMap.put("varchar", new FieldTypeAttribute(true, false));
-        fieldTypeMap.put("date", new FieldTypeAttribute(false, false));
-        fieldTypeMap.put("time", new FieldTypeAttribute(false, false));
-        fieldTypeMap.put("timestamp", new FieldTypeAttribute(false, false));
-        fieldTypeMap.put("datetime", new FieldTypeAttribute(false, false));
-        fieldTypeMap.put("blob", new FieldTypeAttribute(false, false));
-        fieldTypeMap.put("mediumblob", new FieldTypeAttribute(false, false));
-        fieldTypeMap.put("longblob", new FieldTypeAttribute(false, false));
-        fieldTypeMap.put("tinytext", new FieldTypeAttribute(false, false));
-        fieldTypeMap.put("text", new FieldTypeAttribute(false, false));
-        fieldTypeMap.put("mediumtext", new FieldTypeAttribute(false, false));
-        fieldTypeMap.put("longtext", new FieldTypeAttribute(false, false));
+        FIELD_TYPE_MAP.put("tinyint", new FieldTypeAttribute(true, false));
+        FIELD_TYPE_MAP.put("smallint", new FieldTypeAttribute(true, false));
+        FIELD_TYPE_MAP.put("mediumint", new FieldTypeAttribute(true, false));
+        FIELD_TYPE_MAP.put("int", new FieldTypeAttribute(true, false));
+        FIELD_TYPE_MAP.put("integer", new FieldTypeAttribute(true, false));
+        FIELD_TYPE_MAP.put("bigint", new FieldTypeAttribute(true, false));
+        FIELD_TYPE_MAP.put("real", new FieldTypeAttribute(true, true));
+        FIELD_TYPE_MAP.put("float", new FieldTypeAttribute(true, true));
+        FIELD_TYPE_MAP.put("double", new FieldTypeAttribute(true, true));
+        FIELD_TYPE_MAP.put("decimal", new FieldTypeAttribute(true, true));
+        FIELD_TYPE_MAP.put("numeric", new FieldTypeAttribute(true, true));
+        FIELD_TYPE_MAP.put("char", new FieldTypeAttribute(true, false));
+        FIELD_TYPE_MAP.put("varchar", new FieldTypeAttribute(true, false));
+        FIELD_TYPE_MAP.put("date", new FieldTypeAttribute(false, false));
+        FIELD_TYPE_MAP.put("time", new FieldTypeAttribute(false, false));
+        FIELD_TYPE_MAP.put("timestamp", new FieldTypeAttribute(false, false));
+        FIELD_TYPE_MAP.put("datetime", new FieldTypeAttribute(false, false));
+        FIELD_TYPE_MAP.put("blob", new FieldTypeAttribute(false, false));
+        FIELD_TYPE_MAP.put("mediumblob", new FieldTypeAttribute(false, false));
+        FIELD_TYPE_MAP.put("longblob", new FieldTypeAttribute(false, false));
+        FIELD_TYPE_MAP.put("tinytext", new FieldTypeAttribute(false, false));
+        FIELD_TYPE_MAP.put("text", new FieldTypeAttribute(false, false));
+        FIELD_TYPE_MAP.put("mediumtext", new FieldTypeAttribute(false, false));
+        FIELD_TYPE_MAP.put("longtext", new FieldTypeAttribute(false, false));
     }
 
     public FieldTypeAttribute getAttr(String fieldType){
-        return fieldTypeMap.get(fieldType);
+        return FIELD_TYPE_MAP.get(fieldType);
     }
 
 }

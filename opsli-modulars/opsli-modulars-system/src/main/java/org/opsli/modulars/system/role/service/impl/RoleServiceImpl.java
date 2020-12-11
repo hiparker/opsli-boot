@@ -47,7 +47,9 @@ public class RoleServiceImpl extends CrudServiceImpl<RoleMapper, SysRole, RoleMo
     @Override
     @Transactional(rollbackFor = Exception.class)
     public RoleModel insert(RoleModel model) {
-        if(model == null) return null;
+        if(model == null){
+            return null;
+        }
 
         SysRole entity = super.transformM2T(model);
         // 唯一验证
@@ -63,7 +65,9 @@ public class RoleServiceImpl extends CrudServiceImpl<RoleMapper, SysRole, RoleMo
     @Override
     @Transactional(rollbackFor = Exception.class)
     public RoleModel update(RoleModel model) {
-        if(model == null) return null;
+        if(model == null){
+            return null;
+        }
 
         SysRole entity = super.transformM2T(model);
         // 唯一验证

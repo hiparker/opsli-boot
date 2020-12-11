@@ -70,7 +70,9 @@ public class SQLSyncUtil {
      * @param model
      */
     public static void execute(CreaterTableAndColumnModel model){
-        if(model == null) return;
+        if(model == null){
+            return;
+        }
 
         SyncStrategy syncStrategy = HANDLER_MAP.get(model.getJdbcType());
         if(syncStrategy != null){

@@ -41,6 +41,7 @@ import java.util.*;
  */
 public enum VueCodeBuilder {
 
+    /** 实例对象 */
     INSTANCE;
 
     /** 虚拟根路径 */

@@ -43,7 +43,9 @@ public class TenantServiceImpl extends CrudServiceImpl<TenantMapper, SysTenant, 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public TenantModel insert(TenantModel model) {
-        if(model == null) return null;
+        if(model == null){
+            return null;
+        }
 
         SysTenant entity = super.transformM2T(model);
         // 唯一验证
@@ -59,7 +61,9 @@ public class TenantServiceImpl extends CrudServiceImpl<TenantMapper, SysTenant, 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public TenantModel update(TenantModel model) {
-        if(model == null) return null;
+        if(model == null){
+            return null;
+        }
 
         SysTenant entity = super.transformM2T(model);
         // 唯一验证

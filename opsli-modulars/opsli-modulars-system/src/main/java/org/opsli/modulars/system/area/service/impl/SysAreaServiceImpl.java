@@ -57,7 +57,9 @@ public class SysAreaServiceImpl extends CrudServiceImpl<SysAreaMapper, SysArea, 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public SysAreaModel insert(SysAreaModel model) {
-        if(model == null) return null;
+        if(model == null){
+            return null;
+        }
 
         SysArea entity = super.transformM2T(model);
         // 唯一验证
@@ -78,7 +80,9 @@ public class SysAreaServiceImpl extends CrudServiceImpl<SysAreaMapper, SysArea, 
     @Transactional(rollbackFor = Exception.class)
     @Override
     public SysAreaModel update(SysAreaModel model) {
-        if(model == null) return null;
+        if(model == null){
+            return null;
+        }
 
         SysArea entity = super.transformM2T(model);
         // 唯一验证

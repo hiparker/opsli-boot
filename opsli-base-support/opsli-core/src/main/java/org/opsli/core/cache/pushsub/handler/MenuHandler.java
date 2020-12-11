@@ -57,7 +57,9 @@ public class MenuHandler implements RedisPushSubHandler{
     private void menuHandler(JSONObject msgJson){
         JSONObject data = msgJson.getJSONObject(MsgArgsType.MENU_MODEL_DATA.toString());
         // 数据为空则不执行
-        if(data == null) return;
+        if(data == null){
+            return;
+        }
 
         // 获得菜单编号
         String menuCode = (String) msgJson.get(MsgArgsType.MENU_CODE.toString());

@@ -190,7 +190,9 @@ public class CacheDataAop {
         try {
             // 获得方法
             Method objMethod = this.getMethod(point);
-            if(objMethod == null) return null;
+            if(objMethod == null) {
+                return null;
+            }
 
             // 获取注解参数
             HotDataPut aCache= objMethod.getAnnotation(HotDataPut.class);
@@ -239,7 +241,9 @@ public class CacheDataAop {
         try {
             // 获得方法
             Method objMethod = this.getMethod(point);
-            if(objMethod == null) return null;
+            if(objMethod == null) {
+                return null;
+            }
 
             // 获取注解参数
             HotDataDel aCache= objMethod.getAnnotation(HotDataDel.class);

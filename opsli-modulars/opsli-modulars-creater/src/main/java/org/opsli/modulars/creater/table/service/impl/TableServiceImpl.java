@@ -62,7 +62,9 @@ public class TableServiceImpl extends CrudServiceImpl<TableMapper, CreaterTable,
     @Override
     @Transactional(rollbackFor = Exception.class)
     public CreaterTableModel insert(CreaterTableModel model) {
-        if(model == null) return null;
+        if(model == null){
+            return null;
+        }
 
         CreaterTable entity = super.transformM2T(model);
         // 唯一验证
@@ -87,7 +89,9 @@ public class TableServiceImpl extends CrudServiceImpl<TableMapper, CreaterTable,
     @Override
     @Transactional(rollbackFor = Exception.class)
     public CreaterTableModel update(CreaterTableModel model) {
-        if(model == null) return null;
+        if(model == null){
+            return null;
+        }
 
         CreaterTable entity = super.transformM2T(model);
         // 唯一验证

@@ -77,7 +77,9 @@ public class MySQLSyncBuilder implements SyncStrategy {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void execute(CreaterTableAndColumnModel model) {
-        if(model == null) return;
+        if(model == null){
+            return;
+        }
 
         CreaterTableModel currTable = iTableService.get(model.getId());
         if(currTable == null){

@@ -43,6 +43,9 @@ public final class ValidationUtil {
     /** 编码格式 */
     private static final String CHARSET_NAME = "utf-8";
 
+    /** NULL */
+    private static final String NULL = "null";
+
     /**
      * 验证对象
      * @param obj
@@ -112,7 +115,9 @@ public final class ValidationUtil {
                         break;
                     // 字母，数字和下划线
                     case IS_GENERAL:
-                        if(StringUtils.isEmpty(value) || "null".equals(value)) break;
+                        if(StringUtils.isEmpty(value) || NULL.equals(value)) {
+                            break;
+                        }
                         boolean general = Validator.isGeneral(value);
                         if(!general){
                             ValidationMsg msg = ValidationMsg.EXCEPTION_IS_GENERAL;
@@ -122,7 +127,9 @@ public final class ValidationUtil {
                         break;
                     // 数字
                     case IS_NUMBER:
-                        if(StringUtils.isEmpty(value) || "null".equals(value)) break;
+                        if(StringUtils.isEmpty(value) || NULL.equals(value)){
+                            break;
+                        }
                         boolean number = Validator.isNumber(value);
                         if(!number){
                             ValidationMsg msg = ValidationMsg.EXCEPTION_IS_NUMBER;
@@ -132,7 +139,9 @@ public final class ValidationUtil {
                         break;
                     // 纯字母
                     case IS_LETTER:
-                        if(StringUtils.isEmpty(value) || "null".equals(value)) break;
+                        if(StringUtils.isEmpty(value) || NULL.equals(value)){
+                            break;
+                        }
                         boolean letter = Validator.isLetter(value);
                         if(!letter){
                             ValidationMsg msg = ValidationMsg.EXCEPTION_IS_LETTER;
@@ -142,7 +151,9 @@ public final class ValidationUtil {
                         break;
                     // 大写
                     case IS_UPPER_CASE:
-                        if(StringUtils.isEmpty(value) || "null".equals(value)) break;
+                        if(StringUtils.isEmpty(value) || NULL.equals(value)){
+                            break;
+                        }
                         boolean upperCase = Validator.isUpperCase(value);
                         if(!upperCase){
                             ValidationMsg msg = ValidationMsg.EXCEPTION_IS_UPPER_CASE;
@@ -152,7 +163,9 @@ public final class ValidationUtil {
                         break;
                     // 小写
                     case IS_LOWER_CASE:
-                        if(StringUtils.isEmpty(value) || "null".equals(value)) break;
+                        if(StringUtils.isEmpty(value) || NULL.equals(value)){
+                            break;
+                        }
                         boolean lowerCase = Validator.isLowerCase(value);
                         if(!lowerCase){
                             ValidationMsg msg = ValidationMsg.EXCEPTION_IS_LOWER_CASE;
@@ -162,7 +175,9 @@ public final class ValidationUtil {
                         break;
                     // IPV4
                     case IS_IPV4:
-                        if(StringUtils.isEmpty(value) || "null".equals(value)) break;
+                        if(StringUtils.isEmpty(value) || NULL.equals(value)){
+                            break;
+                        }
                         boolean ipv4 = Validator.isIpv4(value);
                         if(!ipv4){
                             ValidationMsg msg = ValidationMsg.EXCEPTION_IS_IPV4;
@@ -172,7 +187,9 @@ public final class ValidationUtil {
                         break;
                     // 金额
                     case IS_MONEY:
-                        if(StringUtils.isEmpty(value) || "null".equals(value)) break;
+                        if(StringUtils.isEmpty(value) || NULL.equals(value)){
+                            break;
+                        }
                         boolean money = Validator.isMoney(value);
                         if(!money){
                             ValidationMsg msg = ValidationMsg.EXCEPTION_IS_MONEY;
@@ -182,7 +199,9 @@ public final class ValidationUtil {
                         break;
                     // 邮箱
                     case IS_EMAIL:
-                        if(StringUtils.isEmpty(value) || "null".equals(value)) break;
+                        if(StringUtils.isEmpty(value) || NULL.equals(value)){
+                            break;
+                        }
                         boolean email = Validator.isEmail(value);
                         if(!email){
                             ValidationMsg msg = ValidationMsg.EXCEPTION_IS_EMAIL;
@@ -192,7 +211,9 @@ public final class ValidationUtil {
                         break;
                     // 手机号
                     case IS_MOBILE:
-                        if(StringUtils.isEmpty(value) || "null".equals(value)) break;
+                        if(StringUtils.isEmpty(value) || NULL.equals(value)){
+                            break;
+                        }
                         boolean mobile = Validator.isMobile(value);
                         if(!mobile){
                             ValidationMsg msg = ValidationMsg.EXCEPTION_IS_MOBILE;
@@ -202,7 +223,9 @@ public final class ValidationUtil {
                         break;
                     // 18位身份证
                     case IS_CITIZENID:
-                        if(StringUtils.isEmpty(value) || "null".equals(value)) break;
+                        if(StringUtils.isEmpty(value) || NULL.equals(value)){
+                            break;
+                        }
                         boolean citizenId = Validator.isCitizenId(value);
                         if(!citizenId){
                             ValidationMsg msg = ValidationMsg.EXCEPTION_IS_CITIZENID;
@@ -212,7 +235,9 @@ public final class ValidationUtil {
                         break;
                     // 邮编
                     case IS_ZIPCODE:
-                        if(StringUtils.isEmpty(value) || "null".equals(value)) break;
+                        if(StringUtils.isEmpty(value) || NULL.equals(value)){
+                            break;
+                        }
                         boolean zipCode = Validator.isZipCode(value);
                         if(!zipCode){
                             ValidationMsg msg = ValidationMsg.EXCEPTION_IS_ZIPCODE;
@@ -222,7 +247,9 @@ public final class ValidationUtil {
                         break;
                     // URL
                     case IS_URL:
-                        if(StringUtils.isEmpty(value) || "null".equals(value)) break;
+                        if(StringUtils.isEmpty(value) || NULL.equals(value)){
+                            break;
+                        }
                         boolean url = Validator.isUrl(value);
                         if(!url){
                             ValidationMsg msg = ValidationMsg.EXCEPTION_IS_URL;
@@ -232,7 +259,9 @@ public final class ValidationUtil {
                         break;
                     // 汉字
                     case IS_CHINESE:
-                        if(StringUtils.isEmpty(value) || "null".equals(value)) break;
+                        if(StringUtils.isEmpty(value) || NULL.equals(value)){
+                            break;
+                        }
                         boolean chinese = Validator.isChinese(value);
                         if(!chinese){
                             ValidationMsg msg = ValidationMsg.EXCEPTION_IS_CHINESE;
@@ -242,7 +271,9 @@ public final class ValidationUtil {
                         break;
                     // 汉字，字母，数字和下划线
                     case IS_GENERAL_WITH_CHINESE:
-                        if(StringUtils.isEmpty(value) || "null".equals(value)) break;
+                        if(StringUtils.isEmpty(value) || NULL.equals(value)){
+                            break;
+                        }
                         boolean generalWithChinese = Validator.isGeneralWithChinese(value);
                         if(!generalWithChinese){
                             ValidationMsg msg = ValidationMsg.EXCEPTION_IS_GENERAL_WITH_CHINESE;
@@ -252,7 +283,9 @@ public final class ValidationUtil {
                         break;
                     // MAC地址
                     case IS_MAC:
-                        if(StringUtils.isEmpty(value) || "null".equals(value)) break;
+                        if(StringUtils.isEmpty(value) || NULL.equals(value)){
+                            break;
+                        }
                         boolean mac = Validator.isMac(value);
                         if(!mac){
                             ValidationMsg msg = ValidationMsg.EXCEPTION_IS_MAC;
@@ -262,7 +295,9 @@ public final class ValidationUtil {
                         break;
                     // 中国车牌
                     case IS_PLATE_NUMBER:
-                        if(StringUtils.isEmpty(value) || "null".equals(value)) break;
+                        if(StringUtils.isEmpty(value) || NULL.equals(value)){
+                            break;
+                        }
                         boolean plateNumber = Validator.isPlateNumber(value);
                         if(!plateNumber){
                             ValidationMsg msg = ValidationMsg.EXCEPTION_IS_PLATE_NUMBER;
@@ -299,7 +334,7 @@ public final class ValidationUtil {
         // 循环验证
         try {
             String value = String.valueOf(fieldValue);
-            if(value != null && !"null".equals(value)){
+            if(value != null && !NULL.equals(value)){
                 // 转换为 数据库真实 长度
                 int strLength = value.getBytes(CHARSET_NAME).length;
                 if(strLength > maxLength){
@@ -332,7 +367,7 @@ public final class ValidationUtil {
         // 循环验证
         try {
             String value = String.valueOf(fieldValue);
-            if(value != null && !"null".equals(value)){
+            if(value != null && !NULL.equals(value)){
                 // 转换为 数据库真实 长度
                 int strLength = value.getBytes(CHARSET_NAME).length;
                 if(strLength < minLength){

@@ -177,7 +177,9 @@ public class ExcelUtil extends ExcelPlugin {
             String typeCode = entry.getValue();
             List<DictWrapper> dictWrapperList = DictUtil.getDictList(typeCode);
             // 如果字典 List 为空 则走下一个
-            if(dictWrapperList == null || dictWrapperList.size() == 0) continue;
+            if(dictWrapperList == null || dictWrapperList.size() == 0){
+                continue;
+            }
             typeCodeAndValue.put(typeCode, dictWrapperList);
         }
         return typeCodeAndValue;

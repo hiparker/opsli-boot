@@ -54,7 +54,9 @@ public class TableColumnServiceImpl extends CrudServiceImpl<TableColumnMapper, C
         // 验证对象
         ValidationUtil.verify(model);
 
-        if(model == null) return null;
+        if(model == null){
+            return null;
+        }
 
         CreaterTableColumn entity = super.transformM2T(model);
         // 唯一验证
@@ -76,7 +78,9 @@ public class TableColumnServiceImpl extends CrudServiceImpl<TableColumnMapper, C
     @Transactional(rollbackFor = Exception.class)
     public boolean insertBatch(List<CreaterTableColumnModel> models) {
 
-        if(models == null || models.size() == 0) return false;
+        if(models == null || models.size() == 0){
+            return false;
+        }
 
         for (CreaterTableColumnModel model : models) {
 
@@ -113,7 +117,9 @@ public class TableColumnServiceImpl extends CrudServiceImpl<TableColumnMapper, C
         // 验证对象
         ValidationUtil.verify(model);
 
-        if(model == null) return null;
+        if(model == null){
+            return null;
+        }
 
         CreaterTableColumn entity = super.transformM2T(model);
         // 唯一验证

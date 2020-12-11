@@ -25,21 +25,21 @@ package org.opsli.common.api;
 public class TokenThreadLocal {
 
     /** 临时线程存储 token 容器 */
-    private static final ThreadLocal<String> tokenData = new ThreadLocal<>();
+    private static final ThreadLocal<String> TOKEN_DATA = new ThreadLocal<>();
 
     public static void put(String token) {
-        if (tokenData.get() == null) {
-            tokenData.set(token);
+        if (TOKEN_DATA.get() == null) {
+            TOKEN_DATA.set(token);
         }
     }
 
     public static String get() {
-        return tokenData.get();
+        return TOKEN_DATA.get();
     }
 
     public static void remove() {
         try {
-            tokenData.remove();
+            TOKEN_DATA.remove();
         }catch (Exception e){}
     }
 }

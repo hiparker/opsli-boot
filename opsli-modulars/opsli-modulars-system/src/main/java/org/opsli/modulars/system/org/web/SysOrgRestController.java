@@ -60,6 +60,8 @@ import java.util.Set;
 public class SysOrgRestController extends BaseRestController<SysOrg, SysOrgModel, ISysOrgService>
     implements SysOrgRestApi {
 
+    /** 父节点ID */
+    private static final String PARENT_ID = "0";
     /** 显示全部 */
     public static final String ORG_ALL = "all";
     /** 未分组 */
@@ -81,7 +83,7 @@ public class SysOrgRestController extends BaseRestController<SysOrg, SysOrgModel
         List<SysOrg> dataList = IService.findList(wrapper);
         List<SysOrgModel> orgModelList = WrapperUtil.transformInstance(dataList, SysOrgModel.class);
         // 0 为初始值
-        if("0".equals(parentId)){
+        if(PARENT_ID.equals(parentId)){
             // 显示全部
             SysOrgModel orgAll = new SysOrgModel();
             orgAll.setId(ORG_ALL);

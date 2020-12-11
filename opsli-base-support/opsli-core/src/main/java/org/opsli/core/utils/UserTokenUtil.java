@@ -153,7 +153,9 @@ public class UserTokenUtil {
      * @return
      */
     public static String getUserIdByToken(String token) {
-        if(StringUtils.isEmpty(token)) return null;
+        if(StringUtils.isEmpty(token)){
+            return null;
+        }
         String userId = "";
         try {
             userId = JwtUtil.getClaim(token, SignConstants.USER_ID);
@@ -167,7 +169,9 @@ public class UserTokenUtil {
      * @return
      */
     public static String getUserNameByToken(String token) {
-        if(StringUtils.isEmpty(token)) return null;
+        if(StringUtils.isEmpty(token)){
+            return null;
+        }
         String username = "";
         try {
             username = JwtUtil.getClaim(token, SignConstants.ACCOUNT);
@@ -182,7 +186,9 @@ public class UserTokenUtil {
      * @param token
      */
     public static void logout(String token) {
-        if(StringUtils.isEmpty(token)) return;
+        if(StringUtils.isEmpty(token)){
+            return;
+        }
         try {
             // 生成MD5 16进制码 用于缩减存储
             String signTokenHex = new Md5Hash(token).toHex();
@@ -207,7 +213,9 @@ public class UserTokenUtil {
      * @param token
      */
     public static boolean verify(String token) {
-        if(StringUtils.isEmpty(token)) return false;
+        if(StringUtils.isEmpty(token)){
+            return false;
+        }
 
         try {
             // 1. 校验是否是有效的 token

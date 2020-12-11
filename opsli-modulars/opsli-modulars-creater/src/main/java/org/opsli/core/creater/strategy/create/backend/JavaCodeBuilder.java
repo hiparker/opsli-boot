@@ -41,6 +41,7 @@ import java.util.Map;
  */
 public enum JavaCodeBuilder {
 
+    /** 实例对象 */
     INSTANCE;
 
     /**

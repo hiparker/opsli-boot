@@ -109,7 +109,9 @@ public class RoleMenuRefRestController implements RoleMenuRefApi {
         // 演示模式 不允许操作
         this.demoError();
 
-        if(model == null) return ResultVo.error("设置权限失败");
+        if(model == null){
+            return ResultVo.error("设置权限失败");
+        }
 
         RoleModel roleModel = iRoleService.get(model.getRoleId());
         // 内置数据 只有超级管理员可以修改

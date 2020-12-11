@@ -24,7 +24,7 @@ import org.opsli.api.wrapper.system.user.UserModel;
 
 /**
  * Shiro工具类
- * 
+ *
  * @author 孙志强
 
  * @date 2016年11月12日 上午9:49:19
@@ -32,12 +32,12 @@ import org.opsli.api.wrapper.system.user.UserModel;
 public class ShiroUtils {
 
 	/**  加密算法 */
-	public final static String hashAlgorithmName = "MD5";
+	public final static String HASH_ALGORITHM_NAME = "MD5";
 	/**  循环次数 */
-	public final static int hashIterations = 1;
+	public final static int HASH_ITERATIONS = 1;
 
 	public static String sha256(String password, String salt) {
-		return new SimpleHash(hashAlgorithmName, password, salt, hashIterations).toString();
+		return new SimpleHash(HASH_ALGORITHM_NAME, password, salt, HASH_ITERATIONS).toString();
 	}
 
 	public static Session getSession() {
@@ -55,7 +55,7 @@ public class ShiroUtils {
 	public static String getUserId() {
 		return getUser().getId();
 	}
-	
+
 	public static void setSessionAttribute(Object key, Object value) {
 		getSession().setAttribute(key, value);
 	}
@@ -71,7 +71,7 @@ public class ShiroUtils {
 	public static void logout() {
 		SecurityUtils.getSubject().logout();
 	}
-	
+
 	public static String getKaptcha(String key) throws RuntimeException {
 		Object kaptcha = getSessionAttribute(key);
 		if(kaptcha == null){

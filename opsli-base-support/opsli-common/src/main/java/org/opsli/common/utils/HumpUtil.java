@@ -39,7 +39,7 @@ public final class HumpUtil {
 
     public static String underlineToHump(String para) {
         StringBuilder result = new StringBuilder();
-        String a[] = para.split(UNDERLINE);
+        String[] a = para.split(UNDERLINE);
         for (String s : a) {
             if (!para.contains(UNDERLINE)) {
                 result.append(s);

@@ -43,6 +43,8 @@ import static org.opsli.common.constants.OrderConstants.EXCEPTION_HANDLER_ORDER;
 @Order(EXCEPTION_HANDLER_ORDER)
 public class GlobalExceptionHandler {
 
+    private static final String SQL_EXCEPTION = "doesn't have a default value";
+
     /*
     算数异常类：ArithmeticException
     空指针异常类型：NullPointerException
@@ -197,7 +199,7 @@ public class GlobalExceptionHandler {
     public ResultVo<?> sqlException(SQLException e) {
         //log.error("数据异常：{}",e.getMessage(),e);
         // 默认值异常
-        if(StringUtils.contains(e.getMessage(),"doesn't have a default value")){
+        if(StringUtils.contains(e.getMessage(),SQL_EXCEPTION)){
             String Field = e.getMessage().replaceAll("Field '","")
                     .replaceAll("' doesn't have a default value","");
             String msg = StrFormatter.format(CoreMsg.SQL_EXCEPTION_NOT_HAVE_DEFAULT_VALUE.getMessage(), Field);

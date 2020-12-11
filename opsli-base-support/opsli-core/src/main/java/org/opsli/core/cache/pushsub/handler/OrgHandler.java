@@ -58,7 +58,9 @@ public class OrgHandler implements RedisPushSubHandler{
     private void orgHandler(JSONObject msgJson){
         JSONObject data = msgJson.getJSONObject(MsgArgsType.ORG_USER_DATA.toString());
         // 数据为空则不执行
-        if(data == null) return;
+        if(data == null){
+            return;
+        }
 
         // 获得用户ID
         String userId = (String) msgJson.get(MsgArgsType.ORG_USER_ID.toString());

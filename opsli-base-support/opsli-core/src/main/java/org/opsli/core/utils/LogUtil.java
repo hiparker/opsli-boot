@@ -61,7 +61,9 @@ public final class LogUtil {
 
             RequestAttributes ra = RequestContextHolder.getRequestAttributes();
             ServletRequestAttributes sra = (ServletRequestAttributes) ra;
-            if(sra == null) return;
+            if(sra == null){
+                return;
+            }
             HttpServletRequest request = sra.getRequest();
 
             // EnableLog 如果不被 EnableLog修饰 则直接退出

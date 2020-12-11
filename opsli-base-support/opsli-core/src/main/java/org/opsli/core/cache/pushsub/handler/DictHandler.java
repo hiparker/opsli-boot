@@ -57,14 +57,18 @@ public class DictHandler implements RedisPushSubHandler{
             Collection<Object> dicts = (Collection<Object>) msgJson.get(MsgArgsType.DICT_MODELS.toString());
             for (Object dictObj : dicts) {
                 JSONObject jsonObject = msgJson.getJSONObject(MsgArgsType.DICT_MODEL.toString());
-                if(jsonObject == null) continue;
+                if(jsonObject == null){
+                    continue;
+                }
 
                 DictWrapper dictWrapperModel = jsonObject.toJavaObject(DictWrapper.class);
                 this.handler(dictWrapperModel, type);
             }
         } else if(DictModelType.OBJECT == dictModelType){
             JSONObject jsonObject = msgJson.getJSONObject(MsgArgsType.DICT_MODEL.toString());
-            if(jsonObject == null) return;
+            if(jsonObject == null){
+                return;
+            }
 
             DictWrapper dictWrapperModel = jsonObject.toJavaObject(DictWrapper.class);
             this.handler(dictWrapperModel, type);

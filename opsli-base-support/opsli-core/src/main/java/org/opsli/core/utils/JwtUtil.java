@@ -32,7 +32,7 @@ public final class JwtUtil {
     /**
      * JWT认证加密私钥(Base64加密)
      */
-    private static final String encryptJWTKey="a30ade6452725123436288ccae58570738ee";
+    private static final String ENCRYPT_JWT_KEY = "a30ade6452725123436288ccae58570738ee";
 
     static {
         Props props = new Props("application.yaml");
@@ -48,7 +48,7 @@ public final class JwtUtil {
      */
     public static boolean verify(String token) {
         try {
-            String secret = getClaim(token, SignConstants.ACCOUNT) + Base64ConvertUtil.decode(encryptJWTKey);
+            String secret = getClaim(token, SignConstants.ACCOUNT) + Base64ConvertUtil.decode(ENCRYPT_JWT_KEY);
             Algorithm algorithm = Algorithm.HMAC256(secret);
             JWTVerifier verifier = JWT.require(algorithm).build();
             verifier.verify(token);
@@ -85,7 +85,7 @@ public final class JwtUtil {
     public static String sign(String account, String userId) {
         try {
             // 帐号加JWT私钥加密
-            String secret = account + Base64ConvertUtil.decode(encryptJWTKey);
+            String secret = account + Base64ConvertUtil.decode(ENCRYPT_JWT_KEY);
             // 此处过期时间是以毫秒为单位，所以乘以1000
             Date date = new Date(System.currentTimeMillis() + EXPIRE);
             Algorithm algorithm = Algorithm.HMAC256(secret);
@@ -114,5 +114,6 @@ public final class JwtUtil {
     }
 
     // ==================
+
     private JwtUtil(){}
 }

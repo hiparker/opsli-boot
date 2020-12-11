@@ -26,6 +26,7 @@ import org.opsli.common.base.msg.BaseMsg;
  */
 public enum JwtMsg implements BaseMsg {
 
+    /** 异常消息 */
     EXCEPTION_TOKEN(11000,"认证解密异常: {}"),
     EXCEPTION_DECODE(10101,"解密异常: {}"),
     EXCEPTION_ENCODE(10102,"加密异常: {}"),

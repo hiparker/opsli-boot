@@ -35,7 +35,7 @@ public final class TokenGenerator {
         return generateValue(UUID.randomUUID().toString());
     }
 
-    private static final char[] hexCode = "0123456789abcdef".toCharArray();
+    private static final char[] HEX_CODE = "0123456789abcdef".toCharArray();
 
 
     /**
@@ -64,13 +64,14 @@ public final class TokenGenerator {
         }
         StringBuilder r = new StringBuilder(data.length*2);
         for ( byte b : data) {
-            r.append(hexCode[(b >> 4) & 0xF]);
-            r.append(hexCode[(b & 0xF)]);
+            r.append(HEX_CODE[(b >> 4) & 0xF]);
+            r.append(HEX_CODE[(b & 0xF)]);
         }
         return r.toString();
     }
 
 
     // =========================
+
     private TokenGenerator(){}
 }
