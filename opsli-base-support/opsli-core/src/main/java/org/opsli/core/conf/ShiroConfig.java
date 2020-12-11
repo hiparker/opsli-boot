@@ -77,6 +77,14 @@ public class ShiroConfig {
         shiroFilter.setFilters(filters);
 
         Map<String, String> filterMap = Maps.newLinkedHashMap();
+
+        // 加载排除URL
+        if(CollUtil.isNotEmpty(URL_EXCLUSION)){
+            for (String excUrl : URL_EXCLUSION) {
+                filterMap.put(excUrl, "anon");
+            }
+        }
+
         filterMap.put("/webjars/**", "anon");
         filterMap.put("/druid/**", "anon");
         filterMap.put("/app/**", "anon");
@@ -91,13 +99,6 @@ public class ShiroConfig {
         filterMap.put("/ueditor/**", "anon");
         filterMap.put("/static/file/**", "anon");
         filterMap.put("/**", "oauth2");
-
-        // 加载排除URL
-        if(CollUtil.isNotEmpty(URL_EXCLUSION)){
-            for (String excUrl : URL_EXCLUSION) {
-                filterMap.put(excUrl, "anon");
-            }
-        }
 
         shiroFilter.setFilterChainDefinitionMap(filterMap);
 
