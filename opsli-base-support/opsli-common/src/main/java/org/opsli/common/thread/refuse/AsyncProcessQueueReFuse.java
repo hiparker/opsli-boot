@@ -1,4 +1,4 @@
-package org.opsli.common.thread;
+package org.opsli.common.thread.refuse;
 
 
 import cn.hutool.core.util.StrUtil;
@@ -10,7 +10,7 @@ import lombok.extern.slf4j.Slf4j;
  * @Description: 自定义线程有界队列
  */
 @Slf4j
-public class AsyncProcessQueue {
+public class AsyncProcessQueueReFuse {
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     /**
@@ -48,6 +48,6 @@ public class AsyncProcessQueue {
      * @return
      */
     public static boolean execute(final Runnable task) {
-        return AsyncProcessor.executeTask(new TaskWrapper(task));
+        return AsyncProcessorReFuse.executeTask(new TaskWrapper(task));
     }
 }

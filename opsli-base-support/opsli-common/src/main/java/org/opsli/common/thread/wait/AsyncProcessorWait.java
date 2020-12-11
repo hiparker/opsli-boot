@@ -1,4 +1,4 @@
-package org.opsli.common.thread;
+package org.opsli.common.thread.wait;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.concurrent.BasicThreadFactory;
@@ -8,10 +8,10 @@ import java.util.concurrent.*;
 /**
  * @Author: 一枝花算不算浪漫
  * @CreateTime: 2020-10-08 10:24
- * @Description: 自定义线程执行器
+ * @Description: 自定义线程执行器 - 等待线程执行完毕不拒绝
  */
 @Slf4j
-public class AsyncProcessor {
+public class AsyncProcessorWait {
 
     /**
      * 默认最大并发数<br>
@@ -21,7 +21,7 @@ public class AsyncProcessor {
     /**
      * 线程池名称格式
      */
-    private static final String THREAD_POOL_NAME = "ExternalConvertProcessPool-%d";
+    private static final String THREAD_POOL_NAME = "ExternalConvertProcessPool-Wait-%d";
 
     /**
      * 线程工厂名称
@@ -38,7 +38,7 @@ public class AsyncProcessor {
     /**
      * 默认线程等待时间 秒
      */
-    private static final int DEFAULT_WAIT_TIME = 10;
+    private static final int DEFAULT_WAIT_TIME = 99999;
 
     /**
      * 默认线程存活时间
@@ -61,26 +61,26 @@ public class AsyncProcessor {
         try {
            EXECUTOR = new ThreadPoolExecutor(DEFAULT_MAX_CONCURRENT, DEFAULT_MAX_CONCURRENT * 4, DEFAULT_KEEP_ALIVE,
                TimeUnit.SECONDS, EXECUTOR_QUEUE, FACTORY);
+           // 这里不会自动关闭线程， 当线程超过阈值时 抛异常
+            // 关闭事件的挂钩
+            Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+                log.info("AsyncProcessor shutting down.");
 
-           // 关闭事件的挂钩
-           Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-              log.info("AsyncProcessor shutting down.");
+                EXECUTOR.shutdown();
 
-              EXECUTOR.shutdown();
+                try {
+                    // 等待1秒执行关闭
+                    if (!EXECUTOR.awaitTermination(DEFAULT_WAIT_TIME, TimeUnit.SECONDS)) {
+                        log.error("AsyncProcessor shutdown immediately due to wait timeout.");
+                        EXECUTOR.shutdownNow();
+                    }
+                } catch (InterruptedException e) {
+                    log.error("AsyncProcessor shutdown interrupted.");
+                    EXECUTOR.shutdownNow();
+                }
 
-              try {
-                 // 等待1秒执行关闭
-                 if (!EXECUTOR.awaitTermination(DEFAULT_WAIT_TIME, TimeUnit.SECONDS)) {
-                     log.error("AsyncProcessor shutdown immediately due to wait timeout.");
-                     EXECUTOR.shutdownNow();
-                 }
-              } catch (InterruptedException e) {
-                 log.error("AsyncProcessor shutdown interrupted.");
-                 EXECUTOR.shutdownNow();
-              }
-
-              log.info("AsyncProcessor shutdown complete.");
-           }));
+                log.info("AsyncProcessor shutdown complete.");
+            }));
         } catch (Exception e) {
             log.error("AsyncProcessor init error.", e);
             throw new ExceptionInInitializerError(e);
@@ -90,7 +90,7 @@ public class AsyncProcessor {
     /**
      * 此类型无法实例化
      */
-    private AsyncProcessor() {
+    private AsyncProcessorWait() {
     }
 
     /**
