@@ -141,6 +141,8 @@
             and c.type in ( '1', '3' )
             and c.deleted = '0'
             and c.hidden = '0'
+        <!-- 2020-12-11 修复用户多角色菜单重复BUG -->
+        group by c.id
     </select>
 
     <update id="updatePassword" parameterType="org.opsli.api.wrapper.system.user.UserPassword">
