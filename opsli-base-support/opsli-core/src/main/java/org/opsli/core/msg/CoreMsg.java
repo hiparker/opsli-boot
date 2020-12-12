@@ -42,12 +42,14 @@ public enum CoreMsg implements BaseMsg {
     /**
      * Excel
      */
-    EXCEL_EXPORT_SUCCESS(200,"Excel 导出成功！  -  数据行数：{}  -  耗时：{}毫秒"),
-    EXCEL_EXPORT_ERROR(10301,"Excel 导出失败！  -  耗时：{}毫秒  -  失败信息：{}"),
-    EXCEL_IMPORT_SUCCESS(200,"EXCEL 导入成功！  -  耗时：{}毫秒"),
-    EXCEL_IMPORT_ERROR(10303,"Excel导入失败!   -  耗时：{}毫秒  -  失败信息：{}"),
+    EXCEL_EXPORT_SUCCESS(200,"Excel 导出成功！  -  数据行数：{}  -  耗时：{}"),
+    EXCEL_EXPORT_ERROR(10301,"Excel 导出失败！  -  耗时：{}  -  失败信息：{}"),
+    EXCEL_IMPORT_SUCCESS(200,"EXCEL 导入成功！  -  耗时：{}"),
+    EXCEL_IMPORT_ERROR(10303,"Excel导入失败!   -  耗时：{}  -  失败信息：{}"),
     EXCEL_IMPORT_NO(10304,""),
     EXCEL_FILE_NULL(10305,"请选择文件"),
+    EXCEL_EXPORT_MAX(10700, "超出最大导出数量, 当前数据[{}]条，允许最大阈值[{}]条"),
+
 
     /**
      * 缓存

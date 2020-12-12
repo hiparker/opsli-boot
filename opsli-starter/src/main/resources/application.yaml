@@ -195,3 +195,6 @@ opsli:
     # 失败锁定时间(秒)
     slip-lock-speed: 300
 
+  # Excel 最大导出数量 防止OOM
+  export-excel-max-count: 20000
+
