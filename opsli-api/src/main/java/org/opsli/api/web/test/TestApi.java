@@ -128,20 +128,20 @@ public interface TestApi {
      * @return
      */
     @GetMapping("/exportExcel")
-    ResultVo<?> exportExcel(HttpServletRequest request, HttpServletResponse response);
+    void exportExcel(HttpServletRequest request, HttpServletResponse response);
 
     /**
      * Excel 导入
      * @return
      */
-    @GetMapping("/exportImport")
-    ResultVo<?> excelImport(MultipartHttpServletRequest request);
+    @GetMapping("/importExcel")
+    ResultVo<?> importExcel(MultipartHttpServletRequest request);
 
     /**
      * Excel 下载导入模版
      * @return
      */
-    @GetMapping("/exportImport/template")
-    ResultVo<?> importTemplate(HttpServletResponse response);
+    @GetMapping("/importExcel/template")
+    void importTemplate(HttpServletResponse response);
 
 }

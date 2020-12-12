@@ -48,7 +48,7 @@ public class TestUser extends BaseEntity {
     private Date birth;
 
     /** 是否启用 */
-    private Character izUsable;
+    private String izUsable;
 
 
     // ========================================

@@ -15,6 +15,7 @@
  */
 package org.opsli.modulars.system.tenant.web;
 
+import cn.hutool.core.util.ReflectUtil;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -24,6 +25,7 @@ import org.opsli.api.web.system.tenant.TenantApi;
 import org.opsli.api.wrapper.system.tenant.TenantModel;
 import org.opsli.common.annotation.ApiRestController;
 import org.opsli.common.annotation.EnableLog;
+import org.opsli.common.annotation.RequiresPermissionsCus;
 import org.opsli.core.base.concroller.BaseRestController;
 import org.opsli.core.persistence.Page;
 import org.opsli.core.persistence.querybuilder.QueryBuilder;
@@ -34,6 +36,7 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.lang.reflect.Method;
 
 
 /**
@@ -162,12 +165,14 @@ public class TenantRestController extends BaseRestController<SysTenant, TenantMo
      * @return ResultVo
      */
     @ApiOperation(value = "导出Excel", notes = "导出Excel")
-    @RequiresPermissions("system_tenant_export")
+    @RequiresPermissionsCus("system_tenant_export")
     @EnableLog
     @Override
-    public ResultVo<?> exportExcel(HttpServletRequest request, HttpServletResponse response) {
+    public void exportExcel(HttpServletRequest request, HttpServletResponse response) {
+        // 当前方法
+        Method method = ReflectUtil.getMethodByName(this.getClass(), "exportExcel");
         QueryBuilder<SysTenant> queryBuilder = new WebQueryBuilder<>(SysTenant.class, request.getParameterMap());
-        return super.excelExport(RoleApi.TITLE, queryBuilder.build(), response);
+        super.excelExport(RoleApi.TITLE, queryBuilder.build(), response, method);
     }
 
     /**
@@ -176,11 +181,11 @@ public class TenantRestController extends BaseRestController<SysTenant, TenantMo
      * @return ResultVo
      */
     @ApiOperation(value = "导入Excel", notes = "导入Excel")
-    @RequiresPermissions("system_tenant_import")
+    @RequiresPermissionsCus("system_tenant_import")
     @EnableLog
     @Override
-    public ResultVo<?> excelImport(MultipartHttpServletRequest request) {
-        return super.excelImport(request);
+    public ResultVo<?> importExcel(MultipartHttpServletRequest request) {
+        return super.importExcel(request);
     }
 
     /**
@@ -189,10 +194,12 @@ public class TenantRestController extends BaseRestController<SysTenant, TenantMo
      * @return ResultVo
      */
     @ApiOperation(value = "导出Excel模版", notes = "导出Excel模版")
-    @RequiresPermissions("system_tenant_import")
+    @RequiresPermissionsCus("system_tenant_import")
     @Override
-    public ResultVo<?> importTemplate(HttpServletResponse response) {
-        return super.importTemplate(RoleApi.TITLE, response);
+    public void importTemplate(HttpServletResponse response) {
+        // 当前方法
+        Method method = ReflectUtil.getMethodByName(this.getClass(), "importTemplate");
+        super.importTemplate(RoleApi.TITLE, response, method);
     }
 
 }

@@ -29,6 +29,7 @@ import org.opsli.common.utils.IPUtil;
 import org.opsli.core.msg.TokenMsg;
 import org.opsli.core.persistence.querybuilder.GenQueryBuilder;
 import org.opsli.core.persistence.querybuilder.QueryBuilder;
+import org.opsli.core.security.shiro.realm.OAuth2Realm;
 import org.opsli.core.utils.CaptchaUtil;
 import org.opsli.core.utils.UserTokenUtil;
 import org.opsli.core.utils.UserUtil;
@@ -63,6 +64,7 @@ import java.util.Map;
 @Slf4j
 @RestController
 public class LoginRestController {
+
 
     @Autowired
     private ITenantService iTenantService;
@@ -108,7 +110,7 @@ public class LoginRestController {
         UserTokenUtil.clearLockAccount(form.getUsername());
 
         // 账号锁定
-        if(user.getLocked() == 1){
+        if(OAuth2Realm.LOCK_VAL.equals(user.getLocked())){
             throw new TokenException(TokenMsg.EXCEPTION_LOGIN_ACCOUNT_LOCKED);
         }
 

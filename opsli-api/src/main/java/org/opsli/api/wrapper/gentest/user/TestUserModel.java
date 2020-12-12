@@ -84,7 +84,7 @@ public class TestUserModel extends ApiWrapper {
     // 验证器
     @ValidationArgs({ValiArgsType.IS_NOT_NULL, })
     @ValidationArgsLenMax(1)
-    private Character izUsable;
+    private String izUsable;
 
 
 

@@ -174,15 +174,15 @@ public interface UserApi {
      * @return ResultVo
      */
     @GetMapping("/exportExcel")
-    ResultVo<?> exportExcel(HttpServletRequest request, HttpServletResponse response);
+    void exportExcel(HttpServletRequest request, HttpServletResponse response);
 
     /**
      * 用户信息 Excel 导入
      * @param request 文件流 request
      * @return ResultVo
      */
-    @GetMapping("/exportImport")
-    ResultVo<?> excelImport(MultipartHttpServletRequest request);
+    @GetMapping("/importExcel")
+    ResultVo<?> importExcel(MultipartHttpServletRequest request);
 
 
     /**
@@ -190,8 +190,8 @@ public interface UserApi {
      * @param response response
      * @return ResultVo
      */
-    @GetMapping("/exportImport/template")
-    ResultVo<?> importTemplate(HttpServletResponse response);
+    @GetMapping("/importExcel/template")
+    void importTemplate(HttpServletResponse response);
 
 
     /**

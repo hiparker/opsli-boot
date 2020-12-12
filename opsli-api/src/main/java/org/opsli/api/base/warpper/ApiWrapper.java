@@ -110,10 +110,12 @@ public abstract class ApiWrapper implements Serializable {
 	/** 是否是内部Api调用 */
 	@JsonIgnore
 	@TableField(exist = false)
+	@ExcelIgnore
 	private Boolean izApi = false;
 
 	/** 是否 手动操控 （如果为true 则可以手动指定创建人和修改人 如果为空则默认） */
 	@JsonIgnore
 	@TableField(exist = false)
+	@ExcelIgnore
 	private Boolean izManual = false;
 }

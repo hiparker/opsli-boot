@@ -42,7 +42,7 @@ public class SysRole extends BaseEntity {
     private String roleName;
 
     /** 是否内置数据 0是  1否*/
-    private Character izLock;
+    private String izLock;
 
     /** 备注 */
     @TableField(updateStrategy = FieldStrategy.IGNORED)

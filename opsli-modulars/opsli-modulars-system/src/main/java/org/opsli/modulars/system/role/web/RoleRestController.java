@@ -16,6 +16,7 @@
 package org.opsli.modulars.system.role.web;
 
 import cn.hutool.core.convert.Convert;
+import cn.hutool.core.util.ReflectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -26,6 +27,7 @@ import org.opsli.api.wrapper.system.role.RoleModel;
 import org.opsli.api.wrapper.system.user.UserModel;
 import org.opsli.common.annotation.ApiRestController;
 import org.opsli.common.annotation.EnableLog;
+import org.opsli.common.annotation.RequiresPermissionsCus;
 import org.opsli.common.constants.MyBatisConstants;
 import org.opsli.common.exception.ServiceException;
 import org.opsli.core.base.concroller.BaseRestController;
@@ -41,6 +43,7 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.lang.reflect.Method;
 import java.util.List;
 
 
@@ -57,7 +60,7 @@ public class RoleRestController extends BaseRestController<SysRole, RoleModel, I
         implements RoleApi {
 
     /** 内置数据 */
-    private static final char LOCK_DATA = '1';
+    private static final String LOCK_DATA = "1";
 
     /**
      * 角色 查一条
@@ -126,7 +129,7 @@ public class RoleRestController extends BaseRestController<SysRole, RoleModel, I
         if(model != null){
             RoleModel roleModel = IService.get(model.getId());
             // 内置数据 只有超级管理员可以修改
-            if(LOCK_DATA == roleModel.getIzLock() ){
+            if(LOCK_DATA.equals(roleModel.getIzLock()) ){
                 UserModel user = UserUtil.getUser();
 
                 if(!UserUtil.SUPER_ADMIN.equals(user.getUsername())){
@@ -156,7 +159,7 @@ public class RoleRestController extends BaseRestController<SysRole, RoleModel, I
 
         RoleModel roleModel = IService.get(id);
         // 内置数据 只有超级管理员可以修改
-        if(LOCK_DATA == roleModel.getIzLock() ){
+        if(LOCK_DATA.equals(roleModel.getIzLock()) ){
             UserModel user = UserUtil.getUser();
             if(!UserUtil.SUPER_ADMIN.equals(user.getUsername())){
                 throw new ServiceException(SystemMsg.EXCEPTION_LOCK_DATA);
@@ -190,7 +193,7 @@ public class RoleRestController extends BaseRestController<SysRole, RoleModel, I
             List<SysRole> roleList = IService.findList(wrapper);
             for (SysRole sysRole : roleList) {
                 // 内置数据 只有超级管理员可以修改
-                if(LOCK_DATA == sysRole.getIzLock() ){
+                if(LOCK_DATA.equals(sysRole.getIzLock()) ){
                     UserModel user = UserUtil.getUser();
                     if(!UserUtil.SUPER_ADMIN.equals(user.getUsername())){
                         throw new ServiceException(SystemMsg.EXCEPTION_LOCK_DATA);
@@ -211,12 +214,14 @@ public class RoleRestController extends BaseRestController<SysRole, RoleModel, I
      * @return ResultVo
      */
     @ApiOperation(value = "导出Excel", notes = "导出Excel")
-    @RequiresPermissions("system_role_export")
+    @RequiresPermissionsCus("system_role_export")
     @EnableLog
     @Override
-    public ResultVo<?> exportExcel(HttpServletRequest request, HttpServletResponse response) {
+    public void exportExcel(HttpServletRequest request, HttpServletResponse response) {
+        // 当前方法
+        Method method = ReflectUtil.getMethodByName(this.getClass(), "exportExcel");
         QueryBuilder<SysRole> queryBuilder = new WebQueryBuilder<>(SysRole.class, request.getParameterMap());
-        return super.excelExport(RoleApi.TITLE, queryBuilder.build(), response);
+        super.excelExport(RoleApi.TITLE, queryBuilder.build(), response, method);
     }
 
     /**
@@ -228,8 +233,8 @@ public class RoleRestController extends BaseRestController<SysRole, RoleModel, I
     @RequiresPermissions("system_role_import")
     @EnableLog
     @Override
-    public ResultVo<?> excelImport(MultipartHttpServletRequest request) {
-        return super.excelImport(request);
+    public ResultVo<?> importExcel(MultipartHttpServletRequest request) {
+        return super.importExcel(request);
     }
 
     /**
@@ -238,11 +243,13 @@ public class RoleRestController extends BaseRestController<SysRole, RoleModel, I
      * @return ResultVo
      */
     @ApiOperation(value = "导出Excel模版", notes = "导出Excel模版")
-    @RequiresPermissions("system_role_import")
+    @RequiresPermissionsCus("system_role_import")
     @EnableLog
     @Override
-    public ResultVo<?> importTemplate(HttpServletResponse response) {
-        return super.importTemplate(RoleApi.TITLE, response);
+    public void importTemplate(HttpServletResponse response) {
+        // 当前方法
+        Method method = ReflectUtil.getMethodByName(this.getClass(), "importTemplate");
+        super.importTemplate(RoleApi.TITLE, response, method);
     }
 
 }

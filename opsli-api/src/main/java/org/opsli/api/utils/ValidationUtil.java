@@ -388,7 +388,7 @@ public final class ValidationUtil {
         dictModel.setTypeCode("asdsa");
         dictModel.setTypeName("阿哈哈哈哈");
         dictModel.setRemark("测试11232131231231223123");
-        dictModel.setIzLock('1');
+        dictModel.setIzLock("1");
 
         ValidationUtil.verify(dictModel);
     }

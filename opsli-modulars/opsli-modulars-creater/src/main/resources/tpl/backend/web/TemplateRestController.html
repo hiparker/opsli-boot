@@ -19,9 +19,11 @@ package #(data.packageName+"."+data.moduleName+"."+data.subModuleName).web;
 package #(data.packageName+"."+data.moduleName).web;
 #end
 
+import cn.hutool.core.util.ReflectUtil;
 import org.opsli.core.base.service.interfaces.CrudServiceInterface;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.opsli.common.annotation.RequiresPermissionsCus;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import #(apiPath).base.result.ResultVo;
 import org.opsli.common.annotation.ApiRestController;
@@ -195,15 +197,17 @@ public class #(data.model.tableName)RestController extends BaseRestController<#(
     */
     @ApiOperation(value = "导出Excel", notes = "导出Excel")
     #if(data.subModuleName != null && data.subModuleName != "")
-    @RequiresPermissions("#(data.moduleName.toLowerCase())_#(data.subModuleName.toLowerCase())_export")
+    @RequiresPermissionsCus("#(data.moduleName.toLowerCase())_#(data.subModuleName.toLowerCase())_export")
     #else
-    @RequiresPermissions("#(data.moduleName.toLowerCase())_export")
+    @RequiresPermissionsCus("#(data.moduleName.toLowerCase())_export")
     #end
     @EnableLog
     @Override
-    public ResultVo<?> exportExcel(HttpServletRequest request, HttpServletResponse response) {
+    public void exportExcel(HttpServletRequest request, HttpServletResponse response) {
+        // 当前方法
+        Method method = ReflectUtil.getMethodByName(this.getClass(), "exportExcel");
         QueryBuilder<#(data.model.tableName)> queryBuilder = new WebQueryBuilder<>(#(data.model.tableName).class, request.getParameterMap());
-        return super.excelExport(#(data.model.tableName)RestApi.TITLE, queryBuilder.build(), response);
+        super.excelExport(#(data.model.tableName)RestApi.TITLE, queryBuilder.build(), response, method);
     }
 
     /**
@@ -213,14 +217,16 @@ public class #(data.model.tableName)RestController extends BaseRestController<#(
     */
     @ApiOperation(value = "导入Excel", notes = "导入Excel")
     #if(data.subModuleName != null && data.subModuleName != "")
-    @RequiresPermissions("#(data.moduleName.toLowerCase())_#(data.subModuleName.toLowerCase())_import")
+    @RequiresPermissionsCus("#(data.moduleName.toLowerCase())_#(data.subModuleName.toLowerCase())_import")
     #else
-    @RequiresPermissions("#(data.moduleName.toLowerCase())_import")
+    @RequiresPermissionsCus("#(data.moduleName.toLowerCase())_import")
     #end
     @EnableLog
     @Override
-    public ResultVo<?> excelImport(MultipartHttpServletRequest request) {
-        return super.excelImport(request);
+    public ResultVo<?> importExcel(MultipartHttpServletRequest request) {
+        // 当前方法
+        Method method = ReflectUtil.getMethodByName(this.getClass(), "importExcel");
+        return super.excelImport(request, method);
     }
 
     /**
@@ -230,13 +236,15 @@ public class #(data.model.tableName)RestController extends BaseRestController<#(
     */
     @ApiOperation(value = "导出Excel模版", notes = "导出Excel模版")
     #if(data.subModuleName != null && data.subModuleName != "")
-    @RequiresPermissions("#(data.moduleName.toLowerCase())_#(data.subModuleName.toLowerCase())_import")
+    @RequiresPermissionsCus("#(data.moduleName.toLowerCase())_#(data.subModuleName.toLowerCase())_import")
     #else
-    @RequiresPermissions("#(data.moduleName.toLowerCase())_import")
+    @RequiresPermissionsCus("#(data.moduleName.toLowerCase())_import")
     #end
     @Override
-    public ResultVo<?> importTemplate(HttpServletResponse response) {
-        return super.importTemplate(#(data.model.tableName)RestApi.TITLE, response);
+    public void importTemplate(HttpServletResponse response) {
+        // 当前方法
+        Method method = ReflectUtil.getMethodByName(this.getClass(), "importTemplate");
+        super.importTemplate(#(data.model.tableName)RestApi.TITLE, response, method);
     }
 
 }

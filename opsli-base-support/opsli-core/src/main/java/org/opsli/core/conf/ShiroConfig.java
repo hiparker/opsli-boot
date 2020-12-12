@@ -55,10 +55,13 @@ public class ShiroConfig {
 
     /** 获得排除URL */
     private static final List<String> URL_EXCLUSION;
+    /** API前缀 */
+    private static final String API_URL_PREFIX;
 
     static{
         Props props = new Props("application.yaml");
         URL_EXCLUSION = props.getList("opsli.token-auth.url-exclusion");
+        API_URL_PREFIX = props.getStr("server.servlet.api.path.global-prefix","");
     }
 
     /**
@@ -85,18 +88,23 @@ public class ShiroConfig {
             }
         }
 
+        // 登录接口拦截
+        filterMap.put("/sys/login", "anon");
+        filterMap.put("/sys/slipCount", "anon");
+        filterMap.put("/captcha.jpg", "anon");
+
+        // 导出Excel\模版 不做自动拦截 手动拦截
+        filterMap.put(API_URL_PREFIX + "/**/exportExcel", "anon");
+        filterMap.put(API_URL_PREFIX + "/**/importExcel/template", "anon");
+
         filterMap.put("/webjars/**", "anon");
         filterMap.put("/druid/**", "anon");
         filterMap.put("/app/**", "anon");
-        filterMap.put("/sys/login", "anon");
-        filterMap.put("/sys/slipCount", "anon");
         filterMap.put("/swagger/**", "anon");
         filterMap.put("/v2/api-docs", "anon");
         filterMap.put("/doc.html", "anon");
         filterMap.put("/swagger-ui.html", "anon");
         filterMap.put("/swagger-resources/**", "anon");
-        filterMap.put("/captcha.jpg", "anon");
-        filterMap.put("/ueditor/**", "anon");
         filterMap.put("/static/file/**", "anon");
         filterMap.put("/**", "oauth2");
 

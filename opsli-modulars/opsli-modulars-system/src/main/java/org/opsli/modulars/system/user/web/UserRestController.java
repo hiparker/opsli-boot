@@ -19,6 +19,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.RandomUtil;
+import cn.hutool.core.util.ReflectUtil;
 import com.alibaba.excel.util.CollectionUtils;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.google.common.collect.Lists;
@@ -35,6 +36,7 @@ import org.opsli.api.wrapper.system.org.SysOrgModel;
 import org.opsli.api.wrapper.system.user.*;
 import org.opsli.common.annotation.ApiRestController;
 import org.opsli.common.annotation.EnableLog;
+import org.opsli.common.annotation.RequiresPermissionsCus;
 import org.opsli.common.constants.MyBatisConstants;
 import org.opsli.common.exception.TokenException;
 import org.opsli.common.utils.HumpUtil;
@@ -63,6 +65,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -386,12 +389,14 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
      * @return ResultVo
      */
     @ApiOperation(value = "导出Excel", notes = "导出Excel")
-    @RequiresPermissions("system_user_export")
+    @RequiresPermissionsCus("system_user_export")
     @EnableLog
     @Override
-    public ResultVo<?> exportExcel(HttpServletRequest request, HttpServletResponse response) {
+    public void exportExcel(HttpServletRequest request, HttpServletResponse response) {
+        // 当前方法
+        Method method = ReflectUtil.getMethodByName(this.getClass(), "exportExcel");
         QueryBuilder<SysUser> queryBuilder = new WebQueryBuilder<>(SysUser.class, request.getParameterMap());
-        return super.excelExport(UserApi.TITLE, queryBuilder.build(), response);
+        super.excelExport(UserApi.TITLE, queryBuilder.build(), response, method);
     }
 
     /**
@@ -403,8 +408,8 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
     @RequiresPermissions("system_user_import")
     @EnableLog
     @Override
-    public ResultVo<?> excelImport(MultipartHttpServletRequest request) {
-        return super.excelImport(request);
+    public ResultVo<?> importExcel(MultipartHttpServletRequest request) {
+        return super.importExcel(request);
     }
 
     /**
@@ -413,10 +418,12 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
      * @return ResultVo
      */
     @ApiOperation(value = "导出Excel模版", notes = "导出Excel模版")
-    @RequiresPermissions("system_user_import")
+    @RequiresPermissionsCus("system_user_import")
     @Override
-    public ResultVo<?> importTemplate(HttpServletResponse response) {
-        return super.importTemplate(UserApi.TITLE, response);
+    public void importTemplate(HttpServletResponse response) {
+        // 当前方法
+        Method method = ReflectUtil.getMethodByName(this.getClass(), "importTemplate");
+        super.importTemplate(UserApi.TITLE, response, method);
     }
 
     /**

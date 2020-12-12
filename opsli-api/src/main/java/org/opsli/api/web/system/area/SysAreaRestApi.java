@@ -100,22 +100,22 @@ public interface SysAreaRestApi {
     * @return ResultVo
     */
     @GetMapping("/exportExcel")
-    ResultVo<?> exportExcel(HttpServletRequest request, HttpServletResponse response);
+    void exportExcel(HttpServletRequest request, HttpServletResponse response);
 
     /**
     * 组织机构表 Excel 导入
     * @param request 文件流 request
     * @return ResultVo
     */
-    @GetMapping("/exportImport")
-    ResultVo<?> excelImport(MultipartHttpServletRequest request);
+    @GetMapping("/importExcel")
+    ResultVo<?> importExcel(MultipartHttpServletRequest request);
 
     /**
     * 组织机构表 Excel 下载导入模版
     * @param response response
     * @return ResultVo
     */
-    @GetMapping("/exportImport/template")
-    ResultVo<?> importTemplate(HttpServletResponse response);
+    @GetMapping("/importExcel/template")
+    void importTemplate(HttpServletResponse response);
 
 }

@@ -2,6 +2,7 @@ package org.opsli.modulars.test.web;
 
 import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.core.util.RandomUtil;
+import cn.hutool.core.util.ReflectUtil;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -33,6 +34,7 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -275,21 +277,25 @@ public class TestRestRestController extends BaseRestController<TestEntity, TestM
 
     @ApiOperation(value = "导出Excel", notes = "导出Excel")
     @Override
-    public ResultVo<?> exportExcel(HttpServletRequest request, HttpServletResponse response) {
+    public void exportExcel(HttpServletRequest request, HttpServletResponse response) {
+        // 当前方法
+        Method method = ReflectUtil.getMethodByName(this.getClass(), "exportExcel");
         QueryBuilder<TestEntity> queryBuilder = new WebQueryBuilder<>(TestEntity.class, request.getParameterMap());
-        return super.excelExport("测试", queryBuilder.build(), response);
+        super.excelExport("测试", queryBuilder.build(), response, method);
     }
 
     @ApiOperation(value = "导入Excel", notes = "导入Excel")
     @Override
-    public ResultVo<?> excelImport(MultipartHttpServletRequest request) {
-        return super.excelImport(request);
+    public ResultVo<?> importExcel(MultipartHttpServletRequest request) {
+        return super.importExcel(request);
     }
 
     @ApiOperation(value = "导出Excel模版", notes = "导出Excel模版")
     @Override
-    public ResultVo<?> importTemplate(HttpServletResponse response) {
-        return super.importTemplate("测试", response);
+    public void importTemplate(HttpServletResponse response) {
+        // 当前方法
+        Method method = ReflectUtil.getMethodByName(this.getClass(), "importTemplate");
+        super.importTemplate("测试", response, method);
     }
 
 

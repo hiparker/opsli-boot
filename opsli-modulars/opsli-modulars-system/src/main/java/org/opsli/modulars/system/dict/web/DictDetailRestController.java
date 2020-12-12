@@ -16,6 +16,7 @@
 package org.opsli.modulars.system.dict.web;
 
 import cn.hutool.core.convert.Convert;
+import cn.hutool.core.util.ReflectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -26,6 +27,7 @@ import org.opsli.api.wrapper.system.dict.DictDetailModel;
 import org.opsli.api.wrapper.system.user.UserModel;
 import org.opsli.common.annotation.ApiRestController;
 import org.opsli.common.annotation.EnableLog;
+import org.opsli.common.annotation.RequiresPermissionsCus;
 import org.opsli.common.constants.MyBatisConstants;
 import org.opsli.common.exception.ServiceException;
 import org.opsli.core.base.concroller.BaseRestController;
@@ -41,6 +43,7 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.lang.reflect.Method;
 import java.util.List;
 
 
@@ -58,7 +61,7 @@ public class DictDetailRestController extends BaseRestController<SysDictDetail, 
 
 
     /** 内置数据 */
-    private static final char LOCK_DATA = '1';
+    private static final String LOCK_DATA = "1";
 
     /**
      * 数据字典 查一条
@@ -123,7 +126,7 @@ public class DictDetailRestController extends BaseRestController<SysDictDetail, 
         if(model != null){
             DictDetailModel dictDetailModel = IService.get(model.getId());
             // 内置数据 只有超级管理员可以修改
-            if(LOCK_DATA == dictDetailModel.getIzLock() ){
+            if(LOCK_DATA.equals(dictDetailModel.getIzLock()) ){
                 UserModel user = UserUtil.getUser();
 
                 if(!UserUtil.SUPER_ADMIN.equals(user.getUsername())){
@@ -151,7 +154,7 @@ public class DictDetailRestController extends BaseRestController<SysDictDetail, 
 
         DictDetailModel dictDetailModel = IService.get(id);
         // 内置数据 只有超级管理员可以修改
-        if(LOCK_DATA == dictDetailModel.getIzLock() ){
+        if(LOCK_DATA.equals(dictDetailModel.getIzLock()) ){
             UserModel user = UserUtil.getUser();
 
             if(!UserUtil.SUPER_ADMIN.equals(user.getUsername())){
@@ -184,7 +187,7 @@ public class DictDetailRestController extends BaseRestController<SysDictDetail, 
             List<SysDictDetail> dictList = IService.findList(wrapper);
             for (SysDictDetail sysDictDetail : dictList) {
                 // 内置数据 只有超级管理员可以修改
-                if(LOCK_DATA == sysDictDetail.getIzLock() ){
+                if(LOCK_DATA.equals(sysDictDetail.getIzLock()) ){
                     UserModel user = UserUtil.getUser();
                     if(!UserUtil.SUPER_ADMIN.equals(user.getUsername())){
                         throw new ServiceException(SystemMsg.EXCEPTION_LOCK_DATA);
@@ -205,12 +208,14 @@ public class DictDetailRestController extends BaseRestController<SysDictDetail, 
      * @return ResultVo
      */
     @ApiOperation(value = "导出Excel", notes = "导出Excel")
-    @RequiresPermissions("system_dict_export")
+    @RequiresPermissionsCus("system_dict_export")
     @EnableLog
     @Override
-    public ResultVo<?> exportExcel(HttpServletRequest request, HttpServletResponse response) {
+    public void exportExcel(HttpServletRequest request, HttpServletResponse response) {
+        // 当前方法
+        Method method = ReflectUtil.getMethodByName(this.getClass(), "exportExcel");
         QueryBuilder<SysDictDetail> queryBuilder = new WebQueryBuilder<>(SysDictDetail.class, request.getParameterMap());
-        return super.excelExport(DictDetailApi.TITLE, queryBuilder.build(), response);
+        super.excelExport(DictDetailApi.TITLE, queryBuilder.build(), response, method);
     }
 
     /**
@@ -222,8 +227,8 @@ public class DictDetailRestController extends BaseRestController<SysDictDetail, 
     @RequiresPermissions("system_dict_import")
     @EnableLog
     @Override
-    public ResultVo<?> excelImport(MultipartHttpServletRequest request) {
-        return super.excelImport(request);
+    public ResultVo<?> importExcel(MultipartHttpServletRequest request) {
+        return super.importExcel(request);
     }
 
     /**
@@ -232,10 +237,12 @@ public class DictDetailRestController extends BaseRestController<SysDictDetail, 
      * @return ResultVo
      */
     @ApiOperation(value = "导出Excel模版", notes = "导出Excel模版")
-    @RequiresPermissions("system_dict_import")
+    @RequiresPermissionsCus("system_dict_import")
     @Override
-    public ResultVo<?> importTemplate(HttpServletResponse response) {
-        return super.importTemplate(DictDetailApi.TITLE, response);
+    public void importTemplate(HttpServletResponse response) {
+        // 当前方法
+        Method method = ReflectUtil.getMethodByName(this.getClass(), "importTemplate");
+        super.importTemplate(DictDetailApi.TITLE, response, method);
     }
 
     /**

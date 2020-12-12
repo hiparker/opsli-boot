@@ -29,14 +29,18 @@ import org.apache.commons.lang3.StringUtils;
 import org.opsli.api.base.result.ResultVo;
 import org.opsli.api.base.warpper.ApiWrapper;
 import org.opsli.api.wrapper.system.user.UserModel;
+import org.opsli.common.annotation.RequiresPermissionsCus;
 import org.opsli.common.annotation.hotdata.EnableHotData;
 import org.opsli.common.exception.ServiceException;
+import org.opsli.common.exception.TokenException;
 import org.opsli.common.msg.CommonMsg;
 import org.opsli.common.utils.WrapperUtil;
 import org.opsli.core.base.entity.BaseEntity;
 import org.opsli.core.base.service.interfaces.CrudServiceInterface;
 import org.opsli.core.cache.local.CacheUtil;
 import org.opsli.core.msg.CoreMsg;
+import org.opsli.core.msg.TokenMsg;
+import org.opsli.core.security.shiro.realm.OAuth2Realm;
 import org.opsli.core.utils.ExcelUtil;
 import org.opsli.core.utils.UserUtil;
 import org.opsli.plugins.excel.exception.ExcelPluginException;
@@ -52,6 +56,7 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletResponse;
+import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.Iterator;
 import java.util.List;
@@ -184,7 +189,7 @@ public abstract class BaseRestController <T extends BaseEntity, E extends ApiWra
      * @param request
      * @return
      */
-    protected ResultVo<?> excelImport(MultipartHttpServletRequest request){
+    protected ResultVo<?> importExcel(MultipartHttpServletRequest request){
         // 计时器
         TimeInterval timer = DateUtil.timer();
         Iterator<String> itr = request.getFileNames();
@@ -228,8 +233,8 @@ public abstract class BaseRestController <T extends BaseEntity, E extends ApiWra
      * @param fileName 文件名称
      * @param response
      */
-    protected ResultVo<?> importTemplate(String fileName, HttpServletResponse response){
-        return this.excelExport(fileName + " 模版 ",null, response);
+    protected void importTemplate(String fileName, HttpServletResponse response, Method method){
+        this.excelExport(fileName + " 模版 ",null, response, method);
     }
 
     /**
@@ -238,7 +243,30 @@ public abstract class BaseRestController <T extends BaseEntity, E extends ApiWra
      * @param queryWrapper 查询构建器
      * @param response
      */
-    protected ResultVo<?> excelExport(String fileName, QueryWrapper<T> queryWrapper, HttpServletResponse response){
+    protected void excelExport(String fileName, QueryWrapper<T> queryWrapper, HttpServletResponse response,
+                                      Method method){
+        // 权限认证
+        try {
+            if(method == null){
+                // 无权访问该方法
+                throw new TokenException(TokenMsg.EXCEPTION_NOT_AUTH);
+
+            }
+
+            // Token 认证
+            OAuth2Realm.authToken();
+
+            RequiresPermissionsCus permissionsCus = method.getAnnotation(RequiresPermissionsCus.class);
+            if(permissionsCus != null){
+                // 方法权限认证
+                OAuth2Realm.authPerms(permissionsCus.value());
+            }
+        }catch (TokenException e){
+            // 推送错误信息
+            OAuth2Realm.exceptionResponse(e.getMessage(), response);
+            return;
+        }
+
         // 计时器
         TimeInterval timer = DateUtil.timer();
         String msgInfo = "";
@@ -269,7 +297,12 @@ public abstract class BaseRestController <T extends BaseEntity, E extends ApiWra
         }
         // 记录导出日志
         log.info(msgInfo);
-        return resultVo;
+
+        // 导出异常
+        if(!resultVo.isSuccess()){
+            // 无权访问该方法
+            OAuth2Realm.exceptionResponse(resultVo.getMsg(), response);
+        }
     }
 
     /**

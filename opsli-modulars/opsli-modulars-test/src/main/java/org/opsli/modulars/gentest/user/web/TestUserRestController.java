@@ -15,8 +15,8 @@
 */
 package org.opsli.modulars.gentest.user.web;
 
-import org.opsli.api.web.system.role.RoleApi;
-import org.opsli.core.base.service.interfaces.CrudServiceInterface;
+import cn.hutool.core.util.ReflectUtil;
+import org.opsli.common.annotation.RequiresPermissionsCus;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -35,6 +35,8 @@ import org.opsli.modulars.gentest.user.entity.TestUser;
 import org.opsli.api.wrapper.gentest.user.TestUserModel;
 import org.opsli.modulars.gentest.user.service.ITestUserService;
 import org.opsli.api.web.gentest.user.TestUserRestApi;
+
+import java.lang.reflect.Method;
 
 /**
 * @BelongsProject: opsli-boot
@@ -152,12 +154,14 @@ public class TestUserRestController extends BaseRestController<TestUser, TestUse
     * @return ResultVo
     */
     @ApiOperation(value = "导出Excel", notes = "导出Excel")
-    @RequiresPermissions("gentest_user_export")
+    @RequiresPermissionsCus("gentest_user_export")
     @EnableLog
     @Override
-    public ResultVo<?> exportExcel(HttpServletRequest request, HttpServletResponse response) {
+    public void exportExcel(HttpServletRequest request, HttpServletResponse response) {
+        // 当前方法
+        Method method = ReflectUtil.getMethodByName(this.getClass(), "exportExcel");
         QueryBuilder<TestUser> queryBuilder = new WebQueryBuilder<>(TestUser.class, request.getParameterMap());
-        return super.excelExport(RoleApi.TITLE, queryBuilder.build(), response);
+        super.excelExport(TestUserRestApi.TITLE, queryBuilder.build(), response, method);
     }
 
     /**
@@ -169,8 +173,8 @@ public class TestUserRestController extends BaseRestController<TestUser, TestUse
     @RequiresPermissions("gentest_user_import")
     @EnableLog
     @Override
-    public ResultVo<?> excelImport(MultipartHttpServletRequest request) {
-        return super.excelImport(request);
+    public ResultVo<?> importExcel(MultipartHttpServletRequest request) {
+        return super.importExcel(request);
     }
 
     /**
@@ -179,10 +183,12 @@ public class TestUserRestController extends BaseRestController<TestUser, TestUse
     * @return ResultVo
     */
     @ApiOperation(value = "导出Excel模版", notes = "导出Excel模版")
-    @RequiresPermissions("gentest_user_import")
+    @RequiresPermissionsCus("gentest_user_import")
     @Override
-    public ResultVo<?> importTemplate(HttpServletResponse response) {
-        return super.importTemplate(RoleApi.TITLE, response);
+    public void importTemplate(HttpServletResponse response) {
+        // 当前方法
+        Method method = ReflectUtil.getMethodByName(this.getClass(), "importTemplate");
+        super.importTemplate(TestUserRestApi.TITLE, response, method);
     }
 
 }

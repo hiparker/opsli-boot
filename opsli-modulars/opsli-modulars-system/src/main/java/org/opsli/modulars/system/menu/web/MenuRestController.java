@@ -18,6 +18,7 @@ package org.opsli.modulars.system.menu.web;
 import cn.hutool.core.lang.tree.Tree;
 import cn.hutool.core.lang.tree.TreeNodeConfig;
 import cn.hutool.core.lang.tree.TreeUtil;
+import cn.hutool.core.util.ReflectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.google.common.collect.Maps;
 import io.swagger.annotations.ApiOperation;
@@ -30,6 +31,7 @@ import org.opsli.api.wrapper.system.menu.MenuModel;
 import org.opsli.api.wrapper.system.user.UserModel;
 import org.opsli.common.annotation.ApiRestController;
 import org.opsli.common.annotation.EnableLog;
+import org.opsli.common.annotation.RequiresPermissionsCus;
 import org.opsli.common.utils.WrapperUtil;
 import org.opsli.core.base.concroller.BaseRestController;
 import org.opsli.core.general.StartPrint;
@@ -45,6 +47,7 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
 
@@ -388,12 +391,14 @@ public class MenuRestController extends BaseRestController<SysMenu, MenuModel, I
      * @return ResultVo
      */
     @ApiOperation(value = "导出Excel", notes = "导出Excel")
-    @RequiresPermissions("system_menu_export")
+    @RequiresPermissionsCus("system_menu_export")
     @EnableLog
     @Override
-    public ResultVo<?> exportExcel(HttpServletRequest request, HttpServletResponse response) {
+    public void exportExcel(HttpServletRequest request, HttpServletResponse response) {
+        // 当前方法
+        Method method = ReflectUtil.getMethodByName(this.getClass(), "exportExcel");
         QueryBuilder<SysMenu> queryBuilder = new WebQueryBuilder<>(SysMenu.class, request.getParameterMap());
-        return super.excelExport(MenuApi.TITLE, queryBuilder.build(), response);
+        super.excelExport(MenuApi.TITLE, queryBuilder.build(), response, method);
     }
 
     /**
@@ -405,8 +410,8 @@ public class MenuRestController extends BaseRestController<SysMenu, MenuModel, I
     @RequiresPermissions("system_menu_import")
     @EnableLog
     @Override
-    public ResultVo<?> excelImport(MultipartHttpServletRequest request) {
-        return super.excelImport(request);
+    public ResultVo<?> importExcel(MultipartHttpServletRequest request) {
+        return super.importExcel(request);
     }
 
     /**
@@ -415,11 +420,13 @@ public class MenuRestController extends BaseRestController<SysMenu, MenuModel, I
      * @return ResultVo
      */
     @ApiOperation(value = "导出Excel模版", notes = "导出Excel模版")
-    @RequiresPermissions("system_menu_import")
+    @RequiresPermissionsCus("system_menu_import")
     @EnableLog
     @Override
-    public ResultVo<?> importTemplate(HttpServletResponse response) {
-        return super.importTemplate(MenuApi.TITLE, response);
+    public void importTemplate(HttpServletResponse response) {
+        // 当前方法
+        Method method = ReflectUtil.getMethodByName(this.getClass(), "importTemplate");
+        super.importTemplate(MenuApi.TITLE, response, method);
     }
 
 

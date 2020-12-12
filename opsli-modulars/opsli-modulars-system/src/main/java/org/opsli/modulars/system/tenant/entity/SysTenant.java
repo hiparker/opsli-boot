@@ -38,7 +38,7 @@ public class SysTenant extends BaseEntity {
     private String tenantName;
 
     /** 是否启用 0是  1否*/
-    private Character izUsable;
+    private String izUsable;
 
     /** 备注 */
     @TableField(updateStrategy = FieldStrategy.IGNORED)

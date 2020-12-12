@@ -64,7 +64,7 @@ public class RoleModel extends ApiWrapper {
     // 验证器
     @ValidationArgs({ValiArgsType.IS_NOT_NULL})
     @ValidationArgsLenMax(1)
-    private Character izLock;
+    private String izLock;
 
     /** 备注 */
     @ApiModelProperty(value = "备注")

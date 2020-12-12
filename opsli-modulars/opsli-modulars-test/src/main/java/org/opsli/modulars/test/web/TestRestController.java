@@ -1,14 +1,16 @@
 package org.opsli.modulars.test.web;
 
+import cn.hutool.core.util.ReflectUtil;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.opsli.api.base.result.ResultVo;
-import org.opsli.api.web.system.role.RoleApi;
+import org.opsli.api.web.gentest.user.TestUserRestApi;
 import org.opsli.api.web.test.TestRestApi;
 import org.opsli.api.wrapper.test.TestModel;
 import org.opsli.common.annotation.ApiRestController;
 import org.opsli.common.annotation.EnableLog;
+import org.opsli.common.annotation.RequiresPermissionsCus;
 import org.opsli.core.base.concroller.BaseRestController;
 import org.opsli.core.persistence.Page;
 import org.opsli.core.persistence.querybuilder.QueryBuilder;
@@ -19,6 +21,7 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.lang.reflect.Method;
 
 
 /**
@@ -137,12 +140,14 @@ public class TestRestController extends BaseRestController<TestEntity, TestModel
      * @return ResultVo
      */
     @ApiOperation(value = "导出Excel", notes = "导出Excel")
-    @RequiresPermissions("gentest_test_export")
+    @RequiresPermissionsCus("gentest_test_export")
     @EnableLog
     @Override
-    public ResultVo<?> exportExcel(HttpServletRequest request, HttpServletResponse response) {
+    public void exportExcel(HttpServletRequest request, HttpServletResponse response) {
+        // 当前方法
+        Method method = ReflectUtil.getMethodByName(this.getClass(), "exportExcel");
         QueryBuilder<TestEntity> queryBuilder = new WebQueryBuilder<>(TestEntity.class, request.getParameterMap());
-        return super.excelExport(RoleApi.TITLE, queryBuilder.build(), response);
+        super.excelExport(TestUserRestApi.TITLE, queryBuilder.build(), response, method);
     }
 
     /**
@@ -154,8 +159,8 @@ public class TestRestController extends BaseRestController<TestEntity, TestModel
     @RequiresPermissions("gentest_test_import")
     @EnableLog
     @Override
-    public ResultVo<?> excelImport(MultipartHttpServletRequest request) {
-        return super.excelImport(request);
+    public ResultVo<?> importExcel(MultipartHttpServletRequest request) {
+        return super.importExcel(request);
     }
 
     /**
@@ -164,10 +169,12 @@ public class TestRestController extends BaseRestController<TestEntity, TestModel
      * @return ResultVo
      */
     @ApiOperation(value = "导出Excel模版", notes = "导出Excel模版")
-    @RequiresPermissions("gentest_test_import")
+    @RequiresPermissionsCus("gentest_test_import")
     @Override
-    public ResultVo<?> importTemplate(HttpServletResponse response) {
-        return super.importTemplate(RoleApi.TITLE, response);
+    public void importTemplate(HttpServletResponse response) {
+        // 当前方法
+        Method method = ReflectUtil.getMethodByName(this.getClass(), "importTemplate");
+        super.importTemplate(TestUserRestApi.TITLE, response, method);
     }
 
 
