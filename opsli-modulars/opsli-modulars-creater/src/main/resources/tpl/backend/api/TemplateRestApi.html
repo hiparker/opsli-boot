@@ -114,6 +114,14 @@ public interface #(data.model.tableName)RestApi {
 
     /**
     * #(data.codeTitle) Excel 导出
+    *
+    * 导出时，Token认证和方法权限认证 全部都由自定义完成
+    * 因为在 导出不成功时，需要推送错误信息，
+    * 前端直接走下载流，当失败时无法获得失败信息，即使前后端换一种方式后端推送二进制文件前端再次解析也是最少2倍的耗时
+    * ，且如果数据量过大，前端进行渲染时直接会把浏览器卡死
+    * 而直接开启socket接口推送显然是太过浪费资源了，所以目前采用Java最原始的手段
+    * response 推送 javascript代码 alert 提示报错信息
+    *
     * @param request request
     * @param response response
     * @return ResultVo
