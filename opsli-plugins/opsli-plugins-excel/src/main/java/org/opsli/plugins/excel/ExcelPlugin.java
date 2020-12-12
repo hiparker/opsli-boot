@@ -159,7 +159,7 @@ public class ExcelPlugin {
         String filePath = fileName + excelTypeEnum.getValue();
         try {
             fileName = new String(filePath.getBytes(), "ISO-8859-1");
-            response.addHeader("Content-Disposition", "filename=" + fileName);
+            response.addHeader("Content-Disposition", "attachment; filename=" + fileName);
             return response.getOutputStream();
         } catch (IOException e) {
             // 创建文件失败
