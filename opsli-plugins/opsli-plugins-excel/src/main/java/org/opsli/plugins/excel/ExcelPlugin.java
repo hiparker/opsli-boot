@@ -35,6 +35,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 /**
@@ -158,7 +159,7 @@ public class ExcelPlugin {
         //创建本地文件
         String filePath = fileName + excelTypeEnum.getValue();
         try {
-            fileName = new String(filePath.getBytes(), "ISO-8859-1");
+            fileName = new String(filePath.getBytes(), StandardCharsets.ISO_8859_1);
             response.addHeader("Content-Disposition", "attachment; filename=" + fileName);
             return response.getOutputStream();
         } catch (IOException e) {
