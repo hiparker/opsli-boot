@@ -213,6 +213,8 @@ public abstract class BaseRestController <T extends BaseEntity, E extends ApiWra
             if(CollUtil.isNotEmpty(modelList)){
                 if(modelList.size() > excelMaxCount){
                     String maxError = StrUtil.format(CoreMsg.EXCEL_HANDLE_MAX.getMessage(), modelList.size(), excelMaxCount);
+                    // 清空 list
+                    modelList.clear();
                     // 超出最大导出数量
                     throw new ExcelPluginException(CoreMsg.EXCEL_HANDLE_MAX.getCode(), maxError);
                 }
