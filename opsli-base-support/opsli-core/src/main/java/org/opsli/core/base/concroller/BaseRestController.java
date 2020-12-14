@@ -221,8 +221,12 @@ public abstract class BaseRestController <T extends BaseEntity, E extends ApiWra
 
                 boolean ret = IService.insertBatch(modelList);
                 if(!ret){
+                    // 清空 list
+                    modelList.clear();
                     throw new ExcelPluginException(CoreMsg.EXCEL_IMPORT_NO);
                 }
+                // 清空 list
+                modelList.clear();
                 // 花费毫秒数
                 long timerCount = timer.interval();
                 // 提示信息
@@ -298,8 +302,8 @@ public abstract class BaseRestController <T extends BaseEntity, E extends ApiWra
         TimeInterval timer = DateUtil.timer();
         String msgInfo = "";
         ResultVo<?> resultVo;
+        List<E> modelList = Lists.newArrayList();
         try {
-            List<E> modelList = Lists.newArrayList();
             if(queryWrapper != null){
                 // 获得数量 大于 阈值 禁止导出， 防止OOM
                 int count = IService.count(queryWrapper);
@@ -330,6 +334,9 @@ public abstract class BaseRestController <T extends BaseEntity, E extends ApiWra
             msgInfo = StrUtil.format(CoreMsg.EXCEL_EXPORT_ERROR.getMessage(), DateUtil.formatBetween(timerCount), e.getMessage());
             // 导出失败
             resultVo = ResultVo.error(CoreMsg.EXCEL_EXPORT_ERROR.getCode(), msgInfo);
+        }finally {
+            // 清空list
+            modelList.clear();
         }
         // 记录导出日志
         log.info(msgInfo);
