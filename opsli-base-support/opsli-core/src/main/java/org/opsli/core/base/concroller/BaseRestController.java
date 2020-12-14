@@ -16,6 +16,7 @@
 package org.opsli.core.base.concroller;
 
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.date.TimeInterval;
 import cn.hutool.core.thread.ThreadUtil;
@@ -91,9 +92,9 @@ public abstract class BaseRestController <T extends BaseEntity, E extends ApiWra
     /** Model 泛型游标 */
     private static final int MODEL_INDEX = 1;
 
-    /** Excel 最大导出数量 防止OOM */
-    @Value("${opsli.export-excel-max-count:20000}")
-    private Integer exportExcelMaxCount;
+    /** Excel 最大操作数量 防止OOM */
+    @Value("${opsli.excel-max-count:20000}")
+    private Integer excelMaxCount;
 
     @Autowired(required = false)
     protected S IService;
@@ -209,17 +210,27 @@ public abstract class BaseRestController <T extends BaseEntity, E extends ApiWra
         String msgInfo = "";
         try {
             List<E> modelList = excelUtil.readExcel(files.get(0), modelClazz);
-            boolean ret = IService.insertBatch(modelList);
-            if(!ret){
-                throw new ExcelPluginException(CoreMsg.EXCEL_IMPORT_NO);
+            if(CollUtil.isNotEmpty(modelList)){
+                if(modelList.size() > excelMaxCount){
+                    String maxError = StrUtil.format(CoreMsg.EXCEL_HANDLE_MAX.getMessage(), modelList.size(), excelMaxCount);
+                    // 超出最大导出数量
+                    throw new ExcelPluginException(CoreMsg.EXCEL_HANDLE_MAX.getCode(), maxError);
+                }
+
+                boolean ret = IService.insertBatch(modelList);
+                if(!ret){
+                    throw new ExcelPluginException(CoreMsg.EXCEL_IMPORT_NO);
+                }
+                // 花费毫秒数
+                long timerCount = timer.interval();
+                // 提示信息
+                msgInfo = StrUtil.format(CoreMsg.EXCEL_IMPORT_SUCCESS.getMessage(), DateUtil.formatBetween(timerCount));
+                // 导出成功
+                resultVo = ResultVo.success(msgInfo);
+                resultVo.setCode(CoreMsg.EXCEL_IMPORT_SUCCESS.getCode());
+            }else {
+                throw new ExcelPluginException(CoreMsg.EXCEL_FILE_NULL);
             }
-            // 花费毫秒数
-            long timerCount = timer.interval();
-            // 提示信息
-            msgInfo = StrUtil.format(CoreMsg.EXCEL_IMPORT_SUCCESS.getMessage(), DateUtil.formatBetween(timerCount));
-            // 导出成功
-            resultVo = ResultVo.success(msgInfo);
-            resultVo.setCode(CoreMsg.EXCEL_IMPORT_SUCCESS.getCode());
         } catch (ExcelPluginException e) {
             // 花费毫秒数
             long timerCount = timer.interval();
@@ -290,10 +301,10 @@ public abstract class BaseRestController <T extends BaseEntity, E extends ApiWra
             if(queryWrapper != null){
                 // 获得数量 大于 阈值 禁止导出， 防止OOM
                 int count = IService.count(queryWrapper);
-                if(count > exportExcelMaxCount){
-                    String maxError = StrUtil.format(CoreMsg.EXCEL_EXPORT_MAX.getMessage(), count, exportExcelMaxCount);
+                if(count > excelMaxCount){
+                    String maxError = StrUtil.format(CoreMsg.EXCEL_HANDLE_MAX.getMessage(), count, excelMaxCount);
                     // 超出最大导出数量
-                    throw new ExcelPluginException(CoreMsg.EXCEL_EXPORT_MAX.getCode(), maxError);
+                    throw new ExcelPluginException(CoreMsg.EXCEL_HANDLE_MAX.getCode(), maxError);
                 }
 
                 List<T> entityList = IService.findList(queryWrapper);

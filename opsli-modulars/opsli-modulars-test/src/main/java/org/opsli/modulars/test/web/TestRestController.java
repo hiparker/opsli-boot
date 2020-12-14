@@ -5,7 +5,6 @@ import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.opsli.api.base.result.ResultVo;
-import org.opsli.api.web.gentest.user.TestUserRestApi;
 import org.opsli.api.web.test.TestRestApi;
 import org.opsli.api.wrapper.test.TestModel;
 import org.opsli.common.annotation.ApiRestController;
@@ -147,7 +146,7 @@ public class TestRestController extends BaseRestController<TestEntity, TestModel
         // 当前方法
         Method method = ReflectUtil.getMethodByName(this.getClass(), "exportExcel");
         QueryBuilder<TestEntity> queryBuilder = new WebQueryBuilder<>(TestEntity.class, request.getParameterMap());
-        super.excelExport(TestUserRestApi.TITLE, queryBuilder.build(), response, method);
+        super.excelExport(TestRestApi.TITLE, queryBuilder.build(), response, method);
     }
 
     /**
@@ -174,7 +173,7 @@ public class TestRestController extends BaseRestController<TestEntity, TestModel
     public void importTemplate(HttpServletResponse response) {
         // 当前方法
         Method method = ReflectUtil.getMethodByName(this.getClass(), "importTemplate");
-        super.importTemplate(TestUserRestApi.TITLE, response, method);
+        super.importTemplate(TestRestApi.TITLE, response, method);
     }
 
 

@@ -114,7 +114,7 @@ public interface RoleApi {
      * @param request 文件流 request
      * @return ResultVo
      */
-    @GetMapping("/importExcel")
+    @PostMapping("/importExcel")
     ResultVo<?> importExcel(MultipartHttpServletRequest request);
 
     /**

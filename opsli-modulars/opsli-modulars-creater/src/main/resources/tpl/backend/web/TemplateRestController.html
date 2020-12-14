@@ -232,9 +232,7 @@ public class #(data.model.tableName)RestController extends BaseRestController<#(
     @EnableLog
     @Override
     public ResultVo<?> importExcel(MultipartHttpServletRequest request) {
-        // 当前方法
-        Method method = ReflectUtil.getMethodByName(this.getClass(), "importExcel");
-        return super.excelImport(request, method);
+        return super.excelImport(request);
     }
 
     /**

@@ -4,6 +4,7 @@ import io.swagger.annotations.ApiOperation;
 import org.opsli.api.base.result.ResultVo;
 import org.opsli.api.wrapper.test.TestModel;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
@@ -134,7 +135,7 @@ public interface TestApi {
      * Excel 导入
      * @return
      */
-    @GetMapping("/importExcel")
+    @PostMapping("/importExcel")
     ResultVo<?> importExcel(MultipartHttpServletRequest request);
 
     /**

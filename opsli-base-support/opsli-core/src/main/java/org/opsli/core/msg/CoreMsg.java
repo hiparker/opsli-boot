@@ -46,9 +46,9 @@ public enum CoreMsg implements BaseMsg {
     EXCEL_EXPORT_ERROR(10301,"Excel 导出失败！  -  耗时：{}  -  失败信息：{}"),
     EXCEL_IMPORT_SUCCESS(200,"EXCEL 导入成功！  -  耗时：{}"),
     EXCEL_IMPORT_ERROR(10303,"Excel导入失败!   -  耗时：{}  -  失败信息：{}"),
-    EXCEL_IMPORT_NO(10304,""),
+    EXCEL_IMPORT_NO(10304,"导入对象为空"),
     EXCEL_FILE_NULL(10305,"请选择文件"),
-    EXCEL_EXPORT_MAX(10700, "超出最大导出数量, 当前数据[{}]条，允许最大阈值[{}]条"),
+    EXCEL_HANDLE_MAX(10700, "超出最大操作数量, 当前数据[{}]条，允许最大阈值[{}]条"),
 
 
     /**
