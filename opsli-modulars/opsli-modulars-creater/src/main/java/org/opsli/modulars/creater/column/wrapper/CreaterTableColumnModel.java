@@ -155,7 +155,6 @@ public class CreaterTableColumnModel extends ApiWrapper {
     @ExcelProperty(value = "验证类别", order = 15)
     @ExcelInfo
     // 验证器
-    @ValidationArgs({ValiArgsType.IS_GENERAL})
     @ValidationArgsLenMax(500)
     private String validateType;
 
