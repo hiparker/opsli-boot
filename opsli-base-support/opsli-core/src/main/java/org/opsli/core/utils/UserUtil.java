@@ -162,7 +162,6 @@ public class UserUtil {
         }finally {
             // ============ 释放锁
             redisLockPlugins.unLock(redisLock);
-            redisLock = null;
         }
 
         if(userModel == null){
@@ -226,7 +225,6 @@ public class UserUtil {
         }finally {
             // ============ 释放锁
             redisLockPlugins.unLock(redisLock);
-            redisLock = null;
         }
 
         if(userModel == null){
@@ -313,7 +311,6 @@ public class UserUtil {
         }finally {
             // ============ 释放锁
             redisLockPlugins.unLock(redisLock);
-            redisLock = null;
         }
 
         if(roles == null || roles.size() == 0){
@@ -402,7 +399,6 @@ public class UserUtil {
         }finally {
             // ============ 释放锁
             redisLockPlugins.unLock(redisLock);
-            redisLock = null;
         }
 
         if(permissions == null || permissions.size() == 0){
@@ -510,7 +506,6 @@ public class UserUtil {
         }finally {
             // ============ 释放锁
             redisLockPlugins.unLock(redisLock);
-            redisLock = null;
         }
 
         if(menus == null || menus.size() == 0){

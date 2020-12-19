@@ -115,7 +115,6 @@ public class OrgUtil {
         }finally {
             // ============ 释放锁
             redisLockPlugins.unLock(redisLock);
-            redisLock = null;
         }
 
         if(orgRefModel == null){

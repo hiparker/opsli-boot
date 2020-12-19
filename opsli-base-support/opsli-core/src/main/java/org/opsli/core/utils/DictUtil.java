@@ -144,7 +144,6 @@ public class DictUtil {
         }finally {
             // ============ 释放锁
             redisLockPlugins.unLock(redisLock);
-            redisLock = null;
         }
 
         // 如果名称还是 为空 则赋默认值
@@ -232,7 +231,6 @@ public class DictUtil {
         }finally {
             // ============ 释放锁
             redisLockPlugins.unLock(redisLock);
-            redisLock = null;
         }
 
 
@@ -346,7 +344,6 @@ public class DictUtil {
             }finally {
                 // ============ 释放锁
                 redisLockPlugins.unLock(redisLock);
-                redisLock = null;
             }
 
 

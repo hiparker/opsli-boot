@@ -166,11 +166,7 @@ public class Props {
         // 获得对象
         Object obj = this.getObject(keys);
 
-        if(obj != null){
-            def = "";
-            def = Convert.convert(String.class, obj);
-        }
-        return def;
+        return Convert.toStr(obj, def);
     }
 
     /**
@@ -195,10 +191,7 @@ public class Props {
         // 获得对象
         Object obj = this.getObject(keys);
 
-        if(obj != null){
-            def = Convert.convert(Integer.class, obj);
-        }
-        return def;
+        return Convert.toInt(obj, def);
     }
 
     /**
@@ -223,10 +216,7 @@ public class Props {
         // 获得对象
         Object obj = this.getObject(keys);
 
-        if(obj != null){
-            def = Convert.convert(Long.class, obj);
-        }
-        return def;
+        return Convert.toLong(obj, def);
     }
 
 
@@ -252,10 +242,7 @@ public class Props {
         // 获得对象
         Object obj = this.getObject(keys);
 
-        if(obj != null){
-            def = Convert.convert(Double.class, obj);
-        }
-        return def;
+        return Convert.toDouble(obj, def);
     }
 
 
@@ -282,10 +269,7 @@ public class Props {
         // 获得对象
         Object obj = this.getObject(keys);
 
-        if(obj != null){
-            def = Convert.convert(Float.class, obj);
-        }
-        return def;
+        return Convert.toFloat(obj, def);
     }
 
 
@@ -311,10 +295,7 @@ public class Props {
         // 获得对象
         Object obj = this.getObject(keys);
 
-        if(obj != null){
-            def = Convert.convert(Character.class, obj);
-        }
-        return def;
+        return Convert.toChar(obj, def);
     }
 
     /**
@@ -339,10 +320,7 @@ public class Props {
         // 获得对象
         Object obj = this.getObject(keys);
 
-        if(obj != null){
-            def = Convert.convert(Boolean.class, obj);
-        }
-        return def;
+        return Convert.toBool(obj, def);
     }
 
     /**
@@ -386,6 +364,7 @@ public class Props {
             if(obj == null){
                 obj = temp.get(k);
             } else if(obj instanceof LinkedHashMap){
+                //Convert
                 obj = ((LinkedHashMap) obj).get(k);
             }
         }

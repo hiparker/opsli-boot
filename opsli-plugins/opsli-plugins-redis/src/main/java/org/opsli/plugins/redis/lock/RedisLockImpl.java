@@ -92,10 +92,7 @@ public class RedisLockImpl implements RedisLockPlugins {
             if(ret == null){
                 return false;
             }
-            if(1 == ret){
-                return true;
-            }
-            return false;
+            return 1 == ret;
         }catch (Exception e){
             log.error(e.getMessage(),e);
         }

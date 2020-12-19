@@ -157,7 +157,6 @@ public abstract class BaseRestController <T extends BaseEntity, E extends ApiWra
                     }finally {
                         // 释放锁
                         redisLockPlugins.unLock(redisLock);
-                        redisLock = null;
                     }
                 }else{
                     // 如果缓存没读到 则去数据库读
