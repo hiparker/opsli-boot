@@ -16,6 +16,7 @@
 package org.opsli.core.conf.mybatis;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.ReflectUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -143,16 +144,9 @@ public class AutoFillInterceptor implements Interceptor {
                 case MyBatisConstants.FIELD_TENANT:
                     // 如果租户ID 为空则进行默认赋值
                     Object tenantValue = ReflectUtil.getFieldValue(arg, f.getName());
-                    if(tenantValue == null){
+                    String tenantValueStr = Convert.toStr(tenantValue);
+                    if(StringUtils.isBlank(tenantValueStr)){
                         setProperty(arg, MyBatisConstants.FIELD_TENANT,  UserUtil.getTenantId());
-                    }else{
-                        // 如果 tenantId 为空字符串 自动转换为 null
-                        if(tenantValue instanceof String){
-                            String tmp = String.valueOf(tenantValue);
-                            if(StringUtils.isBlank(tmp)){
-                                setProperty(arg, MyBatisConstants.FIELD_TENANT,  null);
-                            }
-                        }
                     }
                     break;
                 default:
