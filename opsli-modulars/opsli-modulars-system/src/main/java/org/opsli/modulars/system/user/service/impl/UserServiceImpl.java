@@ -146,6 +146,9 @@ public class UserServiceImpl extends CrudServiceImpl<UserMapper, SysUser, UserMo
         QueryBuilder<SysUser> queryBuilder = new GenQueryBuilder<>();
         QueryWrapper<SysUser> queryWrapper = queryBuilder.build();
         queryWrapper.eq(key, username);
+        queryWrapper.eq(
+                HumpUtil.humpToUnderline(MyBatisConstants.FIELD_DELETE_LOGIC)
+                , "0");
         SysUser user = this.getOne(queryWrapper);
         return super.transformT2M(user);
     }
