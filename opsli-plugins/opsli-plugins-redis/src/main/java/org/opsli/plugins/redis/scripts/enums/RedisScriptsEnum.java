@@ -32,7 +32,7 @@ public enum RedisScriptsEnum {
     ;
 
     /** 脚本路径 */
-    private String path;
+    private final String path;
 
     RedisScriptsEnum(String path){
         this.path = path;

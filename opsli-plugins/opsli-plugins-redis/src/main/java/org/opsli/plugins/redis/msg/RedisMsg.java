@@ -35,8 +35,8 @@ public enum RedisMsg implements BaseMsg {
     ;
 
 
-    private int code;
-    private String message;
+    private final int code;
+    private final String message;
 
     RedisMsg(int code, String message){
         this.code = code;

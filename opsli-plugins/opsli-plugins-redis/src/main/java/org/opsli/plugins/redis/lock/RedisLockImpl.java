@@ -15,6 +15,7 @@
  */
 package org.opsli.plugins.redis.lock;
 
+import cn.hutool.core.thread.ThreadUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.opsli.plugins.redis.RedisLockPlugins;
 import org.opsli.plugins.redis.RedisPlugin;
@@ -82,6 +83,9 @@ public class RedisLockImpl implements RedisLockPlugins {
      */
     @Override
     public boolean unLock(RedisLock redisLock) {
+        if(redisLock == null){
+            return false;
+        }
         try {
             List<String> keys = Collections.singletonList(LOCK_NAME_PREFIX + redisLock.getLockName());
             Long ret = (Long) redisPlugin.callScript(RedisScriptsEnum.REDIS_UN_LOCK, keys,
@@ -120,11 +124,7 @@ public class RedisLockImpl implements RedisLockPlugins {
                 if (1 == ret){
                     acquired = true;
                 } else {
-                    try {
-                        Thread.sleep(10);
-                    } catch (InterruptedException ignored) {
-                        log.error(ignored.getMessage(),ignored);
-                    }
+                    ThreadUtil.sleep(10);
                 }
             }
             redisLock.setIdentifier(identifier);
@@ -141,27 +141,25 @@ public class RedisLockImpl implements RedisLockPlugins {
      * @return boolean
      */
     private void lockDog(RedisLock redisLock) {
+        if(redisLock == null){
+            return;
+        }
         Thread t = new Thread(()->{
             try {
                 // 倒计时前续命
                 long countDownTime = 3000L;
                 // 锁释放时间
                 long lockTimeOutEnd = System.currentTimeMillis() + redisLock.getLockTimeOut();
-                boolean dogFlag = true;
                 // 看门狗检测 当前线程是否还存活
-                while (dogFlag) {
+                while (true) {
                     int lock = redisLock.threadGetLock();
                     if(lock <= 0){
-                        dogFlag = false;
                         // 再一次确定 解锁 防止线程差 最后加锁
                         this.unLock(redisLock);
                         break;
                     }
-                    try {
-                        Thread.sleep(10);
-                    } catch (InterruptedException ignored) {
-                        log.error(ignored.getMessage(),ignored);
-                    }
+
+                    ThreadUtil.sleep(10);
 
                     // 如果 距离倒计时 前 2000 毫秒还没有动作 则执行续命
                     if((System.currentTimeMillis()+countDownTime) >= lockTimeOutEnd){
@@ -188,5 +186,14 @@ public class RedisLockImpl implements RedisLockPlugins {
      */
     private String getInfo(String name,RedisLock redisLock){
         return name + " 锁名称: "+redisLock.getLockName()+" 锁凭证: "+redisLock.getIdentifier();
+    }
+
+
+    public static void main(String[] args) {
+        int count = 0;
+        while (count <= 10) {
+            System.out.println(count);
+            count++;
+        }
     }
 }
