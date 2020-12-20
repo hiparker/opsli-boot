@@ -1,0 +1,11 @@
+
+### 改动不大
+
+修改 sys_user 表索引为
+
+### 1. 先删除 原有老索引
+alter table sys_user drop index unique_username ;
+
+### 2. 增加新索引
+alter table sys_user add index `sys_user_index` (`username`,`real_name`);
+
