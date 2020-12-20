@@ -66,7 +66,7 @@ public class ShiroConfig {
 
     /**
      * filer
-     * @param securityManager
+     * @param securityManager 安全管理器
      * @return
      */
     @Bean("shiroFilter")

@@ -159,7 +159,7 @@ public class UserTokenUtil {
         String userId = "";
         try {
             userId = JwtUtil.getClaim(token, SignConstants.USER_ID);
-        }catch (Exception e){}
+        }catch (Exception ignored){}
         return userId;
     }
 

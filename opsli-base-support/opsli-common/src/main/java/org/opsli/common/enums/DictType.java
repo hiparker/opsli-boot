@@ -14,7 +14,7 @@ public enum DictType {
 
     ;
 
-    private String code;
+    private final String code;
 
     DictType(String code){
         this.code = code;

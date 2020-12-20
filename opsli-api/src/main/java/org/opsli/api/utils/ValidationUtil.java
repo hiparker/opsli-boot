@@ -56,11 +56,10 @@ public final class ValidationUtil {
         }
 
         Field[] fields = ReflectUtil.getFields(obj.getClass());
-        for (int i = 0; i < fields.length; i++) {
-            Field field = fields[i];
+        for (Field field : fields) {
             // 获得 统一验证 注解
             ValidationArgs validationArgs = field.getAnnotation(ValidationArgs.class);
-            if(validationArgs != null){
+            if (validationArgs != null) {
                 ValiArgsType[] types = validationArgs.value();
                 Object fieldValue = ReflectUtil.getFieldValue(obj, field);
                 ValidationUtil.check(field, types, fieldValue);
@@ -68,7 +67,7 @@ public final class ValidationUtil {
 
             // 获得 最大长度 注解
             ValidationArgsLenMax validationArgsMax = field.getAnnotation(ValidationArgsLenMax.class);
-            if(validationArgsMax != null){
+            if (validationArgsMax != null) {
                 int maxLength = validationArgsMax.value();
                 Object fieldValue = ReflectUtil.getFieldValue(obj, field);
                 ValidationUtil.checkMax(field, maxLength, fieldValue);
@@ -76,7 +75,7 @@ public final class ValidationUtil {
 
             // 获得 最小长度 注解
             ValidationArgsLenMin validationArgsMin = field.getAnnotation(ValidationArgsLenMin.class);
-            if(validationArgsMin != null){
+            if (validationArgsMin != null) {
                 int minLength = validationArgsMin.value();
                 Object fieldValue = ReflectUtil.getFieldValue(obj, field);
                 ValidationUtil.checkMin(field, minLength, fieldValue);

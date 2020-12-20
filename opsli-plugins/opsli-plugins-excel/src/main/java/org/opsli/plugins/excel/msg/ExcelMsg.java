@@ -32,8 +32,8 @@ public enum ExcelMsg implements BaseMsg {
     ;
 
 
-    private int code;
-    private String message;
+    private final int code;
+    private final String message;
 
     ExcelMsg(int code, String message){
         this.code = code;

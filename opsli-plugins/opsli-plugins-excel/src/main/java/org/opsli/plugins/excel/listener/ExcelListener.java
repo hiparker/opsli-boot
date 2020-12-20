@@ -32,7 +32,7 @@ public class ExcelListener extends AnalysisEventListener {
 
     private static final String SERIAL_VERSION_UID = "serialVersionUID";
 
-    private List<Object> dataList = new ArrayList<>();
+    private final List<Object> dataList = new ArrayList<>();
 
     /**
      * 通过 AnalysisContext 对象还可以获取当前 sheet，当前行等数据

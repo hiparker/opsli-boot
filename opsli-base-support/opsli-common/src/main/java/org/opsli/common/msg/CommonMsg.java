@@ -34,8 +34,8 @@ public enum CommonMsg implements BaseMsg {
 
     ;
 
-    private int code;
-    private String message;
+    private final int code;
+    private final String message;
 
     CommonMsg(int code, String message){
         this.code = code;

@@ -78,8 +78,8 @@ public enum SystemMsg implements BaseMsg {
 
     ;
 
-    private int code;
-    private String message;
+    private final int code;
+    private final String message;
 
     SystemMsg(int code, String message){
         this.code = code;

@@ -47,11 +47,11 @@ public class WebQueryBuilder<T extends BaseEntity> implements QueryBuilder<T>{
     private static final String ORDER_DESC = "DESC";
 
     /** 参数 */
-    private Map<String, String[]> parameterMap;
+    private final Map<String, String[]> parameterMap;
     /** Entity Clazz */
-    private Class<? extends BaseEntity> entityClazz;
+    private final Class<? extends BaseEntity> entityClazz;
     /** 默认排序字段 */
-    private String defaultOrderField;
+    private final String defaultOrderField;
 
     /**
      * 构造函数 只是生产 查询器
@@ -152,27 +152,33 @@ public class WebQueryBuilder<T extends BaseEntity> implements QueryBuilder<T>{
         }
         // 转换驼峰 为 数据库下划线字段
         key = HumpUtil.humpToUnderline(key);
-        if (EQ.equals(handle)) {
-            // 全值匹配
-            queryWrapper.eq(key,value);
-        } else if (LIKE.equals(handle)) {
-            // 模糊匹配
-            queryWrapper.like(key,value);
-        } else if (BEGIN.equals(handle)) {
-            // 大于等于
-            queryWrapper.ge(key,value);
-        } else if (END.equals(handle)) {
-            // 小于等于
-            queryWrapper.le(key,value);
-        } else if (ORDER.equals(handle)) {
-            // 排序
-            if(ORDER_ASC.equals(value)){
-                queryWrapper.orderByAsc(key);
-            } else if(ORDER_DESC.equals(value)){
-                queryWrapper.orderByDesc(key);
-            } else{
-                queryWrapper.orderByAsc(key);
-            }
+        switch (handle) {
+            case EQ:
+                // 全值匹配
+                queryWrapper.eq(key, value);
+                break;
+            case LIKE:
+                // 模糊匹配
+                queryWrapper.like(key, value);
+                break;
+            case BEGIN:
+                // 大于等于
+                queryWrapper.ge(key, value);
+                break;
+            case END:
+                // 小于等于
+                queryWrapper.le(key, value);
+                break;
+            case ORDER:
+                // 排序
+                if (ORDER_ASC.equals(value)) {
+                    queryWrapper.orderByAsc(key);
+                } else if (ORDER_DESC.equals(value)) {
+                    queryWrapper.orderByDesc(key);
+                } else {
+                    queryWrapper.orderByAsc(key);
+                }
+                break;
         }
     }
 
@@ -208,9 +214,8 @@ public class WebQueryBuilder<T extends BaseEntity> implements QueryBuilder<T>{
             return true;
         } else if (END.equals(handle)) {
             return true;
-        } else if (ORDER.equals(handle)) {
-            return true;
+        } else {
+            return ORDER.equals(handle);
         }
-        return false;
     }
 }

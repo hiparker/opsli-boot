@@ -37,8 +37,7 @@ public class GenQueryBuilder<T extends BaseEntity>  implements QueryBuilder<T> {
 
     @Override
     public QueryWrapper<T> build() {
-        QueryWrapper<T> queryWrapper = new QueryWrapper<>();
-        return queryWrapper;
+        return new QueryWrapper<>();
     }
 
 }

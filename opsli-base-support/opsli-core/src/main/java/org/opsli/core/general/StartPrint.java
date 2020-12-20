@@ -60,13 +60,13 @@ public class StartPrint {
         // 睡一秒打印
         ThreadUtil.sleep(1, TimeUnit.SECONDS);
         String basePath = getBasePath();
-        StringBuilder printStr = new StringBuilder();
-        printStr.append("\n----------------------------------------------------------\n")
-                .append("OPSLI 快速开发平台 框架启动成功! 相关URLs:\n")
-                .append("项目地址: \t\thttp://" + basePath + "/\n")
-                .append("Doc文档: \t\thttp://" + basePath + "/doc.html\n")
-                .append("----------------------------------------------------------\n");
-        Console.log(printStr.toString());
+        String printStr =
+                "\n----------------------------------------------------------\n" +
+                "OPSLI 快速开发平台 框架启动成功! 相关URLs:\n" +
+                "项目地址: \t\thttp://" + basePath + "/\n" +
+                "Doc文档: \t\thttp://" + basePath + "/doc.html\n" +
+                "----------------------------------------------------------\n";
+        Console.log(printStr);
     }
 
     /**
@@ -76,11 +76,11 @@ public class StartPrint {
     public void errorPrint(){
         // 睡一秒打印
         ThreadUtil.sleep(1, TimeUnit.SECONDS);
-        StringBuilder printStr = new StringBuilder();
-        printStr.append("\n----------------------------------------------------------\n")
-                .append("OPSLI 快速开发平台 框架启动失败! 请检查相关配置！\n")
-                .append("----------------------------------------------------------\n");
-        Console.log(printStr.toString());
+        String printStr =
+                "\n----------------------------------------------------------\n" +
+                "OPSLI 快速开发平台 框架启动失败! 请检查相关配置！\n" +
+                "----------------------------------------------------------\n";
+        Console.log(printStr);
     }
 
 

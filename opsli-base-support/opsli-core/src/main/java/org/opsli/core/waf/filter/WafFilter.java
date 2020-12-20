@@ -16,7 +16,6 @@
 package org.opsli.core.waf.filter;
 
 
-import org.opsli.common.exception.TokenException;
 import org.opsli.core.waf.servlet.WafHttpServletRequestWrapper;
 
 import javax.servlet.*;

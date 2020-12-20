@@ -53,8 +53,8 @@ public enum TokenMsg implements BaseMsg {
     EXCEPTION_NOT_AUTH(12202, "无权访问该方法"),
     ;
 
-    private int code;
-    private String message;
+    private final int code;
+    private final String message;
 
     TokenMsg(int code, String message){
         this.code = code;
