@@ -13,12 +13,13 @@
 * License for the specific language governing permissions and limitations under
 * the License.
 */
-package org.opsli.modulars.gentest.user.web;
+package org.opsli.modulars.gentest.carinfo.web;
 
 import cn.hutool.core.util.ReflectUtil;
-import org.opsli.common.annotation.RequiresPermissionsCus;
+import org.opsli.core.base.service.interfaces.CrudServiceInterface;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.opsli.common.annotation.RequiresPermissionsCus;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.opsli.api.base.result.ResultVo;
 import org.opsli.common.annotation.ApiRestController;
@@ -30,36 +31,35 @@ import org.opsli.core.persistence.querybuilder.WebQueryBuilder;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import org.opsli.modulars.gentest.user.entity.TestUser;
-import org.opsli.api.wrapper.gentest.user.TestUserModel;
-import org.opsli.modulars.gentest.user.service.ITestUserService;
-import org.opsli.api.web.gentest.user.TestUserRestApi;
-
 import java.lang.reflect.Method;
+
+import org.opsli.modulars.gentest.carinfo.entity.TestCar;
+import org.opsli.api.wrapper.gentest.carinfo.TestCarModel;
+import org.opsli.modulars.gentest.carinfo.service.ITestCarService;
+import org.opsli.api.web.gentest.carinfo.TestCarRestApi;
 
 /**
 * @BelongsProject: opsli-boot
-* @BelongsPackage: org.opsli.modulars.gentest.user.web
-* @Author: 周鹏程
-* @CreateTime: 2020-11-22 12:12:05
-* @Description: 某系统用户 Controller
+* @BelongsPackage: org.opsli.modulars.gentest.carinfo.web
+* @Author: Parker
+* @CreateTime: 2020-12-20 20:12:57
+* @Description: 汽车信息 Controller
 */
 @Slf4j
-@ApiRestController("/gentest/user")
-public class TestUserRestController extends BaseRestController<TestUser, TestUserModel, ITestUserService>
-    implements TestUserRestApi {
+@ApiRestController("/gentest/carinfo")
+public class TestCarRestController extends BaseRestController<TestCar, TestCarModel, ITestCarService>
+    implements TestCarRestApi {
 
 
     /**
-    * 用户 查一条
+    * 汽车信息 查一条
     * @param model 模型
     * @return ResultVo
     */
-    @ApiOperation(value = "获得单条用户", notes = "获得单条用户 - ID")
-    @RequiresPermissions("gentest_user_select")
+    @ApiOperation(value = "获得单条汽车信息", notes = "获得单条汽车信息 - ID")
+    @RequiresPermissions("gentest_carinfo_select")
     @Override
-    public ResultVo<TestUserModel> get(TestUserModel model) {
+    public ResultVo<TestCarModel> get(TestCarModel model) {
         // 如果系统内部调用 则直接查数据库
         if(model != null && model.getIzApi() != null && model.getIzApi()){
             model = IService.get(model);
@@ -68,19 +68,19 @@ public class TestUserRestController extends BaseRestController<TestUser, TestUse
     }
 
     /**
-    * 用户 查询分页
+    * 汽车信息 查询分页
     * @param pageNo 当前页
     * @param pageSize 每页条数
     * @param request request
     * @return ResultVo
     */
     @ApiOperation(value = "获得分页数据", notes = "获得分页数据 - 查询构造器")
-    @RequiresPermissions("gentest_user_select")
+    @RequiresPermissions("gentest_carinfo_select")
     @Override
     public ResultVo<?> findPage(Integer pageNo, Integer pageSize, HttpServletRequest request) {
 
-        QueryBuilder<TestUser> queryBuilder = new WebQueryBuilder<>(TestUser.class, request.getParameterMap());
-        Page<TestUser, TestUserModel> page = new Page<>(pageNo, pageSize);
+        QueryBuilder<TestCar> queryBuilder = new WebQueryBuilder<>(TestCar.class, request.getParameterMap());
+        Page<TestCar, TestCarModel> page = new Page<>(pageNo, pageSize);
         page.setQueryWrapper(queryBuilder.build());
         page = IService.findPage(page);
 
@@ -88,91 +88,99 @@ public class TestUserRestController extends BaseRestController<TestUser, TestUse
     }
 
     /**
-    * 用户 新增
+    * 汽车信息 新增
     * @param model 模型
     * @return ResultVo
     */
-    @ApiOperation(value = "新增用户数据", notes = "新增用户数据")
-    @RequiresPermissions("gentest_user_insert")
+    @ApiOperation(value = "新增汽车信息数据", notes = "新增汽车信息数据")
+    @RequiresPermissions("gentest_carinfo_insert")
     @EnableLog
     @Override
-    public ResultVo<?> insert(TestUserModel model) {
+    public ResultVo<?> insert(TestCarModel model) {
         // 调用新增方法
         IService.insert(model);
-        return ResultVo.success("新增用户成功");
+        return ResultVo.success("新增汽车信息成功");
     }
 
     /**
-    * 用户 修改
+    * 汽车信息 修改
     * @param model 模型
     * @return ResultVo
     */
-    @ApiOperation(value = "修改用户数据", notes = "修改用户数据")
-    @RequiresPermissions("gentest_user_update")
+    @ApiOperation(value = "修改汽车信息数据", notes = "修改汽车信息数据")
+    @RequiresPermissions("gentest_carinfo_update")
     @EnableLog
     @Override
-    public ResultVo<?> update(TestUserModel model) {
+    public ResultVo<?> update(TestCarModel model) {
         // 调用修改方法
         IService.update(model);
-        return ResultVo.success("修改用户成功");
+        return ResultVo.success("修改汽车信息成功");
     }
 
 
     /**
-    * 用户 删除
+    * 汽车信息 删除
     * @param id ID
     * @return ResultVo
     */
-    @ApiOperation(value = "删除用户数据", notes = "删除用户数据")
-    @RequiresPermissions("gentest_user_update")
+    @ApiOperation(value = "删除汽车信息数据", notes = "删除汽车信息数据")
+    @RequiresPermissions("gentest_carinfo_update")
     @EnableLog
     @Override
     public ResultVo<?> del(String id){
         IService.delete(id);
-        return ResultVo.success("删除用户成功");
+        return ResultVo.success("删除汽车信息成功");
     }
 
     /**
-    * 用户 批量删除
+    * 汽车信息 批量删除
     * @param ids ID 数组
     * @return ResultVo
     */
-    @ApiOperation(value = "批量删除用户数据", notes = "批量删除用户数据")
-    @RequiresPermissions("gentest_user_update")
+    @ApiOperation(value = "批量删除汽车信息数据", notes = "批量删除汽车信息数据")
+    @RequiresPermissions("gentest_carinfo_update")
     @EnableLog
     @Override
     public ResultVo<?> delAll(String[] ids){
         IService.deleteAll(ids);
-        return ResultVo.success("批量删除用户成功");
+        return ResultVo.success("批量删除汽车信息成功");
     }
 
 
     /**
-    * 用户 Excel 导出
+    * 汽车信息 Excel 导出
     * 注：这里 RequiresPermissionsCus 引入的是 自定义鉴权注解
+    *
+    * 导出时，Token认证和方法权限认证 全部都由自定义完成
+    * 因为在 导出不成功时，需要推送错误信息，
+    * 前端直接走下载流，当失败时无法获得失败信息，即使前后端换一种方式后端推送二进制文件前端再次解析也是最少2倍的耗时
+    * ，且如果数据量过大，前端进行渲染时直接会把浏览器卡死
+    * 而直接开启socket接口推送显然是太过浪费资源了，所以目前采用Java最原始的手段
+    * response 推送 javascript代码 alert 提示报错信息
+    *
     * @param request request
     * @param response response
     * @return ResultVo
     */
     @ApiOperation(value = "导出Excel", notes = "导出Excel")
-    @RequiresPermissionsCus("gentest_user_export")
+    @RequiresPermissionsCus("gentest_carinfo_export")
     @EnableLog
     @Override
     public void exportExcel(HttpServletRequest request, HttpServletResponse response) {
         // 当前方法
         Method method = ReflectUtil.getMethodByName(this.getClass(), "exportExcel");
-        QueryBuilder<TestUser> queryBuilder = new WebQueryBuilder<>(TestUser.class, request.getParameterMap());
-        super.excelExport(TestUserRestApi.TITLE, queryBuilder.build(), response, method);
+        QueryBuilder<TestCar> queryBuilder = new WebQueryBuilder<>(TestCar.class, request.getParameterMap());
+        super.excelExport(TestCarRestApi.TITLE, queryBuilder.build(), response, method);
     }
 
     /**
-    * 用户 Excel 导入
+    * 汽车信息 Excel 导入
     * 注：这里 RequiresPermissions 引入的是 Shiro原生鉴权注解
     * @param request 文件流 request
     * @return ResultVo
     */
     @ApiOperation(value = "导入Excel", notes = "导入Excel")
-    @RequiresPermissions("gentest_user_import")
+    @RequiresPermissions("gentest_carinfo_import")
     @EnableLog
     @Override
     public ResultVo<?> importExcel(MultipartHttpServletRequest request) {
@@ -180,18 +188,18 @@ public class TestUserRestController extends BaseRestController<TestUser, TestUse
     }
 
     /**
-    * 用户 Excel 下载导入模版
+    * 汽车信息 Excel 下载导入模版
     * 注：这里 RequiresPermissionsCus 引入的是 自定义鉴权注解
     * @param response response
     * @return ResultVo
     */
     @ApiOperation(value = "导出Excel模版", notes = "导出Excel模版")
-    @RequiresPermissionsCus("gentest_user_import")
+    @RequiresPermissionsCus("gentest_carinfo_import")
     @Override
     public void importTemplate(HttpServletResponse response) {
         // 当前方法
         Method method = ReflectUtil.getMethodByName(this.getClass(), "importTemplate");
-        super.importTemplate(TestUserRestApi.TITLE, response, method);
+        super.importTemplate(TestCarRestApi.TITLE, response, method);
     }
 
 }
