@@ -35,6 +35,7 @@ import org.opsli.core.persistence.querybuilder.WebQueryBuilder;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.lang.reflect.Method;
 
 #if(data.subModuleName != null && data.subModuleName != "")
 import #(data.packageName+"."+data.moduleName+"."+data.subModuleName).entity.#(data.model.tableName);
@@ -191,6 +192,7 @@ public class #(data.model.tableName)RestController extends BaseRestController<#(
 
     /**
     * #(data.codeTitleBrief) Excel 导出
+    * 注：这里 RequiresPermissionsCus 引入的是 自定义鉴权注解
     *
     * 导出时，Token认证和方法权限认证 全部都由自定义完成
     * 因为在 导出不成功时，需要推送错误信息，
@@ -220,23 +222,25 @@ public class #(data.model.tableName)RestController extends BaseRestController<#(
 
     /**
     * #(data.codeTitleBrief) Excel 导入
+    * 注：这里 RequiresPermissions 引入的是 Shiro原生鉴权注解
     * @param request 文件流 request
     * @return ResultVo
     */
     @ApiOperation(value = "导入Excel", notes = "导入Excel")
     #if(data.subModuleName != null && data.subModuleName != "")
-    @RequiresPermissionsCus("#(data.moduleName.toLowerCase())_#(data.subModuleName.toLowerCase())_import")
+    @RequiresPermissions("#(data.moduleName.toLowerCase())_#(data.subModuleName.toLowerCase())_import")
     #else
-    @RequiresPermissionsCus("#(data.moduleName.toLowerCase())_import")
+    @RequiresPermissions("#(data.moduleName.toLowerCase())_import")
     #end
     @EnableLog
     @Override
     public ResultVo<?> importExcel(MultipartHttpServletRequest request) {
-        return super.excelImport(request);
+        return super.importExcel(request);
     }
 
     /**
     * #(data.codeTitleBrief) Excel 下载导入模版
+    * 注：这里 RequiresPermissionsCus 引入的是 自定义鉴权注解
     * @param response response
     * @return ResultVo
     */

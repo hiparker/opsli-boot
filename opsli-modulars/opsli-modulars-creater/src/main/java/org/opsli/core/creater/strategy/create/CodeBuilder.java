@@ -126,6 +126,8 @@ public enum CodeBuilder {
                 fileList.add(VueCodeBuilder.INSTANCE.createIndex(builderModel, dataStr));
                 // edit
                 fileList.add(VueCodeBuilder.INSTANCE.createEdit(builderModel, dataStr));
+                // import
+                fileList.add(VueCodeBuilder.INSTANCE.createImport(builderModel, dataStr));
                 // 前api
                 fileList.add(VueCodeBuilder.INSTANCE.createApi(builderModel, dataStr));
 

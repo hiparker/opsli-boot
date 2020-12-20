@@ -101,6 +101,28 @@
         > 添加 </el-button>
 
         <el-button
+                #if(data.subModuleName != null && data.subModuleName != "")
+                v-if="$perms('#(data.moduleName.toLowerCase())_#(data.subModuleName.toLowerCase())_import')"
+                #else
+                v-if="$perms('#(data.moduleName.toLowerCase())_import')"
+                #end
+                icon="el-icon-upload2"
+                type="warning"
+                @click="handleImportExcel"
+        > 导入 </el-button>
+
+        <el-button
+                #if(data.subModuleName != null && data.subModuleName != "")
+                v-if="$perms('#(data.moduleName.toLowerCase())_#(data.subModuleName.toLowerCase())_export')"
+                #else
+                v-if="$perms('#(data.moduleName.toLowerCase())_export')"
+                #end
+                icon="el-icon-download"
+                type="warning"
+                @click="handleExportExcel"
+        > 导出 </el-button>
+
+        <el-button
             #if(data.subModuleName != null && data.subModuleName != "")
             v-if="$perms('#(data.moduleName.toLowerCase())_#(data.subModuleName.toLowerCase())_delete')"
             #else
@@ -290,22 +312,25 @@
     ></el-pagination>
 
     <edit ref="edit" @fetchData="fetchData"></edit>
+    <import ref="import" @fetchData="fetchData" ></import>
+
   </div>
 </template>
 
 <script>
   #if(data.subModuleName != null && data.subModuleName != "")
-  import { getList, doDelete, doDeleteAll } from "@/api/#(data.moduleName)/#(data.subModuleName)/#(data.model.tableName)Management";
+  import { getList, doDelete, doDeleteAll, doExportExcel } from "@/api/#(data.moduleName)/#(data.subModuleName)/#(data.model.tableName)Management";
   #else
-  import { getList, doDelete, doDeleteAll } from "@/api/#(data.moduleName)/#(data.model.tableName)Management";
+  import { getList, doDelete, doDeleteAll, doExportExcel } from "@/api/#(data.moduleName)/#(data.model.tableName)Management";
   #end
   import Edit from "./components/#(data.model.tableName)ManagementEdit";
+  import Import from "./components/#(data.model.tableName)ManagementImport";
   import { isNotNull } from "@/utils/valiargs";
   import { formateDate } from "@/utils/format";
 
   export default {
     name: "#(data.model.tableName)Management",
-    components: { Edit },
+    components: { Edit, Import },
     data() {
       return {
         list: null,
@@ -442,6 +467,17 @@
           }
         }
       },
+      // 导出excel
+      handleExportExcel(){
+        // 执行导出
+        doExportExcel(this.queryForm);
+      },
+      // 导入excel
+      handleImportExcel(){
+        this.$refs["import"].show();
+      },
+
+
       handleSizeChange(val) {
         this.queryForm.pageSize = val;
         this.fetchData();
