@@ -15,6 +15,7 @@
  */
 package org.opsli.core.utils;
 
+import cn.hutool.core.collection.ListUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
@@ -130,6 +131,7 @@ public class DictUtil {
                         dictWrapperModel.setTypeCode(model.getTypeCode());
                         dictWrapperModel.setDictName(model.getDictName());
                         dictWrapperModel.setDictValue(model.getDictValue());
+                        dictWrapperModel.setDictSort(model.getSortNo());
                         dictWrapperModel.setModel(model);
                         // 保存至缓存
                         DictUtil.put(dictWrapperModel);
@@ -217,6 +219,7 @@ public class DictUtil {
                         dictWrapperModel.setTypeCode(model.getTypeCode());
                         dictWrapperModel.setDictName(model.getDictName());
                         dictWrapperModel.setDictValue(model.getDictValue());
+                        dictWrapperModel.setDictSort(model.getSortNo());
                         dictWrapperModel.setModel(model);
                         // 保存至缓存
                         DictUtil.put(dictWrapperModel);
@@ -270,10 +273,12 @@ public class DictUtil {
                 dictWrapperModel.setTypeCode(typeCode);
                 dictWrapperModel.setDictName(model.getDictName());
                 dictWrapperModel.setDictValue(model.getDictValue());
+                dictWrapperModel.setDictSort(model.getSortNo());
                 dictWrapperModels.add(dictWrapperModel);
             }
             if(!dictWrapperModels.isEmpty()){
-                return dictWrapperModels;
+                // 排序
+                return sortDictWrappers(dictWrapperModels);
             }
 
             // 防止缓存穿透判断
@@ -315,10 +320,12 @@ public class DictUtil {
                     dictWrapperModel.setTypeCode(typeCode);
                     dictWrapperModel.setDictName(model.getDictName());
                     dictWrapperModel.setDictValue(model.getDictValue());
+                    dictWrapperModel.setDictSort(model.getSortNo());
                     dictWrapperModels.add(dictWrapperModel);
                 }
                 if(!dictWrapperModels.isEmpty()){
-                    return dictWrapperModels;
+                    // 排序
+                    return sortDictWrappers(dictWrapperModels);
                 }
 
 
@@ -331,6 +338,7 @@ public class DictUtil {
                         dictWrapperModel.setTypeCode(model.getTypeCode());
                         dictWrapperModel.setDictName(model.getDictName());
                         dictWrapperModel.setDictValue(model.getDictValue());
+                        dictWrapperModel.setDictSort(model.getSortNo());
                         dictWrapperModel.setModel(model);
                         dictWrapperModels.add(dictWrapperModel);
                         // 保存至缓存
@@ -358,6 +366,22 @@ public class DictUtil {
             log.error(e.getMessage(),e);
             dictWrapperModels = Lists.newArrayList();
         }
+
+        // 排序
+        return sortDictWrappers(dictWrapperModels);
+    }
+
+    /**
+     * 字典排序
+     * @param dictWrapperModels
+     * @return
+     */
+    private static List<DictWrapper> sortDictWrappers(List<DictWrapper> dictWrapperModels) {
+        ListUtil.sort(dictWrapperModels, (o1, o2) -> {
+            int oInt1 = o1.getDictValue()==null?Integer.MAX_VALUE:o1.getDictSort();
+            int oInt2 = o2.getDictValue()==null?Integer.MAX_VALUE:o2.getDictSort();
+            return Integer.compare(oInt1, oInt2);
+        });
         return dictWrapperModels;
     }
 
