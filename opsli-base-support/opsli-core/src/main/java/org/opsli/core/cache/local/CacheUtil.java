@@ -15,15 +15,12 @@
  */
 package org.opsli.core.cache.local;
 
-import cn.hutool.core.io.FileUtil;
-import cn.hutool.core.io.file.FileReader;
 import cn.hutool.core.util.XmlUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.opsli.common.constants.CacheConstants;
 import org.opsli.common.utils.Props;
 import org.opsli.core.aspect.CacheDataAop;
@@ -39,7 +36,6 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.util.List;
 
@@ -219,7 +215,7 @@ public class CacheUtil {
      * @return V
      */
     public static Object getHash(String key, String field){
-        return CacheUtil.getHash(CacheConstants.EDEN_HASH_DATA,key,field,true);
+        return CacheUtil.getHash(key,field,true);
     }
 
     /**
@@ -246,7 +242,7 @@ public class CacheUtil {
      * @return V
      */
     public static Object getHashByKeyOriginal(String key, String field){
-        return CacheUtil.getHash(CacheConstants.EDEN_HASH_DATA,key,field,false);
+        return CacheUtil.getHash(key,field,false);
     }
 
     /**
@@ -449,16 +445,15 @@ public class CacheUtil {
 
     /**
      * 获得 Hash 缓存
-     * @param cacheName 主缓存名
      * @param key 键
      * @param field 字段名
      * @param keyFlag 是否处理key
      * @return
      */
-    private static Object getHash(String cacheName, String key, String field, boolean keyFlag){
+    private static Object getHash(String key, String field, boolean keyFlag){
         // 自动处理 key
         if(keyFlag){
-            key = CacheUtil.handleKey(cacheName, key);
+            key = CacheUtil.handleKey(CacheConstants.EDEN_HASH_DATA, key);
         }
         Object v = null;
         try {
@@ -1065,10 +1060,7 @@ public class CacheUtil {
         try {
             // 判断Redis 是否 包含当前Nil值
             Object o = redisPlugin.get(NIL_FLAG_PREFIX + key);
-            if(o != null){
-                return true;
-            }
-            return false;
+            return o != null;
         }catch (Exception e){
             log.error(e.getMessage(),e);
         }

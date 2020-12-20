@@ -17,6 +17,7 @@ package org.opsli.core.conf.mybatis;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.convert.Convert;
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ReflectUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -25,7 +26,6 @@ import org.apache.ibatis.executor.Executor;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.mapping.SqlCommandType;
 import org.apache.ibatis.plugin.*;
-import org.opsli.api.wrapper.system.user.UserModel;
 import org.opsli.common.constants.MyBatisConstants;
 import org.opsli.core.utils.UserUtil;
 import org.springframework.stereotype.Component;
@@ -67,10 +67,7 @@ public class AutoFillInterceptor implements Interceptor {
     private void fillField(Invocation invocation) {
         Object[] args = invocation.getArgs();
         SqlCommandType sqlCommandType = null;
-        for (int i = 0; i < args.length; i++) {
-            Object arg = args[i];
-            //String className = arg.getClass().getName();
-            //log.info(i + " 参数类型：" + className);
+        for (Object arg : args) {
             //第一个参数处理。根据它判断是否给“操作属性”赋值。
             //如果是第一个参数 MappedStatement
             if (arg instanceof MappedStatement) {
@@ -103,7 +100,8 @@ public class AutoFillInterceptor implements Interceptor {
         if(arg == null ){
             return;
         }
-
+        // 当前时间
+        Date currDate = DateUtil.date();
         Field[] fields = ReflectUtil.getFields(arg.getClass());
         for (Field f : fields) {
             f.setAccessible(true);
@@ -112,25 +110,25 @@ public class AutoFillInterceptor implements Interceptor {
                 case MyBatisConstants.FIELD_CREATE_BY:
                     // 如果创建人 为空则进行默认赋值
                     Object createValue = ReflectUtil.getFieldValue(arg, f.getName());
-                    if(createValue == null){
+                    if(StringUtils.isBlank(Convert.toStr(createValue))){
                         setProperty(arg, MyBatisConstants.FIELD_CREATE_BY, UserUtil.getUser().getId());
                     }
-                    break;
-                // 创建日期
-                case MyBatisConstants.FIELD_CREATE_TIME:
-                    setProperty(arg, MyBatisConstants.FIELD_CREATE_TIME, new Date());
                     break;
                 // 更新人
                 case MyBatisConstants.FIELD_UPDATE_BY:
                     // 如果更新人 为空则进行默认赋值
                     Object updateValue = ReflectUtil.getFieldValue(arg, f.getName());
-                    if(updateValue == null){
+                    if(StringUtils.isBlank(Convert.toStr(updateValue))){
                         setProperty(arg, MyBatisConstants.FIELD_UPDATE_BY, UserUtil.getUser().getId());
                     }
                     break;
+                // 创建日期
+                case MyBatisConstants.FIELD_CREATE_TIME:
+                    setProperty(arg, MyBatisConstants.FIELD_CREATE_TIME, currDate);
+                    break;
                 // 更新日期
                 case MyBatisConstants.FIELD_UPDATE_TIME:
-                    setProperty(arg, MyBatisConstants.FIELD_UPDATE_TIME, new Date());
+                    setProperty(arg, MyBatisConstants.FIELD_UPDATE_TIME, currDate);
                     break;
                 // 乐观锁
                 case MyBatisConstants.FIELD_OPTIMISTIC_LOCK:
@@ -142,10 +140,10 @@ public class AutoFillInterceptor implements Interceptor {
                     break;
                 // 多租户设置
                 case MyBatisConstants.FIELD_TENANT:
+                    // 2020-12-05 修复当前租户可能为空字符串报错问题
                     // 如果租户ID 为空则进行默认赋值
                     Object tenantValue = ReflectUtil.getFieldValue(arg, f.getName());
-                    String tenantValueStr = Convert.toStr(tenantValue);
-                    if(StringUtils.isBlank(tenantValueStr)){
+                    if(StringUtils.isBlank(Convert.toStr(tenantValue))){
                         setProperty(arg, MyBatisConstants.FIELD_TENANT,  UserUtil.getTenantId());
                     }
                     break;
@@ -187,13 +185,13 @@ public class AutoFillInterceptor implements Interceptor {
                 case MyBatisConstants.FIELD_UPDATE_BY:
                     // 如果更新人 为空则进行默认赋值
                     Object updateValue = ReflectUtil.getFieldValue(arg, f.getName());
-                    if(updateValue == null){
+                    if(StringUtils.isBlank(Convert.toStr(updateValue))){
                         setProperty(arg, MyBatisConstants.FIELD_UPDATE_BY, UserUtil.getUser().getId());
                     }
                     break;
                 // 更新日期
                 case MyBatisConstants.FIELD_UPDATE_TIME:
-                    setProperty(arg, MyBatisConstants.FIELD_UPDATE_TIME, new Date());
+                    setProperty(arg, MyBatisConstants.FIELD_UPDATE_TIME, DateUtil.date());
                     break;
                 default:
                     break;
@@ -207,7 +205,7 @@ public class AutoFillInterceptor implements Interceptor {
     /**
      * 为对象的操作属性赋值
      *
-     * @param bean
+     * @param bean bean对象
      */
     private void setProperty(Object bean, String name, Object value) {
         //根据需要，将相关属性赋上默认值
