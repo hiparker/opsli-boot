@@ -91,7 +91,6 @@ public class DictDetailServiceImpl extends CrudServiceImpl<DictDetailMapper, Sys
                     dictWrapperModel.setTypeCode(dictDetailModel.getTypeCode());
                     dictWrapperModel.setDictName(dictDetailModel.getDictName());
                     dictWrapperModel.setDictValue(dictDetailModel.getDictValue());
-                    dictWrapperModel.setDictSort(model.getSortNo());
                     dictWrapperList.add(dictWrapperModel);
                 }
                 // 删除缓存
@@ -136,7 +135,6 @@ public class DictDetailServiceImpl extends CrudServiceImpl<DictDetailMapper, Sys
                     dictWrapperModel.setTypeCode(dictDetailModel.getTypeCode());
                     dictWrapperModel.setDictName(dictDetailModel.getDictName());
                     dictWrapperModel.setDictValue(dictDetailModel.getDictValue());
-                    dictWrapperModel.setDictSort(model.getSortNo());
                     dictWrapperList.add(dictWrapperModel);
                 }
                 // 删除缓存
@@ -170,7 +168,6 @@ public class DictDetailServiceImpl extends CrudServiceImpl<DictDetailMapper, Sys
                     dictWrapperModel.setTypeCode(dictDetailModel.getTypeCode());
                     dictWrapperModel.setDictName(dictDetailModel.getDictName());
                     dictWrapperModel.setDictValue(dictDetailModel.getDictValue());
-                    dictWrapperModel.setDictSort(dictDetailModel.getSortNo());
                     dictWrapperList.add(dictWrapperModel);
                 }
                 // 删除缓存
@@ -202,7 +199,6 @@ public class DictDetailServiceImpl extends CrudServiceImpl<DictDetailMapper, Sys
                     dictWrapperModel.setTypeCode(dictDetailModel.getTypeCode());
                     dictWrapperModel.setDictName(dictDetailModel.getDictName());
                     dictWrapperModel.setDictValue(dictDetailModel.getDictValue());
-                    dictWrapperModel.setDictSort(dictDetailModel.getSortNo());
                     dictWrapperList.add(dictWrapperModel);
                 }
                 // 删除缓存
@@ -240,7 +236,6 @@ public class DictDetailServiceImpl extends CrudServiceImpl<DictDetailMapper, Sys
                     dictWrapperModel.setTypeCode(sysDictDetail.getTypeCode());
                     dictWrapperModel.setDictName(sysDictDetail.getDictName());
                     dictWrapperModel.setDictValue(sysDictDetail.getDictValue());
-                    dictWrapperModel.setDictSort(sysDictDetail.getSortNo());
 
                     dictWrapperModels.add(dictWrapperModel);
 
@@ -293,7 +288,6 @@ public class DictDetailServiceImpl extends CrudServiceImpl<DictDetailMapper, Sys
                     dictWrapperModel.setTypeCode(sysDictDetail.getTypeCode());
                     dictWrapperModel.setDictName(sysDictDetail.getDictName());
                     dictWrapperModel.setDictValue(sysDictDetail.getDictValue());
-                    dictWrapperModel.setDictSort(sysDictDetail.getSortNo());
 
                     dictWrapperModels.add(dictWrapperModel);
 
@@ -342,7 +336,6 @@ public class DictDetailServiceImpl extends CrudServiceImpl<DictDetailMapper, Sys
                     dictWrapperModel.setTypeCode(dictDetailModel.getTypeCode());
                     dictWrapperModel.setDictName(dictDetailModel.getDictName());
                     dictWrapperModel.setDictValue(dictDetailModel.getDictValue());
-                    dictWrapperModel.setDictSort(dictDetailModel.getSortNo());
                     dictWrapperList.add(dictWrapperModel);
                 }
                 // 删除缓存

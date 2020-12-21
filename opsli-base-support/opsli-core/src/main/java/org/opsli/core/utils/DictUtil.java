@@ -131,7 +131,6 @@ public class DictUtil {
                         dictWrapperModel.setTypeCode(model.getTypeCode());
                         dictWrapperModel.setDictName(model.getDictName());
                         dictWrapperModel.setDictValue(model.getDictValue());
-                        dictWrapperModel.setDictSort(model.getSortNo());
                         dictWrapperModel.setModel(model);
                         // 保存至缓存
                         DictUtil.put(dictWrapperModel);
@@ -219,7 +218,6 @@ public class DictUtil {
                         dictWrapperModel.setTypeCode(model.getTypeCode());
                         dictWrapperModel.setDictName(model.getDictName());
                         dictWrapperModel.setDictValue(model.getDictValue());
-                        dictWrapperModel.setDictSort(model.getSortNo());
                         dictWrapperModel.setModel(model);
                         // 保存至缓存
                         DictUtil.put(dictWrapperModel);
@@ -273,7 +271,6 @@ public class DictUtil {
                 dictWrapperModel.setTypeCode(typeCode);
                 dictWrapperModel.setDictName(model.getDictName());
                 dictWrapperModel.setDictValue(model.getDictValue());
-                dictWrapperModel.setDictSort(model.getSortNo());
                 dictWrapperModels.add(dictWrapperModel);
             }
             if(!dictWrapperModels.isEmpty()){
@@ -320,7 +317,6 @@ public class DictUtil {
                     dictWrapperModel.setTypeCode(typeCode);
                     dictWrapperModel.setDictName(model.getDictName());
                     dictWrapperModel.setDictValue(model.getDictValue());
-                    dictWrapperModel.setDictSort(model.getSortNo());
                     dictWrapperModels.add(dictWrapperModel);
                 }
                 if(!dictWrapperModels.isEmpty()){
@@ -338,7 +334,6 @@ public class DictUtil {
                         dictWrapperModel.setTypeCode(model.getTypeCode());
                         dictWrapperModel.setDictName(model.getDictName());
                         dictWrapperModel.setDictValue(model.getDictValue());
-                        dictWrapperModel.setDictSort(model.getSortNo());
                         dictWrapperModel.setModel(model);
                         dictWrapperModels.add(dictWrapperModel);
                         // 保存至缓存
@@ -378,8 +373,14 @@ public class DictUtil {
      */
     private static List<DictWrapper> sortDictWrappers(List<DictWrapper> dictWrapperModels) {
         ListUtil.sort(dictWrapperModels, (o1, o2) -> {
-            int oInt1 = o1.getDictValue()==null?Integer.MAX_VALUE:o1.getDictSort();
-            int oInt2 = o2.getDictValue()==null?Integer.MAX_VALUE:o2.getDictSort();
+            int oInt1 = Integer.MAX_VALUE;
+            int oInt2 = Integer.MAX_VALUE;
+            if(o1 != null && o1.getModel() != null){
+                oInt1 = o1.getModel().getSortNo()==null?oInt1:o1.getModel().getSortNo();
+            }
+            if(o2 != null && o2.getModel() != null){
+                oInt2 = o2.getModel().getSortNo()==null?oInt2:o2.getModel().getSortNo();
+            }
             return Integer.compare(oInt1, oInt2);
         });
         return dictWrapperModels;
