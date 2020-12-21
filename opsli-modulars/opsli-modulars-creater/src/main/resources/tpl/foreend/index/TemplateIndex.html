@@ -325,6 +325,8 @@
   #end
   import Edit from "./components/#(data.model.tableName)ManagementEdit";
   import Import from "./components/#(data.model.tableName)ManagementImport";
+
+  import { vueButtonClickBan } from "@/utils";
   import { isNotNull } from "@/utils/valiargs";
   import { formateDate } from "@/utils/format";
 
@@ -468,7 +470,10 @@
         }
       },
       // 导出excel
-      handleExportExcel(){
+      handleExportExcel(el){
+        // 导出按钮防抖处理 默认限制为10秒
+        vueButtonClickBan(el, 10);
+
         // 执行导出
         doExportExcel(this.queryForm);
       },
