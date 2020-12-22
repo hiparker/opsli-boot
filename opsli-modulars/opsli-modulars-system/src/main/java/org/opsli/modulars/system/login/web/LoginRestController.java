@@ -89,11 +89,7 @@ public class LoginRestController {
 
         // 失败次数超过 验证次数阈值 开启验证码验证
         if(slipCount >= UserTokenUtil.ACCOUNT_SLIP_VERIFY_COUNT){
-            boolean captcha = CaptchaUtil.validate(form.getUuid(), form.getCaptcha());
-            // 验证码不正确
-            if(!captcha){
-                throw new TokenException(TokenMsg.EXCEPTION_LOGIN_CAPTCHA);
-            }
+            CaptchaUtil.validate(form.getUuid(), form.getCaptcha());
         }
 
         // 用户信息
