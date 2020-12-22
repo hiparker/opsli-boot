@@ -103,7 +103,8 @@ public class LoginRestController {
         if(user == null ||
                 !user.getPassword().equals(UserUtil.handlePassword(form.getPassword(), user.getSecretkey()))) {
             // 判断是否需要锁定账号 这里没有直接抛异常 而是返回错误信息， 其中包含 是否开启验证码状态
-            return UserTokenUtil.lockAccount(form.getUsername());
+            TokenMsg lockAccountMsg = UserTokenUtil.lockAccount(form.getUsername());
+            throw new TokenException(lockAccountMsg);
         }
 
         // 如果验证成功， 则清除锁定信息

@@ -244,7 +244,7 @@ public class UserTokenUtil {
 
     /**
      * 验证锁定账号
-     * @param username
+     * @param username 用户名
      */
     public static void verifyLockAccount(String username){
         // 判断账号是否临时锁定
@@ -273,9 +273,9 @@ public class UserTokenUtil {
 
     /**
      * 锁定账号
-     * @param username
+     * @param username 用户名
      */
-    public static ResultVo<?> lockAccount(String username){
+    public static TokenMsg lockAccount(String username){
         // 如果失败次数 超过阈值 则锁定账号
         Long slipNum = redisPlugin.increment(ACCOUNT_SLIP_COUNT_PREFIX + username);
         if (slipNum != null){
@@ -291,20 +291,12 @@ public class UserTokenUtil {
             }
         }
 
-        Map<String,Boolean> flagMap = Maps.newHashMap();
-        flagMap.put("izVerify", false);
-        if(slipNum != null && slipNum >= ACCOUNT_SLIP_VERIFY_COUNT){
-            flagMap.put("izVerify", true);
-        }
-        return ResultVo.error(TokenMsg.EXCEPTION_LOGIN_ACCOUNT_NO.getCode(),
-                TokenMsg.EXCEPTION_LOGIN_ACCOUNT_NO.getMessage(),
-                flagMap
-                );
+        return TokenMsg.EXCEPTION_LOGIN_ACCOUNT_NO;
     }
 
     /**
      * 获得当前失败次数
-     * @param username
+     * @param username 用户名
      */
     public static long getSlipCount(String username){
         long count = 0L;
@@ -320,7 +312,7 @@ public class UserTokenUtil {
 
     /**
      * 清除锁定账号
-     * @param username
+     * @param username 用户名
      */
     public static void clearLockAccount(String username){
         // 删除失败次数记录
