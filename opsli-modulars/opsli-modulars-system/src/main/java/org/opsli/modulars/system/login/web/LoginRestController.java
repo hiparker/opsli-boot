@@ -125,17 +125,10 @@ public class LoginRestController {
         if(resultVo.isSuccess()){
             // 异步保存IP
             AsyncProcessQueueReFuse.execute(()->{
-                try {
-                    // 临时设置 token缓存
-                    TokenThreadLocal.put(String.valueOf(resultVo.getData().get("token")));
-                    // 保存用户最后登录IP
-                    String clientIpAddress = IPUtil.getClientIpAddress(request);
-                    user.setLoginIp(clientIpAddress);
-                    iUserService.updateLoginIp(user);
-                }finally {
-                    // 清空 token缓存
-                    TokenThreadLocal.remove();
-                }
+                // 保存用户最后登录IP
+                String clientIpAddress = IPUtil.getClientIpAddress(request);
+                user.setLoginIp(clientIpAddress);
+                iUserService.updateLoginIp(user);
             });
         }
         return resultVo;
