@@ -58,6 +58,7 @@ import org.opsli.modulars.system.user.entity.SysUserAndOrg;
 import org.opsli.modulars.system.user.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
@@ -85,6 +86,8 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
 
     @Value("${opsli.web.upload-path}")
     private String basedir;
+    @Value("${opsli.default-pass}")
+    private String defaultPass;
 
     @Autowired
     private ISysOrgService iSysOrgService;
@@ -247,7 +250,29 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
         return ResultVo.success();
     }
 
+    /**
+     * 重置密码
+     * @return ResultVo
+     */
+    @ApiOperation(value = "重置密码", notes = "重置密码")
+    @RequiresPermissions("system_user_resetPassword")
+    @EnableLog
+    @Override
+    public ResultVo<?> resetPasswordById(String userId) {
+        // 演示模式 不允许操作
+        super.demoError();
 
+        UserPassword userPassword = new UserPassword();
+        userPassword.setNewPassword(defaultPass);
+        userPassword.setUserId(userId);
+
+        boolean resetPasswordFlag = IService.resetPassword(userPassword);
+        if(!resetPasswordFlag){
+            return ResultVo.error("重置密码失败");
+        }
+
+        return ResultVo.success("重置密码成功！默认密码为：" + defaultPass);
+    }
 
     /**
      * 用户信息 查一条

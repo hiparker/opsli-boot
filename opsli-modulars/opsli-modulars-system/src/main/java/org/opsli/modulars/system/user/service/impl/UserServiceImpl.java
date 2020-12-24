@@ -230,6 +230,37 @@ public class UserServiceImpl extends CrudServiceImpl<UserMapper, SysUser, UserMo
         return ret;
     }
 
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public boolean resetPassword(UserPassword userPassword) {
+        UserModel userModel = super.get(userPassword.getUserId());
+        // 如果为空则 不修改密码
+        if(userModel == null){
+            return false;
+        }
+
+        // 设置随机新盐值
+        userPassword.setSalt(
+                RandomUtil.randomString(20)
+        );
+        // 处理密码
+        userPassword.setNewPassword(
+                UserUtil.handlePassword(userPassword.getNewPassword(),
+                        userPassword.getSalt())
+        );
+
+
+        // 修改密码
+        boolean ret = mapper.updatePassword(userPassword);
+
+        if(ret){
+            // 刷新用户缓存
+            UserUtil.refreshUser(userModel);
+        }
+
+        return ret;
+    }
+
     /**
      * 更新用户最后登录IP
      * @param model

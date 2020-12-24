@@ -186,6 +186,9 @@ opsli:
   # token 有效时间 （分钟） 2小时
   token-effective-time: 120
 
+  # 重置默认密码
+  default-pass: Aa123456
+
   # 登录设置
   login:
     # 失败次数

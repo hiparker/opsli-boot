@@ -102,6 +102,13 @@ public interface UserApi {
     @PostMapping("/updatePasswordById")
     ResultVo<?> updatePasswordById(@RequestBody UserPassword userPassword);
 
+    /**
+     * 重置密码 ID
+     * @return ResultVo
+     */
+    @PostMapping("/resetPasswordById")
+    ResultVo<?> resetPasswordById(String userId);
+
 
     /**
      * 上传头像
