@@ -15,7 +15,6 @@
  */
 package org.opsli.modulars.system.login.web;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.google.common.collect.Maps;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -28,16 +27,12 @@ import org.opsli.common.api.TokenThreadLocal;
 import org.opsli.common.exception.TokenException;
 import org.opsli.common.utils.IPUtil;
 import org.opsli.core.msg.TokenMsg;
-import org.opsli.core.persistence.querybuilder.GenQueryBuilder;
-import org.opsli.core.persistence.querybuilder.QueryBuilder;
 import org.opsli.core.security.shiro.realm.OAuth2Realm;
 import org.opsli.core.utils.CaptchaUtil;
 import org.opsli.core.utils.TenantUtil;
 import org.opsli.core.utils.UserTokenUtil;
 import org.opsli.core.utils.UserUtil;
 import org.opsli.modulars.system.login.entity.LoginForm;
-import org.opsli.modulars.system.tenant.entity.SysTenant;
-import org.opsli.modulars.system.tenant.service.ITenantService;
 import org.opsli.modulars.system.user.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -51,7 +46,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -68,8 +62,6 @@ import java.util.Map;
 public class LoginRestController {
 
 
-    @Autowired
-    private ITenantService iTenantService;
     @Autowired
     private IUserService iUserService;
 
