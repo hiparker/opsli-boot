@@ -25,6 +25,7 @@ import org.opsli.api.wrapper.system.tenant.TenantModel;
 import org.opsli.api.wrapper.system.user.UserModel;
 import org.opsli.common.api.TokenThreadLocal;
 import org.opsli.common.exception.TokenException;
+import org.opsli.common.thread.refuse.AsyncProcessQueueReFuse;
 import org.opsli.common.utils.IPUtil;
 import org.opsli.core.msg.TokenMsg;
 import org.opsli.core.security.shiro.realm.OAuth2Realm;
@@ -122,20 +123,21 @@ public class LoginRestController {
         //生成token，并保存到Redis
         ResultVo<Map<String, Object>> resultVo = UserTokenUtil.createToken(user);
         if(resultVo.isSuccess()){
-            try {
-                // 临时设置 token缓存
-                TokenThreadLocal.put(String.valueOf(resultVo.getData().get("token")));
-                // 保存用户最后登录IP
-                String clientIpAddress = IPUtil.getClientIpAddress(request);
-                user.setLoginIp(clientIpAddress);
-                iUserService.updateLoginIp(user);
-            }catch (Exception ignored){
-            }finally {
-                // 清空 token缓存
-                TokenThreadLocal.remove();
-            }
+            // 异步保存IP
+            AsyncProcessQueueReFuse.execute(()->{
+                try {
+                    // 临时设置 token缓存
+                    TokenThreadLocal.put(String.valueOf(resultVo.getData().get("token")));
+                    // 保存用户最后登录IP
+                    String clientIpAddress = IPUtil.getClientIpAddress(request);
+                    user.setLoginIp(clientIpAddress);
+                    iUserService.updateLoginIp(user);
+                }finally {
+                    // 清空 token缓存
+                    TokenThreadLocal.remove();
+                }
+            });
         }
-
         return resultVo;
     }
 

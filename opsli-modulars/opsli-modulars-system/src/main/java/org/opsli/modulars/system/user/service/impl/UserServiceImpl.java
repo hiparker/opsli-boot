@@ -273,11 +273,11 @@ public class UserServiceImpl extends CrudServiceImpl<UserMapper, SysUser, UserMo
             return false;
         }
         // 激活一下 当前登录用户 User
-        UserUtil.getUser(model.getId());
-
+        //UserUtil.getUser(model.getId());
         SysUser sysUser = new SysUser();
         sysUser.setId(model.getId());
         sysUser.setLoginIp(model.getLoginIp());
+        sysUser.setUpdateBy(model.getUpdateBy());
         return mapper.updateLoginIp(sysUser);
     }
 
