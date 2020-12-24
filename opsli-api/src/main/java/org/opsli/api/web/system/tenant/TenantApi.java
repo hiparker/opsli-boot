@@ -125,4 +125,13 @@ public interface TenantApi {
     @GetMapping("/importExcel/template")
     void importTemplate(HttpServletResponse response);
 
+    // =========================
+
+    /**
+     * 获得已启用租户 查一条
+     * @param tenantId 模型
+     * @return ResultVo
+     */
+    @GetMapping("/getTenantByUsable")
+    ResultVo<TenantModel> getTenantByUsable(String tenantId);
 }

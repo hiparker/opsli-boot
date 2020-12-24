@@ -15,9 +15,18 @@
  */
 package org.opsli.modulars.system.tenant.service.impl;
 
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.convert.Convert;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.google.common.collect.Lists;
 import org.opsli.api.wrapper.system.tenant.TenantModel;
+import org.opsli.common.constants.MyBatisConstants;
 import org.opsli.common.exception.ServiceException;
+import org.opsli.common.utils.HumpUtil;
 import org.opsli.core.base.service.impl.CrudServiceImpl;
+import org.opsli.core.persistence.querybuilder.GenQueryBuilder;
+import org.opsli.core.persistence.querybuilder.QueryBuilder;
+import org.opsli.core.utils.TenantUtil;
 import org.opsli.modulars.system.SystemMsg;
 import org.opsli.modulars.system.tenant.entity.SysTenant;
 import org.opsli.modulars.system.tenant.mapper.TenantMapper;
@@ -25,6 +34,9 @@ import org.opsli.modulars.system.tenant.service.ITenantService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Collection;
+import java.util.List;
 
 
 /**
@@ -73,7 +85,108 @@ public class TenantServiceImpl extends CrudServiceImpl<TenantMapper, SysTenant, 
             throw new ServiceException(SystemMsg.EXCEPTION_TENANT_UNIQUE);
         }
 
-        return super.update(model);
+        TenantModel tenantModel = super.update(model);
+        if(tenantModel != null){
+            // 刷新缓存
+            TenantUtil.refreshTenant(tenantModel.getId());
+        }
+        return tenantModel;
+    }
+
+
+    /**
+     * 删除
+     * @param id ID
+     * @return
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public boolean delete(String id) {
+        TenantModel tenantModel = this.get(id);
+        boolean ret = super.delete(id);
+        if(ret){
+            // 刷新缓存
+            TenantUtil.refreshTenant(tenantModel.getId());
+        }
+        return ret;
+    }
+
+    /**
+     * 删除
+     * @param model 数据模型
+     * @return
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public boolean delete(TenantModel model) {
+        TenantModel tenantModel = this.get(model);
+        boolean ret = super.delete(model);
+        if(ret){
+            // 刷新缓存
+            TenantUtil.refreshTenant(tenantModel.getId());
+        }
+        return ret;
+    }
+
+    /**
+     * 删除 - 多个
+     * @param ids id数组
+     * @return
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public boolean deleteAll(String[] ids) {
+        List<String> idList = Convert.toList(String.class, ids);
+
+        QueryBuilder<SysTenant> queryBuilder = new GenQueryBuilder<>();
+        QueryWrapper<SysTenant> queryWrapper = queryBuilder.build();
+        queryWrapper.in(HumpUtil.humpToUnderline(MyBatisConstants.FIELD_ID), idList);
+        List<SysTenant> list = this.findList(queryWrapper);
+
+        boolean ret = super.deleteAll(ids);
+
+        if(ret){
+            if(CollUtil.isNotEmpty(list)){
+                for (SysTenant sysTenant : list) {
+                    // 刷新缓存
+                    TenantUtil.refreshTenant(sysTenant.getId());
+                }
+            }
+        }
+        return ret;
+    }
+
+
+    /**
+     * 删除 - 多个
+     * @param models 封装模型
+     * @return
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public boolean deleteAll(Collection<TenantModel> models) {
+        List<String> idList = Lists.newArrayListWithCapacity(models.size());
+        for (TenantModel model : models) {
+            idList.add(model.getId());
+        }
+
+        QueryBuilder<SysTenant> queryBuilder = new GenQueryBuilder<>();
+        QueryWrapper<SysTenant> queryWrapper = queryBuilder.build();
+        queryWrapper.in(HumpUtil.humpToUnderline(MyBatisConstants.FIELD_ID), idList);
+        List<SysTenant> list = this.findList(queryWrapper);
+
+        boolean ret = super.deleteAll(models);
+
+        if(ret){
+            if(CollUtil.isNotEmpty(list)){
+                for (SysTenant sysTenant : list) {
+                    // 刷新缓存
+                    TenantUtil.refreshTenant(sysTenant.getId());
+                }
+            }
+        }
+
+        return ret;
     }
 
 

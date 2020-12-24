@@ -156,6 +156,7 @@ public class DictDetailServiceImpl extends CrudServiceImpl<DictDetailMapper, Sys
      * @return
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public boolean delete(String id) {
         DictDetailModel dictModel = this.get(id);
         boolean ret = super.delete(id);
@@ -187,6 +188,7 @@ public class DictDetailServiceImpl extends CrudServiceImpl<DictDetailMapper, Sys
      * @return
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public boolean delete(DictDetailModel model) {
         DictDetailModel dictModel = this.get(model);
         boolean ret = super.delete(model);
@@ -218,6 +220,7 @@ public class DictDetailServiceImpl extends CrudServiceImpl<DictDetailMapper, Sys
      * @return
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public boolean deleteAll(String[] ids) {
         QueryBuilder<SysDictDetail> queryBuilder = new GenQueryBuilder<>();
         QueryWrapper<SysDictDetail> queryWrapper = queryBuilder.build();
@@ -263,6 +266,7 @@ public class DictDetailServiceImpl extends CrudServiceImpl<DictDetailMapper, Sys
      * @return
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public boolean deleteAll(Collection<DictDetailModel> models) {
 
         QueryBuilder<SysDictDetail> queryBuilder = new GenQueryBuilder<>();
