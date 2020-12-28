@@ -16,16 +16,23 @@
 package org.opsli.modulars.system.area.web;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.io.IoUtil;
+import cn.hutool.core.lang.Snowflake;
 import cn.hutool.core.lang.tree.Tree;
 import cn.hutool.core.lang.tree.TreeNodeConfig;
 import cn.hutool.core.lang.tree.TreeUtil;
+import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.ReflectUtil;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.opsli.api.base.result.ResultVo;
 import org.opsli.api.web.system.area.SysAreaRestApi;
@@ -40,13 +47,18 @@ import org.opsli.core.base.entity.HasChildren;
 import org.opsli.core.persistence.querybuilder.GenQueryBuilder;
 import org.opsli.core.persistence.querybuilder.QueryBuilder;
 import org.opsli.core.persistence.querybuilder.WebQueryBuilder;
+import org.opsli.core.utils.SpringContextHolder;
 import org.opsli.modulars.system.area.entity.SysArea;
 import org.opsli.modulars.system.area.service.ISysAreaService;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.InputStream;
 import java.lang.reflect.Method;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -265,6 +277,83 @@ public class SysAreaRestController extends BaseRestController<SysArea, SysAreaMo
         // 当前方法
         Method method = ReflectUtil.getMethodByName(this.getClass(), "importTemplate");
         super.importTemplate(SysAreaRestApi.TITLE, response, method);
+    }
+
+    /**
+     * 导入数据
+     */
+    @ApiOperation(value = "获得json数据 查询数据", notes = "获得json数据 查询数据")
+    @GetMapping("/importJson")
+    public void importJson() {
+        // https://github.com/small-dream/China_Province_City
+        // JSON 放在 resources下更新当前数据库数据
+        ClassPathResource resource = new ClassPathResource("/json/2020年8月中华人民共和国县以上行政区划代码.json");
+        try (InputStream inputStream = resource.getInputStream()) {
+            String readTpl = IoUtil.read(inputStream, StandardCharsets.UTF_8);
+
+            List<SysAreaModel> tmpList = Lists.newArrayList();
+
+            // 填充省份
+            Snowflake snowflake = IdUtil.getSnowflake(1, 1);
+
+            String baseId = snowflake.nextIdStr();
+            SysAreaModel model = new SysAreaModel();
+            model.setId(baseId);
+            model.setAreaCode("86");
+            model.setAreaName("中国");
+            model.setParentId("0");
+            tmpList.add(model);
+
+            JSONArray jsonArray = JSONArray.parseArray(readTpl);
+            for (int i = 0; i < jsonArray.size(); i++) {
+                JSONObject jsonObject = jsonArray.getJSONObject(i);
+
+                // 填充省份
+                SysAreaModel sysAreaModel = new SysAreaModel();
+                String sId = snowflake.nextIdStr();
+                sysAreaModel.setId(sId);
+                sysAreaModel.setAreaCode((String) jsonObject.get("code"));
+                sysAreaModel.setAreaName((String) jsonObject.get("name"));
+                sysAreaModel.setParentId(baseId);
+                tmpList.add(sysAreaModel);
+
+                JSONArray jsonArray2 = jsonObject.getJSONArray("cityList");
+                for (int j = 0; j < jsonArray2.size(); j++) {
+                    JSONObject jsonObject2 = jsonArray2.getJSONObject(j);
+                    // 填充城市
+                    SysAreaModel sysAreaModel2 = new SysAreaModel();
+                    String cityId = snowflake.nextIdStr();
+                    sysAreaModel2.setId(cityId);
+                    sysAreaModel2.setAreaCode((String) jsonObject2.get("code"));
+                    sysAreaModel2.setAreaName((String) jsonObject2.get("name"));
+                    sysAreaModel2.setParentId(sId);
+                    tmpList.add(sysAreaModel2);
+
+
+                    JSONArray jsonArray3 = jsonObject2.getJSONArray("areaList");
+                    if(jsonArray3 != null){
+                        for (int k = 0; k < jsonArray3.size(); k++) {
+                            JSONObject jsonObject3 = jsonArray3.getJSONObject(k);
+                            // 填充城市
+                            SysAreaModel sysAreaModel3 = new SysAreaModel();
+                            String areaId = snowflake.nextIdStr();
+                            sysAreaModel3.setId(areaId);
+                            sysAreaModel3.setAreaCode((String) jsonObject3.get("code"));
+                            sysAreaModel3.setAreaName((String) jsonObject3.get("name"));
+                            sysAreaModel3.setParentId(cityId);
+                            tmpList.add(sysAreaModel3);
+                        }
+                    }
+
+                }
+
+            }
+
+            IService.insertBatch(tmpList);
+
+        }catch (Exception e){
+            log.error(e.getMessage(), e);
+        }
     }
 
 }
