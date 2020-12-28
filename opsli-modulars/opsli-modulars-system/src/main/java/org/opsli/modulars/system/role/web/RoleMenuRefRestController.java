@@ -68,7 +68,6 @@ public class RoleMenuRefRestController implements RoleMenuRefApi {
      * @return ResultVo
      */
     @RequiresPermissions("system_role_setPerms")
-    @EnableLog
     @Override
     public ResultVo<?> getPerms(RoleMenuRefModel model) {
         if(model == null){
