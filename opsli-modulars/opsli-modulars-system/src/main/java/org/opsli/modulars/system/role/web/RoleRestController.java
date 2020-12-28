@@ -180,14 +180,16 @@ public class RoleRestController extends BaseRestController<SysRole, RoleModel, I
     @RequiresPermissions("system_role_delete")
     @EnableLog
     @Override
-    public ResultVo<?> delAll(String[] ids){
+    public ResultVo<?> delAll(String ids){
         // 演示模式 不允许操作
         super.demoError();
 
-        if(ids != null){
+        String[] idArray = Convert.toStrArray(ids);
+
+        if(idArray != null){
             QueryBuilder<SysRole> queryBuilder = new GenQueryBuilder<>();
             QueryWrapper<SysRole> wrapper = queryBuilder.build();
-            List<String> idList = Convert.toList(String.class,ids);
+            List<String> idList = Convert.toList(String.class,idArray);
 
             wrapper.in(MyBatisConstants.FIELD_ID, idList);
             List<SysRole> roleList = IService.findList(wrapper);
@@ -202,7 +204,7 @@ public class RoleRestController extends BaseRestController<SysRole, RoleModel, I
             }
         }
 
-        IService.deleteAll(ids);
+        IService.deleteAll(idArray);
         return ResultVo.success("批量删除角色成功");
     }
 

@@ -16,6 +16,7 @@
 package org.opsli.modulars.system.org.web;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.convert.Convert;
 import cn.hutool.core.lang.tree.Tree;
 import cn.hutool.core.lang.tree.TreeNodeConfig;
 import cn.hutool.core.lang.tree.TreeUtil;
@@ -390,11 +391,13 @@ public class SysOrgRestController extends BaseRestController<SysOrg, SysOrgModel
     @RequiresPermissions("system_org_update")
     @EnableLog
     @Override
-    public ResultVo<?> delAll(String[] ids){
+    public ResultVo<?> delAll(String ids){
         // 演示模式 不允许操作
         super.demoError();
 
-        IService.deleteAll(ids);
+        String[] idArray = Convert.toStrArray(ids);
+        IService.deleteAll(idArray);
+
         return ResultVo.success("批量删除组织机构成功");
     }
 

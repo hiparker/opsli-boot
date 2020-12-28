@@ -178,12 +178,12 @@ public class DictRestController extends BaseRestController<SysDict, DictModel, I
     @RequiresPermissions("system_dict_insert")
     @EnableLog
     @Override
-    public ResultVo<?> delAll(String[] ids){
-
+    public ResultVo<?> delAll(String ids){
+        String[] idArray = Convert.toStrArray(ids);
         if(ids != null){
             QueryBuilder<SysDict> queryBuilder = new GenQueryBuilder<>();
             QueryWrapper<SysDict> wrapper = queryBuilder.build();
-            List<String> idList = Convert.toList(String.class,ids);
+            List<String> idList = Convert.toList(String.class, idArray);
 
             wrapper.in(MyBatisConstants.FIELD_ID, idList);
             List<SysDict> dictList = IService.findList(wrapper);
@@ -198,7 +198,7 @@ public class DictRestController extends BaseRestController<SysDict, DictModel, I
             }
         }
 
-        IService.deleteAll(ids);
+        IService.deleteAll(idArray);
         return ResultVo.success("批量删除字典数据成功");
     }
 

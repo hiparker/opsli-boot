@@ -15,6 +15,7 @@
  */
 package org.opsli.modulars.system.menu.web;
 
+import cn.hutool.core.convert.Convert;
 import cn.hutool.core.lang.tree.Tree;
 import cn.hutool.core.lang.tree.TreeNodeConfig;
 import cn.hutool.core.lang.tree.TreeUtil;
@@ -375,11 +376,13 @@ public class MenuRestController extends BaseRestController<SysMenu, MenuModel, I
     @RequiresPermissions("system_menu_delete")
     @EnableLog
     @Override
-    public ResultVo<?> delAll(String[] ids){
+    public ResultVo<?> delAll(String ids){
         // 演示模式 不允许操作
         super.demoError();
 
-        IService.deleteAll(ids);
+        String[] idArray = Convert.toStrArray(ids);
+        IService.deleteAll(idArray);
+
         return ResultVo.success("批量删除菜单成功");
     }
 

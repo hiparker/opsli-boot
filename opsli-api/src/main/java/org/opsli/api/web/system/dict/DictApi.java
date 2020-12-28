@@ -98,7 +98,7 @@ public interface DictApi {
      * @return ResultVo
      */
     @PostMapping("/delAll")
-    ResultVo<?> delAll(String[] ids);
+    ResultVo<?> delAll(String ids);
 
     /**
      * 数据字典 Excel 导出

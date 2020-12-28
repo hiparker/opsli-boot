@@ -104,7 +104,7 @@ public interface SysOrgRestApi {
     * @return ResultVo
     */
     @PostMapping("/delAll")
-    ResultVo<?> delAll(String[] ids);
+    ResultVo<?> delAll(String ids);
 
     /**
     * 组织机构表 Excel 导出

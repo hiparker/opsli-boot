@@ -98,7 +98,7 @@ public interface RoleApi {
      * @return ResultVo
      */
     @PostMapping("/delAll")
-    ResultVo<?> delAll(String[] ids);
+    ResultVo<?> delAll(String ids);
 
     /**
      * 角色 Excel 导出

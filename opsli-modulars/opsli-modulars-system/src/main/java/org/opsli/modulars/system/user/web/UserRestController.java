@@ -16,6 +16,7 @@
 package org.opsli.modulars.system.user.web;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.convert.Convert;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.RandomUtil;
@@ -404,13 +405,14 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
     @RequiresPermissions("system_user_delete")
     @EnableLog
     @Override
-    public ResultVo<?> delAll(String[] ids){
+    public ResultVo<?> delAll(String ids){
         // 演示模式 不允许操作
         super.demoError();
 
-        IService.deleteAll(ids);
+        String[] idArray = Convert.toStrArray(ids);
+        IService.deleteAll(idArray);
 
-        for (String id : ids) {
+        for (String id : idArray) {
             // 清除缓存信息
             UserModel userModel = new UserModel();
             userModel.setId(id);

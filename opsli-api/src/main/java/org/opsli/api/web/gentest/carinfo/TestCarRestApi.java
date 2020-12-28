@@ -98,7 +98,7 @@ public interface TestCarRestApi {
     * @return ResultVo
     */
     @PostMapping("/delAll")
-    ResultVo<?> delAll(String[] ids);
+    ResultVo<?> delAll(String ids);
 
     /**
     * 汽车信息 Excel 导出

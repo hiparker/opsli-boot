@@ -1,5 +1,6 @@
 package org.opsli.modulars.test.web;
 
+import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.ReflectUtil;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -126,8 +127,9 @@ public class TestRestController extends BaseRestController<TestEntity, TestModel
     @RequiresPermissions("gentest_test_delete")
     @EnableLog
     @Override
-    public ResultVo<?> delAll(String[] ids){
-        IService.deleteAll(ids);
+    public ResultVo<?> delAll(String ids){
+        String[] idArray = Convert.toStrArray(ids);
+        IService.deleteAll(idArray);
         return ResultVo.success("批量删除测试成功");
     }
 

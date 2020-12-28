@@ -15,6 +15,7 @@
 */
 package org.opsli.modulars.gentest.user.web;
 
+import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.ReflectUtil;
 import org.opsli.common.annotation.RequiresPermissionsCus;
 import io.swagger.annotations.ApiOperation;
@@ -141,8 +142,9 @@ public class TestUserRestController extends BaseRestController<TestUser, TestUse
     @RequiresPermissions("gentest_user_update")
     @EnableLog
     @Override
-    public ResultVo<?> delAll(String[] ids){
-        IService.deleteAll(ids);
+    public ResultVo<?> delAll(String ids){
+        String[] idArray = Convert.toStrArray(ids);
+        IService.deleteAll(idArray);
         return ResultVo.success("批量删除用户成功");
     }
 

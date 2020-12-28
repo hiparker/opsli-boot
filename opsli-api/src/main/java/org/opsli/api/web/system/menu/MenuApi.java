@@ -130,7 +130,7 @@ public interface MenuApi {
      * @return ResultVo
      */
     @PostMapping("/delAll")
-    ResultVo<?> delAll(String[] ids);
+    ResultVo<?> delAll(String ids);
 
     /**
      * 菜单 Excel 导出

@@ -98,7 +98,7 @@ public interface TestUserRestApi {
     * @return ResultVo
     */
     @PostMapping("/delAll")
-    ResultVo<?> delAll(String[] ids);
+    ResultVo<?> delAll(String ids);
 
     /**
     * 某系统用户 Excel 导出

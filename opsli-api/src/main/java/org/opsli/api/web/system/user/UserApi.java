@@ -172,7 +172,7 @@ public interface UserApi {
      * @return ResultVo
      */
     @PostMapping("/delAll")
-    ResultVo<?> delAll(String[] ids);
+    ResultVo<?> delAll(String ids);
 
     /**
      * 用户信息 Excel 导出

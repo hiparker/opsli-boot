@@ -15,6 +15,7 @@
  */
 package org.opsli.modulars.creater.table.web;
 
+import cn.hutool.core.convert.Convert;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -182,12 +183,13 @@ public class TableRestController extends BaseRestController<CreaterTable, Create
     @RequiresPermissions("deve_creater_delete")
     @EnableLog
     @Override
-    public ResultVo<?> delAll(String[] ids){
+    public ResultVo<?> delAll(String ids){
         // 演示模式 不允许操作
         //super.demoError();
+        String[] idArray = Convert.toStrArray(ids);
 
         try {
-            IService.removeByIdsAny(ids);
+            IService.removeByIdsAny(idArray);
         } catch (ServiceException e){
             throw e;
         } catch (Exception e){
@@ -240,12 +242,13 @@ public class TableRestController extends BaseRestController<CreaterTable, Create
     @RequiresPermissions("deve_creater_import")
     @EnableLog
     @Override
-    public ResultVo<?> importTables(String[] tableNames) {
-        if(tableNames == null){
+    public ResultVo<?> importTables(String tableNames) {
+        String[] tableNameArray = Convert.toStrArray(tableNames);
+        if(tableNameArray == null){
             // 未选中表，无法导入
             throw new CreaterException(CreaterMsg.EXCEPTION_IMPORT_NULL);
         }
-        IService.importTables(tableNames);
+        IService.importTables(tableNameArray);
         return ResultVo.success("导入成功");
     }
 }

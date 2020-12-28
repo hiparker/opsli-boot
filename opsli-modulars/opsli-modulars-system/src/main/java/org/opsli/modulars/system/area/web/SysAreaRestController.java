@@ -16,6 +16,7 @@
 package org.opsli.modulars.system.area.web;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.convert.Convert;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.lang.Snowflake;
 import cn.hutool.core.lang.tree.Tree;
@@ -226,11 +227,13 @@ public class SysAreaRestController extends BaseRestController<SysArea, SysAreaMo
     @RequiresPermissions("system_area_update")
     @EnableLog
     @Override
-    public ResultVo<?> delAll(String[] ids){
+    public ResultVo<?> delAll(String ids){
         // 演示模式 不允许操作
         super.demoError();
 
-        IService.deleteAll(ids);
+        String[] idArray = Convert.toStrArray(ids);
+        IService.deleteAll(idArray);
+
         return ResultVo.success("批量删除地域成功");
     }
 

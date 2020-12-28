@@ -15,6 +15,7 @@
 */
 package org.opsli.modulars.gentest.carinfo.web;
 
+import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.ReflectUtil;
 import org.opsli.core.base.service.interfaces.CrudServiceInterface;
 import io.swagger.annotations.ApiOperation;
@@ -141,8 +142,9 @@ public class TestCarRestController extends BaseRestController<TestCar, TestCarMo
     @RequiresPermissions("gentest_carinfo_update")
     @EnableLog
     @Override
-    public ResultVo<?> delAll(String[] ids){
-        IService.deleteAll(ids);
+    public ResultVo<?> delAll(String ids){
+        String[] idArray = Convert.toStrArray(ids);
+        IService.deleteAll(idArray);
         return ResultVo.success("批量删除汽车信息成功");
     }
 
