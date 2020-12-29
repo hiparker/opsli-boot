@@ -50,6 +50,9 @@ import java.util.concurrent.ConcurrentMap;
 @Configuration
 public class RedisPushSubReceiver extends BaseReceiver {
 
+    /** Spring Bean 前缀 */
+    public static final String SPRING_PREFIX = "redisPushSub_";
+
     /** 监听信道 */
     public static final String CHANNEL = "opsli";
 
@@ -90,7 +93,7 @@ public class RedisPushSubReceiver extends BaseReceiver {
                 HANDLER_MAP.put(handler.getType(),handler);
 
                 //将new出的对象放入Spring容器中
-                defaultListableBeanFactory.registerSingleton(aClass.getSimpleName(), obj);
+                defaultListableBeanFactory.registerSingleton(SPRING_PREFIX+aClass.getSimpleName(), obj);
 
                 //自动注入依赖
                 beanFactory.autowireBean(obj);
