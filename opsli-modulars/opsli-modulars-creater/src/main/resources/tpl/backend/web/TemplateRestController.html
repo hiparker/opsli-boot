@@ -107,7 +107,7 @@ public class #(data.model.tableName)RestController extends BaseRestController<#(
     @Override
     public ResultVo<?> findPage(Integer pageNo, Integer pageSize, HttpServletRequest request) {
 
-        QueryBuilder<#(data.model.tableName)> queryBuilder = new WebQueryBuilder<>(#(data.model.tableName).class, request.getParameterMap());
+        QueryBuilder<#(data.model.tableName)> queryBuilder = new WebQueryBuilder<>(entityClazz, request.getParameterMap());
         Page<#(data.model.tableName), #(data.model.tableName)Model> page = new Page<>(pageNo, pageSize);
         page.setQueryWrapper(queryBuilder.build());
         page = IService.findPage(page);
@@ -218,7 +218,7 @@ public class #(data.model.tableName)RestController extends BaseRestController<#(
     public void exportExcel(HttpServletRequest request, HttpServletResponse response) {
         // 当前方法
         Method method = ReflectUtil.getMethodByName(this.getClass(), "exportExcel");
-        QueryBuilder<#(data.model.tableName)> queryBuilder = new WebQueryBuilder<>(#(data.model.tableName).class, request.getParameterMap());
+        QueryBuilder<#(data.model.tableName)> queryBuilder = new WebQueryBuilder<>(entityClazz, request.getParameterMap());
         super.excelExport(#(data.model.tableName)RestApi.TITLE, queryBuilder.build(), response, method);
     }
 

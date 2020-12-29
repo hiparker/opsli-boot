@@ -86,7 +86,7 @@ public class TenantRestController extends BaseRestController<SysTenant, TenantMo
     @Override
     public ResultVo<?> findPage(Integer pageNo, Integer pageSize, HttpServletRequest request) {
 
-        QueryBuilder<SysTenant> queryBuilder = new WebQueryBuilder<>(SysTenant.class, request.getParameterMap());
+        QueryBuilder<SysTenant> queryBuilder = new WebQueryBuilder<>(entityClazz, request.getParameterMap());
         Page<SysTenant, TenantModel> page = new Page<>(pageNo, pageSize);
         page.setQueryWrapper(queryBuilder.build());
         page = IService.findPage(page);
@@ -178,7 +178,7 @@ public class TenantRestController extends BaseRestController<SysTenant, TenantMo
     public void exportExcel(HttpServletRequest request, HttpServletResponse response) {
         // 当前方法
         Method method = ReflectUtil.getMethodByName(this.getClass(), "exportExcel");
-        QueryBuilder<SysTenant> queryBuilder = new WebQueryBuilder<>(SysTenant.class, request.getParameterMap());
+        QueryBuilder<SysTenant> queryBuilder = new WebQueryBuilder<>(entityClazz, request.getParameterMap());
         super.excelExport(RoleApi.TITLE, queryBuilder.build(), response, method);
     }
 
@@ -188,7 +188,7 @@ public class TenantRestController extends BaseRestController<SysTenant, TenantMo
      * @return ResultVo
      */
     @ApiOperation(value = "导入Excel", notes = "导入Excel")
-    @RequiresPermissionsCus("system_tenant_import")
+    @RequiresPermissions("system_tenant_import")
     @EnableLog
     @Override
     public ResultVo<?> importExcel(MultipartHttpServletRequest request) {
@@ -226,7 +226,7 @@ public class TenantRestController extends BaseRestController<SysTenant, TenantMo
         SysTenant entity = IService.getOne(queryWrapper);
 
         return ResultVo.success(
-                WrapperUtil.transformInstance(entity, TenantModel.class)
+                WrapperUtil.transformInstance(entity, modelClazz)
         );
     }
 

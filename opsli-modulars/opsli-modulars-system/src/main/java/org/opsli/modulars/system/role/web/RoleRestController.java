@@ -90,7 +90,7 @@ public class RoleRestController extends BaseRestController<SysRole, RoleModel, I
     @Override
     public ResultVo<?> findPage(Integer pageNo, Integer pageSize, HttpServletRequest request) {
 
-        QueryBuilder<SysRole> queryBuilder = new WebQueryBuilder<>(SysRole.class, request.getParameterMap());
+        QueryBuilder<SysRole> queryBuilder = new WebQueryBuilder<>(entityClazz, request.getParameterMap());
         Page<SysRole, RoleModel> page = new Page<>(pageNo, pageSize);
         page.setQueryWrapper(queryBuilder.build());
         page = IService.findPage(page);
@@ -222,7 +222,7 @@ public class RoleRestController extends BaseRestController<SysRole, RoleModel, I
     public void exportExcel(HttpServletRequest request, HttpServletResponse response) {
         // 当前方法
         Method method = ReflectUtil.getMethodByName(this.getClass(), "exportExcel");
-        QueryBuilder<SysRole> queryBuilder = new WebQueryBuilder<>(SysRole.class, request.getParameterMap());
+        QueryBuilder<SysRole> queryBuilder = new WebQueryBuilder<>(entityClazz, request.getParameterMap());
         super.excelExport(RoleApi.TITLE, queryBuilder.build(), response, method);
     }
 

@@ -1,6 +1,7 @@
 package org.opsli.core.utils;
 
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
 /**
@@ -15,7 +16,7 @@ public final class Base64ConvertUtil {
      * @return java.lang.String
      */
     public static String encode(String str) throws UnsupportedEncodingException {
-        byte[] encodeBytes = Base64.getEncoder().encode(str.getBytes("utf-8"));
+        byte[] encodeBytes = Base64.getEncoder().encode(str.getBytes(StandardCharsets.UTF_8));
         return new String(encodeBytes);
     }
 
@@ -25,7 +26,7 @@ public final class Base64ConvertUtil {
      * @return java.lang.String
      */
     public static String decode(String str) throws UnsupportedEncodingException {
-        byte[] decodeBytes = Base64.getDecoder().decode(str.getBytes("utf-8"));
+        byte[] decodeBytes = Base64.getDecoder().decode(str.getBytes(StandardCharsets.UTF_8));
         return new String(decodeBytes);
     }
 

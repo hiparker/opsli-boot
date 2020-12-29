@@ -84,13 +84,13 @@ public class MenuRestController extends BaseRestController<SysMenu, MenuModel, I
         // 获得全量数据
         if(UserUtil.SUPER_ADMIN.equals(user.getUsername())){
             List<SysMenu> menuList = IService.findList(queryBuilder.build());
-            menuModelList = WrapperUtil.transformInstance(menuList, MenuModel.class);
+            menuModelList = WrapperUtil.transformInstance(menuList, modelClazz);
         }else {
             List<MenuModel> menuListByUserId = UserUtil.getMenuListByUserId(user.getId());
             if(menuListByUserId != null){
                 // 这里有 ehcache的坑 需要深克隆再操作
                 menuModelList = WrapperUtil.cloneTransformInstance(menuListByUserId
-                        ,MenuModel.class);
+                        ,modelClazz);
             }
 
             List<String> perms = UserUtil.getUserAllPermsByUserId(user.getId());
@@ -98,7 +98,7 @@ public class MenuRestController extends BaseRestController<SysMenu, MenuModel, I
                 QueryWrapper<SysMenu> wrapper = queryBuilder.build();
                 wrapper.in("menu_code", perms);
                 List<SysMenu> sysMenus = IService.findList(wrapper);
-                List<MenuModel> menuModels = WrapperUtil.transformInstance(sysMenus, MenuModel.class);
+                List<MenuModel> menuModels = WrapperUtil.transformInstance(sysMenus, modelClazz);
                 if(menuModelList != null){
                     menuModelList.addAll(menuModels);
                 }
@@ -224,7 +224,7 @@ public class MenuRestController extends BaseRestController<SysMenu, MenuModel, I
     @Override
     public ResultVo<?> findMenuTreePage(HttpServletRequest request) {
 
-        QueryBuilder<SysMenu> queryBuilder = new WebQueryBuilder<>(SysMenu.class,
+        QueryBuilder<SysMenu> queryBuilder = new WebQueryBuilder<>(entityClazz,
                 request.getParameterMap());
 
 
@@ -272,7 +272,7 @@ public class MenuRestController extends BaseRestController<SysMenu, MenuModel, I
         QueryBuilder<SysMenu> queryBuilder = new GenQueryBuilder<>();
         // 菜单集合
         List<SysMenu> menuList = IService.findList(queryBuilder.build());
-        List<MenuModel> menuModelList = WrapperUtil.transformInstance(menuList, MenuModel.class);
+        List<MenuModel> menuModelList = WrapperUtil.transformInstance(menuList, modelClazz);
         return ResultVo.success(menuModelList);
     }
 
@@ -304,7 +304,7 @@ public class MenuRestController extends BaseRestController<SysMenu, MenuModel, I
     @Override
     public ResultVo<?> findPage(Integer pageNo, Integer pageSize, HttpServletRequest request) {
 
-        QueryBuilder<SysMenu> queryBuilder = new WebQueryBuilder<>(SysMenu.class, request.getParameterMap());
+        QueryBuilder<SysMenu> queryBuilder = new WebQueryBuilder<>(entityClazz, request.getParameterMap());
         Page<SysMenu, MenuModel> page = new Page<>(pageNo, pageSize);
         page.setQueryWrapper(queryBuilder.build());
         page = IService.findPage(page);
@@ -400,7 +400,7 @@ public class MenuRestController extends BaseRestController<SysMenu, MenuModel, I
     public void exportExcel(HttpServletRequest request, HttpServletResponse response) {
         // 当前方法
         Method method = ReflectUtil.getMethodByName(this.getClass(), "exportExcel");
-        QueryBuilder<SysMenu> queryBuilder = new WebQueryBuilder<>(SysMenu.class, request.getParameterMap());
+        QueryBuilder<SysMenu> queryBuilder = new WebQueryBuilder<>(entityClazz, request.getParameterMap());
         super.excelExport(MenuApi.TITLE, queryBuilder.build(), response, method);
     }
 

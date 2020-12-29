@@ -91,7 +91,7 @@ public class DictRestController extends BaseRestController<SysDict, DictModel, I
     @Override
     public ResultVo<?> findPage(Integer pageNo, Integer pageSize, HttpServletRequest request) {
 
-        QueryBuilder<SysDict> queryBuilder = new WebQueryBuilder<>(SysDict.class, request.getParameterMap());
+        QueryBuilder<SysDict> queryBuilder = new WebQueryBuilder<>(entityClazz, request.getParameterMap());
         Page<SysDict, DictModel> page = new Page<>(pageNo, pageSize);
         page.setQueryWrapper(queryBuilder.build());
         page = IService.findPage(page);
@@ -216,7 +216,7 @@ public class DictRestController extends BaseRestController<SysDict, DictModel, I
     public void exportExcel(HttpServletRequest request, HttpServletResponse response) {
         // 当前方法
         Method method = ReflectUtil.getMethodByName(this.getClass(), "exportExcel");
-        QueryBuilder<SysDict> queryBuilder = new WebQueryBuilder<>(SysDict.class, request.getParameterMap());
+        QueryBuilder<SysDict> queryBuilder = new WebQueryBuilder<>(entityClazz, request.getParameterMap());
         super.excelExport(DictApi.TITLE, queryBuilder.build(), response, method);
     }
 

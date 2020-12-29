@@ -93,7 +93,7 @@ public class SwaggerConfig {
                 // 描述
                 .description("后台API接口")
                 // 作者
-                .contact("Parker")
+                .contact(new Contact("Parker", "https://opsli.com", "meet.parker@foxmail.com"))
                 .license("The Apache License, Version 2.0")
                 .licenseUrl("http://www.apache.org/licenses/LICENSE-2.0.html")
                 .build();

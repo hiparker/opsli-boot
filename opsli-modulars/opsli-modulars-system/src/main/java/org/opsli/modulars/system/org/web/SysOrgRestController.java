@@ -85,7 +85,7 @@ public class SysOrgRestController extends BaseRestController<SysOrg, SysOrgModel
 
         // 获得用户 对应菜单
         List<SysOrg> dataList = IService.findList(wrapper);
-        List<SysOrgModel> orgModelList = WrapperUtil.transformInstance(dataList, SysOrgModel.class);
+        List<SysOrgModel> orgModelList = WrapperUtil.transformInstance(dataList, modelClazz);
         // 0 为初始值
         if(PARENT_ID.equals(parentId)){
             // 显示全部
@@ -173,7 +173,7 @@ public class SysOrgRestController extends BaseRestController<SysOrg, SysOrgModel
 
         // 获得用户 对应菜单
         List<SysOrg> dataList = IService.findList(wrapper);
-        List<SysOrgModel> orgModelList = WrapperUtil.transformInstance(dataList, SysOrgModel.class);
+        List<SysOrgModel> orgModelList = WrapperUtil.transformInstance(dataList, modelClazz);
 
 
         //配置
@@ -239,7 +239,7 @@ public class SysOrgRestController extends BaseRestController<SysOrg, SysOrgModel
 
         // 获得用户 对应菜单
         List<SysOrg> dataList = IService.findList(wrapper);
-        List<SysOrgModel> orgModelList = WrapperUtil.transformInstance(dataList, SysOrgModel.class);
+        List<SysOrgModel> orgModelList = WrapperUtil.transformInstance(dataList, modelClazz);
 
 
         //配置
@@ -295,7 +295,7 @@ public class SysOrgRestController extends BaseRestController<SysOrg, SysOrgModel
     @Override
     public ResultVo<?> findTree(HttpServletRequest request) {
 
-        QueryBuilder<SysOrg> queryBuilder = new WebQueryBuilder<>(SysOrg.class,
+        QueryBuilder<SysOrg> queryBuilder = new WebQueryBuilder<>(entityClazz,
                 request.getParameterMap());
 
 
@@ -415,7 +415,7 @@ public class SysOrgRestController extends BaseRestController<SysOrg, SysOrgModel
     public void exportExcel(HttpServletRequest request, HttpServletResponse response) {
         // 当前方法
         Method method = ReflectUtil.getMethodByName(this.getClass(), "exportExcel");
-        QueryBuilder<SysOrg> queryBuilder = new WebQueryBuilder<>(SysOrg.class, request.getParameterMap());
+        QueryBuilder<SysOrg> queryBuilder = new WebQueryBuilder<>(entityClazz, request.getParameterMap());
         super.excelExport(SysOrgRestApi.TITLE, queryBuilder.build(), response, method);
     }
 

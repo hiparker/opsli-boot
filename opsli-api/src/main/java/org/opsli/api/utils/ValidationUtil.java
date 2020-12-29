@@ -15,6 +15,7 @@
  */
 package org.opsli.api.utils;
 
+import cn.hutool.core.convert.Convert;
 import cn.hutool.core.lang.Validator;
 import cn.hutool.core.util.ReflectUtil;
 import io.swagger.annotations.ApiModelProperty;
@@ -29,6 +30,7 @@ import org.opsli.common.enums.ValiArgsType;
 import org.opsli.common.exception.ServiceException;
 
 import java.lang.reflect.Field;
+import java.nio.charset.StandardCharsets;
 
 /**
  * @BelongsProject: opsli-boot
@@ -39,12 +41,6 @@ import java.lang.reflect.Field;
  */
 @Slf4j
 public final class ValidationUtil {
-
-    /** 编码格式 */
-    private static final String CHARSET_NAME = "utf-8";
-
-    /** NULL */
-    private static final String NULL = "null";
 
     /**
      * 验证对象
@@ -97,7 +93,7 @@ public final class ValidationUtil {
             fieldName = annotation.value();
         }
 
-        String value = String.valueOf(fieldValue);
+        String value = Convert.toStr(fieldValue);
 
         // 循环验证
         for (ValiArgsType type : types) {
@@ -114,7 +110,7 @@ public final class ValidationUtil {
                         break;
                     // 字母，数字和下划线
                     case IS_GENERAL:
-                        if(StringUtils.isEmpty(value) || NULL.equals(value)) {
+                        if(StringUtils.isEmpty(value)) {
                             break;
                         }
                         boolean general = Validator.isGeneral(value);
@@ -126,7 +122,7 @@ public final class ValidationUtil {
                         break;
                     // 数字
                     case IS_NUMBER:
-                        if(StringUtils.isEmpty(value) || NULL.equals(value)){
+                        if(StringUtils.isEmpty(value)){
                             break;
                         }
                         boolean number = Validator.isNumber(value);
@@ -138,7 +134,7 @@ public final class ValidationUtil {
                         break;
                     // 纯字母
                     case IS_LETTER:
-                        if(StringUtils.isEmpty(value) || NULL.equals(value)){
+                        if(StringUtils.isEmpty(value)){
                             break;
                         }
                         boolean letter = Validator.isLetter(value);
@@ -150,7 +146,7 @@ public final class ValidationUtil {
                         break;
                     // 大写
                     case IS_UPPER_CASE:
-                        if(StringUtils.isEmpty(value) || NULL.equals(value)){
+                        if(StringUtils.isEmpty(value)){
                             break;
                         }
                         boolean upperCase = Validator.isUpperCase(value);
@@ -162,7 +158,7 @@ public final class ValidationUtil {
                         break;
                     // 小写
                     case IS_LOWER_CASE:
-                        if(StringUtils.isEmpty(value) || NULL.equals(value)){
+                        if(StringUtils.isEmpty(value)){
                             break;
                         }
                         boolean lowerCase = Validator.isLowerCase(value);
@@ -174,7 +170,7 @@ public final class ValidationUtil {
                         break;
                     // IPV4
                     case IS_IPV4:
-                        if(StringUtils.isEmpty(value) || NULL.equals(value)){
+                        if(StringUtils.isEmpty(value)){
                             break;
                         }
                         boolean ipv4 = Validator.isIpv4(value);
@@ -186,7 +182,7 @@ public final class ValidationUtil {
                         break;
                     // 金额
                     case IS_MONEY:
-                        if(StringUtils.isEmpty(value) || NULL.equals(value)){
+                        if(StringUtils.isEmpty(value)){
                             break;
                         }
                         boolean money = Validator.isMoney(value);
@@ -198,7 +194,7 @@ public final class ValidationUtil {
                         break;
                     // 邮箱
                     case IS_EMAIL:
-                        if(StringUtils.isEmpty(value) || NULL.equals(value)){
+                        if(StringUtils.isEmpty(value)){
                             break;
                         }
                         boolean email = Validator.isEmail(value);
@@ -210,7 +206,7 @@ public final class ValidationUtil {
                         break;
                     // 手机号
                     case IS_MOBILE:
-                        if(StringUtils.isEmpty(value) || NULL.equals(value)){
+                        if(StringUtils.isEmpty(value)){
                             break;
                         }
                         boolean mobile = Validator.isMobile(value);
@@ -222,7 +218,7 @@ public final class ValidationUtil {
                         break;
                     // 18位身份证
                     case IS_CITIZENID:
-                        if(StringUtils.isEmpty(value) || NULL.equals(value)){
+                        if(StringUtils.isEmpty(value)){
                             break;
                         }
                         boolean citizenId = Validator.isCitizenId(value);
@@ -234,7 +230,7 @@ public final class ValidationUtil {
                         break;
                     // 邮编
                     case IS_ZIPCODE:
-                        if(StringUtils.isEmpty(value) || NULL.equals(value)){
+                        if(StringUtils.isEmpty(value)){
                             break;
                         }
                         boolean zipCode = Validator.isZipCode(value);
@@ -246,7 +242,7 @@ public final class ValidationUtil {
                         break;
                     // URL
                     case IS_URL:
-                        if(StringUtils.isEmpty(value) || NULL.equals(value)){
+                        if(StringUtils.isEmpty(value)){
                             break;
                         }
                         boolean url = Validator.isUrl(value);
@@ -258,7 +254,7 @@ public final class ValidationUtil {
                         break;
                     // 汉字
                     case IS_CHINESE:
-                        if(StringUtils.isEmpty(value) || NULL.equals(value)){
+                        if(StringUtils.isEmpty(value)){
                             break;
                         }
                         boolean chinese = Validator.isChinese(value);
@@ -270,7 +266,7 @@ public final class ValidationUtil {
                         break;
                     // 汉字，字母，数字和下划线
                     case IS_GENERAL_WITH_CHINESE:
-                        if(StringUtils.isEmpty(value) || NULL.equals(value)){
+                        if(StringUtils.isEmpty(value)){
                             break;
                         }
                         boolean generalWithChinese = Validator.isGeneralWithChinese(value);
@@ -282,7 +278,7 @@ public final class ValidationUtil {
                         break;
                     // MAC地址
                     case IS_MAC:
-                        if(StringUtils.isEmpty(value) || NULL.equals(value)){
+                        if(StringUtils.isEmpty(value)){
                             break;
                         }
                         boolean mac = Validator.isMac(value);
@@ -294,7 +290,7 @@ public final class ValidationUtil {
                         break;
                     // 中国车牌
                     case IS_PLATE_NUMBER:
-                        if(StringUtils.isEmpty(value) || NULL.equals(value)){
+                        if(StringUtils.isEmpty(value)){
                             break;
                         }
                         boolean plateNumber = Validator.isPlateNumber(value);
@@ -332,10 +328,10 @@ public final class ValidationUtil {
 
         // 循环验证
         try {
-            String value = String.valueOf(fieldValue);
-            if(value != null && !NULL.equals(value)){
+            String value = Convert.toStr(fieldValue);
+            if(StringUtils.isNotEmpty(value)){
                 // 转换为 数据库真实 长度
-                int strLength = value.getBytes(CHARSET_NAME).length;
+                int strLength = value.getBytes(StandardCharsets.UTF_8).length;
                 if(strLength > maxLength){
                     ValidationMsg msg = ValidationMsg.EXCEPTION_IS_MAX;
                     msg.setFieldName(fieldName);
@@ -365,10 +361,10 @@ public final class ValidationUtil {
 
         // 循环验证
         try {
-            String value = String.valueOf(fieldValue);
-            if(value != null && !NULL.equals(value)){
+            String value = Convert.toStr(fieldValue);
+            if(StringUtils.isNotEmpty(value)){
                 // 转换为 数据库真实 长度
-                int strLength = value.getBytes(CHARSET_NAME).length;
+                int strLength = value.getBytes(StandardCharsets.UTF_8).length;
                 if(strLength < minLength){
                     ValidationMsg msg = ValidationMsg.EXCEPTION_IS_MIN;
                     msg.setFieldName(fieldName);
@@ -394,5 +390,7 @@ public final class ValidationUtil {
 
 
     // ================
+
     private ValidationUtil(){}
+
 }

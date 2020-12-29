@@ -179,6 +179,8 @@ public class WebQueryBuilder<T extends BaseEntity> implements QueryBuilder<T>{
                     queryWrapper.orderByAsc(key);
                 }
                 break;
+            default:
+                break;
         }
     }
 

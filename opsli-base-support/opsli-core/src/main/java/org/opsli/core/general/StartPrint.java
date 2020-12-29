@@ -20,6 +20,7 @@ import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.lang.Console;
 import cn.hutool.core.thread.ThreadUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -44,7 +45,7 @@ public class StartPrint {
     /** 服务根地址 */
     private static String serverContextPath;
     /** 系统启动时间 */
-    private static Date starterDate;
+    private static String starterDate;
 
 
     /**
@@ -97,7 +98,7 @@ public class StartPrint {
      */
     public String getRunTime(){
         //Level.MINUTE表示精确到分
-        return DateUtil.formatBetween(starterDate, DateUtil.date(), BetweenFormatter.Level.MINUTE);
+        return DateUtil.formatBetween(DateUtil.parseDateTime(starterDate), DateUtil.date(), BetweenFormatter.Level.MINUTE);
     }
 
     // ======================
@@ -125,11 +126,23 @@ public class StartPrint {
     }
 
     @Value("${opsli.system-starter-time}")
-    public void setStarterDate(Date starterDate) {
-        if(starterDate == null){
-            StartPrint.starterDate = DateUtil.date();
+    public void setStarterDate(String starterDate) {
+        // 非空验证
+        if(StringUtils.isEmpty(starterDate)){
+            StartPrint.starterDate = DateUtil.date().toString();
             return;
         }
+
+        // 非法时间参数验证
+        Date tmp = null;
+        try {
+            tmp = DateUtil.parseDateTime(starterDate);
+        }catch (Exception ignored){}
+        if(tmp == null){
+            StartPrint.starterDate = DateUtil.date().toString();
+            return;
+        }
+
         StartPrint.starterDate = starterDate;
     }
 

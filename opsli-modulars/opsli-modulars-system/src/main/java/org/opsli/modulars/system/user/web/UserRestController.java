@@ -19,7 +19,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.FileUtil;
-import cn.hutool.core.util.RandomUtil;
+import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.ReflectUtil;
 import com.alibaba.excel.util.CollectionUtils;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -33,7 +33,6 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.opsli.api.base.result.ResultVo;
 import org.opsli.api.web.system.user.UserApi;
 import org.opsli.api.wrapper.system.menu.MenuModel;
-import org.opsli.api.wrapper.system.org.SysOrgModel;
 import org.opsli.api.wrapper.system.user.*;
 import org.opsli.common.annotation.ApiRestController;
 import org.opsli.common.annotation.EnableLog;
@@ -59,7 +58,6 @@ import org.opsli.modulars.system.user.entity.SysUserAndOrg;
 import org.opsli.modulars.system.user.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
@@ -210,7 +208,7 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
             String date = DateUtil.format(DateUtil.date(), "yyyyMMdd");
             String dateTime = DateUtil.format(DateUtil.date(), "yyyyMMddHHmmss");
             String packageName = basedir + staticPath+"/"+date;
-            String fileName = dateTime+"-"+ RandomUtil.simpleUUID() +".jpg";
+            String fileName = dateTime+"-"+ IdUtil.simpleUUID() +".jpg";
             File file = new File(packageName+"/"+fileName);
             MultipartFile multipartFile = files.get(0);
             FileUtils.copyInputStreamToFile(multipartFile.getInputStream(), file);
@@ -436,7 +434,7 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
     public void exportExcel(HttpServletRequest request, HttpServletResponse response) {
         // 当前方法
         Method method = ReflectUtil.getMethodByName(this.getClass(), "exportExcel");
-        QueryBuilder<SysUser> queryBuilder = new WebQueryBuilder<>(SysUser.class, request.getParameterMap());
+        QueryBuilder<SysUser> queryBuilder = new WebQueryBuilder<>(entityClazz, request.getParameterMap());
         super.excelExport(UserApi.TITLE, queryBuilder.build(), response, method);
     }
 

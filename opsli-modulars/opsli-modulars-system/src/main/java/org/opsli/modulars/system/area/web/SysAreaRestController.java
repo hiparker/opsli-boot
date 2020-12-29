@@ -251,7 +251,7 @@ public class SysAreaRestController extends BaseRestController<SysArea, SysAreaMo
     public void exportExcel(HttpServletRequest request, HttpServletResponse response) {
         // 当前方法
         Method method = ReflectUtil.getMethodByName(this.getClass(), "exportExcel");
-        QueryBuilder<SysArea> queryBuilder = new WebQueryBuilder<>(SysArea.class, request.getParameterMap());
+        QueryBuilder<SysArea> queryBuilder = new WebQueryBuilder<>(entityClazz, request.getParameterMap());
         super.excelExport(SysAreaRestApi.TITLE, queryBuilder.build(), response, method);
     }
 

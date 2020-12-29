@@ -147,7 +147,7 @@ public class TestRestController extends BaseRestController<TestEntity, TestModel
     public void exportExcel(HttpServletRequest request, HttpServletResponse response) {
         // 当前方法
         Method method = ReflectUtil.getMethodByName(this.getClass(), "exportExcel");
-        QueryBuilder<TestEntity> queryBuilder = new WebQueryBuilder<>(TestEntity.class, request.getParameterMap());
+        QueryBuilder<TestEntity> queryBuilder = new WebQueryBuilder<>(entityClazz, request.getParameterMap());
         super.excelExport(TestRestApi.TITLE, queryBuilder.build(), response, method);
     }
 
