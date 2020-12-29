@@ -7,4 +7,5 @@
 
 
 ${AnsiColor.BRIGHT_BLUE}:: opsli   :: Running Spring Boot ${spring-boot.version} ::
-:: https://www.opsli.com ::${AnsiColor.DEFAULT}
+:: https://www.opsli.com ::
+${AnsiColor.BRIGHT_GREEN}:: ${opsli.system-name} ::${AnsiColor.DEFAULT}
