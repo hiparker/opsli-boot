@@ -61,7 +61,7 @@ public class RedisPushSubReceiver extends BaseReceiver {
     private AutowireCapableBeanFactory beanFactory;
 
     @Autowired
-    DefaultListableBeanFactory defaultListableBeanFactory;
+    private DefaultListableBeanFactory defaultListableBeanFactory;
 
     public RedisPushSubReceiver() {
         super(CHANNEL);
@@ -75,7 +75,6 @@ public class RedisPushSubReceiver extends BaseReceiver {
                 , RedisPushSubHandler.class
         );
 
-        int count = 0;
         for (Class<?> aClass : clazzSet) {
             // 位运算 去除抽象类
             if((aClass.getModifiers() & Modifier.ABSTRACT) != 0){
@@ -91,7 +90,7 @@ public class RedisPushSubReceiver extends BaseReceiver {
                 HANDLER_MAP.put(handler.getType(),handler);
 
                 //将new出的对象放入Spring容器中
-                defaultListableBeanFactory.registerSingleton("redisPushSubHandler"+count, obj);
+                defaultListableBeanFactory.registerSingleton(aClass.getSimpleName(), obj);
 
                 //自动注入依赖
                 beanFactory.autowireBean(obj);
@@ -99,7 +98,6 @@ public class RedisPushSubReceiver extends BaseReceiver {
             } catch (Exception e){
                 log.error(CoreMsg.REDIS_EXCEPTION_PUSH_SUB.getMessage());
             }
-            count ++;
         }
     }
 
