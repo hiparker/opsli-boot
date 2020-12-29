@@ -285,8 +285,8 @@ public class SysAreaRestController extends BaseRestController<SysArea, SysAreaMo
     /**
      * 导入数据
      */
-    @ApiOperation(value = "获得json数据 查询数据", notes = "获得json数据 查询数据")
-    @GetMapping("/importJson")
+    //@ApiOperation(value = "获得json数据 查询数据", notes = "获得json数据 查询数据")
+    //@GetMapping("/importJson")
     public void importJson() {
         // https://github.com/small-dream/China_Province_City
         // JSON 放在 resources下更新当前数据库数据
