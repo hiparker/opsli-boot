@@ -18,7 +18,7 @@ public class ApplicationFailedEventListener implements ApplicationListener<Appli
 
     @Override
     public void onApplicationEvent(ApplicationFailedEvent event) {
-        StartPrint.INSTANCE.errorPrint();
+        StartPrint.getInstance().errorPrint();
     }
 
 }

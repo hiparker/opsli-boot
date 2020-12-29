@@ -194,7 +194,7 @@ public class MenuRestController extends BaseRestController<SysMenu, MenuModel, I
                         // 设置BASE_PATH
                         if(StringUtils.isNotEmpty(treeNode.getUrl())){
                             treeNode.setUrl(treeNode.getUrl().replace("${BASE_PATH}",
-                                    StartPrint.INSTANCE.getBasePath()
+                                    StartPrint.getInstance().getBasePath()
                             ));
                         }
                     }

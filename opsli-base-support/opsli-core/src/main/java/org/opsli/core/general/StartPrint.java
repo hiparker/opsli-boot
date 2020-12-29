@@ -15,6 +15,8 @@
  */
 package org.opsli.core.general;
 
+import cn.hutool.core.date.BetweenFormatter;
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.lang.Console;
 import cn.hutool.core.thread.ThreadUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -23,6 +25,7 @@ import org.springframework.stereotype.Component;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -34,23 +37,15 @@ import java.util.concurrent.TimeUnit;
 @Component
 public class StartPrint {
 
-    /** 实例对象 */
-    public static StartPrint INSTANCE = new StartPrint();
-
+    /** 系统名称 */
+    private static String systemName;
     /** 服务端口 */
     private static String serverPort;
     /** 服务根地址 */
     private static String serverContextPath;
+    /** 系统启动时间 */
+    private static Date starterDate;
 
-    @Value("${server.port:8080}")
-    public void setServerPort(String serverPort) {
-        StartPrint.serverPort = serverPort;
-    }
-
-    @Value("${server.servlet.context-path:/opsli-boot}")
-    public void setServerContextPath(String serverContextPath) {
-        StartPrint.serverContextPath = serverContextPath;
-    }
 
     /**
      * 成功
@@ -62,7 +57,7 @@ public class StartPrint {
         String basePath = getBasePath();
         String printStr =
                 "\n----------------------------------------------------------\n" +
-                "OPSLI 快速开发平台 框架启动成功! 相关URLs:\n" +
+                systemName + " 框架启动成功! 相关URLs:\n" +
                 "项目地址: \t\thttp://" + basePath + "/\n" +
                 "Doc文档: \t\thttp://" + basePath + "/doc.html\n" +
                 "----------------------------------------------------------\n";
@@ -70,7 +65,7 @@ public class StartPrint {
     }
 
     /**
-     * 势必啊
+     * 失败
      * 打印启动日志
      */
     public void errorPrint(){
@@ -78,7 +73,7 @@ public class StartPrint {
         ThreadUtil.sleep(1, TimeUnit.SECONDS);
         String printStr =
                 "\n----------------------------------------------------------\n" +
-                "OPSLI 快速开发平台 框架启动失败! 请检查相关配置！\n" +
+                systemName + " 框架启动失败! 请检查相关配置！\n" +
                 "----------------------------------------------------------\n";
         Console.log(printStr);
     }
@@ -86,7 +81,7 @@ public class StartPrint {
 
     /**
      * 获得服务根路径
-     * @return
+     * @return String
      */
     public String getBasePath(){
         String ip = "127.0.0.1";
@@ -95,4 +90,57 @@ public class StartPrint {
         }catch (UnknownHostException ignored){}
         return ip + ":" + serverPort + serverContextPath;
     }
+
+    /**
+     * 获得当前系统运行时间
+     * @return String
+     */
+    public String getRunTime(){
+        //Level.MINUTE表示精确到分
+        return DateUtil.formatBetween(starterDate, DateUtil.date(), BetweenFormatter.Level.MINUTE);
+    }
+
+    // ======================
+
+    /**
+     * 获得实例对象
+     * @return StartPrint
+     */
+    public static StartPrint getInstance(){
+        return StartPrintInner.INSTANCE;
+    }
+
+
+    /**
+     * 静态内部类
+     */
+    private static class StartPrintInner{
+        /** 实例对象 */
+        private static final StartPrint INSTANCE = new StartPrint();
+    }
+
+    @Value("${opsli.system-name:OPSLI快速开发平台}")
+    public void setSystemName(String systemName) {
+        StartPrint.systemName = systemName;
+    }
+
+    @Value("${opsli.system-starter-time}")
+    public void setStarterDate(Date starterDate) {
+        if(starterDate == null){
+            StartPrint.starterDate = DateUtil.date();
+            return;
+        }
+        StartPrint.starterDate = starterDate;
+    }
+
+    @Value("${server.port:8080}")
+    public void setServerPort(String serverPort) {
+        StartPrint.serverPort = serverPort;
+    }
+
+    @Value("${server.servlet.context-path:/opsli-boot}")
+    public void setServerContextPath(String serverContextPath) {
+        StartPrint.serverContextPath = serverContextPath;
+    }
+
 }

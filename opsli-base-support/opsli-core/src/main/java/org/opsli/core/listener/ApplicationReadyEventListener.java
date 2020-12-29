@@ -19,7 +19,7 @@ public class ApplicationReadyEventListener implements ApplicationListener<Applic
     @Override
     public void onApplicationEvent(ApplicationReadyEvent event) {
         event.getApplicationContext();
-        StartPrint.INSTANCE.successPrint();
+        StartPrint.getInstance().successPrint();
     }
 
 }
