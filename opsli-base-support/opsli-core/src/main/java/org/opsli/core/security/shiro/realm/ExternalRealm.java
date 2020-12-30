@@ -37,6 +37,7 @@ public class ExternalRealm extends AuthorizingRealm implements FlagRealm {
     @Override
     protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
         // TODO 待处理
+
         return null;
     }
 
