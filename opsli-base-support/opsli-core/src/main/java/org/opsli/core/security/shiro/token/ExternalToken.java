@@ -6,7 +6,7 @@ import org.apache.shiro.authc.AuthenticationToken;
 /**
  *  第三方对外接口 token
  *
- * @author 周鹏程
+ * @author Parker
 
  * @date 2017-05-20 13:22
  */

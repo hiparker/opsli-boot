@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 /**
  * 第三方对外接口 认证
  *
- * @author 周鹏程
+ * @author Parker
 
  * @date 2020-12-29 14:00
  */
