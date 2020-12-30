@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 
 
 /**
- * 对外接口 认证
+ * 第三方对外接口 认证
  *
  * @author 周鹏程
 

@@ -4,7 +4,7 @@ package org.opsli.core.security.shiro.token;
 import org.apache.shiro.authc.AuthenticationToken;
 
 /**
- *  第三方接口 token
+ *  第三方对外接口 token
  *
  * @author 周鹏程
 
