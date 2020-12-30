@@ -20,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.authc.IncorrectCredentialsException;
 import org.apache.shiro.authc.LockedAccountException;
+import org.apache.shiro.authc.pam.UnsupportedTokenException;
 import org.apache.shiro.authz.AuthorizationException;
 import org.opsli.api.base.result.ResultVo;
 import org.opsli.common.exception.*;
@@ -141,6 +142,19 @@ public class GlobalExceptionHandler {
         return ResultVo.error(TokenMsg.EXCEPTION_NOT_AUTH.getCode(),
                 TokenMsg.EXCEPTION_NOT_AUTH.getMessage()
                 );
+    }
+
+    /**
+     * 拦截 自定义 Shiro 认证异常
+     */
+    @ExceptionHandler(UnsupportedTokenException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ResponseBody
+    public ResultVo<?> unsupportedTokenException(UnsupportedTokenException e) {
+        // 找不到认证授权器
+        return ResultVo.error(TokenMsg.EXCEPTION_NOT_REALM.getCode(),
+                TokenMsg.EXCEPTION_NOT_REALM.getMessage()
+        );
     }
 
 

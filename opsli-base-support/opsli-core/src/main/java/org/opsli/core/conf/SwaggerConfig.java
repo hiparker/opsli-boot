@@ -21,6 +21,7 @@ import com.google.common.collect.Lists;
 import io.swagger.annotations.ApiOperation;
 import org.opsli.core.utils.UserTokenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -46,6 +47,10 @@ import java.util.List;
 @EnableKnife4j
 @Import(BeanValidatorPluginsConfiguration.class)
 public class SwaggerConfig {
+
+    /** 系统名称 */
+    @Value("${opsli.system-name:OPSLI 快速开发平台}")
+    private String systemName;
 
     private final TypeResolver typeResolver;
 
@@ -87,7 +92,7 @@ public class SwaggerConfig {
     private ApiInfo apiInfo() {
         return new ApiInfoBuilder()
                 // //大标题
-                .title("Opsli-Boot 后台服务API接口文档")
+                .title(systemName + " 服务API接口文档")
                 // 版本号
                 .version("1.0")
                 // 描述

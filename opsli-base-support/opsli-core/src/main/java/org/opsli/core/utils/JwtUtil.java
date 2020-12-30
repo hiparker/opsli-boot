@@ -8,6 +8,7 @@ import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import lombok.extern.slf4j.Slf4j;
 import org.opsli.common.constants.SignConstants;
+import org.opsli.common.constants.TokenTypeConstants;
 import org.opsli.common.exception.JwtException;
 import org.opsli.common.utils.Props;
 import org.opsli.core.msg.JwtMsg;
@@ -79,10 +80,12 @@ public final class JwtUtil {
 
     /**
      * 生成签名
+     * @param tokenType token类型
      * @param account 帐号
+     * @param userId 用户ID
      * @return java.lang.String 返回加密的Token
      */
-    public static String sign(String account, String userId) {
+    public static String sign(String tokenType, String account, String userId) {
         try {
             // 帐号加JWT私钥加密
             String secret = account + Base64ConvertUtil.decode(ENCRYPT_JWT_KEY);
@@ -91,6 +94,7 @@ public final class JwtUtil {
             Algorithm algorithm = Algorithm.HMAC256(secret);
             // 附带account帐号信息
             return JWT.create()
+                    .withClaim(SignConstants.TYPE, tokenType)
                     .withClaim(SignConstants.ACCOUNT, account)
                     .withClaim(SignConstants.USER_ID, userId)
                     .withClaim(SignConstants.TIMESTAMP, String.valueOf(System.currentTimeMillis()))
@@ -106,7 +110,7 @@ public final class JwtUtil {
 
 
     public static void main(String[] args) {
-        String aaaaaa = JwtUtil.sign("aaaaaa","123123");
+        String aaaaaa = JwtUtil.sign(TokenTypeConstants.TYPE_SYSTEM, "aaaaaa","123123");
 
         boolean verify = JwtUtil.verify(aaaaaa);
         System.out.println(aaaaaa);

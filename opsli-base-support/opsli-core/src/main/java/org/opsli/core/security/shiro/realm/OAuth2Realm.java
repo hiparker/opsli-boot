@@ -30,7 +30,7 @@ import java.util.List;
  */
 @Component
 @Slf4j
-public class OAuth2Realm extends AuthorizingRealm {
+public class OAuth2Realm extends AuthorizingRealm implements FlagRealm {
 
     /** 账号锁定状态 */
     public static final String LOCK_VAL = "1";

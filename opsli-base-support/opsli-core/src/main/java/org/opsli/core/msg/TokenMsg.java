@@ -52,7 +52,9 @@ public enum TokenMsg implements BaseMsg {
      * 其他
      */
     EXCEPTION_USER_NULL(12200, "用户为空"),
-    EXCEPTION_NOT_AUTH(12204, "无权访问该方法"),
+    EXCEPTION_NOT_AUTH(12201, "无权访问该方法"),
+    EXCEPTION_NOT_REALM(12202, "找不到认证授权器"),
+
     ;
 
     private final int code;

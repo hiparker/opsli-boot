@@ -11,7 +11,8 @@ import org.apache.shiro.authc.AuthenticationToken;
  * @date 2017-05-20 13:22
  */
 public class OAuth2Token implements AuthenticationToken {
-    private String token;
+
+    private final String token;
 
     public OAuth2Token(String token){
         this.token = token;
@@ -26,4 +27,5 @@ public class OAuth2Token implements AuthenticationToken {
     public Object getCredentials() {
         return token;
     }
+
 }

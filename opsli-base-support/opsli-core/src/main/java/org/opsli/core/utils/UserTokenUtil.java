@@ -29,6 +29,7 @@ import org.opsli.api.wrapper.system.user.UserModel;
 import org.opsli.common.constants.CacheConstants;
 import org.opsli.common.constants.SignConstants;
 import org.opsli.common.constants.TokenConstants;
+import org.opsli.common.constants.TokenTypeConstants;
 import org.opsli.common.exception.ServiceException;
 import org.opsli.common.exception.TokenException;
 import org.opsli.common.utils.Props;
@@ -116,7 +117,7 @@ public class UserTokenUtil {
             );
 
             // 生成 Token 包含 username userId timestamp
-            String signToken = JwtUtil.sign(user.getUsername(), user.getId());
+            String signToken = JwtUtil.sign(TokenTypeConstants.TYPE_SYSTEM, user.getUsername(), user.getId());
 
             // 生成MD5 16进制码 用于缩减存储
             String signTokenHex = new Md5Hash(signToken).toHex();
