@@ -50,7 +50,7 @@ import static org.opsli.common.constants.OrderConstants.TOKEN_AOP_SORT;
 public class TokenAop {
 
 
-    @Pointcut("execution(public * org.opsli.modulars*..*.*Controller*.*(..))")
+    @Pointcut("execution(public * org.opsli..*.*Controller*.*(..))")
     public void requestMapping() {
     }
 
