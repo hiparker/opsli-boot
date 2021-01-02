@@ -74,7 +74,14 @@ public class Page<T extends BaseEntity,E extends ApiWrapper> extends PageSeriali
      * 分页函数
      */
     public void pageHelperBegin(){
-        PageHelper.startPage(this.pageNo,this.pageSize);
+        this.pageHelperBegin(true);
+    }
+
+    /**
+     * 分页函数 不统计 count
+     */
+    public void pageHelperBegin(boolean countFlag){
+        PageHelper.startPage(this.pageNo,this.pageSize, countFlag);
     }
 
     /**

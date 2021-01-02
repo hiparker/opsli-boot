@@ -239,6 +239,21 @@ public abstract class CrudServiceImpl<M extends BaseMapper<T>, T extends BaseEnt
         return page;
     }
 
+    @Override
+    public Page<T,E> findPageNotCount(Page<T,E> page) {
+        page.pageHelperBegin(false);
+        try{
+            List<T> list = this.findList(page.getQueryWrapper());
+            PageInfo<T> pageInfo = new PageInfo<>(list);
+            List<E> es = transformTs2Ms(pageInfo.getList());
+            page.instance(pageInfo, es);
+        } finally {
+            page.pageHelperEnd();
+        }
+        return page;
+    }
+
+
     // ======================== 对象转化 ========================
 
     /**

@@ -192,6 +192,13 @@ public interface CrudServiceInterface<T extends BaseEntity,E extends ApiWrapper>
      */
     Page<T,E> findPage(Page<T,E> page);
 
+    /**
+     * 查询分页数据 不查询 count
+     *
+     * @return  Page<T>
+     */
+    Page<T,E> findPageNotCount(Page<T,E> page);
+
 
 }
 
