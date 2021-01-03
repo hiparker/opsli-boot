@@ -18,6 +18,7 @@ package org.opsli.core.creater.strategy.create;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.IoUtil;
 import com.jfinal.kit.Kv;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.opsli.api.ApiFlag;
@@ -50,6 +51,7 @@ import java.util.Map;
  * @CreateTime: 2020-11-20 17:30
  * @Description: Java代码构建器
  */
+@Slf4j
 public enum CodeBuilder {
 
     /** 实例对象 */
@@ -140,7 +142,9 @@ public enum CodeBuilder {
                 // 输出流文件
                 IoUtil.write(out,true, baos.toByteArray());
             }
-        }catch (Exception ignored){}
+        }catch (Exception e){
+            log.error(e.getMessage(), e);
+        }
     }
 
 
