@@ -166,7 +166,7 @@ public enum VueCodeBuilder {
 
         // 处理数据
         if(columnList.size() == 1){
-            if(columnList.get(0).getIzShowForm().equals(DictType.NO_YES_YES.getCode()) &&
+            if(DictType.NO_YES_YES.getCode().equals(columnList.get(0).getIzShowForm()) &&
                 StringUtils.isNotBlank(columnList.get(0).getShowType())
                 ){
                 List<CreaterTableColumnModel> formTmpList = new ArrayList<>();
@@ -176,7 +176,7 @@ public enum VueCodeBuilder {
         }else{
             for (int i = 0; i < columnList.size(); i+=2) {
                 List<CreaterTableColumnModel> formTmpList = new ArrayList<>();
-                if(columnList.get(i).getIzShowForm().equals(DictType.NO_YES_YES.getCode()) &&
+                if(DictType.NO_YES_YES.getCode().equals(columnList.get(i).getIzShowForm()) &&
                         StringUtils.isNotBlank(columnList.get(i).getShowType())
                 ){
                     formTmpList.add(columnList.get(i));
