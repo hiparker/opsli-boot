@@ -10,7 +10,7 @@ import org.opsli.common.constants.SignConstants;
 import org.opsli.common.constants.TokenTypeConstants;
 import org.opsli.core.msg.TokenMsg;
 import org.opsli.core.security.shiro.token.ExternalToken;
-import org.opsli.core.security.shiro.token.OAuth2Token;
+import org.opsli.core.security.shiro.token.JwtToken;
 import org.opsli.core.utils.JwtUtil;
 import org.opsli.core.utils.UserTokenUtil;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -46,13 +46,13 @@ public class CustomShiroFilter extends AuthenticatingFilter {
         // 分析token
         String claim = JwtUtil.getClaim(token, SignConstants.TYPE);
 
-        // 第三方登录
+        // 手机登录
         if(TokenTypeConstants.TYPE_EXTERNAL.equals(claim)){
             return new ExternalToken(token);
         }
         // .... 追加登录方式
 
-        return new OAuth2Token(token);
+        return new JwtToken(token);
     }
 
     @Override

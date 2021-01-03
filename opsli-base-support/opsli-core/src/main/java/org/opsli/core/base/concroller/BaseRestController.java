@@ -19,7 +19,6 @@ package org.opsli.core.base.concroller;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.date.TimeInterval;
-import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.core.util.TypeUtil;
 import com.alibaba.excel.support.ExcelTypeEnum;
@@ -42,7 +41,7 @@ import org.opsli.core.base.service.interfaces.CrudServiceInterface;
 import org.opsli.core.cache.local.CacheUtil;
 import org.opsli.core.msg.CoreMsg;
 import org.opsli.core.msg.TokenMsg;
-import org.opsli.core.security.shiro.realm.OAuth2Realm;
+import org.opsli.core.security.shiro.realm.JwtRealm;
 import org.opsli.core.utils.ExcelUtil;
 import org.opsli.core.utils.UserUtil;
 import org.opsli.plugins.excel.exception.ExcelPluginException;
@@ -284,16 +283,16 @@ public abstract class BaseRestController <T extends BaseEntity, E extends ApiWra
             }
 
             // Token 认证
-            OAuth2Realm.authToken();
+            JwtRealm.authToken();
 
             RequiresPermissionsCus permissionsCus = method.getAnnotation(RequiresPermissionsCus.class);
             if(permissionsCus != null){
                 // 方法权限认证
-                OAuth2Realm.authPerms(permissionsCus.value());
+                JwtRealm.authPerms(permissionsCus.value());
             }
         }catch (TokenException e){
             // 推送错误信息
-            OAuth2Realm.exceptionResponse(e.getMessage(), response);
+            JwtRealm.exceptionResponse(e.getMessage(), response);
             return;
         }
 
@@ -343,7 +342,7 @@ public abstract class BaseRestController <T extends BaseEntity, E extends ApiWra
         // 导出异常
         if(!resultVo.isSuccess()){
             // 无权访问该方法
-            OAuth2Realm.exceptionResponse(resultVo.getMsg(), response);
+            JwtRealm.exceptionResponse(resultVo.getMsg(), response);
         }
     }
 

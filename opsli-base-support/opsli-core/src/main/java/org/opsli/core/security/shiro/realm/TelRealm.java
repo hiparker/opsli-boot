@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 
 
 /**
- * 第三方对外接口 认证
+ * 手机登录 认证
  *
  * @author Parker
 
@@ -21,7 +21,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Slf4j
-public class ExternalRealm extends AuthorizingRealm implements FlagRealm {
+public class TelRealm extends AuthorizingRealm implements FlagRealm {
 
     /** 账号锁定状态 */
     public static final char LOCK_VAL = '1';

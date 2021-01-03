@@ -6,15 +6,15 @@ import org.apache.shiro.authc.AuthenticationToken;
 /**
  *  OAuth2 token
  *
- * @author 孙志强
+ * @author Parker
 
  * @date 2017-05-20 13:22
  */
-public class OAuth2Token implements AuthenticationToken {
+public class JwtToken implements AuthenticationToken {
 
     private final String token;
 
-    public OAuth2Token(String token){
+    public JwtToken(String token){
         this.token = token;
     }
 

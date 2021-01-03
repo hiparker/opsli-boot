@@ -12,7 +12,7 @@ import org.opsli.api.wrapper.system.user.UserModel;
 import org.opsli.common.api.TokenThreadLocal;
 import org.opsli.common.exception.TokenException;
 import org.opsli.core.msg.TokenMsg;
-import org.opsli.core.security.shiro.token.OAuth2Token;
+import org.opsli.core.security.shiro.token.JwtToken;
 import org.opsli.core.utils.UserTokenUtil;
 import org.opsli.core.utils.UserUtil;
 import org.springframework.stereotype.Component;
@@ -30,14 +30,14 @@ import java.util.List;
  */
 @Component
 @Slf4j
-public class OAuth2Realm extends AuthorizingRealm implements FlagRealm {
+public class JwtRealm extends AuthorizingRealm implements FlagRealm {
 
     /** 账号锁定状态 */
     public static final String LOCK_VAL = "1";
 
     @Override
     public boolean supports(AuthenticationToken token) {
-        return token instanceof OAuth2Token;
+        return token instanceof JwtToken;
     }
 
     /**
@@ -115,7 +115,7 @@ public class OAuth2Realm extends AuthorizingRealm implements FlagRealm {
         UserModel user = UserUtil.getUser(userId);
 
         // 3. 校验账户是否锁定
-        if(user == null || user.getLocked().equals(OAuth2Realm.LOCK_VAL)){
+        if(user == null || user.getLocked().equals(JwtRealm.LOCK_VAL)){
             // 账号已被锁定,请联系管理员
             // token失效，请重新登录
             throw new TokenException(

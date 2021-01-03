@@ -28,7 +28,7 @@ import org.opsli.common.exception.TokenException;
 import org.opsli.common.thread.refuse.AsyncProcessQueueReFuse;
 import org.opsli.common.utils.IPUtil;
 import org.opsli.core.msg.TokenMsg;
-import org.opsli.core.security.shiro.realm.OAuth2Realm;
+import org.opsli.core.security.shiro.realm.JwtRealm;
 import org.opsli.core.utils.CaptchaUtil;
 import org.opsli.core.utils.TenantUtil;
 import org.opsli.core.utils.UserTokenUtil;
@@ -102,7 +102,7 @@ public class LoginRestController {
         UserTokenUtil.clearLockAccount(form.getUsername());
 
         // 账号锁定
-        if(OAuth2Realm.LOCK_VAL.equals(user.getLocked())){
+        if(JwtRealm.LOCK_VAL.equals(user.getLocked())){
             throw new TokenException(TokenMsg.EXCEPTION_LOGIN_ACCOUNT_LOCKED);
         }
 
