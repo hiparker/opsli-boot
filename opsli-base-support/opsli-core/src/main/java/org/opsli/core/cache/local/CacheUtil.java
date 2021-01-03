@@ -975,8 +975,10 @@ public class CacheUtil {
             // 删除 EhCache 不论是什么 本地都按照热数据处理
             ehCachePlugin.delete(CacheConstants.HOT_DATA,key+":"+field);
             // 删除 Redis
-            redisPlugin.hDelete(key, field);
-            ret = true;
+            Long hDeleteLong = redisPlugin.hDelete(key, field);
+            if(hDeleteLong != null && hDeleteLong > 0){
+                ret = true;
+            }
         }catch (Exception e){
             log.error(e.getMessage(),e);
         }
@@ -1000,8 +1002,7 @@ public class CacheUtil {
             // 删除 EhCache 不论是什么 本地都按照热数据处理
             ehCachePlugin.delete(CacheConstants.HOT_DATA,key);
             // 删除 Redis
-            redisPlugin.del(key);
-            ret = true;
+            ret = redisPlugin.del(key);
         }catch (Exception e){
             log.error(e.getMessage(),e);
         }
@@ -1039,9 +1040,8 @@ public class CacheUtil {
     public static boolean delNilFlag(String key) {
         boolean ret = false;
         try {
-            // 存入Redis
-            redisPlugin.del(NIL_FLAG_PREFIX + key);
-            ret = true;
+            // 删除Redis
+            ret = redisPlugin.del(NIL_FLAG_PREFIX + key);
         }catch (Exception e){
             log.error(e.getMessage(),e);
         }
