@@ -23,6 +23,7 @@ import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.opsli.api.base.result.ResultVo;
 import org.opsli.api.wrapper.system.tenant.TenantModel;
 import org.opsli.api.wrapper.system.user.UserModel;
+import org.opsli.common.annotation.limiter.Limiter;
 import org.opsli.common.api.TokenThreadLocal;
 import org.opsli.common.exception.TokenException;
 import org.opsli.common.thread.refuse.AsyncProcessQueueReFuse;
@@ -69,6 +70,7 @@ public class LoginRestController {
     /**
      * 登录
      */
+    @Limiter
     @ApiOperation(value = "登录", notes = "登录")
     @PostMapping("/sys/login")
     public ResultVo<?> login(@RequestBody LoginForm form, HttpServletRequest request){
@@ -153,6 +155,7 @@ public class LoginRestController {
     /**
      * 获得当前登录失败次数
      */
+    @Limiter
     @ApiOperation(value = "获得当前登录失败次数", notes = "获得当前登录失败次数")
     @GetMapping("/sys/slipCount")
     public ResultVo<?> slipCount(String username){
@@ -168,6 +171,7 @@ public class LoginRestController {
     /**
      * 验证码
      */
+    @Limiter
     @ApiOperation(value = "验证码", notes = "验证码")
     @GetMapping("captcha.jpg")
     public void captcha(String uuid, HttpServletResponse response) throws IOException {
