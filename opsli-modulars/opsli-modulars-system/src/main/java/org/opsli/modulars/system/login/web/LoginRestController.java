@@ -25,9 +25,11 @@ import org.opsli.api.wrapper.system.tenant.TenantModel;
 import org.opsli.api.wrapper.system.user.UserModel;
 import org.opsli.common.annotation.limiter.Limiter;
 import org.opsli.common.api.TokenThreadLocal;
+import org.opsli.common.enums.AlertType;
 import org.opsli.common.exception.TokenException;
 import org.opsli.common.thread.refuse.AsyncProcessQueueReFuse;
 import org.opsli.common.utils.IPUtil;
+import org.opsli.common.utils.OutputStreamUtil;
 import org.opsli.core.msg.TokenMsg;
 import org.opsli.core.security.shiro.realm.JwtRealm;
 import org.opsli.core.utils.CaptchaUtil;
@@ -172,19 +174,23 @@ public class LoginRestController {
     /**
      * 验证码
      */
-    @Limiter
+    @Limiter(alertType = AlertType.ALERT)
     @ApiOperation(value = "验证码", notes = "验证码")
     @GetMapping("captcha.jpg")
     public void captcha(String uuid, HttpServletResponse response) throws IOException {
         response.setHeader("Cache-Control", "no-store, no-cache");
         response.setContentType("image/jpeg");
 
-        //获取图片验证码
-        BufferedImage image = CaptchaUtil.getCaptcha(uuid);
-        if(image != null){
-            ServletOutputStream out = response.getOutputStream();
-            ImageIO.write(image, "jpg", out);
-            IOUtils.closeQuietly(out);
+        try {
+            //获取图片验证码
+            BufferedImage image = CaptchaUtil.getCaptcha(uuid);
+            if(image != null){
+                ServletOutputStream out = response.getOutputStream();
+                ImageIO.write(image, "jpg", out);
+                IOUtils.closeQuietly(out);
+            }
+        }catch (RuntimeException e){
+            OutputStreamUtil.exceptionResponse(e.getMessage(), response);
         }
     }
 
