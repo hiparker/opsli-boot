@@ -140,6 +140,7 @@ public class LoginRestController {
     /**
      * 登出
      */
+    @Limiter
     @ApiOperation(value = "登出", notes = "登出")
     @PostMapping("/sys/logout")
     public ResultVo<?> logout() {
