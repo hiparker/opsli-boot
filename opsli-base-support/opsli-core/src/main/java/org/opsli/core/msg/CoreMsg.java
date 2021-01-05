@@ -66,6 +66,9 @@ public enum CoreMsg implements BaseMsg {
     /** 演示模式 */
     EXCEPTION_ENABLE_DEMO(10600,"演示模式不允许操作"),
 
+    /** 其他 */
+    OTHER_EXCEPTION_LIMITER(10700,"当前系统繁忙，请稍后再试"),
+
     ;
 
     private final int code;

@@ -155,22 +155,4 @@ public class JwtRealm extends AuthorizingRealm implements FlagRealm {
         }
     }
 
-
-    /**
-     * 返回异常值
-     */
-    public static void exceptionResponse(String msg, HttpServletResponse response){
-        try {
-            response.setCharacterEncoding("utf-8");
-            response.setContentType("text/html;charset=utf-8;");
-            PrintWriter writer = response.getWriter();
-            writer.write(
-                    "<script type=\"text/javascript\">alert('"+msg+"');</script>");
-            writer.flush();
-            // 关闭流
-            IoUtil.close(writer);
-        }catch (Exception e){
-            log.error(e.getMessage(), e);
-        }
-    }
 }

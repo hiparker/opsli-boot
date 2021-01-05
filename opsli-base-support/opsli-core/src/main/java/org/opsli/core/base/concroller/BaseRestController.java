@@ -35,6 +35,7 @@ import org.opsli.common.annotation.hotdata.EnableHotData;
 import org.opsli.common.exception.ServiceException;
 import org.opsli.common.exception.TokenException;
 import org.opsli.common.msg.CommonMsg;
+import org.opsli.common.utils.OutputStreamUtil;
 import org.opsli.common.utils.WrapperUtil;
 import org.opsli.core.base.entity.BaseEntity;
 import org.opsli.core.base.service.interfaces.CrudServiceInterface;
@@ -292,7 +293,7 @@ public abstract class BaseRestController <T extends BaseEntity, E extends ApiWra
             }
         }catch (TokenException e){
             // 推送错误信息
-            JwtRealm.exceptionResponse(e.getMessage(), response);
+            OutputStreamUtil.exceptionResponse(e.getMessage(), response);
             return;
         }
 
@@ -342,7 +343,7 @@ public abstract class BaseRestController <T extends BaseEntity, E extends ApiWra
         // 导出异常
         if(!resultVo.isSuccess()){
             // 无权访问该方法
-            JwtRealm.exceptionResponse(resultVo.getMsg(), response);
+            OutputStreamUtil.exceptionResponse(resultVo.getMsg(), response);
         }
     }
 

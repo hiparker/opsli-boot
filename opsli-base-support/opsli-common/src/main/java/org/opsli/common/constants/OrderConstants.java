@@ -25,6 +25,9 @@ public interface OrderConstants {
     /** Util 加载顺序 */
     int UTIL_ORDER = 140;
 
+    /** 限流器 */
+    int LIMITER_AOP_SORT = 149;
+
     /** token */
     int TOKEN_AOP_SORT = 150;
 
