@@ -55,7 +55,7 @@ public enum CoreMsg implements BaseMsg {
      * 缓存
      */
     CACHE_PUNCTURE_EXCEPTION(10405, "当期服务繁忙，客官请稍微再次尝试！"),
-    CACHE_DEL_EXCEPTION(10406, "删除失败，无法清除缓存，请稍后再试"),
+    CACHE_DEL_EXCEPTION(10406, "无法清除缓存，请稍后再试"),
 
 
     /**
