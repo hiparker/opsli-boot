@@ -15,7 +15,7 @@ import java.lang.annotation.*;
 @Documented
 public @interface Limiter {
 
-    /** 标题 */
+    /** QPS */
     double qps() default RateLimiterUtil.DEFAULT_QPS;
 
     /** 提醒方式 */
