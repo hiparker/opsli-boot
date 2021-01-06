@@ -138,29 +138,42 @@ public class TenantUtil {
      * @param tenantId
      * @return
      */
-    public static void refreshTenant(String tenantId){
+    public static boolean refreshTenant(String tenantId){
         if(StringUtils.isEmpty(tenantId)){
-            return;
+            return true;
         }
+
+        // 计数器
+        int count = 0;
 
         TenantModel tenantModel = CacheUtil.get(PREFIX_CODE + tenantId, TenantModel.class);
         boolean hasNilFlag = CacheUtil.hasNilFlag(PREFIX_CODE + tenantId);
 
         // 只要不为空 则执行刷新
         if (hasNilFlag){
+            count++;
             // 清除空拦截
-            CacheUtil.delNilFlag(PREFIX_CODE + tenantId);
+            boolean tmp = CacheUtil.delNilFlag(PREFIX_CODE + tenantId);
+            if(tmp){
+                count--;
+            }
         }
 
         if(tenantModel != null){
+            count++;
             // 先删除
-            CacheUtil.del(PREFIX_CODE + tenantId);
+            boolean tmp = CacheUtil.del(PREFIX_CODE + tenantId);
+            if(tmp){
+                count--;
+            }
 
             // 发送通知消息
             redisPlugin.sendMessage(
                     TenantMsgFactory.createTenantMsg(tenantModel)
             );
         }
+
+        return count == 0;
     }
 
 

@@ -20,6 +20,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
 import org.opsli.common.exception.ServiceException;
+import org.opsli.core.msg.CoreMsg;
 import org.opsli.core.utils.UserUtil;
 import org.opsli.modulars.system.SystemMsg;
 import org.opsli.modulars.system.user.entity.SysUserRoleRef;
@@ -82,15 +83,45 @@ public class UserRoleRefServiceImpl extends ServiceImpl<UserRoleRefMapper, SysUs
                 entity.setRoleId(roleId);
                 list.add(entity);
             }
-            super.saveBatch(list);
+            boolean ret = super.saveBatch(list);
+            if(ret){
+                // 清除缓存
+                this.clearCache(userId);
+            }
         }
 
-        // 清空当期用户缓存角色、权限、菜单
-        UserUtil.refreshUserRoles(userId);
-        UserUtil.refreshUserAllPerms(userId);
-        UserUtil.refreshUserMenus(userId);
-
         return true;
+    }
+
+
+    // ===========
+
+    /**
+     * 清除缓存
+     * @param userId
+     */
+    private void clearCache(String userId) {
+        int cacheCount = 3;
+        boolean tmp;
+        // 清空当期用户缓存角色、权限、菜单
+        tmp = UserUtil.refreshUserRoles(userId);
+        if(tmp){
+            cacheCount--;
+        }
+        tmp = UserUtil.refreshUserAllPerms(userId);
+        if(tmp){
+            cacheCount--;
+        }
+        tmp = UserUtil.refreshUserMenus(userId);
+        if(tmp){
+            cacheCount--;
+        }
+
+        // 判断删除状态
+        if(cacheCount != 0){
+            // 删除缓存失败
+            throw new ServiceException(CoreMsg.CACHE_DEL_EXCEPTION);
+        }
     }
 }
 

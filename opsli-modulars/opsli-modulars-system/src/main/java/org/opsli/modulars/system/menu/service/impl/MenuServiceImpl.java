@@ -15,6 +15,7 @@
  */
 package org.opsli.modulars.system.menu.service.impl;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.apache.commons.lang3.StringUtils;
@@ -22,8 +23,8 @@ import org.opsli.api.wrapper.system.menu.MenuModel;
 import org.opsli.common.constants.MyBatisConstants;
 import org.opsli.common.exception.ServiceException;
 import org.opsli.common.utils.HumpUtil;
-import org.opsli.common.utils.WrapperUtil;
 import org.opsli.core.base.service.impl.CrudServiceImpl;
+import org.opsli.core.msg.CoreMsg;
 import org.opsli.core.persistence.querybuilder.GenQueryBuilder;
 import org.opsli.core.persistence.querybuilder.QueryBuilder;
 import org.opsli.core.utils.MenuUtil;
@@ -107,18 +108,8 @@ public class MenuServiceImpl extends CrudServiceImpl<MenuMapper, SysMenu, MenuMo
 
         MenuModel menuModel = super.update(model);
         if(menuModel != null){
-            // 清空编号缓存
-            MenuUtil.refreshMenu(menuModel);
-            // 清空该菜单下 用户缓存
-            List<String> userIdList = iUserRoleRefService.getUserIdListByMenuId(menuModel.getId());
-            if(userIdList != null && !userIdList.isEmpty()){
-                for (String userId : userIdList) {
-                    // 清空当期用户缓存角色、权限、菜单
-                    UserUtil.refreshUserRoles(userId);
-                    UserUtil.refreshUserAllPerms(userId);
-                    UserUtil.refreshUserMenus(userId);
-                }
-            }
+            // 清除缓存
+            this.clearCache(model);
         }
 
         return menuModel;
@@ -134,18 +125,8 @@ public class MenuServiceImpl extends CrudServiceImpl<MenuMapper, SysMenu, MenuMo
 
 
         if(ret){
-            // 清空编号缓存
-            MenuUtil.refreshMenu(menuModel);
-            // 清空该菜单下 用户缓存
-            List<String> userIdList = iUserRoleRefService.getUserIdListByMenuId(id);
-            if(userIdList != null && !userIdList.isEmpty()){
-                for (String userId : userIdList) {
-                    // 清空当期用户缓存角色、权限、菜单
-                    UserUtil.refreshUserRoles(userId);
-                    UserUtil.refreshUserAllPerms(userId);
-                    UserUtil.refreshUserMenus(userId);
-                }
-            }
+            // 清除缓存
+            this.clearCache(menuModel);
         }
         return ret;
     }
@@ -156,7 +137,15 @@ public class MenuServiceImpl extends CrudServiceImpl<MenuMapper, SysMenu, MenuMo
         QueryBuilder<SysMenu> queryBuilder = new GenQueryBuilder<>();
         QueryWrapper<SysMenu> queryWrapper = queryBuilder.build();
         queryWrapper.in(MyBatisConstants.FIELD_ID, Convert.toList(String.class, ids));
-        List<SysMenu> menuList = super.findList(queryWrapper);
+        List<MenuModel> menuList = super.transformTs2Ms(
+                super.findList(queryWrapper)
+        );
+
+
+        // 清除缓存
+        for (MenuModel menuModel : menuList) {
+            this.clearCache(menuModel);
+        }
 
         boolean ret = super.deleteAll(ids);
         // 删除子数据
@@ -164,27 +153,6 @@ public class MenuServiceImpl extends CrudServiceImpl<MenuMapper, SysMenu, MenuMo
             this.deleteByParentId(id);
         }
 
-        if(ret){
-            // 清空编号缓存
-            for (SysMenu sysMenu : menuList) {
-                MenuUtil.refreshMenu(
-                        WrapperUtil.transformInstance(sysMenu, MenuModel.class)
-                );
-            }
-
-            for (String id : ids) {
-                // 清空该菜单下 用户缓存
-                List<String> userIdList = iUserRoleRefService.getUserIdListByMenuId(id);
-                if(userIdList != null && !userIdList.isEmpty()){
-                    for (String userId : userIdList) {
-                        // 清空当期用户缓存角色、权限、菜单
-                        UserUtil.refreshUserRoles(userId);
-                        UserUtil.refreshUserAllPerms(userId);
-                        UserUtil.refreshUserMenus(userId);
-                    }
-                }
-            }
-        }
         return ret;
     }
 
@@ -207,6 +175,49 @@ public class MenuServiceImpl extends CrudServiceImpl<MenuMapper, SysMenu, MenuMo
             ret = this.deleteByParentId(sysMenu.getId());
         }
         return ret;
+    }
+
+    // ============
+
+    /**
+     * 清除缓存
+     * @param menuModel
+     */
+    private void clearCache(MenuModel menuModel){
+        boolean cacheRet;
+        // 计数器
+        int cacheCount = 1;
+        // 先清除缓存
+        // 清空编号缓存
+        cacheRet = MenuUtil.refreshMenu(menuModel);
+        if(cacheRet){
+            cacheCount--;
+        }
+        // 清空该菜单下 用户缓存
+        List<String> userIdList = iUserRoleRefService.getUserIdListByMenuId(menuModel.getId());
+        if(CollUtil.isNotEmpty(userIdList)){
+            for (String userId : userIdList) {
+                cacheCount += 3;
+                // 清空当期用户缓存角色、权限、菜单
+                cacheRet = UserUtil.refreshUserRoles(userId);
+                if(cacheRet){
+                    cacheCount--;
+                }
+                cacheRet = UserUtil.refreshUserAllPerms(userId);
+                if(cacheRet){
+                    cacheCount--;
+                }
+                cacheRet = UserUtil.refreshUserMenus(userId);
+                if(cacheRet){
+                    cacheCount--;
+                }
+            }
+        }
+        // 判断删除状态
+        if(cacheCount != 0){
+            // 删除缓存失败
+            throw new ServiceException(CoreMsg.CACHE_DEL_EXCEPTION);
+        }
     }
 }
 

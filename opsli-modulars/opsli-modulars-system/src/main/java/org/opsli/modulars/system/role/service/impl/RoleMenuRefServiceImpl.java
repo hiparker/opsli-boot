@@ -15,11 +15,13 @@
  */
 package org.opsli.modulars.system.role.service.impl;
 
+import cn.hutool.core.collection.CollUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
 import org.opsli.common.exception.ServiceException;
+import org.opsli.core.msg.CoreMsg;
 import org.opsli.core.utils.UserUtil;
 import org.opsli.modulars.system.SystemMsg;
 import org.opsli.modulars.system.menu.entity.SysMenu;
@@ -75,21 +77,51 @@ public class RoleMenuRefServiceImpl extends ServiceImpl<RoleMenuRefMapper,SysRol
                 entity.setMenuId(permsId);
                 list.add(entity);
             }
-            super.saveBatch(list);
-        }
-
-        // 清空该角色下 用户缓存
-        List<String> userIdList = iUserRoleRefService.getUserIdListByRoleId(roleId);
-        if(userIdList != null && !userIdList.isEmpty()){
-            for (String userId : userIdList) {
-                // 清空当期用户缓存角色、权限、菜单
-                UserUtil.refreshUserRoles(userId);
-                UserUtil.refreshUserAllPerms(userId);
-                UserUtil.refreshUserMenus(userId);
+            boolean ret = super.saveBatch(list);
+            if(ret){
+                // 清除缓存
+                this.clearCache(roleId);
             }
+            return ret;
         }
 
         return true;
+    }
+
+    // =========================
+
+    /**
+     * 清除缓存
+     * @param roleId
+     */
+    private void clearCache(String roleId){
+        // 清空该角色下 用户缓存
+        List<String> userIdList = iUserRoleRefService.getUserIdListByRoleId(roleId);
+        if(CollUtil.isNotEmpty(userIdList)){
+            int cacheCount = 0;
+            for (String userId : userIdList) {
+                cacheCount += 3;
+                boolean tmp;
+                // 清空当期用户缓存角色、权限、菜单
+                tmp = UserUtil.refreshUserRoles(userId);
+                if(tmp){
+                    cacheCount--;
+                }
+                tmp = UserUtil.refreshUserAllPerms(userId);
+                if(tmp){
+                    cacheCount--;
+                }
+                tmp = UserUtil.refreshUserMenus(userId);
+                if(tmp){
+                    cacheCount--;
+                }
+            }
+            // 判断删除状态
+            if(cacheCount != 0){
+                // 删除缓存失败
+                throw new ServiceException(CoreMsg.CACHE_DEL_EXCEPTION);
+            }
+        }
     }
 }
 

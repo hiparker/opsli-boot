@@ -524,9 +524,9 @@ public class UserUtil {
      * @param user
      * @return
      */
-    public static void refreshUser(UserModel user){
+    public static boolean refreshUser(UserModel user){
         if(user == null || StringUtils.isEmpty(user.getId())){
-            return;
+            return true;
         }
 
         UserModel userModelById = CacheUtil.get(PREFIX_ID + user.getId(), UserModel.class);
@@ -536,27 +536,52 @@ public class UserUtil {
         boolean hasNilFlagById = CacheUtil.hasNilFlag(PREFIX_ID + user.getId());
         boolean hasNilFlagByName = CacheUtil.hasNilFlag(PREFIX_USERNAME + user.getUsername());
 
-        // 只要有一个不为空 则执行刷新
-        if (hasNilFlagById || hasNilFlagByName){
+        // 计数器
+        int count = 0;
+
+        if (hasNilFlagById){
+            count++;
             // 清除空拦截
-            CacheUtil.delNilFlag(PREFIX_ID + user.getId());
-            CacheUtil.delNilFlag(PREFIX_USERNAME + user.getUsername());
+            boolean tmp = CacheUtil.delNilFlag(PREFIX_ID + user.getId());
+            if(tmp){
+                count--;
+            }
+        }
+
+        if (hasNilFlagByName){
+            count++;
+            // 清除空拦截
+            boolean tmp = CacheUtil.delNilFlag(PREFIX_USERNAME + user.getUsername());
+            if(tmp){
+                count--;
+            }
         }
 
         // 只要有一个不为空 则执行刷新
-        if (userModelById != null || userModelByUsername != null){
+        if (userModelById != null){
+            count++;
             // 先删除
-            CacheUtil.del(PREFIX_ID + user.getId());
-            CacheUtil.del(PREFIX_USERNAME + user.getUsername());
-            // 清除空拦截
-            CacheUtil.delNilFlag(PREFIX_ID + user.getId());
-            CacheUtil.delNilFlag(PREFIX_USERNAME + user.getUsername());
-
-            // 发送通知消息
-            redisPlugin.sendMessage(
-                    UserMsgFactory.createUserMsg(user)
-            );
+            boolean tmp = CacheUtil.del(PREFIX_ID + user.getId());
+            if(tmp){
+                count--;
+            }
         }
+
+        if (userModelByUsername != null){
+            count++;
+            // 先删除
+            boolean tmp = CacheUtil.del(PREFIX_USERNAME + user.getUsername());
+            if(tmp){
+                count--;
+            }
+        }
+
+        // 发送通知消息
+        redisPlugin.sendMessage(
+                UserMsgFactory.createUserMsg(user)
+        );
+
+        return count == 0;
     }
 
 
@@ -565,30 +590,38 @@ public class UserUtil {
      * @param userId
      * @return
      */
-    public static void refreshUserRoles(String userId){
-        try {
-            Object obj = CacheUtil.get(PREFIX_ID_ROLES + userId);
-            boolean hasNilFlag = CacheUtil.hasNilFlag(PREFIX_ID_ROLES + userId);
+    public static boolean refreshUserRoles(String userId){
+        Object obj = CacheUtil.get(PREFIX_ID_ROLES + userId);
+        boolean hasNilFlag = CacheUtil.hasNilFlag(PREFIX_ID_ROLES + userId);
 
-            // 只要不为空 则执行刷新
-            if (hasNilFlag){
-                // 清除空拦截
-                CacheUtil.delNilFlag(PREFIX_ID_ROLES + userId);
+        // 计数器
+        int count = 0;
+
+        // 只要不为空 则执行刷新
+        if (hasNilFlag){
+            count++;
+            // 清除空拦截
+            boolean tmp = CacheUtil.delNilFlag(PREFIX_ID_ROLES + userId);
+            if(tmp){
+                count--;
             }
-
-            if(obj != null){
-                // 先删除
-                CacheUtil.del(PREFIX_ID_ROLES + userId);
-
-                // 发送通知消息
-                redisPlugin.sendMessage(
-                        UserMsgFactory.createUserRolesMsg(userId, null)
-                );
-            }
-
-        }catch (Exception e){
-            log.error(e.getMessage(), e);
         }
+
+        if(obj != null){
+            count++;
+            // 先删除
+            boolean tmp = CacheUtil.del(PREFIX_ID_ROLES + userId);
+            if(tmp){
+                count--;
+            }
+        }
+
+        // 发送通知消息
+        redisPlugin.sendMessage(
+                UserMsgFactory.createUserRolesMsg(userId, null)
+        );
+
+        return count == 0;
     }
 
     /**
@@ -596,29 +629,38 @@ public class UserUtil {
      * @param userId
      * @return
      */
-    public static void refreshUserAllPerms(String userId){
-        try {
-            Object obj = CacheUtil.get(PREFIX_ID_PERMISSIONS + userId);
-            boolean hasNilFlag = CacheUtil.hasNilFlag(PREFIX_ID_PERMISSIONS + userId);
+    public static boolean refreshUserAllPerms(String userId){
+        Object obj = CacheUtil.get(PREFIX_ID_PERMISSIONS + userId);
+        boolean hasNilFlag = CacheUtil.hasNilFlag(PREFIX_ID_PERMISSIONS + userId);
 
-            // 只要不为空 则执行刷新
-            if (hasNilFlag){
-                // 清除空拦截
-                CacheUtil.delNilFlag(PREFIX_ID_PERMISSIONS + userId);
+        // 计数器
+        int count = 0;
+
+        // 只要不为空 则执行刷新
+        if (hasNilFlag){
+            count++;
+            // 清除空拦截
+            boolean tmp = CacheUtil.delNilFlag(PREFIX_ID_PERMISSIONS + userId);
+            if(tmp){
+                count--;
             }
-
-            if(obj != null){
-                // 先删除
-                CacheUtil.del(PREFIX_ID_PERMISSIONS + userId);
-
-                // 发送通知消息
-                redisPlugin.sendMessage(
-                        UserMsgFactory.createUserPermsMsg(userId, null)
-                );
-            }
-        }catch (Exception e){
-            log.error(e.getMessage(), e);
         }
+
+        if(obj != null){
+            count++;
+            // 先删除
+            boolean tmp = CacheUtil.del(PREFIX_ID_PERMISSIONS + userId);
+            if(tmp){
+                count--;
+            }
+        }
+
+        // 发送通知消息
+        redisPlugin.sendMessage(
+                UserMsgFactory.createUserPermsMsg(userId, null)
+        );
+
+        return count == 0;
     }
 
     /**
@@ -626,30 +668,38 @@ public class UserUtil {
      * @param userId
      * @return
      */
-    public static void refreshUserMenus(String userId){
-        try {
-            Object obj = CacheUtil.get(PREFIX_ID_MENUS + userId);
-            boolean hasNilFlag = CacheUtil.hasNilFlag(PREFIX_ID_MENUS + userId);
+    public static boolean refreshUserMenus(String userId){
+        Object obj = CacheUtil.get(PREFIX_ID_MENUS + userId);
+        boolean hasNilFlag = CacheUtil.hasNilFlag(PREFIX_ID_MENUS + userId);
 
-            // 只要不为空 则执行刷新
-            if (hasNilFlag){
-                // 清除空拦截
-                CacheUtil.delNilFlag(PREFIX_ID_MENUS + userId);
+        // 计数器
+        int count = 0;
+
+        // 只要不为空 则执行刷新
+        if (hasNilFlag){
+            count++;
+            // 清除空拦截
+            boolean tmp = CacheUtil.delNilFlag(PREFIX_ID_MENUS + userId);
+            if(tmp){
+                count--;
             }
-
-            if(obj != null){
-                // 先删除
-                CacheUtil.del(PREFIX_ID_MENUS + userId);
-
-                // 发送通知消息
-                redisPlugin.sendMessage(
-                        UserMsgFactory.createUserMenusMsg(userId, null)
-                );
-            }
-
-        }catch (Exception e){
-            log.error(e.getMessage(), e);
         }
+
+        if(obj != null){
+            count++;
+            // 先删除
+            boolean tmp = CacheUtil.del(PREFIX_ID_MENUS + userId);
+            if(tmp){
+                count--;
+            }
+        }
+
+        // 发送通知消息
+        redisPlugin.sendMessage(
+                UserMsgFactory.createUserMenusMsg(userId, null)
+        );
+
+        return count == 0;
     }
 
     /**

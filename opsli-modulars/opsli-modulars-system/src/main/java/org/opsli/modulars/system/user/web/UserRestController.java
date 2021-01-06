@@ -385,11 +385,6 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
 
         IService.delete(id);
 
-        // 清除缓存信息
-        UserModel userModel = new UserModel();
-        userModel.setId(id);
-        UserUtil.refreshUser(userModel);
-
         return ResultVo.success("删除用户信息成功");
     }
 
@@ -409,13 +404,6 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
 
         String[] idArray = Convert.toStrArray(ids);
         IService.deleteAll(idArray);
-
-        for (String id : idArray) {
-            // 清除缓存信息
-            UserModel userModel = new UserModel();
-            userModel.setId(id);
-            UserUtil.refreshUser(userModel);
-        }
 
         return ResultVo.success("批量删除用户信息成功");
     }

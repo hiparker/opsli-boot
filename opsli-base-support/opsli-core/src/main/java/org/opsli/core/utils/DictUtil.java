@@ -15,6 +15,7 @@
  */
 package org.opsli.core.utils;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Lists;
@@ -396,13 +397,13 @@ public class DictUtil {
      * @return
      */
     public static void put(DictWrapper model){
+        // 清除缓存
+        DictUtil.del(model);
+
         CacheUtil.putEdenHash(DictConstants.CACHE_PREFIX_NAME + model.getTypeCode(),
                 model.getDictName(), model.getModel());
         CacheUtil.putEdenHash(DictConstants.CACHE_PREFIX_VALUE + model.getTypeCode(),
                 model.getDictValue(), model.getModel());
-        // 删除 空属性 拦截
-        CacheUtil.delNilFlag(DictConstants.CACHE_PREFIX_NAME + model.getTypeCode() + ":" + model.getDictName());
-        CacheUtil.delNilFlag(DictConstants.CACHE_PREFIX_VALUE + model.getTypeCode() + ":" + model.getTypeCode());
     }
 
     /**
@@ -410,12 +411,64 @@ public class DictUtil {
      * @param model 字典模型
      * @return
      */
-    public static void del(DictWrapper model){
-        CacheUtil.delEdenHash(DictConstants.CACHE_PREFIX_NAME + model.getTypeCode(), model.getDictName());
-        CacheUtil.delEdenHash(DictConstants.CACHE_PREFIX_VALUE + model.getTypeCode(), model.getDictValue());
-        // 删除 空属性 拦截
-        CacheUtil.delNilFlag(DictConstants.CACHE_PREFIX_NAME + model.getTypeCode() + ":" + model.getDictName());
-        CacheUtil.delNilFlag(DictConstants.CACHE_PREFIX_VALUE + model.getTypeCode() + ":" + model.getTypeCode());
+    public static boolean del(DictWrapper model){
+        if(model == null){
+            return true;
+        }
+
+        boolean hasNilFlagByName = CacheUtil.hasNilFlag(DictConstants.CACHE_PREFIX_NAME +
+                model.getTypeCode() + ":" + model.getDictName());
+        boolean hasNilFlagByValue = CacheUtil.hasNilFlag(DictConstants.CACHE_PREFIX_VALUE +
+                model.getTypeCode() + ":" + model.getDictValue());
+
+        DictWrapper dictByName = CacheUtil.get(DictConstants.CACHE_PREFIX_NAME + model.getTypeCode(),
+                DictWrapper.class);
+        DictWrapper dictByValue = CacheUtil.get(DictConstants.CACHE_PREFIX_VALUE + model.getTypeCode(),
+                DictWrapper.class);
+
+        // 计数器
+        int count = 0;
+        if (hasNilFlagByName){
+            count++;
+            // 清除空拦截
+            boolean tmp = CacheUtil.delNilFlag(DictConstants.CACHE_PREFIX_NAME +
+                    model.getTypeCode() + ":" + model.getDictName());
+            if(tmp){
+                count--;
+            }
+        }
+
+        if (hasNilFlagByValue){
+            count++;
+            // 清除空拦截
+            boolean tmp = CacheUtil.delNilFlag(DictConstants.CACHE_PREFIX_VALUE +
+                    model.getTypeCode() + ":" + model.getDictValue());
+            if(tmp){
+                count--;
+            }
+        }
+
+        if (dictByName != null){
+            count++;
+            // 清除空拦截
+            boolean tmp = CacheUtil.delEdenHash(DictConstants.CACHE_PREFIX_NAME +
+                    model.getTypeCode(), model.getDictName());
+            if(tmp){
+                count--;
+            }
+        }
+
+        if (dictByValue != null){
+            count++;
+            // 清除空拦截
+            boolean tmp = CacheUtil.delEdenHash(DictConstants.CACHE_PREFIX_VALUE +
+                    model.getTypeCode(), model.getDictValue());
+            if(tmp){
+                count--;
+            }
+        }
+
+        return count == 0;
     }
 
     /**
@@ -423,11 +476,21 @@ public class DictUtil {
      * @param typeCode 字典编号
      * @return
      */
-    public static void delAll(String typeCode){
+    public static boolean delAll(String typeCode){
         List<DictWrapper> dictWrapperList = DictUtil.getDictList(typeCode);
-        for (DictWrapper dictWrapperModel : dictWrapperList) {
-            DictUtil.del(dictWrapperModel);
+        if(CollUtil.isEmpty(dictWrapperList)){
+            return true;
         }
+
+        // 计数器
+        int count = dictWrapperList.size();
+        for (DictWrapper dictWrapperModel : dictWrapperList) {
+            boolean tmp = DictUtil.del(dictWrapperModel);
+            if(tmp){
+                count--;
+            }
+        }
+        return count == 0;
     }
 
 

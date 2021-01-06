@@ -17,15 +17,11 @@ package org.opsli.modulars.system.tenant.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.google.common.collect.Lists;
 import org.opsli.api.wrapper.system.tenant.TenantModel;
-import org.opsli.common.constants.MyBatisConstants;
 import org.opsli.common.exception.ServiceException;
-import org.opsli.common.utils.HumpUtil;
 import org.opsli.core.base.service.impl.CrudServiceImpl;
-import org.opsli.core.persistence.querybuilder.GenQueryBuilder;
-import org.opsli.core.persistence.querybuilder.QueryBuilder;
+import org.opsli.core.msg.CoreMsg;
 import org.opsli.core.utils.TenantUtil;
 import org.opsli.modulars.system.SystemMsg;
 import org.opsli.modulars.system.tenant.entity.SysTenant;
@@ -36,6 +32,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 
@@ -87,8 +84,8 @@ public class TenantServiceImpl extends CrudServiceImpl<TenantMapper, SysTenant, 
 
         TenantModel tenantModel = super.update(model);
         if(tenantModel != null){
-            // 刷新缓存
-            TenantUtil.refreshTenant(tenantModel.getId());
+            // 清除缓存
+            this.clearCache(Collections.singletonList(model.getId()));
         }
         return tenantModel;
     }
@@ -103,11 +100,17 @@ public class TenantServiceImpl extends CrudServiceImpl<TenantMapper, SysTenant, 
     @Transactional(rollbackFor = Exception.class)
     public boolean delete(String id) {
         TenantModel tenantModel = this.get(id);
-        boolean ret = super.delete(id);
-        if(ret){
-            // 刷新缓存
-            TenantUtil.refreshTenant(tenantModel.getId());
+        if(tenantModel == null){
+            return false;
         }
+
+        boolean ret = super.delete(id);
+
+        if(ret){
+            // 清除缓存
+            this.clearCache(Collections.singletonList(tenantModel.getId()));
+        }
+
         return ret;
     }
 
@@ -120,11 +123,17 @@ public class TenantServiceImpl extends CrudServiceImpl<TenantMapper, SysTenant, 
     @Transactional(rollbackFor = Exception.class)
     public boolean delete(TenantModel model) {
         TenantModel tenantModel = this.get(model);
-        boolean ret = super.delete(model);
-        if(ret){
-            // 刷新缓存
-            TenantUtil.refreshTenant(tenantModel.getId());
+        if(tenantModel == null){
+            return false;
         }
+
+        boolean ret = super.delete(model);
+
+        if(ret){
+            // 清除缓存
+            this.clearCache(Collections.singletonList(tenantModel.getId()));
+        }
+
         return ret;
     }
 
@@ -138,20 +147,10 @@ public class TenantServiceImpl extends CrudServiceImpl<TenantMapper, SysTenant, 
     public boolean deleteAll(String[] ids) {
         List<String> idList = Convert.toList(String.class, ids);
 
-        QueryBuilder<SysTenant> queryBuilder = new GenQueryBuilder<>();
-        QueryWrapper<SysTenant> queryWrapper = queryBuilder.build();
-        queryWrapper.in(HumpUtil.humpToUnderline(MyBatisConstants.FIELD_ID), idList);
-        List<SysTenant> list = this.findList(queryWrapper);
-
         boolean ret = super.deleteAll(ids);
-
         if(ret){
-            if(CollUtil.isNotEmpty(list)){
-                for (SysTenant sysTenant : list) {
-                    // 刷新缓存
-                    TenantUtil.refreshTenant(sysTenant.getId());
-                }
-            }
+            // 清除缓存
+            this.clearCache(idList);
         }
         return ret;
     }
@@ -170,25 +169,38 @@ public class TenantServiceImpl extends CrudServiceImpl<TenantMapper, SysTenant, 
             idList.add(model.getId());
         }
 
-        QueryBuilder<SysTenant> queryBuilder = new GenQueryBuilder<>();
-        QueryWrapper<SysTenant> queryWrapper = queryBuilder.build();
-        queryWrapper.in(HumpUtil.humpToUnderline(MyBatisConstants.FIELD_ID), idList);
-        List<SysTenant> list = this.findList(queryWrapper);
-
         boolean ret = super.deleteAll(models);
-
         if(ret){
-            if(CollUtil.isNotEmpty(list)){
-                for (SysTenant sysTenant : list) {
-                    // 刷新缓存
-                    TenantUtil.refreshTenant(sysTenant.getId());
-                }
-            }
+            // 清除缓存
+            this.clearCache(idList);
         }
-
         return ret;
     }
 
+    // ============
+
+    /**
+     * 清除缓存
+     * @param tenantIds
+     */
+    private void clearCache(List<String> tenantIds){
+        // 清空缓存
+        if(CollUtil.isNotEmpty(tenantIds)){
+            int cacheCount = 0;
+            for (String tenantId : tenantIds) {
+                cacheCount++;
+                boolean tmp = TenantUtil.refreshTenant(tenantId);
+                if(tmp){
+                    cacheCount--;
+                }
+            }
+            // 判断删除状态
+            if(cacheCount != 0){
+                // 删除缓存失败
+                throw new ServiceException(CoreMsg.CACHE_DEL_EXCEPTION);
+            }
+        }
+    }
 
 }
 

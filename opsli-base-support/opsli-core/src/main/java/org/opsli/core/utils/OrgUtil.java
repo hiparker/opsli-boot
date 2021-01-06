@@ -134,29 +134,41 @@ public class OrgUtil {
      * @param userId
      * @return
      */
-    public static void refreshMenu(String userId){
+    public static boolean refreshOrg(String userId){
         if(StringUtils.isEmpty(userId)){
-            return;
+            return true;
         }
+
+        // 计数器
+        int count = 0;
 
         UserOrgRefModel orgRefModel = CacheUtil.get(PREFIX_CODE + userId, UserOrgRefModel.class);
         boolean hasNilFlag = CacheUtil.hasNilFlag(PREFIX_CODE + userId);
 
         // 只要不为空 则执行刷新
         if (hasNilFlag){
+            count++;
             // 清除空拦截
-            CacheUtil.delNilFlag(PREFIX_CODE + userId);
+            boolean tmp = CacheUtil.delNilFlag(PREFIX_CODE + userId);
+            if(tmp){
+                count--;
+            }
         }
 
         if(orgRefModel != null){
+            count++;
             // 先删除
-            CacheUtil.del(PREFIX_CODE + userId);
+            boolean tmp = CacheUtil.del(PREFIX_CODE + userId);
+            if(tmp){
+                count--;
+            }
 
             // 发送通知消息
             redisPlugin.sendMessage(
                     OrgMsgFactory.createOrgMsg(orgRefModel)
             );
         }
+        return count == 0;
     }
 
 

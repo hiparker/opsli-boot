@@ -133,29 +133,42 @@ public class MenuUtil {
      * @param menu
      * @return
      */
-    public static void refreshMenu(MenuModel menu){
+    public static boolean refreshMenu(MenuModel menu){
         if(menu == null || StringUtils.isEmpty(menu.getMenuCode())){
-            return;
+            return true;
         }
+
+        // 计数器
+        int count = 0;
 
         MenuModel menuModel = CacheUtil.get(PREFIX_CODE + menu.getMenuCode(), MenuModel.class);
         boolean hasNilFlag = CacheUtil.hasNilFlag(PREFIX_CODE + menu.getMenuCode());
 
         // 只要不为空 则执行刷新
         if (hasNilFlag){
+            count++;
             // 清除空拦截
-            CacheUtil.delNilFlag(PREFIX_CODE + menu.getMenuCode());
+            boolean tmp = CacheUtil.delNilFlag(PREFIX_CODE + menu.getMenuCode());
+            if(tmp){
+                count--;
+            }
         }
 
         if(menuModel != null){
+            count++;
             // 先删除
-            CacheUtil.del(PREFIX_CODE + menu.getMenuCode());
+            boolean tmp = CacheUtil.del(PREFIX_CODE + menu.getMenuCode());
+            if(tmp){
+                count--;
+            }
 
             // 发送通知消息
             redisPlugin.sendMessage(
                     MenuMsgFactory.createMenuMsg(menu)
             );
         }
+
+        return count == 0;
     }
 
 
