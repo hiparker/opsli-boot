@@ -28,7 +28,8 @@ public final class OutputStreamUtil {
             throws ServiceException {
         try {
             fileName = new String(fileName.getBytes(), StandardCharsets.ISO_8859_1);
-            response.addHeader("Content-Disposition", "attachment; filename=" + fileName);
+            response.setHeader("Content-Disposition", "attachment; filename=" + fileName);
+            response.setHeader("Cache-Control", "no-store, no-cache");
             return response.getOutputStream();
         } catch (IOException e) {
             // 创建文件失败

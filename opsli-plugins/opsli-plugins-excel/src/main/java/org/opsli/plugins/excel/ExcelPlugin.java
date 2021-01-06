@@ -160,7 +160,8 @@ public class ExcelPlugin {
         String filePath = fileName + excelTypeEnum.getValue();
         try {
             fileName = new String(filePath.getBytes(), StandardCharsets.ISO_8859_1);
-            response.addHeader("Content-Disposition", "attachment; filename=" + fileName);
+            response.setHeader("Content-Disposition", "attachment; filename=" + fileName);
+            response.setHeader("Cache-Control", "no-store, no-cache");
             return response.getOutputStream();
         } catch (IOException e) {
             // 创建文件失败

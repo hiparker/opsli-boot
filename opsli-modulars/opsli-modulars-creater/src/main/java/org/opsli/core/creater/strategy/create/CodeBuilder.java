@@ -149,7 +149,8 @@ public enum CodeBuilder {
         //创建本地文件
         try {
             String fileName = FILE_NAME +"-"+ dataStr+".zip";
-            response.addHeader("Content-Disposition", "attachment;filename=" + fileName);
+            response.setHeader("Content-Disposition", "attachment; filename=" + fileName);
+            response.setHeader("Cache-Control", "no-store, no-cache");
             return response.getOutputStream();
         } catch (IOException ignored) {}
         return null;
