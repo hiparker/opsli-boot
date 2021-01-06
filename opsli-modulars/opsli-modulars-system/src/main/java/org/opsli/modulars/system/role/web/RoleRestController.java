@@ -129,7 +129,7 @@ public class RoleRestController extends BaseRestController<SysRole, RoleModel, I
         if(model != null){
             RoleModel roleModel = IService.get(model.getId());
             // 内置数据 只有超级管理员可以修改
-            if(LOCK_DATA.equals(roleModel.getIzLock()) ){
+            if(roleModel != null && LOCK_DATA.equals(roleModel.getIzLock()) ){
                 UserModel user = UserUtil.getUser();
 
                 if(!UserUtil.SUPER_ADMIN.equals(user.getUsername())){
@@ -159,7 +159,7 @@ public class RoleRestController extends BaseRestController<SysRole, RoleModel, I
 
         RoleModel roleModel = IService.get(id);
         // 内置数据 只有超级管理员可以修改
-        if(LOCK_DATA.equals(roleModel.getIzLock()) ){
+        if(roleModel != null && LOCK_DATA.equals(roleModel.getIzLock()) ){
             UserModel user = UserUtil.getUser();
             if(!UserUtil.SUPER_ADMIN.equals(user.getUsername())){
                 throw new ServiceException(SystemMsg.EXCEPTION_LOCK_DATA);
@@ -195,7 +195,7 @@ public class RoleRestController extends BaseRestController<SysRole, RoleModel, I
             List<SysRole> roleList = IService.findList(wrapper);
             for (SysRole sysRole : roleList) {
                 // 内置数据 只有超级管理员可以修改
-                if(LOCK_DATA.equals(sysRole.getIzLock()) ){
+                if(sysRole != null && LOCK_DATA.equals(sysRole.getIzLock()) ){
                     UserModel user = UserUtil.getUser();
                     if(!UserUtil.SUPER_ADMIN.equals(user.getUsername())){
                         throw new ServiceException(SystemMsg.EXCEPTION_LOCK_DATA);

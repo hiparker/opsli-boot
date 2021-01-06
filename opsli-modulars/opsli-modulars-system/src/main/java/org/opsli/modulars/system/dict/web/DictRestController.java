@@ -128,7 +128,7 @@ public class DictRestController extends BaseRestController<SysDict, DictModel, I
         if(model != null){
             DictModel dictModel = IService.get(model.getId());
             // 内置数据 只有超级管理员可以修改
-            if(LOCK_DATA.equals(dictModel.getIzLock()) ){
+            if(dictModel != null && LOCK_DATA.equals(dictModel.getIzLock()) ){
                 UserModel user = UserUtil.getUser();
 
                 if(!UserUtil.SUPER_ADMIN.equals(user.getUsername())){
@@ -156,7 +156,7 @@ public class DictRestController extends BaseRestController<SysDict, DictModel, I
 
         DictModel dictModel = IService.get(id);
         // 内置数据 只有超级管理员可以修改
-        if(LOCK_DATA.equals(dictModel.getIzLock()) ){
+        if(dictModel != null && LOCK_DATA.equals(dictModel.getIzLock()) ){
             UserModel user = UserUtil.getUser();
 
             if(!UserUtil.SUPER_ADMIN.equals(user.getUsername())){
@@ -189,7 +189,7 @@ public class DictRestController extends BaseRestController<SysDict, DictModel, I
             List<SysDict> dictList = IService.findList(wrapper);
             for (SysDict sysDict : dictList) {
                 // 内置数据 只有超级管理员可以修改
-                if(LOCK_DATA.equals(sysDict.getIzLock()) ){
+                if(sysDict != null && LOCK_DATA.equals(sysDict.getIzLock()) ){
                     UserModel user = UserUtil.getUser();
                     if(!UserUtil.SUPER_ADMIN.equals(user.getUsername())){
                         throw new ServiceException(SystemMsg.EXCEPTION_LOCK_DATA);

@@ -114,7 +114,7 @@ public class RoleMenuRefRestController implements RoleMenuRefApi {
 
         RoleModel roleModel = iRoleService.get(model.getRoleId());
         // 内置数据 只有超级管理员可以修改
-        if(LOCK_DATA.equals(roleModel.getIzLock()) ){
+        if(roleModel != null && LOCK_DATA.equals(roleModel.getIzLock()) ){
             UserModel user = UserUtil.getUser();
             if(!UserUtil.SUPER_ADMIN.equals(user.getUsername())){
                 throw new ServiceException(SystemMsg.EXCEPTION_LOCK_DATA);
