@@ -72,8 +72,8 @@ spring:
     prefix: opsli
   # 一级缓存 ---- EhCache 配置
   cache:
-    # 开启 是否启用本地缓存
-    enable: true
+    # 是否启用本地缓存 (默认不启用， 如果业务对于缓存依赖较高可启用本地缓存作为一级缓存)
+    enable: false
     # 加载配置文件
     jcache:
       config: classpath:config/ehcache-opsli.xml
