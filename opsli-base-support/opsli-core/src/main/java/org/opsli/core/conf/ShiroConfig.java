@@ -130,6 +130,8 @@ public class ShiroConfig {
     public DefaultWebSecurityManager securityManager(SessionManager sessionManager) {
         DefaultWebSecurityManager securityManager = new DefaultWebSecurityManager();
         securityManager.setSessionManager(sessionManager);
+        // 设置验证器为自定义验证器
+        securityManager.setAuthenticator(modularRealmAuthenticator());
 
         List<Realm> realms = Lists.newArrayList();
         // 拿到state包下 实现了 FlagRealm 接口的,所有子类

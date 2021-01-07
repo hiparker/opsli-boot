@@ -43,11 +43,14 @@ public class CustomShiroFilter extends AuthenticatingFilter {
             return null;
         }
 
+        String tokenType = "";
         // 分析token
-        String claim = JwtUtil.getClaim(token, SignConstants.TYPE);
+        try {
+            tokenType = JwtUtil.getClaim(token, SignConstants.TYPE);
+        }catch (Exception ignored){}
 
         // 手机登录
-        if(TokenTypeConstants.TYPE_EXTERNAL.equals(claim)){
+        if(TokenTypeConstants.TYPE_EXTERNAL.equals(tokenType)){
             return new ExternalToken(token);
         }
         // .... 追加登录方式
@@ -100,7 +103,7 @@ public class CustomShiroFilter extends AuthenticatingFilter {
             //处理登录失败的异常
             Throwable throwable = e.getCause() == null ? e : e.getCause();
             ResultVo<Object> error = ResultVo.error(TokenMsg.EXCEPTION_TOKEN_LOSE_EFFICACY.getCode(),
-                    TokenMsg.EXCEPTION_TOKEN_LOSE_EFFICACY.getMessage());
+                    throwable.getMessage());
             httpResponse.getWriter().print(error.toJsonStr());
         } catch (IOException ignored) {}
         return false;
