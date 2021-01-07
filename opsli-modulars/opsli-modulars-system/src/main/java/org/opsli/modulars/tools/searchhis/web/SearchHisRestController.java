@@ -54,7 +54,7 @@ public class SearchHisRestController {
     }
 
     /**
-     * 获得搜索历史记录
+     * 测试存入搜索历史记录
      */
     @Limiter
     @SearchHis(keys = {"test"})
