@@ -102,20 +102,20 @@ public class WebQueryBuilder<T extends BaseEntity> implements QueryBuilder<T>{
             }
 
             // 键 和 操作
-            String[] key_handle = keys.split("_");
-            if(key_handle.length < 2){
+            String[] keyHandle = keys.split("_");
+            if(keyHandle.length < 2){
                 continue;
             }
             // 判断 字段是否合法
-            boolean hasField = this.validationField(key_handle);
+            boolean hasField = this.validationField(keyHandle);
             if(hasField){
                 // 验证操作是否合法
-                boolean hasHandle = this.validationHandle(key_handle);
+                boolean hasHandle = this.validationHandle(keyHandle);
                 if(hasHandle){
                     // 操作
-                    String handle = key_handle[1];
+                    String handle = keyHandle[1];
                     // 键
-                    String key = key_handle[0];
+                    String key = keyHandle[0];
                     // 处理值
                     String value = values[0];
                     // 赋值
@@ -186,28 +186,28 @@ public class WebQueryBuilder<T extends BaseEntity> implements QueryBuilder<T>{
 
     /**
      * 检测 字段是否合法
-     * @param key_handle
+     * @param keyHandle
      * @return
      */
-    private boolean validationField(String[] key_handle){
-        if(entityClazz == null || key_handle == null || StringUtils.isEmpty(key_handle[0])){
+    private boolean validationField(String[] keyHandle){
+        if(entityClazz == null || keyHandle == null || StringUtils.isEmpty(keyHandle[0])){
             return false;
         }
         // 判断当前传入参数 是否是Entity的字段
-        return ReflectUtil.hasField(entityClazz, key_handle[0]);
+        return ReflectUtil.hasField(entityClazz, keyHandle[0]);
     }
 
 
     /**
      * 检测 操作是否合法
-     * @param key_handle
+     * @param keyHandle
      * @return
      */
-    private boolean validationHandle(String[] key_handle){
-        if(key_handle == null || StringUtils.isEmpty(key_handle[1])){
+    private boolean validationHandle(String[] keyHandle){
+        if(keyHandle == null || StringUtils.isEmpty(keyHandle[1])){
             return false;
         }
-        String handle = key_handle[1];
+        String handle = keyHandle[1];
         if (EQ.equals(handle)) {
             return true;
         } else if (LIKE.equals(handle)) {
@@ -216,8 +216,7 @@ public class WebQueryBuilder<T extends BaseEntity> implements QueryBuilder<T>{
             return true;
         } else if (END.equals(handle)) {
             return true;
-        } else {
-            return ORDER.equals(handle);
         }
+        return ORDER.equals(handle);
     }
 }
