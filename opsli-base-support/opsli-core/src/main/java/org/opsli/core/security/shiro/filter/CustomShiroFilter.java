@@ -99,7 +99,8 @@ public class CustomShiroFilter extends AuthenticatingFilter {
         try {
             //处理登录失败的异常
             Throwable throwable = e.getCause() == null ? e : e.getCause();
-            ResultVo<Object> error = ResultVo.error(401, throwable.getMessage());
+            ResultVo<Object> error = ResultVo.error(TokenMsg.EXCEPTION_TOKEN_LOSE_EFFICACY.getCode(),
+                    TokenMsg.EXCEPTION_TOKEN_LOSE_EFFICACY.getMessage());
             httpResponse.getWriter().print(error.toJsonStr());
         } catch (IOException ignored) {}
         return false;
