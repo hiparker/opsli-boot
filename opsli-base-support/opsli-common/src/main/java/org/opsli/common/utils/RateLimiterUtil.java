@@ -95,7 +95,7 @@ public final class RateLimiterUtil {
      */
     public static boolean enter(String clientIpAddress, String resource, Double dfQps) {
         // 计时器
-        TimeInterval timer = DateUtil.timer();
+        long t1 = System.currentTimeMillis();
 
         Map<String, RateLimiterInner> rateLimiterInnerMap;
         try {
@@ -141,15 +141,11 @@ public final class RateLimiterUtil {
 
         //非阻塞
         if (!rateLimiter.tryAcquire(Duration.ofMillis(DEFAULT_WAIT))) {
-            // 花费毫秒数
-            long timerCount = timer.interval();
             //限速中，提示用户
-            log.error("限流器 - 访问频繁 耗时: "+ timerCount + "ms, IP地址: " + clientIpAddress + ", URI: " + resource);
+            log.error("限流器 - 访问频繁 耗时: "+ (System.currentTimeMillis() - t1) + "ms, IP地址: " + clientIpAddress + ", URI: " + resource);
             return false;
         } else {
             // 正常访问
-            // 花费毫秒数
-            long timerCount = timer.interval();
             return true;
         }
     }

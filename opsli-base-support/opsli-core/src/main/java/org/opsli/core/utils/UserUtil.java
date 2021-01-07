@@ -29,7 +29,6 @@ import org.opsli.common.api.TokenThreadLocal;
 import org.opsli.common.exception.TokenException;
 import org.opsli.common.utils.Props;
 import org.opsli.core.cache.local.CacheUtil;
-import org.opsli.core.cache.pushsub.msgs.MenuMsgFactory;
 import org.opsli.core.cache.pushsub.msgs.UserMsgFactory;
 import org.opsli.core.msg.TokenMsg;
 import org.opsli.plugins.redis.RedisLockPlugins;

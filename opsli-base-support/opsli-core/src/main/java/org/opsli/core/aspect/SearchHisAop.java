@@ -15,19 +15,15 @@
  */
 package org.opsli.core.aspect;
 
-
+import cn.hutool.core.convert.Convert;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
-import org.opsli.common.annotation.Limiter;
-import org.opsli.common.enums.AlertType;
-import org.opsli.common.exception.ServiceException;
-import org.opsli.common.utils.OutputStreamUtil;
-import org.opsli.common.utils.RateLimiterUtil;
-import org.opsli.core.msg.CoreMsg;
+import org.opsli.common.annotation.SearchHis;
+import org.opsli.core.utils.SearchHisUtil;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestAttributes;
@@ -35,24 +31,24 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Method;
 
-import static org.opsli.common.constants.OrderConstants.LIMITER_AOP_SORT;
+import static org.opsli.common.constants.OrderConstants.SEARCH_HIS_AOP_SORT;
+
 /**
- * 限流器
+ * 搜索历史 AOP
  *
  * @author 周鹏程
  * @date 2020-09-16
  */
 @Slf4j
-@Order(LIMITER_AOP_SORT)
+@Order(SEARCH_HIS_AOP_SORT)
 @Aspect
 @Component
-public class LimiterAop {
+public class SearchHisAop {
 
 
-    @Pointcut("@annotation(org.opsli.common.annotation.Limiter)")
+    @Pointcut("@annotation(org.opsli.common.annotation.SearchHis)")
     public void requestMapping() {
     }
 
@@ -69,30 +65,14 @@ public class LimiterAop {
             Method method = signature.getMethod();
             if(sra != null) {
                 HttpServletRequest request = sra.getRequest();
-                HttpServletResponse response = sra.getResponse();
-                Limiter limiter = method.getAnnotation(Limiter.class);
-                if(limiter != null){
-                    AlertType alertType = limiter.alertType();
-                    double qps = limiter.qps();
+                SearchHis searchHis = method.getAnnotation(SearchHis.class);
+                if(searchHis != null){
+                    String[] keys = searchHis.keys();
 
-                    // 限流
-                    boolean enterFlag = RateLimiterUtil.enter(request, qps);
-                    if(!enterFlag){
-                        // alert 弹出
-                        if(AlertType.ALERT == alertType){
-                            OutputStreamUtil.exceptionResponse(
-                                    CoreMsg.OTHER_EXCEPTION_LIMITER.getMessage(),
-                                    response
-                            );
-                        }else {
-                            // 异常返回
-                            throw new ServiceException(CoreMsg.OTHER_EXCEPTION_LIMITER);
-                        }
-                    }
+                    // 存入缓存
+                    SearchHisUtil.putSearchHis(request, Convert.toList(String.class, keys));
                 }
             }
-        }catch (ServiceException e){
-            throw e;
         }catch (Exception e){
             log.error(e.getMessage(),e);
         }

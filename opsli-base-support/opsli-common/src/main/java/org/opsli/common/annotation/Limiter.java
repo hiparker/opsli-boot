@@ -1,4 +1,4 @@
-package org.opsli.common.annotation.limiter;
+package org.opsli.common.annotation;
 
 
 import org.opsli.common.enums.AlertType;

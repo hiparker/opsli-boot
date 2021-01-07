@@ -37,6 +37,9 @@ public interface OrderConstants {
     /** 参数非法验证顺序 */
     int PARAM_VALIDATE_AOP_SORT = 185;
 
+    /** 搜索历史 */
+    int SEARCH_HIS_AOP_SORT = 186;
+
     /** SQL 切面执行顺序 */
     int SQL_ORDER = 190;
 

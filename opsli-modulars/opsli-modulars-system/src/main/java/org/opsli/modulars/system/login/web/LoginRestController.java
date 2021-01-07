@@ -23,7 +23,7 @@ import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.opsli.api.base.result.ResultVo;
 import org.opsli.api.wrapper.system.tenant.TenantModel;
 import org.opsli.api.wrapper.system.user.UserModel;
-import org.opsli.common.annotation.limiter.Limiter;
+import org.opsli.common.annotation.Limiter;
 import org.opsli.common.api.TokenThreadLocal;
 import org.opsli.common.enums.AlertType;
 import org.opsli.common.exception.TokenException;

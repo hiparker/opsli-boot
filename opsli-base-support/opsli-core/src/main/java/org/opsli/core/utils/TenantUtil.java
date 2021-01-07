@@ -20,13 +20,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.opsli.api.base.result.ResultVo;
 import org.opsli.api.web.system.tenant.TenantApi;
 import org.opsli.api.wrapper.system.tenant.TenantModel;
-import org.opsli.api.wrapper.system.user.UserOrgRefModel;
-import org.opsli.common.exception.TokenException;
 import org.opsli.core.cache.local.CacheUtil;
-import org.opsli.core.cache.pushsub.msgs.OrgMsgFactory;
 import org.opsli.core.cache.pushsub.msgs.TenantMsgFactory;
-import org.opsli.core.msg.TokenMsg;
-import org.opsli.core.persistence.querybuilder.GenQueryBuilder;
 import org.opsli.plugins.redis.RedisLockPlugins;
 import org.opsli.plugins.redis.RedisPlugin;
 import org.opsli.plugins.redis.lock.RedisLock;
@@ -35,8 +30,6 @@ import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
 
 import static org.opsli.common.constants.OrderConstants.UTIL_ORDER;
 

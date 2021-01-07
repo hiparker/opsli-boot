@@ -17,12 +17,10 @@ package org.opsli.core.utils;
 
 import com.google.code.kaptcha.Producer;
 import org.apache.commons.lang3.StringUtils;
-import org.opsli.api.web.system.dict.DictDetailApi;
 import org.opsli.common.constants.CacheConstants;
 import org.opsli.common.exception.TokenException;
 import org.opsli.common.utils.Props;
 import org.opsli.core.msg.TokenMsg;
-import org.opsli.plugins.redis.RedisLockPlugins;
 import org.opsli.plugins.redis.RedisPlugin;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
