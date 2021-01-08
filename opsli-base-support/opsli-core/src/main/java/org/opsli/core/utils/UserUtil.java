@@ -15,6 +15,7 @@
  */
 package org.opsli.core.utils;
 
+import cn.hutool.core.convert.Convert;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Lists;
@@ -247,12 +248,12 @@ public class UserUtil {
         try {
             Object obj = CacheUtil.get(PREFIX_ID_ROLES + userId);
             if(obj instanceof List){
-                List<String> list = (List<String>) obj;
+                List<String> list = Convert.toList(String.class, obj);
                 if (!list.isEmpty()) {
                     return list;
                 }
             }else {
-                JSONArray jsonArray = (JSONArray) obj;
+                JSONArray jsonArray = Convert.convert(JSONArray.class, obj);
                 if (jsonArray != null && !jsonArray.isEmpty()) {
                     return jsonArray.toJavaList(String.class);
                 }
@@ -286,12 +287,12 @@ public class UserUtil {
             try {
                 Object obj = CacheUtil.get(PREFIX_ID_ROLES + userId);
                 if(obj instanceof List){
-                    List<String> list = (List<String>) obj;
+                    List<String> list = Convert.toList(String.class, obj);
                     if (!list.isEmpty()) {
                         return list;
                     }
                 }else {
-                    JSONArray jsonArray = (JSONArray) obj;
+                    JSONArray jsonArray = Convert.convert(JSONArray.class, obj);
                     if (jsonArray != null && !jsonArray.isEmpty()) {
                         return jsonArray.toJavaList(String.class);
                     }
@@ -334,12 +335,12 @@ public class UserUtil {
         try {
             Object obj = CacheUtil.get(PREFIX_ID_PERMISSIONS + userId);
             if(obj instanceof List){
-                List<String> list = (List<String>) obj;
+                List<String> list = Convert.toList(String.class, obj);
                 if (!list.isEmpty()) {
                     return list;
                 }
             }else {
-                JSONArray jsonArray = (JSONArray) obj;
+                JSONArray jsonArray = Convert.convert(JSONArray.class, obj);
                 if (jsonArray != null && !jsonArray.isEmpty()) {
                     return jsonArray.toJavaList(String.class);
                 }
@@ -374,12 +375,12 @@ public class UserUtil {
             try {
                 Object obj = CacheUtil.get(PREFIX_ID_PERMISSIONS + userId);
                 if(obj instanceof List){
-                    List<String> list = (List<String>) obj;
+                    List<String> list = Convert.toList(String.class, obj);
                     if (!list.isEmpty()) {
                         return list;
                     }
                 }else {
-                    JSONArray jsonArray = (JSONArray) obj;
+                    JSONArray jsonArray = Convert.convert(JSONArray.class, obj);
                     if (jsonArray != null && !jsonArray.isEmpty()) {
                         return jsonArray.toJavaList(String.class);
                     }
@@ -421,7 +422,7 @@ public class UserUtil {
         try {
             Object obj = CacheUtil.get(PREFIX_ID_MENUS + userId);
             if(obj instanceof List){
-                List<Object> list = (List<Object>) obj;
+                List<?> list = Convert.toList(obj);
                 if (!list.isEmpty()) {
                     List<MenuModel> menuModels = Lists.newArrayListWithCapacity(list.size());
                     for (Object menuObj : list) {
@@ -436,7 +437,7 @@ public class UserUtil {
                     return menuModels;
                 }
             }else {
-                JSONArray jsonArray = (JSONArray) obj;
+                JSONArray jsonArray = Convert.convert(JSONArray.class, obj);
                 if (jsonArray != null && !jsonArray.isEmpty()) {
                     return jsonArray.toJavaList(MenuModel.class);
                 }
@@ -471,7 +472,7 @@ public class UserUtil {
             try {
                 Object obj = CacheUtil.get(PREFIX_ID_MENUS + userId);
                 if(obj instanceof List){
-                    List<Object> list = (List<Object>) obj;
+                    List<?> list = Convert.toList(obj);
                     if (!list.isEmpty()) {
                         List<MenuModel> menuModels = Lists.newArrayListWithCapacity(list.size());
                         for (Object menuObj : list) {
@@ -486,7 +487,7 @@ public class UserUtil {
                         return menuModels;
                     }
                 }else {
-                    JSONArray jsonArray = (JSONArray) obj;
+                    JSONArray jsonArray = Convert.convert(JSONArray.class, obj);
                     if (jsonArray != null && !jsonArray.isEmpty()) {
                         return jsonArray.toJavaList(MenuModel.class);
                     }
