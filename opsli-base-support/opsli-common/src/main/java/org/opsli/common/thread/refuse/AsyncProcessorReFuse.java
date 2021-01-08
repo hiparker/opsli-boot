@@ -64,25 +64,25 @@ public class AsyncProcessorReFuse {
 
            // 关闭事件的挂钩
            Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-              log.info("AsyncProcessor shutting down.");
+              log.info("AsyncProcessorReFuse 异步处理器关闭");
 
               EXECUTOR.shutdown();
 
               try {
                  // 等待1秒执行关闭
                  if (!EXECUTOR.awaitTermination(DEFAULT_WAIT_TIME, TimeUnit.SECONDS)) {
-                     log.error("AsyncProcessor shutdown immediately due to wait timeout.");
+                     log.error("AsyncProcessorReFuse 由于等待超时，异步处理器立即关闭");
                      EXECUTOR.shutdownNow();
                  }
               } catch (InterruptedException e) {
-                 log.error("AsyncProcessor shutdown interrupted.");
+                 log.error("AsyncProcessorReFuse 异步处理器关闭中断");
                  EXECUTOR.shutdownNow();
               }
 
-              log.info("AsyncProcessor shutdown complete.");
+              log.info("AsyncProcessorReFuse 异步处理器关闭完成");
            }));
         } catch (Exception e) {
-            log.error("AsyncProcessor init error.", e);
+            log.error("AsyncProcessorReFuse 异步处理器初始化错误", e);
             throw new ExceptionInInitializerError(e);
         }
     }
@@ -104,7 +104,7 @@ public class AsyncProcessorReFuse {
         try {
             EXECUTOR.execute(task);
         } catch (RejectedExecutionException e) {
-            log.error("Task executing was rejected.", e);
+            log.error("AsyncProcessorReFuse 执行任务被拒绝", e);
             return false;
         }
         return true;
@@ -121,8 +121,8 @@ public class AsyncProcessorReFuse {
         try {
             return EXECUTOR.submit(task);
         } catch (RejectedExecutionException e) {
-            log.error("Task executing was rejected.", e);
-            throw new UnsupportedOperationException("Unable to submit the task, rejected.", e);
+            log.error("AsyncProcessorReFuse 执行任务被拒绝", e);
+            throw new UnsupportedOperationException("AsyncProcessorReFuse 无法提交任务，已被拒绝", e);
         }
     }
 }

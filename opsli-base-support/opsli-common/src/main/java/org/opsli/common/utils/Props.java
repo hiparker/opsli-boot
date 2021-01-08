@@ -365,7 +365,7 @@ public class Props {
                 obj = temp.get(k);
             } else if(obj instanceof LinkedHashMap){
                 //Convert
-                obj = ((LinkedHashMap) obj).get(k);
+                obj = Convert.convert(LinkedHashMap.class, obj).get(k);
             }
         }
         return obj;

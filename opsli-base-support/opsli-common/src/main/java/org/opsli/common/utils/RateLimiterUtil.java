@@ -61,8 +61,8 @@ public final class RateLimiterUtil {
         // 获得IP
         String clientIpAddress = IPUtil.getClientIpAddress(request);
         // 获得URI
-        String clientURI = request.getRequestURI();
-        return RateLimiterUtil.enter(clientIpAddress, clientURI);
+        String clientUri = request.getRequestURI();
+        return RateLimiterUtil.enter(clientIpAddress, clientUri);
     }
 
     /**
@@ -74,8 +74,8 @@ public final class RateLimiterUtil {
         // 获得IP
         String clientIpAddress = IPUtil.getClientIpAddress(request);
         // 获得URI
-        String clientURI = request.getRequestURI();
-        return RateLimiterUtil.enter(clientIpAddress, clientURI, dfQps);
+        String clientUri = request.getRequestURI();
+        return RateLimiterUtil.enter(clientIpAddress, clientUri, dfQps);
     }
 
     /**
