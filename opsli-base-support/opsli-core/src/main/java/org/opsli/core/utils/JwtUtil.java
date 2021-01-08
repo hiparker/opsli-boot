@@ -1,5 +1,6 @@
 package org.opsli.core.utils;
 
+import cn.hutool.core.codec.Base64;
 import cn.hutool.core.util.StrUtil;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
@@ -13,7 +14,6 @@ import org.opsli.common.exception.JwtException;
 import org.opsli.common.utils.Props;
 import org.opsli.core.msg.JwtMsg;
 
-import java.io.UnsupportedEncodingException;
 import java.util.Date;
 
 /**
@@ -48,17 +48,11 @@ public final class JwtUtil {
      * @return boolean 是否正确
      */
     public static boolean verify(String token) {
-        try {
-            String secret = getClaim(token, SignConstants.ACCOUNT) + Base64ConvertUtil.decode(ENCRYPT_JWT_KEY);
-            Algorithm algorithm = Algorithm.HMAC256(secret);
-            JWTVerifier verifier = JWT.require(algorithm).build();
-            verifier.verify(token);
-            return true;
-        } catch (UnsupportedEncodingException e) {
-            // 认证解密异常
-            String msg = StrUtil.format(JwtMsg.EXCEPTION_TOKEN.getMessage(), e.getMessage());
-            throw new JwtException(JwtMsg.EXCEPTION_TOKEN.getCode(), msg);
-        }
+        String secret = getClaim(token, SignConstants.ACCOUNT) + Base64.decodeStr(ENCRYPT_JWT_KEY);
+        Algorithm algorithm = Algorithm.HMAC256(secret);
+        JWTVerifier verifier = JWT.require(algorithm).build();
+        verifier.verify(token);
+        return true;
     }
 
     /**
@@ -86,26 +80,20 @@ public final class JwtUtil {
      * @return java.lang.String 返回加密的Token
      */
     public static String sign(String tokenType, String account, String userId) {
-        try {
-            // 帐号加JWT私钥加密
-            String secret = account + Base64ConvertUtil.decode(ENCRYPT_JWT_KEY);
-            // 此处过期时间是以毫秒为单位，所以乘以1000
-            Date date = new Date(System.currentTimeMillis() + EXPIRE);
-            Algorithm algorithm = Algorithm.HMAC256(secret);
-            // 附带account帐号信息
-            return JWT.create()
-                    .withClaim(SignConstants.TYPE, tokenType)
-                    .withClaim(SignConstants.ACCOUNT, account)
-                    .withClaim(SignConstants.USER_ID, userId)
-                    .withClaim(SignConstants.TIMESTAMP, String.valueOf(System.currentTimeMillis()))
-                    // token 过期时间
-                    .withExpiresAt(date)
-                    .sign(algorithm);
-        } catch (UnsupportedEncodingException e) {
-            // 加密异常
-            String msg = StrUtil.format(JwtMsg.EXCEPTION_ENCODE.getMessage(), e.getMessage());
-            throw new JwtException(JwtMsg.EXCEPTION_ENCODE.getCode(), msg);
-        }
+        // 帐号加JWT私钥加密
+        String secret = account + Base64.decodeStr(ENCRYPT_JWT_KEY);
+        // 此处过期时间是以毫秒为单位，所以乘以1000
+        Date date = new Date(System.currentTimeMillis() + EXPIRE);
+        Algorithm algorithm = Algorithm.HMAC256(secret);
+        // 附带account帐号信息
+        return JWT.create()
+                .withClaim(SignConstants.TYPE, tokenType)
+                .withClaim(SignConstants.ACCOUNT, account)
+                .withClaim(SignConstants.USER_ID, userId)
+                .withClaim(SignConstants.TIMESTAMP, String.valueOf(System.currentTimeMillis()))
+                // token 过期时间
+                .withExpiresAt(date)
+                .sign(algorithm);
     }
 
 
