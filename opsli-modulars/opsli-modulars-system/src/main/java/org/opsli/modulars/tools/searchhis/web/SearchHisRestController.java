@@ -60,7 +60,7 @@ public class SearchHisRestController {
     @SearchHis(keys = {"test"})
     @ApiOperation(value = "测试存入搜索历史记录", notes = "测试存入搜索历史记录")
     @PostMapping("/testPutSearchHis")
-    public void getSearchHis(String test, HttpServletRequest request){
+    public void testPutSearchHis(String test, HttpServletRequest request){
     }
 
 }
