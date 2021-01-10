@@ -16,6 +16,7 @@
 package org.opsli.plugins.redis.lock;
 
 import cn.hutool.core.thread.ThreadUtil;
+import cn.hutool.core.util.IdUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.opsli.plugins.redis.RedisLockPlugins;
 import org.opsli.plugins.redis.RedisPlugin;
@@ -25,7 +26,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.UUID;
 
 /**
  * @BelongsProject: opsli-boot
@@ -66,7 +66,7 @@ public class RedisLockImpl implements RedisLockPlugins {
     @Override
     public RedisLock tryLock(RedisLock redisLock) {
         // 锁凭证
-        String identifier = UUID.randomUUID().toString().replaceAll("-","");
+        String identifier = IdUtil.simpleUUID();
         redisLock = this.tryLock(redisLock,identifier);
         if(redisLock != null){
             log.info(this.getInfo("分布式锁 - 开启",redisLock));

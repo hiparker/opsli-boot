@@ -64,7 +64,8 @@ public final class HumpUtil {
 
     public static String humpToUnderline(String para) {
         StringBuilder sb = new StringBuilder(para);
-        int temp = 0;//定位
+        //定位
+        int temp = 0;
         if (!para.contains(UNDERLINE)) {
             for (int i = 0; i < para.length(); i++) {
                 if (Character.isUpperCase(para.charAt(i))) {

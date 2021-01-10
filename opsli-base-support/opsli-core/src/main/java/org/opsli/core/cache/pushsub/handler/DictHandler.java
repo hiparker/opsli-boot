@@ -15,6 +15,8 @@
  */
 package org.opsli.core.cache.pushsub.handler;
 
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.convert.Convert;
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.opsli.api.wrapper.system.dict.DictWrapper;
@@ -29,6 +31,7 @@ import org.opsli.plugins.cache.EhCachePlugin;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Collection;
+import java.util.List;
 
 /**
  * @BelongsProject: opsli-boot
@@ -41,7 +44,7 @@ import java.util.Collection;
 public class DictHandler implements RedisPushSubHandler{
 
     @Autowired
-    EhCachePlugin ehCachePlugin;
+    private EhCachePlugin ehCachePlugin;
 
     @Override
     public PushSubType getType() {
@@ -54,15 +57,12 @@ public class DictHandler implements RedisPushSubHandler{
         CacheType type = CacheType.valueOf((String) msgJson.get(MsgArgsType.DICT_TYPE.toString()));
 
         if(DictModelType.COLLECTION == dictModelType){
-            Collection<Object> dicts = (Collection<Object>) msgJson.get(MsgArgsType.DICT_MODELS.toString());
-            for (Object dictObj : dicts) {
-                JSONObject jsonObject = msgJson.getJSONObject(MsgArgsType.DICT_MODEL.toString());
-                if(jsonObject == null){
-                    continue;
+            Object dictListObj = msgJson.get(MsgArgsType.DICT_MODELS.toString());
+            List<DictWrapper> dictWrappers = Convert.toList(DictWrapper.class, dictListObj);
+            if(CollUtil.isNotEmpty(dictWrappers)){
+                for (DictWrapper dictWrapper : dictWrappers) {
+                    this.handler(dictWrapper, type);
                 }
-
-                DictWrapper dictWrapperModel = jsonObject.toJavaObject(DictWrapper.class);
-                this.handler(dictWrapperModel, type);
             }
         } else if(DictModelType.OBJECT == dictModelType){
             JSONObject jsonObject = msgJson.getJSONObject(MsgArgsType.DICT_MODEL.toString());

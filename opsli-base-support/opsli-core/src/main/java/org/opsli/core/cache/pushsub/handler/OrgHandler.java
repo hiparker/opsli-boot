@@ -38,7 +38,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class OrgHandler implements RedisPushSubHandler{
 
     @Autowired
-    EhCachePlugin ehCachePlugin;
+    private EhCachePlugin ehCachePlugin;
 
     @Override
     public PushSubType getType() {

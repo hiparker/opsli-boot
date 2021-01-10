@@ -214,9 +214,9 @@ public class GlobalExceptionHandler {
         //log.error("数据异常：{}",e.getMessage(),e);
         // 默认值异常
         if(StringUtils.contains(e.getMessage(),SQL_EXCEPTION)){
-            String Field = e.getMessage().replaceAll("Field '","")
+            String field = e.getMessage().replaceAll("Field '","")
                     .replaceAll("' doesn't have a default value","");
-            String msg = StrFormatter.format(CoreMsg.SQL_EXCEPTION_NOT_HAVE_DEFAULT_VALUE.getMessage(), Field);
+            String msg = StrFormatter.format(CoreMsg.SQL_EXCEPTION_NOT_HAVE_DEFAULT_VALUE.getMessage(), field);
             return ResultVo.error(CoreMsg.SQL_EXCEPTION_NOT_HAVE_DEFAULT_VALUE.getCode(), msg);
         }
         String msg = StrFormatter.format(CoreMsg.SQL_EXCEPTION_UNKNOWN.getMessage(), e.getMessage());
