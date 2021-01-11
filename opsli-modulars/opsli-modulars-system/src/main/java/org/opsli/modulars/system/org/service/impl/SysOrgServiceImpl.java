@@ -53,6 +53,9 @@ import java.util.Set;
 public class SysOrgServiceImpl extends CrudServiceImpl<SysOrgMapper, SysOrg, SysOrgModel>
     implements ISysOrgService {
 
+    /** 顶级ID */
+    private static final String TOP_PARENT_ID = "0";
+
     @Autowired(required = false)
     private SysOrgMapper mapper;
 
@@ -74,7 +77,16 @@ public class SysOrgServiceImpl extends CrudServiceImpl<SysOrgMapper, SysOrg, Sys
 
         // 如果上级ID 为空 则默认为 0
         if(StringUtils.isEmpty(model.getParentId())){
-            model.setParentId("0");
+            model.setParentId(TOP_PARENT_ID);
+        }
+
+        // 如果上级ID不为空 且 不等于顶级ID
+        if(StringUtils.isNotEmpty(model.getParentId()) &&
+                !TOP_PARENT_ID.equals(model.getParentId())
+            ){
+            // 下级沿用上级租户ID
+            SysOrgModel sysOrgModel = super.get(model.getParentId());
+            model.setTenantId(sysOrgModel.getTenantId());
         }
 
         return super.insert(model);
@@ -93,6 +105,15 @@ public class SysOrgServiceImpl extends CrudServiceImpl<SysOrgMapper, SysOrg, Sys
         if(count != null && count > 0){
             // 重复
             throw new ServiceException(SystemMsg.EXCEPTION_ORG_UNIQUE);
+        }
+
+        // 如果上级ID不为空 且 不等于顶级ID
+        if(StringUtils.isNotEmpty(model.getParentId()) &&
+                !TOP_PARENT_ID.equals(model.getParentId())
+            ){
+            // 下级沿用上级租户ID
+            SysOrgModel sysOrgModel = super.get(model.getParentId());
+            model.setTenantId(sysOrgModel.getTenantId());
         }
 
         return super.update(model);
