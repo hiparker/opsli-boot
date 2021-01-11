@@ -163,8 +163,7 @@ public class MenuServiceImpl extends CrudServiceImpl<MenuMapper, SysMenu, MenuMo
      * @return
      */
     @Transactional(rollbackFor = Exception.class)
-    public boolean deleteByParentId(String parentId) {
-        boolean ret = false;
+    public void deleteByParentId(String parentId) {
         QueryBuilder<SysMenu> queryBuilder = new GenQueryBuilder<>();
         QueryWrapper<SysMenu> queryWrapper = queryBuilder.build();
         queryWrapper.eq(HumpUtil.humpToUnderline(MyBatisConstants.FIELD_PARENT_ID), parentId);
@@ -172,9 +171,8 @@ public class MenuServiceImpl extends CrudServiceImpl<MenuMapper, SysMenu, MenuMo
         for (SysMenu sysMenu : menuList) {
             super.delete(sysMenu.getId());
             // 逐级删除子数据
-            ret = this.deleteByParentId(sysMenu.getId());
+            this.deleteByParentId(sysMenu.getId());
         }
-        return ret;
     }
 
     // ============
