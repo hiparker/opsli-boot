@@ -111,7 +111,7 @@ public class RedisLockImpl implements RedisLockPlugins {
      */
     private RedisLock tryLock(RedisLock redisLock,String identifier) {
         try {
-            List<String> keys = Collections.singletonList("lock:" + redisLock.getLockName());
+            List<String> keys = Collections.singletonList(redisLock.getLockName());
             long acquireTimeEnd = System.currentTimeMillis() + redisLock.getAcquireTimeOut();
             boolean acquired = false;
             // 尝试获得锁
