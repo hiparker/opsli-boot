@@ -15,9 +15,12 @@
  */
 package org.opsli.modulars.system.user.service.impl;
 
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.RandomUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.github.pagehelper.PageInfo;
+import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.formula.functions.T;
 import org.opsli.api.wrapper.system.menu.MenuModel;
@@ -29,6 +32,7 @@ import org.opsli.common.exception.ServiceException;
 import org.opsli.common.utils.HumpUtil;
 import org.opsli.common.utils.WrapperUtil;
 import org.opsli.core.base.service.impl.CrudServiceImpl;
+import org.opsli.core.msg.CoreMsg;
 import org.opsli.core.persistence.Page;
 import org.opsli.core.persistence.querybuilder.GenQueryBuilder;
 import org.opsli.core.persistence.querybuilder.QueryBuilder;
@@ -44,9 +48,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
-import java.util.List;
+import java.util.*;
 
 
 /**
@@ -134,10 +136,84 @@ public class UserServiceImpl extends CrudServiceImpl<UserMapper, SysUser, UserMo
         UserModel update = super.update(model);
         if(update != null){
             // 刷新用户缓存
-            UserUtil.refreshUser(update);
+            this.clearCache(Collections.singletonList(update));
         }
 
         return update;
+    }
+
+    @Override
+    public boolean delete(String id) {
+        UserModel userModel = super.get(id);
+        boolean ret = super.delete(id);
+        if(ret){
+            // 刷新用户缓存
+            this.clearCache(Collections.singletonList(userModel));
+        }
+        return ret;
+    }
+
+    @Override
+    public boolean delete(UserModel model) {
+        UserModel userModel = null;
+        if(model != null){
+            userModel = this.get(model.getId());
+        }
+
+        boolean ret = super.delete(model);
+        if(ret){
+            if(userModel != null){
+                // 刷新用户缓存
+                this.clearCache(Collections.singletonList(userModel));
+            }
+        }
+        return ret;
+    }
+
+    @Override
+    public boolean deleteAll(String[] ids) {
+        QueryBuilder<SysUser> queryBuilder = new GenQueryBuilder<>();
+        QueryWrapper<SysUser> queryWrapper = queryBuilder.build();
+        List<String> idList = Convert.toList(String.class, ids);
+        queryWrapper.in(HumpUtil.humpToUnderline(MyBatisConstants.FIELD_ID),idList);
+        List<UserModel> modelList = super.transformTs2Ms(
+                this.findList(queryWrapper)
+        );
+
+        boolean ret = super.deleteAll(ids);
+        if(ret){
+            // 刷新用户缓存
+            this.clearCache(modelList);
+        }
+
+        return ret;
+    }
+
+    @Override
+    public boolean deleteAll(Collection<UserModel> models) {
+        if(CollUtil.isEmpty(models)){
+            return false;
+        }
+
+        List<String> idList = Lists.newArrayListWithCapacity(models.size());
+        for (UserModel model : models) {
+            idList.add(model.getId());
+        }
+
+        QueryBuilder<SysUser> queryBuilder = new GenQueryBuilder<>();
+        QueryWrapper<SysUser> queryWrapper = queryBuilder.build();
+        queryWrapper.in(HumpUtil.humpToUnderline(MyBatisConstants.FIELD_ID),idList);
+        List<UserModel> modelList = super.transformTs2Ms(
+                this.findList(queryWrapper)
+        );
+
+        boolean ret = super.deleteAll(models);
+        if(ret){
+            // 刷新用户缓存
+            this.clearCache(modelList);
+        }
+
+        return ret;
     }
 
     @Override
@@ -146,6 +222,9 @@ public class UserServiceImpl extends CrudServiceImpl<UserMapper, SysUser, UserMo
         QueryBuilder<SysUser> queryBuilder = new GenQueryBuilder<>();
         QueryWrapper<SysUser> queryWrapper = queryBuilder.build();
         queryWrapper.eq(key, username);
+        queryWrapper.eq(
+                HumpUtil.humpToUnderline(MyBatisConstants.FIELD_DELETE_LOGIC)
+                , "0");
         SysUser user = this.getOne(queryWrapper);
         return super.transformT2M(user);
     }
@@ -221,7 +300,38 @@ public class UserServiceImpl extends CrudServiceImpl<UserMapper, SysUser, UserMo
 
         if(ret){
             // 刷新用户缓存
-            UserUtil.refreshUser(userModel);
+            this.clearCache(Collections.singletonList(userModel));
+        }
+
+        return ret;
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public boolean resetPassword(UserPassword userPassword) {
+        UserModel userModel = super.get(userPassword.getUserId());
+        // 如果为空则 不修改密码
+        if(userModel == null){
+            return false;
+        }
+
+        // 设置随机新盐值
+        userPassword.setSalt(
+                RandomUtil.randomString(20)
+        );
+        // 处理密码
+        userPassword.setNewPassword(
+                UserUtil.handlePassword(userPassword.getNewPassword(),
+                        userPassword.getSalt())
+        );
+
+
+        // 修改密码
+        boolean ret = mapper.updatePassword(userPassword);
+
+        if(ret){
+            // 刷新用户缓存
+            this.clearCache(Collections.singletonList(userModel));
         }
 
         return ret;
@@ -239,11 +349,11 @@ public class UserServiceImpl extends CrudServiceImpl<UserMapper, SysUser, UserMo
             return false;
         }
         // 激活一下 当前登录用户 User
-        UserUtil.getUser(model.getId());
-
+        //UserUtil.getUser(model.getId());
         SysUser sysUser = new SysUser();
         sysUser.setId(model.getId());
         sysUser.setLoginIp(model.getLoginIp());
+        sysUser.setUpdateBy(model.getUpdateBy());
         return mapper.updateLoginIp(sysUser);
     }
 
@@ -288,6 +398,33 @@ public class UserServiceImpl extends CrudServiceImpl<UserMapper, SysUser, UserMo
             page.pageHelperEnd();
         }
         return page;
+    }
+
+
+
+    // ==================
+
+    /**
+     * 清除缓存
+     * @param list
+     */
+    private void clearCache(List<UserModel> list){
+        if(CollUtil.isNotEmpty(list)){
+            int cacheCount = 0;
+            for (UserModel userModel : list) {
+                cacheCount++;
+                // 刷新用户缓存
+                boolean tmp = UserUtil.refreshUser(userModel);
+                if(tmp){
+                    cacheCount--;
+                }
+            }
+            // 判断删除状态
+            if(cacheCount != 0){
+                // 删除缓存失败
+                throw new ServiceException(CoreMsg.CACHE_DEL_EXCEPTION);
+            }
+        }
     }
 
 }

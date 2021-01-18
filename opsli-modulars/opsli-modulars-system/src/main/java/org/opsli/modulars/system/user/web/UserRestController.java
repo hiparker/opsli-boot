@@ -16,9 +16,11 @@
 package org.opsli.modulars.system.user.web;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.convert.Convert;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.FileUtil;
-import cn.hutool.core.util.RandomUtil;
+import cn.hutool.core.util.IdUtil;
+import cn.hutool.core.util.ReflectUtil;
 import com.alibaba.excel.util.CollectionUtils;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.google.common.collect.Lists;
@@ -31,10 +33,10 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.opsli.api.base.result.ResultVo;
 import org.opsli.api.web.system.user.UserApi;
 import org.opsli.api.wrapper.system.menu.MenuModel;
-import org.opsli.api.wrapper.system.org.SysOrgModel;
 import org.opsli.api.wrapper.system.user.*;
 import org.opsli.common.annotation.ApiRestController;
 import org.opsli.common.annotation.EnableLog;
+import org.opsli.common.annotation.RequiresPermissionsCus;
 import org.opsli.common.constants.MyBatisConstants;
 import org.opsli.common.exception.TokenException;
 import org.opsli.common.utils.HumpUtil;
@@ -63,6 +65,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -82,6 +85,8 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
 
     @Value("${opsli.web.upload-path}")
     private String basedir;
+    @Value("${opsli.default-pass}")
+    private String defaultPass;
 
     @Autowired
     private ISysOrgService iSysOrgService;
@@ -203,7 +208,7 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
             String date = DateUtil.format(DateUtil.date(), "yyyyMMdd");
             String dateTime = DateUtil.format(DateUtil.date(), "yyyyMMddHHmmss");
             String packageName = basedir + staticPath+"/"+date;
-            String fileName = dateTime+"-"+ RandomUtil.simpleUUID() +".jpg";
+            String fileName = dateTime+"-"+ IdUtil.simpleUUID() +".jpg";
             File file = new File(packageName+"/"+fileName);
             MultipartFile multipartFile = files.get(0);
             FileUtils.copyInputStreamToFile(multipartFile.getInputStream(), file);
@@ -244,7 +249,29 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
         return ResultVo.success();
     }
 
+    /**
+     * 重置密码
+     * @return ResultVo
+     */
+    @ApiOperation(value = "重置密码", notes = "重置密码")
+    @RequiresPermissions("system_user_resetPassword")
+    @EnableLog
+    @Override
+    public ResultVo<?> resetPasswordById(String userId) {
+        // 演示模式 不允许操作
+        super.demoError();
 
+        UserPassword userPassword = new UserPassword();
+        userPassword.setNewPassword(defaultPass);
+        userPassword.setUserId(userId);
+
+        boolean resetPasswordFlag = IService.resetPassword(userPassword);
+        if(!resetPasswordFlag){
+            return ResultVo.error("重置密码失败");
+        }
+
+        return ResultVo.success("重置密码成功！默认密码为：" + defaultPass);
+    }
 
     /**
      * 用户信息 查一条
@@ -357,6 +384,7 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
         super.demoError();
 
         IService.delete(id);
+
         return ResultVo.success("删除用户信息成功");
     }
 
@@ -370,11 +398,13 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
     @RequiresPermissions("system_user_delete")
     @EnableLog
     @Override
-    public ResultVo<?> delAll(String[] ids){
+    public ResultVo<?> delAll(String ids){
         // 演示模式 不允许操作
         super.demoError();
 
-        IService.deleteAll(ids);
+        String[] idArray = Convert.toStrArray(ids);
+        IService.deleteAll(idArray);
+
         return ResultVo.success("批量删除用户信息成功");
     }
 
@@ -386,12 +416,14 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
      * @return ResultVo
      */
     @ApiOperation(value = "导出Excel", notes = "导出Excel")
-    @RequiresPermissions("system_user_export")
+    @RequiresPermissionsCus("system_user_export")
     @EnableLog
     @Override
-    public ResultVo<?> exportExcel(HttpServletRequest request, HttpServletResponse response) {
-        QueryBuilder<SysUser> queryBuilder = new WebQueryBuilder<>(SysUser.class, request.getParameterMap());
-        return super.excelExport(UserApi.TITLE, queryBuilder.build(), response);
+    public void exportExcel(HttpServletRequest request, HttpServletResponse response) {
+        // 当前方法
+        Method method = ReflectUtil.getMethodByName(this.getClass(), "exportExcel");
+        QueryBuilder<SysUser> queryBuilder = new WebQueryBuilder<>(entityClazz, request.getParameterMap());
+        super.excelExport(UserApi.TITLE, queryBuilder.build(), response, method);
     }
 
     /**
@@ -403,8 +435,8 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
     @RequiresPermissions("system_user_import")
     @EnableLog
     @Override
-    public ResultVo<?> excelImport(MultipartHttpServletRequest request) {
-        return super.excelImport(request);
+    public ResultVo<?> importExcel(MultipartHttpServletRequest request) {
+        return super.importExcel(request);
     }
 
     /**
@@ -413,10 +445,12 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
      * @return ResultVo
      */
     @ApiOperation(value = "导出Excel模版", notes = "导出Excel模版")
-    @RequiresPermissions("system_user_import")
+    @RequiresPermissionsCus("system_user_import")
     @Override
-    public ResultVo<?> importTemplate(HttpServletResponse response) {
-        return super.importTemplate(UserApi.TITLE, response);
+    public void importTemplate(HttpServletResponse response) {
+        // 当前方法
+        Method method = ReflectUtil.getMethodByName(this.getClass(), "importTemplate");
+        super.importTemplate(UserApi.TITLE, response, method);
     }
 
     /**

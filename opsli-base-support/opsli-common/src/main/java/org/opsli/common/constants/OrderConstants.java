@@ -25,6 +25,9 @@ public interface OrderConstants {
     /** Util 加载顺序 */
     int UTIL_ORDER = 140;
 
+    /** 限流器 */
+    int LIMITER_AOP_SORT = 149;
+
     /** token */
     int TOKEN_AOP_SORT = 150;
 
@@ -33,6 +36,9 @@ public interface OrderConstants {
 
     /** 参数非法验证顺序 */
     int PARAM_VALIDATE_AOP_SORT = 185;
+
+    /** 搜索历史 */
+    int SEARCH_HIS_AOP_SORT = 186;
 
     /** SQL 切面执行顺序 */
     int SQL_ORDER = 190;

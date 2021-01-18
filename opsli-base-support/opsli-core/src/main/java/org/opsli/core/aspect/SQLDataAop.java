@@ -51,7 +51,7 @@ public class SQLDataAop {
     }
 
     @AfterReturning(returning = "ret", pointcut = "insert()")
-    public void insertHadnler(Object ret){
+    public void insertHandler(Object ret){
         try {
             if(ret == null){
                 throw new ServiceException(CoreMsg.SQL_EXCEPTION_INSERT);
@@ -64,7 +64,7 @@ public class SQLDataAop {
     }
 
     @AfterReturning(returning = "ret", pointcut = "update()")
-    public void updateHadnler(Object ret){
+    public void updateHandler(Object ret){
         try {
             if(ret == null){
                 throw new ServiceException(CoreMsg.SQL_EXCEPTION_UPDATE);
@@ -77,7 +77,7 @@ public class SQLDataAop {
     }
 
     @AfterReturning(returning = "ret", pointcut = "delete()")
-    public void deleteHadnler(Object ret){
+    public void deleteHandler(Object ret){
         try {
             if(ret != null){
                 Boolean retFlag = (Boolean) ret;

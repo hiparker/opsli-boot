@@ -47,11 +47,11 @@ public class WebQueryBuilder<T extends BaseEntity> implements QueryBuilder<T>{
     private static final String ORDER_DESC = "DESC";
 
     /** 参数 */
-    private Map<String, String[]> parameterMap;
+    private final Map<String, String[]> parameterMap;
     /** Entity Clazz */
-    private Class<? extends BaseEntity> entityClazz;
+    private final Class<? extends BaseEntity> entityClazz;
     /** 默认排序字段 */
-    private String defaultOrderField;
+    private final String defaultOrderField;
 
     /**
      * 构造函数 只是生产 查询器
@@ -102,20 +102,20 @@ public class WebQueryBuilder<T extends BaseEntity> implements QueryBuilder<T>{
             }
 
             // 键 和 操作
-            String[] key_handle = keys.split("_");
-            if(key_handle.length < 2){
+            String[] keyHandle = keys.split("_");
+            if(keyHandle.length < 2){
                 continue;
             }
             // 判断 字段是否合法
-            boolean hasField = this.validationField(key_handle);
+            boolean hasField = this.validationField(keyHandle);
             if(hasField){
                 // 验证操作是否合法
-                boolean hasHandle = this.validationHandle(key_handle);
+                boolean hasHandle = this.validationHandle(keyHandle);
                 if(hasHandle){
                     // 操作
-                    String handle = key_handle[1];
+                    String handle = keyHandle[1];
                     // 键
-                    String key = key_handle[0];
+                    String key = keyHandle[0];
                     // 处理值
                     String value = values[0];
                     // 赋值
@@ -152,54 +152,62 @@ public class WebQueryBuilder<T extends BaseEntity> implements QueryBuilder<T>{
         }
         // 转换驼峰 为 数据库下划线字段
         key = HumpUtil.humpToUnderline(key);
-        if (EQ.equals(handle)) {
-            // 全值匹配
-            queryWrapper.eq(key,value);
-        } else if (LIKE.equals(handle)) {
-            // 模糊匹配
-            queryWrapper.like(key,value);
-        } else if (BEGIN.equals(handle)) {
-            // 大于等于
-            queryWrapper.ge(key,value);
-        } else if (END.equals(handle)) {
-            // 小于等于
-            queryWrapper.le(key,value);
-        } else if (ORDER.equals(handle)) {
-            // 排序
-            if(ORDER_ASC.equals(value)){
-                queryWrapper.orderByAsc(key);
-            } else if(ORDER_DESC.equals(value)){
-                queryWrapper.orderByDesc(key);
-            } else{
-                queryWrapper.orderByAsc(key);
-            }
+        switch (handle) {
+            case EQ:
+                // 全值匹配
+                queryWrapper.eq(key, value);
+                break;
+            case LIKE:
+                // 模糊匹配
+                queryWrapper.like(key, value);
+                break;
+            case BEGIN:
+                // 大于等于
+                queryWrapper.ge(key, value);
+                break;
+            case END:
+                // 小于等于
+                queryWrapper.le(key, value);
+                break;
+            case ORDER:
+                // 排序
+                if (ORDER_ASC.equals(value)) {
+                    queryWrapper.orderByAsc(key);
+                } else if (ORDER_DESC.equals(value)) {
+                    queryWrapper.orderByDesc(key);
+                } else {
+                    queryWrapper.orderByAsc(key);
+                }
+                break;
+            default:
+                break;
         }
     }
 
     /**
      * 检测 字段是否合法
-     * @param key_handle
+     * @param keyHandle
      * @return
      */
-    private boolean validationField(String[] key_handle){
-        if(entityClazz == null || key_handle == null || StringUtils.isEmpty(key_handle[0])){
+    private boolean validationField(String[] keyHandle){
+        if(entityClazz == null || keyHandle == null || StringUtils.isEmpty(keyHandle[0])){
             return false;
         }
         // 判断当前传入参数 是否是Entity的字段
-        return ReflectUtil.hasField(entityClazz, key_handle[0]);
+        return ReflectUtil.hasField(entityClazz, keyHandle[0]);
     }
 
 
     /**
      * 检测 操作是否合法
-     * @param key_handle
+     * @param keyHandle
      * @return
      */
-    private boolean validationHandle(String[] key_handle){
-        if(key_handle == null || StringUtils.isEmpty(key_handle[1])){
+    private boolean validationHandle(String[] keyHandle){
+        if(keyHandle == null || StringUtils.isEmpty(keyHandle[1])){
             return false;
         }
-        String handle = key_handle[1];
+        String handle = keyHandle[1];
         if (EQ.equals(handle)) {
             return true;
         } else if (LIKE.equals(handle)) {
@@ -208,9 +216,7 @@ public class WebQueryBuilder<T extends BaseEntity> implements QueryBuilder<T>{
             return true;
         } else if (END.equals(handle)) {
             return true;
-        } else if (ORDER.equals(handle)) {
-            return true;
         }
-        return false;
+        return ORDER.equals(handle);
     }
 }

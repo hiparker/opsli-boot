@@ -98,7 +98,7 @@ public interface DictDetailApi {
      * @return ResultVo
      */
     @PostMapping("/delAll")
-    ResultVo<?> delAll(String[] ids);
+    ResultVo<?> delAll(String ids);
 
     /**
      * 数据字典 Excel 导出
@@ -107,23 +107,23 @@ public interface DictDetailApi {
      * @return ResultVo
      */
     @GetMapping("/exportExcel")
-    ResultVo<?> exportExcel(HttpServletRequest request, HttpServletResponse response);
+    void exportExcel(HttpServletRequest request, HttpServletResponse response);
 
     /**
      * 数据字典 Excel 导入
      * @param request 文件流 request
      * @return ResultVo
      */
-    @GetMapping("/exportImport")
-    ResultVo<?> excelImport(MultipartHttpServletRequest request);
+    @PostMapping("/importExcel")
+    ResultVo<?> importExcel(MultipartHttpServletRequest request);
 
     /**
      * 数据字典 Excel 下载导入模版
      * @param response response
      * @return ResultVo
      */
-    @GetMapping("/exportImport/template")
-    ResultVo<?> importTemplate(HttpServletResponse response);
+    @GetMapping("/importExcel/template")
+    void importTemplate(HttpServletResponse response);
 
 
     // ================================

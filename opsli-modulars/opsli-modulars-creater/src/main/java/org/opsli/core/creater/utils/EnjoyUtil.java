@@ -27,8 +27,6 @@ public final class EnjoyUtil {
      */
     public static String render(String templateFileName, Kv kv)  {
 
-        //ClassPathResource resource = new ClassPathResource(templateFileName);
-        // (InputStream inputStream = resource.getInputStream())
         String str = "";
         ClassPathResource resource = new ClassPathResource(BASE_PATH + templateFileName);
         try (InputStream inputStream = resource.getInputStream()){

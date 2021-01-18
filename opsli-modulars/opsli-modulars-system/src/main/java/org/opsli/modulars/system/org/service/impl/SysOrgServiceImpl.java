@@ -53,6 +53,9 @@ import java.util.Set;
 public class SysOrgServiceImpl extends CrudServiceImpl<SysOrgMapper, SysOrg, SysOrgModel>
     implements ISysOrgService {
 
+    /** 顶级ID */
+    private static final String TOP_PARENT_ID = "0";
+
     @Autowired(required = false)
     private SysOrgMapper mapper;
 
@@ -74,7 +77,16 @@ public class SysOrgServiceImpl extends CrudServiceImpl<SysOrgMapper, SysOrg, Sys
 
         // 如果上级ID 为空 则默认为 0
         if(StringUtils.isEmpty(model.getParentId())){
-            model.setParentId("0");
+            model.setParentId(TOP_PARENT_ID);
+        }
+
+        // 如果上级ID不为空 且 不等于顶级ID
+        if(StringUtils.isNotEmpty(model.getParentId()) &&
+                !TOP_PARENT_ID.equals(model.getParentId())
+            ){
+            // 下级沿用上级租户ID
+            SysOrgModel sysOrgModel = super.get(model.getParentId());
+            model.setTenantId(sysOrgModel.getTenantId());
         }
 
         return super.insert(model);
@@ -95,6 +107,32 @@ public class SysOrgServiceImpl extends CrudServiceImpl<SysOrgMapper, SysOrg, Sys
             throw new ServiceException(SystemMsg.EXCEPTION_ORG_UNIQUE);
         }
 
+        // 如果上级ID不为空 且 不等于顶级ID
+        if(StringUtils.isNotEmpty(model.getParentId()) &&
+                !TOP_PARENT_ID.equals(model.getParentId())
+            ){
+            // 下级沿用上级租户ID
+            SysOrgModel sysOrgModel = super.get(model.getParentId());
+            model.setTenantId(sysOrgModel.getTenantId());
+        }
+
+        SysOrgModel sysOrgModel = super.get(model);
+        // 如果 TenantId 发生变化 则需要更改 下级数据 租户ID
+        if(sysOrgModel != null && !sysOrgModel.getTenantId().equals(
+                model.getTenantId())){
+            QueryWrapper<SysOrg> queryWrapper = new QueryWrapper<>();
+            queryWrapper.eq("org_id", sysOrgModel.getId());
+            Integer countTmp = mapper.hasUse(queryWrapper);
+            if(countTmp > 0){
+                // 组织机构已被引用，不能删除
+                throw new ServiceException(SystemMsg.EXCEPTION_ORG_USE_TENANT);
+            }
+
+            // 如果没有被引用 则逐级修改
+            this.updateTenantByParentId(sysOrgModel.getId(), model.getTenantId());
+        }
+
+        // 修改
         return super.update(model);
     }
 
@@ -147,23 +185,40 @@ public class SysOrgServiceImpl extends CrudServiceImpl<SysOrgMapper, SysOrg, Sys
     }
 
     /**
+     * 逐级修改机构下租户
+     * @param parentId
+     * @return
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public void updateTenantByParentId(String parentId, String tenantId) {
+        QueryBuilder<SysOrg> queryBuilder = new GenQueryBuilder<>();
+        QueryWrapper<SysOrg> queryWrapper = queryBuilder.build();
+        queryWrapper.eq(HumpUtil.humpToUnderline(MyBatisConstants.FIELD_PARENT_ID), parentId);
+        List<SysOrg> entityList = super.findList(queryWrapper);
+        for (SysOrg sysOrg : entityList) {
+            sysOrg.setTenantId(tenantId);
+            super.updateById(sysOrg);
+            // 逐级删除子数据
+            this.updateTenantByParentId(sysOrg.getId(), tenantId);
+        }
+    }
+
+    /**
      * 逐级删除子数据
      * @param parentId
      * @return
      */
     @Transactional(rollbackFor = Exception.class)
-    public boolean deleteByParentId(String parentId) {
-        boolean ret = false;
+    public void deleteByParentId(String parentId) {
         QueryBuilder<SysOrg> queryBuilder = new GenQueryBuilder<>();
         QueryWrapper<SysOrg> queryWrapper = queryBuilder.build();
         queryWrapper.eq(HumpUtil.humpToUnderline(MyBatisConstants.FIELD_PARENT_ID), parentId);
-        List<SysOrg> menuList = super.findList(queryWrapper);
-        for (SysOrg sysOrg : menuList) {
+        List<SysOrg> entityList = super.findList(queryWrapper);
+        for (SysOrg sysOrg : entityList) {
             super.delete(sysOrg.getId());
             // 逐级删除子数据
-            ret = this.deleteByParentId(sysOrg.getId());
+            this.deleteByParentId(sysOrg.getId());
         }
-        return ret;
     }
 
     /**

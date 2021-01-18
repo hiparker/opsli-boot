@@ -16,7 +16,6 @@
 package org.opsli.core.waf.filter;
 
 
-import org.opsli.common.exception.TokenException;
 import org.opsli.core.waf.servlet.WafHttpServletRequestWrapper;
 
 import javax.servlet.*;
@@ -39,7 +38,7 @@ public class WafFilter implements Filter {
 
 
 	@Override
-	public void init(FilterConfig config) throws ServletException {
+	public void init(FilterConfig config) {
 	}
 
 	@Override

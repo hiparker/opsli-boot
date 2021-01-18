@@ -23,18 +23,6 @@
         </where>
     </select>
 
-    <select id="hasChildren" parameterType="SysOrg" resultType="org.opsli.core.base.entity.HasChildren">
-        select
-        parent_id as parentId,
-        count(0) as `count`
-        from
-        sys_org
-        <where>
-            ${ew.sqlSegment}
-        </where>
-    </select>
-
-
     <select id="hasUse" parameterType="SysOrg" resultType="Integer">
         select
             count(0)

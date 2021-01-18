@@ -38,6 +38,9 @@ public class DictWrapper {
     /** 字典值 */
     private String dictValue;
 
+    /** 排序 */
+    private Integer dictSort;
+
     /** 消息 */
     private DictDetailModel model;
 

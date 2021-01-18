@@ -1,12 +1,17 @@
 package org.opsli.core.security.shiro.filter;
 
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.web.filter.authc.AuthenticatingFilter;
 import org.opsli.api.base.result.ResultVo;
+import org.opsli.common.constants.SignConstants;
+import org.opsli.common.constants.TokenTypeConstants;
 import org.opsli.core.msg.TokenMsg;
-import org.opsli.core.security.shiro.token.OAuth2Token;
+import org.opsli.core.security.shiro.token.ExternalToken;
+import org.opsli.core.security.shiro.token.JwtToken;
+import org.opsli.core.utils.JwtUtil;
 import org.opsli.core.utils.UserTokenUtil;
 import org.springframework.web.bind.annotation.RequestMethod;
 
@@ -27,7 +32,7 @@ import java.io.IOException;
 
  * @date 2017-05-20 13:00
  */
-public class OAuth2Filter extends AuthenticatingFilter {
+public class CustomShiroFilter extends AuthenticatingFilter {
 
     @Override
     protected AuthenticationToken createToken(ServletRequest request, ServletResponse response) throws Exception {
@@ -38,7 +43,19 @@ public class OAuth2Filter extends AuthenticatingFilter {
             return null;
         }
 
-        return new OAuth2Token(token);
+        String tokenType = "";
+        // 分析token
+        try {
+            tokenType = JwtUtil.getClaim(token, SignConstants.TYPE);
+        }catch (Exception ignored){}
+
+        // 手机登录
+        if(TokenTypeConstants.TYPE_EXTERNAL.equals(tokenType)){
+            return new ExternalToken(token);
+        }
+        // .... 追加登录方式
+
+        return new JwtToken(token);
     }
 
     @Override
@@ -85,11 +102,10 @@ public class OAuth2Filter extends AuthenticatingFilter {
         try {
             //处理登录失败的异常
             Throwable throwable = e.getCause() == null ? e : e.getCause();
-            ResultVo<Object> error = ResultVo.error(401, throwable.getMessage());
+            ResultVo<Object> error = ResultVo.error(TokenMsg.EXCEPTION_TOKEN_LOSE_EFFICACY.getCode(),
+                    throwable.getMessage());
             httpResponse.getWriter().print(error.toJsonStr());
-        } catch (IOException e1) {
-
-        }
+        } catch (IOException ignored) {}
         return false;
     }
 

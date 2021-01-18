@@ -98,7 +98,7 @@ public interface TenantApi {
      * @return ResultVo
      */
     @PostMapping("/delAll")
-    ResultVo<?> delAll(String[] ids);
+    ResultVo<?> delAll(String ids);
 
     /**
      * 租户 Excel 导出
@@ -107,22 +107,31 @@ public interface TenantApi {
      * @return ResultVo
      */
     @GetMapping("/exportExcel")
-    ResultVo<?> exportExcel(HttpServletRequest request, HttpServletResponse response);
+    void exportExcel(HttpServletRequest request, HttpServletResponse response);
 
     /**
      * 租户 Excel 导入
      * @param request 文件流 request
      * @return ResultVo
      */
-    @GetMapping("/exportImport")
-    ResultVo<?> excelImport(MultipartHttpServletRequest request);
+    @PostMapping("/importExcel")
+    ResultVo<?> importExcel(MultipartHttpServletRequest request);
 
     /**
      * 租户 Excel 下载导入模版
      * @param response response
      * @return ResultVo
      */
-    @GetMapping("/exportImport/template")
-    ResultVo<?> importTemplate(HttpServletResponse response);
+    @GetMapping("/importExcel/template")
+    void importTemplate(HttpServletResponse response);
 
+    // =========================
+
+    /**
+     * 获得已启用租户 查一条
+     * @param tenantId 模型
+     * @return ResultVo
+     */
+    @GetMapping("/getTenantByUsable")
+    ResultVo<TenantModel> getTenantByUsable(String tenantId);
 }

@@ -15,8 +15,10 @@ import org.springframework.stereotype.Component;
 @Component
 @Slf4j
 public class ApplicationFailedEventListener implements ApplicationListener<ApplicationFailedEvent> {
+
     @Override
     public void onApplicationEvent(ApplicationFailedEvent event) {
-        StartPrint.INSTANCE.errorPrint();
+        StartPrint.getInstance().errorPrint();
     }
+
 }

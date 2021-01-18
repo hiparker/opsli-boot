@@ -36,7 +36,10 @@ public enum TokenMsg implements BaseMsg {
     /**
      * 登陆
      */
-    EXCEPTION_LOGIN_CAPTCHA(12100,"验证码不正确！"),
+    EXCEPTION_CAPTCHA_ERROR(12100,"验证码不正确！"),
+    EXCEPTION_CAPTCHA_NULL(12201, "验证码已失效"),
+    EXCEPTION_CAPTCHA_UUID_NULL(12202, "验证码UUID为空"),
+    EXCEPTION_CAPTCHA_CODE_NULL(12203, "验证码为空"),
     EXCEPTION_LOGIN_ACCOUNT_NO(12101,"账号或密码不正确！"),
     EXCEPTION_LOGIN_ACCOUNT_LOCKED(12102,"账号已被锁定,请联系管理员！"),
     EXCEPTION_LOGOUT_ERROR(12103,"登出失败，没有授权Token！"),
@@ -49,12 +52,13 @@ public enum TokenMsg implements BaseMsg {
      * 其他
      */
     EXCEPTION_USER_NULL(12200, "用户为空"),
-    EXCEPTION_CAPTCHA_NULL(12201, "验证码已失效"),
-    EXCEPTION_NOT_AUTH(12202, "无权访问该方法"),
+    EXCEPTION_NOT_AUTH(12201, "无权访问该方法"),
+    EXCEPTION_NOT_REALM(12202, "找不到认证授权器"),
+
     ;
 
-    private int code;
-    private String message;
+    private final int code;
+    private final String message;
 
     TokenMsg(int code, String message){
         this.code = code;

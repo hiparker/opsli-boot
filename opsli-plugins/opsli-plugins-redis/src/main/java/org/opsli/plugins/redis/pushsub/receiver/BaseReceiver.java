@@ -1,7 +1,6 @@
 package org.opsli.plugins.redis.pushsub.receiver;
 
 
-import com.alibaba.fastjson.JSONObject;
 
 /**
  * @BelongsProject: opsli-boot
@@ -13,7 +12,7 @@ import com.alibaba.fastjson.JSONObject;
 public abstract class BaseReceiver {
 
     public static final String BASE_CHANNEL = "listener:msg:";
-    private String channel;
+    private final String channel;
 
     public BaseReceiver(String channel){
         this.channel = BASE_CHANNEL+channel;

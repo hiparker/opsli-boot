@@ -74,7 +74,7 @@ public class LogsRestController extends BaseRestController<SysLogs, LogsModel, I
     @Override
     public ResultVo<?> findPage(Integer pageNo, Integer pageSize, HttpServletRequest request) {
 
-        QueryBuilder<SysLogs> queryBuilder = new WebQueryBuilder<>(SysLogs.class, request.getParameterMap());
+        QueryBuilder<SysLogs> queryBuilder = new WebQueryBuilder<>(entityClazz, request.getParameterMap());
         Page<SysLogs, LogsModel> page = new Page<>(pageNo, pageSize);
         page.setQueryWrapper(queryBuilder.build());
         page = IService.findPage(page);

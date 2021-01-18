@@ -15,8 +15,13 @@
  */
 package org.opsli.modulars.system.tenant.web;
 
+import cn.hutool.core.convert.Convert;
+import cn.hutool.core.util.ReflectUtil;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.api.R;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.opsli.api.base.result.ResultVo;
 import org.opsli.api.web.system.role.RoleApi;
@@ -24,8 +29,11 @@ import org.opsli.api.web.system.tenant.TenantApi;
 import org.opsli.api.wrapper.system.tenant.TenantModel;
 import org.opsli.common.annotation.ApiRestController;
 import org.opsli.common.annotation.EnableLog;
+import org.opsli.common.annotation.RequiresPermissionsCus;
+import org.opsli.common.utils.WrapperUtil;
 import org.opsli.core.base.concroller.BaseRestController;
 import org.opsli.core.persistence.Page;
+import org.opsli.core.persistence.querybuilder.GenQueryBuilder;
 import org.opsli.core.persistence.querybuilder.QueryBuilder;
 import org.opsli.core.persistence.querybuilder.WebQueryBuilder;
 import org.opsli.modulars.system.tenant.entity.SysTenant;
@@ -34,6 +42,7 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.lang.reflect.Method;
 
 
 /**
@@ -77,7 +86,7 @@ public class TenantRestController extends BaseRestController<SysTenant, TenantMo
     @Override
     public ResultVo<?> findPage(Integer pageNo, Integer pageSize, HttpServletRequest request) {
 
-        QueryBuilder<SysTenant> queryBuilder = new WebQueryBuilder<>(SysTenant.class, request.getParameterMap());
+        QueryBuilder<SysTenant> queryBuilder = new WebQueryBuilder<>(entityClazz, request.getParameterMap());
         Page<SysTenant, TenantModel> page = new Page<>(pageNo, pageSize);
         page.setQueryWrapper(queryBuilder.build());
         page = IService.findPage(page);
@@ -146,11 +155,12 @@ public class TenantRestController extends BaseRestController<SysTenant, TenantMo
     @RequiresPermissions("system_tenant_delete")
     @EnableLog
     @Override
-    public ResultVo<?> delAll(String[] ids){
+    public ResultVo<?> delAll(String ids){
         // 演示模式 不允许操作
         super.demoError();
 
-        IService.deleteAll(ids);
+        String[] idArray = Convert.toStrArray(ids);
+        IService.deleteAll(idArray);
         return ResultVo.success("批量删除租户成功");
     }
 
@@ -162,12 +172,14 @@ public class TenantRestController extends BaseRestController<SysTenant, TenantMo
      * @return ResultVo
      */
     @ApiOperation(value = "导出Excel", notes = "导出Excel")
-    @RequiresPermissions("system_tenant_export")
+    @RequiresPermissionsCus("system_tenant_export")
     @EnableLog
     @Override
-    public ResultVo<?> exportExcel(HttpServletRequest request, HttpServletResponse response) {
-        QueryBuilder<SysTenant> queryBuilder = new WebQueryBuilder<>(SysTenant.class, request.getParameterMap());
-        return super.excelExport(RoleApi.TITLE, queryBuilder.build(), response);
+    public void exportExcel(HttpServletRequest request, HttpServletResponse response) {
+        // 当前方法
+        Method method = ReflectUtil.getMethodByName(this.getClass(), "exportExcel");
+        QueryBuilder<SysTenant> queryBuilder = new WebQueryBuilder<>(entityClazz, request.getParameterMap());
+        super.excelExport(RoleApi.TITLE, queryBuilder.build(), response, method);
     }
 
     /**
@@ -179,8 +191,8 @@ public class TenantRestController extends BaseRestController<SysTenant, TenantMo
     @RequiresPermissions("system_tenant_import")
     @EnableLog
     @Override
-    public ResultVo<?> excelImport(MultipartHttpServletRequest request) {
-        return super.excelImport(request);
+    public ResultVo<?> importExcel(MultipartHttpServletRequest request) {
+        return super.importExcel(request);
     }
 
     /**
@@ -189,10 +201,33 @@ public class TenantRestController extends BaseRestController<SysTenant, TenantMo
      * @return ResultVo
      */
     @ApiOperation(value = "导出Excel模版", notes = "导出Excel模版")
-    @RequiresPermissions("system_tenant_import")
+    @RequiresPermissionsCus("system_tenant_import")
     @Override
-    public ResultVo<?> importTemplate(HttpServletResponse response) {
-        return super.importTemplate(RoleApi.TITLE, response);
+    public void importTemplate(HttpServletResponse response) {
+        // 当前方法
+        Method method = ReflectUtil.getMethodByName(this.getClass(), "importTemplate");
+        super.importTemplate(RoleApi.TITLE, response, method);
+    }
+
+    // =========================
+
+    /**
+     * 获得已启用租户 查一条
+     * @param tenantId 模型
+     * @return ResultVo
+     */
+    @ApiOperation(value = "获得已启用租户", notes = "获得已启用租户 - ID")
+    @Override
+    public ResultVo<TenantModel> getTenantByUsable(String tenantId) {
+        QueryBuilder<SysTenant> queryBuilder = new GenQueryBuilder<>();
+        QueryWrapper<SysTenant> queryWrapper = queryBuilder.build();
+        queryWrapper.eq("id", tenantId)
+                .eq("iz_usable", "1");
+        SysTenant entity = IService.getOne(queryWrapper);
+
+        return ResultVo.success(
+                WrapperUtil.transformInstance(entity, modelClazz)
+        );
     }
 
 }

@@ -19,11 +19,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.opsli.api.base.result.ResultVo;
 import org.opsli.api.web.system.menu.MenuApi;
-import org.opsli.api.web.system.user.UserApi;
 import org.opsli.api.wrapper.system.menu.MenuModel;
 import org.opsli.core.cache.local.CacheUtil;
 import org.opsli.core.cache.pushsub.msgs.MenuMsgFactory;
-import org.opsli.core.cache.pushsub.msgs.OrgMsgFactory;
 import org.opsli.plugins.redis.RedisLockPlugins;
 import org.opsli.plugins.redis.RedisPlugin;
 import org.opsli.plugins.redis.lock.RedisLock;
@@ -114,7 +112,6 @@ public class MenuUtil {
         }finally {
             // ============ 释放锁
             redisLockPlugins.unLock(redisLock);
-            redisLock = null;
         }
 
         if(menuModel == null){
@@ -134,29 +131,42 @@ public class MenuUtil {
      * @param menu
      * @return
      */
-    public static void refreshMenu(MenuModel menu){
+    public static boolean refreshMenu(MenuModel menu){
         if(menu == null || StringUtils.isEmpty(menu.getMenuCode())){
-            return;
+            return true;
         }
+
+        // 计数器
+        int count = 0;
 
         MenuModel menuModel = CacheUtil.get(PREFIX_CODE + menu.getMenuCode(), MenuModel.class);
         boolean hasNilFlag = CacheUtil.hasNilFlag(PREFIX_CODE + menu.getMenuCode());
 
         // 只要不为空 则执行刷新
         if (hasNilFlag){
+            count++;
             // 清除空拦截
-            CacheUtil.delNilFlag(PREFIX_CODE + menu.getMenuCode());
+            boolean tmp = CacheUtil.delNilFlag(PREFIX_CODE + menu.getMenuCode());
+            if(tmp){
+                count--;
+            }
         }
 
         if(menuModel != null){
+            count++;
             // 先删除
-            CacheUtil.del(PREFIX_CODE + menu.getMenuCode());
+            boolean tmp = CacheUtil.del(PREFIX_CODE + menu.getMenuCode());
+            if(tmp){
+                count--;
+            }
 
             // 发送通知消息
             redisPlugin.sendMessage(
                     MenuMsgFactory.createMenuMsg(menu)
             );
         }
+
+        return count == 0;
     }
 
 

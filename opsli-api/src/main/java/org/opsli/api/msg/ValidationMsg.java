@@ -70,9 +70,9 @@ public enum ValidationMsg implements BaseMsg {
     ;
 
     private static final String PREFIX = "参数验证错误: ";
-    private int code;
+    private final int code;
+    private final String message;
     private String fieldName;
-    private String message;
 
     ValidationMsg(int code, String message){
         this.code = code;

@@ -42,17 +42,20 @@ public enum CoreMsg implements BaseMsg {
     /**
      * Excel
      */
-    EXCEL_EXPORT_SUCCESS(200,"Excel 导出成功！  -  数据行数：{}  -  耗时：{}毫秒"),
-    EXCEL_EXPORT_ERROR(10301,"Excel 导出失败！  -  耗时：{}毫秒  -  失败信息：{}"),
-    EXCEL_IMPORT_SUCCESS(200,"EXCEL 导入成功！  -  耗时：{}毫秒"),
-    EXCEL_IMPORT_ERROR(10303,"Excel导入失败!   -  耗时：{}毫秒  -  失败信息：{}"),
-    EXCEL_IMPORT_NO(10304,""),
+    EXCEL_EXPORT_SUCCESS(200,"Excel 导出成功！  -  数据行数：{}  -  耗时：{}"),
+    EXCEL_EXPORT_ERROR(10301,"Excel 导出失败！  -  耗时：{}  -  失败信息：{}"),
+    EXCEL_IMPORT_SUCCESS(200,"EXCEL 导入成功！  -  耗时：{}"),
+    EXCEL_IMPORT_ERROR(10303,"Excel导入失败!   -  耗时：{}  -  失败信息：{}"),
+    EXCEL_IMPORT_NO(10304,"导入对象为空"),
     EXCEL_FILE_NULL(10305,"请选择文件"),
+    EXCEL_HANDLE_MAX(10700, "超出最大操作数量, 当前数据[{}]条，允许最大阈值[{}]条"),
+
 
     /**
      * 缓存
      */
     CACHE_PUNCTURE_EXCEPTION(10405, "当期服务繁忙，客官请稍微再次尝试！"),
+    CACHE_DEL_EXCEPTION(10406, "无法清除缓存，请稍后再试"),
 
 
     /**
@@ -64,10 +67,13 @@ public enum CoreMsg implements BaseMsg {
     /** 演示模式 */
     EXCEPTION_ENABLE_DEMO(10600,"演示模式不允许操作"),
 
+    /** 其他 */
+    OTHER_EXCEPTION_LIMITER(10700,"当前系统繁忙，请稍后再试"),
+
     ;
 
-    private int code;
-    private String message;
+    private final int code;
+    private final String message;
 
     CoreMsg(int code,String message){
         this.code = code;

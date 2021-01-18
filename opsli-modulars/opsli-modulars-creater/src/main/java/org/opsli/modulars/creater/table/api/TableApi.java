@@ -100,7 +100,7 @@ public interface TableApi {
      * @return ResultVo
      */
     @PostMapping("/delAll")
-    ResultVo<?> delAll(String[] ids);
+    ResultVo<?> delAll(String ids);
 
     /**
      * 同步到数据库
@@ -122,6 +122,6 @@ public interface TableApi {
      * @return ResultVo
      */
     @PostMapping("/importTables")
-    ResultVo<?> importTables(String[] tableNames);
+    ResultVo<?> importTables(String tableNames);
 
 }

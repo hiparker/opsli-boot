@@ -71,23 +71,17 @@ public class Page<T extends BaseEntity,E extends ApiWrapper> extends PageSeriali
     }
 
     /**
-     * 分页 构造函数
-     * @param pageNo 页
-     * @param pageSize 分页大小
-     */
-    public Page(int pageNo, int pageSize, String orderBy) {
-        super();
-        this.pageNo = pageNo;
-        this.pageSize = pageSize;
-    }
-
-
-
-    /**
      * 分页函数
      */
     public void pageHelperBegin(){
-        PageHelper.startPage(this.pageNo,this.pageSize);
+        this.pageHelperBegin(true);
+    }
+
+    /**
+     * 分页函数 不统计 count
+     */
+    public void pageHelperBegin(boolean countFlag){
+        PageHelper.startPage(this.pageNo,this.pageSize, countFlag);
     }
 
     /**

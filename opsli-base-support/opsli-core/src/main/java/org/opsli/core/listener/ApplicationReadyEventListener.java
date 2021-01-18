@@ -14,10 +14,12 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Slf4j
-public class ApplicationReadyEventListene implements ApplicationListener<ApplicationReadyEvent> {
+public class ApplicationReadyEventListener implements ApplicationListener<ApplicationReadyEvent> {
+
     @Override
     public void onApplicationEvent(ApplicationReadyEvent event) {
         event.getApplicationContext();
-        StartPrint.INSTANCE.successPrint();
+        StartPrint.getInstance().successPrint();
     }
+
 }

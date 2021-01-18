@@ -15,6 +15,7 @@
  */
 package org.opsli.modulars.creater.table.service.impl;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import org.opsli.common.enums.DictType;
 import org.opsli.common.utils.WrapperUtil;
@@ -214,6 +215,11 @@ public class TableServiceImpl extends CrudServiceImpl<TableMapper, CreaterTable,
 
             // 获得表字段
             List<DatabaseColumn> columns = ImportTableUtil.findColumns(tableName);
+            if(CollUtil.isEmpty(columns)){
+                // 暂未获得表字段
+                throw new CreaterException(CreaterMsg.EXCEPTION_IMPORT_FIELD_NULL);
+            }
+
             List<CreaterTableColumnModel> columnModels = new ArrayList<>();
             for (int i = 0; i < columns.size(); i++) {
                 DatabaseColumn column = columns.get(i);

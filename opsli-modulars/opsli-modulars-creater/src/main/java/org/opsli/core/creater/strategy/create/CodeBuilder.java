@@ -17,11 +17,8 @@ package org.opsli.core.creater.strategy.create;
 
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.IoUtil;
-import com.jfinal.kit.Kv;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.builder.ToStringBuilder;
+import lombok.extern.slf4j.Slf4j;
 import org.opsli.api.ApiFlag;
-import org.opsli.common.enums.DictType;
 import org.opsli.common.enums.ValiArgsType;
 import org.opsli.common.utils.HumpUtil;
 import org.opsli.common.utils.Props;
@@ -29,7 +26,6 @@ import org.opsli.common.utils.ZipUtils;
 import org.opsli.core.creater.strategy.create.backend.JavaCodeBuilder;
 import org.opsli.core.creater.strategy.create.foreend.VueCodeBuilder;
 import org.opsli.core.creater.strategy.create.readme.ReadMeBuilder;
-import org.opsli.core.creater.utils.EnjoyUtil;
 import org.opsli.modulars.creater.column.wrapper.CreaterTableColumnModel;
 import org.opsli.modulars.creater.createrlogs.wrapper.CreaterBuilderModel;
 import org.opsli.modulars.creater.table.wrapper.CreaterTableAndColumnModel;
@@ -39,7 +35,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -50,6 +45,7 @@ import java.util.Map;
  * @CreateTime: 2020-11-20 17:30
  * @Description: Java代码构建器
  */
+@Slf4j
 public enum CodeBuilder {
 
     /** 实例对象 */
@@ -126,6 +122,8 @@ public enum CodeBuilder {
                 fileList.add(VueCodeBuilder.INSTANCE.createIndex(builderModel, dataStr));
                 // edit
                 fileList.add(VueCodeBuilder.INSTANCE.createEdit(builderModel, dataStr));
+                // import
+                fileList.add(VueCodeBuilder.INSTANCE.createImport(builderModel, dataStr));
                 // 前api
                 fileList.add(VueCodeBuilder.INSTANCE.createApi(builderModel, dataStr));
 
@@ -138,7 +136,9 @@ public enum CodeBuilder {
                 // 输出流文件
                 IoUtil.write(out,true, baos.toByteArray());
             }
-        }catch (Exception ignored){}
+        }catch (Exception e){
+            log.error(e.getMessage(), e);
+        }
     }
 
 
@@ -149,7 +149,8 @@ public enum CodeBuilder {
         //创建本地文件
         try {
             String fileName = FILE_NAME +"-"+ dataStr+".zip";
-            response.addHeader("Content-Disposition", "attachment;filename=" + fileName);
+            response.setHeader("Content-Disposition", "attachment; filename=" + fileName);
+            response.setHeader("Cache-Control", "no-store, no-cache");
             return response.getOutputStream();
         } catch (IOException ignored) {}
         return null;

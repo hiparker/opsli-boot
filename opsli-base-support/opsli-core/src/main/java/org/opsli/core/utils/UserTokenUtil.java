@@ -29,13 +29,12 @@ import org.opsli.api.wrapper.system.user.UserModel;
 import org.opsli.common.constants.CacheConstants;
 import org.opsli.common.constants.SignConstants;
 import org.opsli.common.constants.TokenConstants;
-import org.opsli.common.exception.ServiceException;
+import org.opsli.common.constants.TokenTypeConstants;
 import org.opsli.common.exception.TokenException;
 import org.opsli.common.utils.Props;
 import org.opsli.core.msg.TokenMsg;
 import org.opsli.plugins.redis.RedisPlugin;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.core.annotation.Order;
@@ -116,7 +115,7 @@ public class UserTokenUtil {
             );
 
             // 生成 Token 包含 username userId timestamp
-            String signToken = JwtUtil.sign(user.getUsername(), user.getId());
+            String signToken = JwtUtil.sign(TokenTypeConstants.TYPE_SYSTEM, user.getUsername(), user.getId());
 
             // 生成MD5 16进制码 用于缩减存储
             String signTokenHex = new Md5Hash(signToken).toHex();
@@ -159,7 +158,7 @@ public class UserTokenUtil {
         String userId = "";
         try {
             userId = JwtUtil.getClaim(token, SignConstants.USER_ID);
-        }catch (Exception e){}
+        }catch (Exception ignored){}
         return userId;
     }
 
@@ -244,7 +243,7 @@ public class UserTokenUtil {
 
     /**
      * 验证锁定账号
-     * @param username
+     * @param username 用户名
      */
     public static void verifyLockAccount(String username){
         // 判断账号是否临时锁定
@@ -273,9 +272,9 @@ public class UserTokenUtil {
 
     /**
      * 锁定账号
-     * @param username
+     * @param username 用户名
      */
-    public static ResultVo<?> lockAccount(String username){
+    public static TokenMsg lockAccount(String username){
         // 如果失败次数 超过阈值 则锁定账号
         Long slipNum = redisPlugin.increment(ACCOUNT_SLIP_COUNT_PREFIX + username);
         if (slipNum != null){
@@ -291,20 +290,12 @@ public class UserTokenUtil {
             }
         }
 
-        Map<String,Boolean> flagMap = Maps.newHashMap();
-        flagMap.put("izVerify", false);
-        if(slipNum != null && slipNum >= ACCOUNT_SLIP_VERIFY_COUNT){
-            flagMap.put("izVerify", true);
-        }
-        return ResultVo.error(TokenMsg.EXCEPTION_LOGIN_ACCOUNT_NO.getCode(),
-                TokenMsg.EXCEPTION_LOGIN_ACCOUNT_NO.getMessage(),
-                flagMap
-                );
+        return TokenMsg.EXCEPTION_LOGIN_ACCOUNT_NO;
     }
 
     /**
      * 获得当前失败次数
-     * @param username
+     * @param username 用户名
      */
     public static long getSlipCount(String username){
         long count = 0L;
@@ -320,7 +311,7 @@ public class UserTokenUtil {
 
     /**
      * 清除锁定账号
-     * @param username
+     * @param username 用户名
      */
     public static void clearLockAccount(String username){
         // 删除失败次数记录

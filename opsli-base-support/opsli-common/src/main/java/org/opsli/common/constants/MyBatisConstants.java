@@ -29,9 +29,9 @@ public final class MyBatisConstants {
 
 
     /** 逻辑删除值 */
-    public static final char  LOGIC_DELETE_VALUE;
+    public static final String  LOGIC_DELETE_VALUE;
     /** 逻辑不删除值 */
-    public static final char  LOGIC_NOT_DELETE_VALUE;
+    public static final String  LOGIC_NOT_DELETE_VALUE;
 
 
     /** ID */
@@ -56,8 +56,8 @@ public final class MyBatisConstants {
 
     static {
         Props props = new Props("application.yaml");
-        LOGIC_DELETE_VALUE = props.getChar("mybatis-plus.global-config.db-config.logic-delete-value",'1');
-        LOGIC_NOT_DELETE_VALUE = props.getChar("mybatis-plus.global-config.db-config.logic-not-delete-value",'0');
+        LOGIC_DELETE_VALUE = props.getStr("mybatis-plus.global-config.db-config.logic-delete-value","1");
+        LOGIC_NOT_DELETE_VALUE = props.getStr("mybatis-plus.global-config.db-config.logic-not-delete-value","0");
     }
 
     private MyBatisConstants(){}

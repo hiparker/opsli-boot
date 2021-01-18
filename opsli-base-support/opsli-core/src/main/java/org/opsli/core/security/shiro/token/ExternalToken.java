@@ -4,16 +4,17 @@ package org.opsli.core.security.shiro.token;
 import org.apache.shiro.authc.AuthenticationToken;
 
 /**
- *  OAuth2 token
+ *  第三方对外接口 token
  *
- * @author 孙志强
+ * @author Parker
 
  * @date 2017-05-20 13:22
  */
-public class OAuth2Token implements AuthenticationToken {
-    private String token;
+public class ExternalToken implements AuthenticationToken {
 
-    public OAuth2Token(String token){
+    private final String token;
+
+    public ExternalToken(String token){
         this.token = token;
     }
 
@@ -26,4 +27,5 @@ public class OAuth2Token implements AuthenticationToken {
     public Object getCredentials() {
         return token;
     }
+
 }

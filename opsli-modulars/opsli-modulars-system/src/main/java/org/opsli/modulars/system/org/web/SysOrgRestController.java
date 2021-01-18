@@ -16,9 +16,11 @@
 package org.opsli.modulars.system.org.web;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.convert.Convert;
 import cn.hutool.core.lang.tree.Tree;
 import cn.hutool.core.lang.tree.TreeNodeConfig;
 import cn.hutool.core.lang.tree.TreeUtil;
+import cn.hutool.core.util.ReflectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -30,6 +32,7 @@ import org.opsli.api.web.system.org.SysOrgRestApi;
 import org.opsli.api.wrapper.system.org.SysOrgModel;
 import org.opsli.common.annotation.ApiRestController;
 import org.opsli.common.annotation.EnableLog;
+import org.opsli.common.annotation.RequiresPermissionsCus;
 import org.opsli.common.constants.MyBatisConstants;
 import org.opsli.common.utils.HumpUtil;
 import org.opsli.common.utils.WrapperUtil;
@@ -44,6 +47,7 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -81,7 +85,7 @@ public class SysOrgRestController extends BaseRestController<SysOrg, SysOrgModel
 
         // 获得用户 对应菜单
         List<SysOrg> dataList = IService.findList(wrapper);
-        List<SysOrgModel> orgModelList = WrapperUtil.transformInstance(dataList, SysOrgModel.class);
+        List<SysOrgModel> orgModelList = WrapperUtil.transformInstance(dataList, modelClazz);
         // 0 为初始值
         if(PARENT_ID.equals(parentId)){
             // 显示全部
@@ -169,7 +173,7 @@ public class SysOrgRestController extends BaseRestController<SysOrg, SysOrgModel
 
         // 获得用户 对应菜单
         List<SysOrg> dataList = IService.findList(wrapper);
-        List<SysOrgModel> orgModelList = WrapperUtil.transformInstance(dataList, SysOrgModel.class);
+        List<SysOrgModel> orgModelList = WrapperUtil.transformInstance(dataList, modelClazz);
 
 
         //配置
@@ -235,7 +239,7 @@ public class SysOrgRestController extends BaseRestController<SysOrg, SysOrgModel
 
         // 获得用户 对应菜单
         List<SysOrg> dataList = IService.findList(wrapper);
-        List<SysOrgModel> orgModelList = WrapperUtil.transformInstance(dataList, SysOrgModel.class);
+        List<SysOrgModel> orgModelList = WrapperUtil.transformInstance(dataList, modelClazz);
 
 
         //配置
@@ -291,7 +295,7 @@ public class SysOrgRestController extends BaseRestController<SysOrg, SysOrgModel
     @Override
     public ResultVo<?> findTree(HttpServletRequest request) {
 
-        QueryBuilder<SysOrg> queryBuilder = new WebQueryBuilder<>(SysOrg.class,
+        QueryBuilder<SysOrg> queryBuilder = new WebQueryBuilder<>(entityClazz,
                 request.getParameterMap());
 
 
@@ -387,11 +391,13 @@ public class SysOrgRestController extends BaseRestController<SysOrg, SysOrgModel
     @RequiresPermissions("system_org_update")
     @EnableLog
     @Override
-    public ResultVo<?> delAll(String[] ids){
+    public ResultVo<?> delAll(String ids){
         // 演示模式 不允许操作
         super.demoError();
 
-        IService.deleteAll(ids);
+        String[] idArray = Convert.toStrArray(ids);
+        IService.deleteAll(idArray);
+
         return ResultVo.success("批量删除组织机构成功");
     }
 
@@ -403,12 +409,14 @@ public class SysOrgRestController extends BaseRestController<SysOrg, SysOrgModel
     * @return ResultVo
     */
     @ApiOperation(value = "导出Excel", notes = "导出Excel")
-    @RequiresPermissions("system_org_export")
+    @RequiresPermissionsCus("system_org_export")
     @EnableLog
     @Override
-    public ResultVo<?> exportExcel(HttpServletRequest request, HttpServletResponse response) {
-        QueryBuilder<SysOrg> queryBuilder = new WebQueryBuilder<>(SysOrg.class, request.getParameterMap());
-        return super.excelExport(SysOrgRestApi.TITLE, queryBuilder.build(), response);
+    public void exportExcel(HttpServletRequest request, HttpServletResponse response) {
+        // 当前方法
+        Method method = ReflectUtil.getMethodByName(this.getClass(), "exportExcel");
+        QueryBuilder<SysOrg> queryBuilder = new WebQueryBuilder<>(entityClazz, request.getParameterMap());
+        super.excelExport(SysOrgRestApi.TITLE, queryBuilder.build(), response, method);
     }
 
     /**
@@ -420,8 +428,8 @@ public class SysOrgRestController extends BaseRestController<SysOrg, SysOrgModel
     @RequiresPermissions("system_org_import")
     @EnableLog
     @Override
-    public ResultVo<?> excelImport(MultipartHttpServletRequest request) {
-        return super.excelImport(request);
+    public ResultVo<?> importExcel(MultipartHttpServletRequest request) {
+        return super.importExcel(request);
     }
 
     /**
@@ -430,10 +438,12 @@ public class SysOrgRestController extends BaseRestController<SysOrg, SysOrgModel
     * @return ResultVo
     */
     @ApiOperation(value = "导出Excel模版", notes = "导出Excel模版")
-    @RequiresPermissions("system_org_import")
+    @RequiresPermissionsCus("system_org_import")
     @Override
-    public ResultVo<?> importTemplate(HttpServletResponse response) {
-        return super.importTemplate(SysOrgRestApi.TITLE, response);
+    public void importTemplate(HttpServletResponse response) {
+        // 当前方法
+        Method method = ReflectUtil.getMethodByName(this.getClass(), "importTemplate");
+        super.importTemplate(SysOrgRestApi.TITLE, response, method);
     }
 
 }

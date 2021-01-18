@@ -18,12 +18,9 @@ package org.opsli.core.utils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.opsli.api.base.result.ResultVo;
-import org.opsli.api.web.system.menu.MenuApi;
 import org.opsli.api.web.system.user.UserApi;
-import org.opsli.api.wrapper.system.menu.MenuModel;
 import org.opsli.api.wrapper.system.user.UserOrgRefModel;
 import org.opsli.core.cache.local.CacheUtil;
-import org.opsli.core.cache.pushsub.msgs.MenuMsgFactory;
 import org.opsli.core.cache.pushsub.msgs.OrgMsgFactory;
 import org.opsli.plugins.redis.RedisLockPlugins;
 import org.opsli.plugins.redis.RedisPlugin;
@@ -115,7 +112,6 @@ public class OrgUtil {
         }finally {
             // ============ 释放锁
             redisLockPlugins.unLock(redisLock);
-            redisLock = null;
         }
 
         if(orgRefModel == null){
@@ -135,29 +131,41 @@ public class OrgUtil {
      * @param userId
      * @return
      */
-    public static void refreshMenu(String userId){
+    public static boolean refreshOrg(String userId){
         if(StringUtils.isEmpty(userId)){
-            return;
+            return true;
         }
+
+        // 计数器
+        int count = 0;
 
         UserOrgRefModel orgRefModel = CacheUtil.get(PREFIX_CODE + userId, UserOrgRefModel.class);
         boolean hasNilFlag = CacheUtil.hasNilFlag(PREFIX_CODE + userId);
 
         // 只要不为空 则执行刷新
         if (hasNilFlag){
+            count++;
             // 清除空拦截
-            CacheUtil.delNilFlag(PREFIX_CODE + userId);
+            boolean tmp = CacheUtil.delNilFlag(PREFIX_CODE + userId);
+            if(tmp){
+                count--;
+            }
         }
 
         if(orgRefModel != null){
+            count++;
             // 先删除
-            CacheUtil.del(PREFIX_CODE + userId);
+            boolean tmp = CacheUtil.del(PREFIX_CODE + userId);
+            if(tmp){
+                count--;
+            }
 
             // 发送通知消息
             redisPlugin.sendMessage(
                     OrgMsgFactory.createOrgMsg(orgRefModel)
             );
         }
+        return count == 0;
     }
 
 

@@ -47,6 +47,8 @@ public enum CreaterMsg implements BaseMsg {
      */
     EXCEPTION_IMPORT_NULL(50120,"未选中表，无法导入"),
     EXCEPTION_IMPORT_TABLE_NULL(50121,"暂无{}该表"),
+    EXCEPTION_IMPORT_FIELD_NULL(50122,"暂未获得表字段"),
+
 
     /**
      * 生成
@@ -58,8 +60,8 @@ public enum CreaterMsg implements BaseMsg {
 
     ;
 
-    private int code;
-    private String message;
+    private final int code;
+    private final String message;
 
     CreaterMsg(int code, String message){
         this.code = code;

@@ -16,6 +16,7 @@
 package org.opsli.core.base.concroller;
 
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.date.TimeInterval;
 import cn.hutool.core.util.StrUtil;
@@ -29,14 +30,19 @@ import org.apache.commons.lang3.StringUtils;
 import org.opsli.api.base.result.ResultVo;
 import org.opsli.api.base.warpper.ApiWrapper;
 import org.opsli.api.wrapper.system.user.UserModel;
+import org.opsli.common.annotation.RequiresPermissionsCus;
 import org.opsli.common.annotation.hotdata.EnableHotData;
 import org.opsli.common.exception.ServiceException;
+import org.opsli.common.exception.TokenException;
 import org.opsli.common.msg.CommonMsg;
+import org.opsli.common.utils.OutputStreamUtil;
 import org.opsli.common.utils.WrapperUtil;
 import org.opsli.core.base.entity.BaseEntity;
 import org.opsli.core.base.service.interfaces.CrudServiceInterface;
 import org.opsli.core.cache.local.CacheUtil;
 import org.opsli.core.msg.CoreMsg;
+import org.opsli.core.msg.TokenMsg;
+import org.opsli.core.security.shiro.realm.JwtRealm;
 import org.opsli.core.utils.ExcelUtil;
 import org.opsli.core.utils.UserUtil;
 import org.opsli.plugins.excel.exception.ExcelPluginException;
@@ -52,6 +58,7 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletResponse;
+import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.Iterator;
 import java.util.List;
@@ -84,6 +91,10 @@ public abstract class BaseRestController <T extends BaseEntity, E extends ApiWra
     protected Class<E> modelClazz;
     /** Model 泛型游标 */
     private static final int MODEL_INDEX = 1;
+
+    /** Excel 最大操作数量 防止OOM */
+    @Value("${opsli.excel-max-count:20000}")
+    private Integer excelMaxCount;
 
     @Autowired(required = false)
     protected S IService;
@@ -146,7 +157,6 @@ public abstract class BaseRestController <T extends BaseEntity, E extends ApiWra
                     }finally {
                         // 释放锁
                         redisLockPlugins.unLock(redisLock);
-                        redisLock = null;
                     }
                 }else{
                     // 如果缓存没读到 则去数据库读
@@ -184,7 +194,7 @@ public abstract class BaseRestController <T extends BaseEntity, E extends ApiWra
      * @param request
      * @return
      */
-    protected ResultVo<?> excelImport(MultipartHttpServletRequest request){
+    protected ResultVo<?> importExcel(MultipartHttpServletRequest request){
         // 计时器
         TimeInterval timer = DateUtil.timer();
         Iterator<String> itr = request.getFileNames();
@@ -199,22 +209,39 @@ public abstract class BaseRestController <T extends BaseEntity, E extends ApiWra
         String msgInfo = "";
         try {
             List<E> modelList = excelUtil.readExcel(files.get(0), modelClazz);
-            boolean ret = IService.insertBatch(modelList);
-            if(!ret){
-                throw new ExcelPluginException(CoreMsg.EXCEL_IMPORT_NO);
+            if(CollUtil.isNotEmpty(modelList)){
+                if(modelList.size() > excelMaxCount){
+                    String maxError = StrUtil.format(CoreMsg.EXCEL_HANDLE_MAX.getMessage(), modelList.size(), excelMaxCount);
+                    // 清空 list
+                    modelList.clear();
+                    // 超出最大导出数量
+                    throw new ExcelPluginException(CoreMsg.EXCEL_HANDLE_MAX.getCode(), maxError);
+                }
+
+                boolean ret = IService.insertBatch(modelList);
+                if(!ret){
+                    // 清空 list
+                    modelList.clear();
+                    throw new ExcelPluginException(CoreMsg.EXCEL_IMPORT_NO);
+                }
+                // 清空 list
+                modelList.clear();
+                // 花费毫秒数
+                long timerCount = timer.interval();
+                // 提示信息
+                msgInfo = StrUtil.format(CoreMsg.EXCEL_IMPORT_SUCCESS.getMessage(), DateUtil.formatBetween(timerCount));
+                // 导出成功
+                resultVo = ResultVo.success(msgInfo);
+                resultVo.setCode(CoreMsg.EXCEL_IMPORT_SUCCESS.getCode());
+            }else {
+                throw new ExcelPluginException(CoreMsg.EXCEL_FILE_NULL);
             }
-            // 花费毫秒数
-            long timerCount = timer.interval();
-            // 提示信息
-            msgInfo = StrUtil.format(CoreMsg.EXCEL_IMPORT_SUCCESS.getMessage(), timerCount);
-            // 导出成功
-            resultVo = ResultVo.success(msgInfo);
-            resultVo.setCode(CoreMsg.EXCEL_IMPORT_SUCCESS.getCode());
         } catch (ExcelPluginException e) {
             // 花费毫秒数
             long timerCount = timer.interval();
             // 提示信息
-            msgInfo = StrUtil.format(CoreMsg.EXCEL_IMPORT_ERROR.getMessage(), timerCount, e.getMessage());
+            msgInfo = StrUtil.format(CoreMsg.EXCEL_IMPORT_ERROR.getMessage(), DateUtil.formatBetween(timerCount),
+                    e.getMessage());
             // 导入失败
             resultVo = ResultVo.error(CoreMsg.EXCEL_IMPORT_ERROR.getCode(), msgInfo);
         }
@@ -228,24 +255,63 @@ public abstract class BaseRestController <T extends BaseEntity, E extends ApiWra
      * @param fileName 文件名称
      * @param response
      */
-    protected ResultVo<?> importTemplate(String fileName, HttpServletResponse response){
-        return this.excelExport(fileName + " 模版 ",null, response);
+    protected void importTemplate(String fileName, HttpServletResponse response, Method method){
+        this.excelExport(fileName + " 模版 ",null, response, method);
     }
 
     /**
      * 导出
+     *
+     * 导出时，Token认证和方法权限认证 全部都由自定义完成
+     * 因为在 导出不成功时，需要推送错误信息，
+     * 前端直接走下载流，当失败时无法获得失败信息，即使前后端换一种方式后端推送二进制文件前端再次解析也是最少2倍的耗时
+     * ，且如果数据量过大，前端进行渲染时直接会把浏览器卡死
+     * 而直接开启socket接口推送显然是太过浪费资源了，所以目前采用Java最原始的手段
+     * response 推送 javascript代码 alert 提示报错信息
+     *
      * @param fileName 文件名称
      * @param queryWrapper 查询构建器
      * @param response
      */
-    protected ResultVo<?> excelExport(String fileName, QueryWrapper<T> queryWrapper, HttpServletResponse response){
+    protected void excelExport(String fileName, QueryWrapper<T> queryWrapper, HttpServletResponse response,
+                                      Method method){
+        // 权限认证
+        try {
+            if(method == null){
+                // 无权访问该方法
+                throw new TokenException(TokenMsg.EXCEPTION_NOT_AUTH);
+
+            }
+
+            // Token 认证
+            JwtRealm.authToken();
+
+            RequiresPermissionsCus permissionsCus = method.getAnnotation(RequiresPermissionsCus.class);
+            if(permissionsCus != null){
+                // 方法权限认证
+                JwtRealm.authPerms(permissionsCus.value());
+            }
+        }catch (TokenException e){
+            // 推送错误信息
+            OutputStreamUtil.exceptionResponse(e.getMessage(), response);
+            return;
+        }
+
         // 计时器
         TimeInterval timer = DateUtil.timer();
         String msgInfo = "";
         ResultVo<?> resultVo;
+        List<E> modelList = Lists.newArrayList();
         try {
-            List<E> modelList = Lists.newArrayList();
             if(queryWrapper != null){
+                // 获得数量 大于 阈值 禁止导出， 防止OOM
+                int count = IService.count(queryWrapper);
+                if(count > excelMaxCount){
+                    String maxError = StrUtil.format(CoreMsg.EXCEL_HANDLE_MAX.getMessage(), count, excelMaxCount);
+                    // 超出最大导出数量
+                    throw new ExcelPluginException(CoreMsg.EXCEL_HANDLE_MAX.getCode(), maxError);
+                }
+
                 List<T> entityList = IService.findList(queryWrapper);
                 // 转化类型
                 modelList = WrapperUtil.transformInstance(entityList, modelClazz);
@@ -255,7 +321,8 @@ public abstract class BaseRestController <T extends BaseEntity, E extends ApiWra
             // 花费毫秒数
             long timerCount = timer.interval();
             // 提示信息
-            msgInfo = StrUtil.format(CoreMsg.EXCEL_EXPORT_SUCCESS.getMessage(), modelList.size(), timerCount);
+            msgInfo = StrUtil.format(CoreMsg.EXCEL_EXPORT_SUCCESS.getMessage(), modelList.size(),
+                    DateUtil.formatBetween(timerCount));
             // 导出成功
             resultVo = ResultVo.success(msgInfo);
             resultVo.setCode(CoreMsg.EXCEL_EXPORT_SUCCESS.getCode());
@@ -263,13 +330,21 @@ public abstract class BaseRestController <T extends BaseEntity, E extends ApiWra
             // 花费毫秒数
             long timerCount = timer.interval();
             // 提示信息
-            msgInfo = StrUtil.format(CoreMsg.EXCEL_EXPORT_ERROR.getMessage(), timerCount, e.getMessage());
+            msgInfo = StrUtil.format(CoreMsg.EXCEL_EXPORT_ERROR.getMessage(), DateUtil.formatBetween(timerCount), e.getMessage());
             // 导出失败
             resultVo = ResultVo.error(CoreMsg.EXCEL_EXPORT_ERROR.getCode(), msgInfo);
+        }finally {
+            // 清空list
+            modelList.clear();
         }
         // 记录导出日志
         log.info(msgInfo);
-        return resultVo;
+
+        // 导出异常
+        if(!resultVo.isSuccess()){
+            // 无权访问该方法
+            OutputStreamUtil.exceptionResponse(resultVo.getMsg(), response);
+        }
     }
 
     /**

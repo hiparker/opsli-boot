@@ -29,7 +29,7 @@ public enum SystemInfo {
     /** 实例 */
     INSTANCE;
 
-    private String systemID;
+    private final String systemID;
 
     SystemInfo(){
         // 生成系统ID

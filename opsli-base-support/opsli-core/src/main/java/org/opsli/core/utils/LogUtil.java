@@ -15,6 +15,8 @@
  */
 package org.opsli.core.utils;
 
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.convert.Convert;
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -26,6 +28,7 @@ import org.opsli.api.wrapper.system.logs.LogsModel;
 import org.opsli.api.wrapper.system.menu.MenuModel;
 import org.opsli.api.wrapper.system.user.UserModel;
 import org.opsli.common.annotation.EnableLog;
+import org.opsli.common.annotation.RequiresPermissionsCus;
 import org.opsli.common.utils.IPUtil;
 import org.opsli.core.thread.LogsThreadPool;
 import org.springframework.web.context.request.RequestAttributes;
@@ -137,10 +140,18 @@ public final class LogUtil {
         // 如果title 还为空 则系统自动赋值
         if(StringUtils.isEmpty(logsModel.getTitle())){
             RequiresPermissions permissions = method.getAnnotation(RequiresPermissions.class);
+            RequiresPermissionsCus permissionsCus = method.getAnnotation(RequiresPermissionsCus.class);
+
+            List<String> values = null;
             if(permissions != null){
-                String[] values = permissions.value();
-                if(values.length > 0){
-                    String perms = values[0];
+                values = Convert.toList(String.class, permissions.value());
+            }else if(permissionsCus != null){
+                values = Convert.toList(String.class, permissionsCus.value());
+            }
+
+            if(CollUtil.isNotEmpty(values)){
+                if(values != null && values.size() > 0){
+                    String perms = values.get(0);
                     // 获得当前用户所持有菜单
                     List<MenuModel> menuListByUserId = UserUtil.getMenuListByUserId(user.getId());
                     if(menuListByUserId != null){

@@ -15,27 +15,24 @@
  */
 package org.opsli.modulars.system.user.service.impl;
 
+import cn.hutool.core.collection.CollUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
 import org.opsli.api.wrapper.system.user.UserOrgRefModel;
 import org.opsli.common.exception.ServiceException;
+import org.opsli.core.msg.CoreMsg;
 import org.opsli.core.utils.OrgUtil;
-import org.opsli.core.utils.UserUtil;
 import org.opsli.modulars.system.SystemMsg;
 import org.opsli.modulars.system.user.entity.SysUserOrgRef;
-import org.opsli.modulars.system.user.entity.SysUserRoleRef;
 import org.opsli.modulars.system.user.mapper.UserOrgRefMapper;
-import org.opsli.modulars.system.user.mapper.UserRoleRefMapper;
 import org.opsli.modulars.system.user.service.IUserOrgRefService;
-import org.opsli.modulars.system.user.service.IUserRoleRefService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
+import java.util.Collections;
 import java.util.List;
 
 
@@ -99,10 +96,36 @@ public class UserOrgRefServiceImpl extends ServiceImpl<UserOrgRefMapper, SysUser
 
         // 清空缓存
         if(saveBatchFlag){
-            OrgUtil.refreshMenu(model.getUserId());
+            // 刷新用户缓存
+            this.clearCache(Collections.singletonList(model.getUserId()));
         }
 
         return true;
+    }
+
+    // ============
+
+    /**
+     * 清除缓存
+     * @param userIds
+     */
+    private void clearCache(List<String> userIds){
+        // 清空缓存
+        if(CollUtil.isNotEmpty(userIds)){
+            int cacheCount = 0;
+            for (String userId : userIds) {
+                cacheCount++;
+                boolean tmp = OrgUtil.refreshOrg(userId);
+                if(tmp){
+                    cacheCount--;
+                }
+            }
+            // 判断删除状态
+            if(cacheCount != 0){
+                // 删除缓存失败
+                throw new ServiceException(CoreMsg.CACHE_DEL_EXCEPTION);
+            }
+        }
     }
 
 }

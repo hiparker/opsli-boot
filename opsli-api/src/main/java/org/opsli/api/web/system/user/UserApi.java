@@ -102,6 +102,13 @@ public interface UserApi {
     @PostMapping("/updatePasswordById")
     ResultVo<?> updatePasswordById(@RequestBody UserPassword userPassword);
 
+    /**
+     * 重置密码 ID
+     * @return ResultVo
+     */
+    @PostMapping("/resetPasswordById")
+    ResultVo<?> resetPasswordById(String userId);
+
 
     /**
      * 上传头像
@@ -165,7 +172,7 @@ public interface UserApi {
      * @return ResultVo
      */
     @PostMapping("/delAll")
-    ResultVo<?> delAll(String[] ids);
+    ResultVo<?> delAll(String ids);
 
     /**
      * 用户信息 Excel 导出
@@ -174,15 +181,15 @@ public interface UserApi {
      * @return ResultVo
      */
     @GetMapping("/exportExcel")
-    ResultVo<?> exportExcel(HttpServletRequest request, HttpServletResponse response);
+    void exportExcel(HttpServletRequest request, HttpServletResponse response);
 
     /**
      * 用户信息 Excel 导入
      * @param request 文件流 request
      * @return ResultVo
      */
-    @GetMapping("/exportImport")
-    ResultVo<?> excelImport(MultipartHttpServletRequest request);
+    @PostMapping("/importExcel")
+    ResultVo<?> importExcel(MultipartHttpServletRequest request);
 
 
     /**
@@ -190,8 +197,8 @@ public interface UserApi {
      * @param response response
      * @return ResultVo
      */
-    @GetMapping("/exportImport/template")
-    ResultVo<?> importTemplate(HttpServletResponse response);
+    @GetMapping("/importExcel/template")
+    void importTemplate(HttpServletResponse response);
 
 
     /**

@@ -77,7 +77,7 @@ public class DictDetailModel extends ApiWrapper {
     // 验证器
     @ValidationArgs({ValiArgsType.IS_NOT_NULL})
     @ValidationArgsLenMax(1)
-    private Character izLock;
+    private String izLock;
 
     /** 排序 */
     @ApiModelProperty(value = "排序")

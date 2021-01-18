@@ -60,11 +60,11 @@ public class RoleModel extends ApiWrapper {
     /** 是否内置数据 0是  1否*/
     @ApiModelProperty(value = "是否内置数据 0是  1否")
     @ExcelProperty(value = "是否内置数据", order = 3)
-    @ExcelInfo(dictType = "yes_no")
+    @ExcelInfo(dictType = "no_yes")
     // 验证器
     @ValidationArgs({ValiArgsType.IS_NOT_NULL})
     @ValidationArgsLenMax(1)
-    private Character izLock;
+    private String izLock;
 
     /** 备注 */
     @ApiModelProperty(value = "备注")

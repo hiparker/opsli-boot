@@ -66,7 +66,7 @@ public class UserModel extends ApiWrapper {
     // 验证器
     @ValidationArgs({ValiArgsType.IS_NOT_NULL})
     @ValidationArgsLenMax(1)
-    private Character locked;
+    private String locked;
 
     /** 真实姓名 */
     @ApiModelProperty(value = "真实姓名")

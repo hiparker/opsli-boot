@@ -16,8 +16,13 @@
 package org.opsli.core.conf;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.ClassUtil;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import org.apache.shiro.authc.pam.AtLeastOneSuccessfulStrategy;
+import org.apache.shiro.authc.pam.ModularRealmAuthenticator;
 import org.apache.shiro.mgt.SecurityManager;
+import org.apache.shiro.realm.Realm;
 import org.apache.shiro.session.mgt.SessionManager;
 import org.apache.shiro.spring.LifecycleBeanPostProcessor;
 import org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor;
@@ -25,21 +30,21 @@ import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
 import org.opsli.common.utils.Props;
-import org.opsli.core.security.shiro.filter.OAuth2Filter;
-import org.opsli.core.security.shiro.realm.OAuth2Realm;
+import org.opsli.core.security.shiro.authenticator.CustomModularRealmAuthenticator;
+import org.opsli.core.security.shiro.filter.CustomShiroFilter;
+import org.opsli.core.security.shiro.realm.FlagRealm;
 import org.opsli.plugins.redis.conf.RedisPluginConfig;
 import org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
-import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 
 import javax.servlet.Filter;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
+import java.lang.reflect.Modifier;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Shiro配置
@@ -55,15 +60,18 @@ public class ShiroConfig {
 
     /** 获得排除URL */
     private static final List<String> URL_EXCLUSION;
+    /** API前缀 */
+    private static final String API_URL_PREFIX;
 
     static{
         Props props = new Props("application.yaml");
         URL_EXCLUSION = props.getList("opsli.token-auth.url-exclusion");
+        API_URL_PREFIX = props.getStr("server.servlet.api.path.global-prefix","");
     }
 
     /**
      * filer
-     * @param securityManager
+     * @param securityManager 安全管理器
      * @return
      */
     @Bean("shiroFilter")
@@ -73,24 +81,10 @@ public class ShiroConfig {
 
         //oauth过滤
         Map<String, Filter> filters = Maps.newHashMapWithExpectedSize(1);
-        filters.put("oauth2", new OAuth2Filter());
+        filters.put("last_filter", new CustomShiroFilter());
         shiroFilter.setFilters(filters);
 
         Map<String, String> filterMap = Maps.newLinkedHashMap();
-        filterMap.put("/webjars/**", "anon");
-        filterMap.put("/druid/**", "anon");
-        filterMap.put("/app/**", "anon");
-        filterMap.put("/sys/login", "anon");
-        filterMap.put("/sys/slipCount", "anon");
-        filterMap.put("/swagger/**", "anon");
-        filterMap.put("/v2/api-docs", "anon");
-        filterMap.put("/doc.html", "anon");
-        filterMap.put("/swagger-ui.html", "anon");
-        filterMap.put("/swagger-resources/**", "anon");
-        filterMap.put("/captcha.jpg", "anon");
-        filterMap.put("/ueditor/**", "anon");
-        filterMap.put("/static/file/**", "anon");
-        filterMap.put("/**", "oauth2");
 
         // 加载排除URL
         if(CollUtil.isNotEmpty(URL_EXCLUSION)){
@@ -98,6 +92,26 @@ public class ShiroConfig {
                 filterMap.put(excUrl, "anon");
             }
         }
+
+        // 登录接口拦截
+        filterMap.put("/sys/login", "anon");
+        filterMap.put("/sys/slipCount", "anon");
+        filterMap.put("/captcha.jpg", "anon");
+
+        // 导出Excel\模版 不做自动拦截 手动拦截
+        filterMap.put(API_URL_PREFIX + "/**/exportExcel", "anon");
+        filterMap.put(API_URL_PREFIX + "/**/importExcel/template", "anon");
+
+        filterMap.put("/webjars/**", "anon");
+        filterMap.put("/druid/**", "anon");
+        filterMap.put("/app/**", "anon");
+        filterMap.put("/swagger/**", "anon");
+        filterMap.put("/v2/api-docs", "anon");
+        filterMap.put("/doc.html", "anon");
+        filterMap.put("/swagger-ui.html", "anon");
+        filterMap.put("/swagger-resources/**", "anon");
+        filterMap.put("/static/file/**", "anon");
+        filterMap.put("/**", "last_filter");
 
         shiroFilter.setFilterChainDefinitionMap(filterMap);
 
@@ -113,16 +127,44 @@ public class ShiroConfig {
     }
 
     @Bean("securityManager")
-    public DefaultWebSecurityManager securityManager(OAuth2Realm oAuth2Realm, SessionManager sessionManager,LettuceConnectionFactory lettuceConnectionFactory) {
+    public DefaultWebSecurityManager securityManager(SessionManager sessionManager) {
         DefaultWebSecurityManager securityManager = new DefaultWebSecurityManager();
-        securityManager.setRealm(oAuth2Realm);
         securityManager.setSessionManager(sessionManager);
+        // 设置验证器为自定义验证器
+        securityManager.setAuthenticator(modularRealmAuthenticator());
+
+        List<Realm> realms = Lists.newArrayList();
+        // 拿到state包下 实现了 FlagRealm 接口的,所有子类
+        Set<Class<?>> clazzSet = ClassUtil.scanPackageBySuper(FlagRealm.class.getPackage().getName()
+                , FlagRealm.class
+        );
+        for (Class<?> aClass : clazzSet) {
+            // 位运算 去除抽象类
+            if((aClass.getModifiers() & Modifier.ABSTRACT) != 0){
+                continue;
+            }
+
+            try {
+                realms.add((Realm) aClass.newInstance());
+            } catch (Exception ignored){ }
+        }
+
+        if(CollUtil.isNotEmpty(realms)){
+            // 追加 Realms
+            securityManager.setRealms(realms);
+        }
+
         return securityManager;
     }
 
-    @Bean
-    public OAuth2Realm oAuth2Realm() {
-        return new OAuth2Realm();
+    /**
+     * 针对多Realm，使用自定义身份验证器
+     */
+    @Bean("modularRealmAuthenticator")
+    public ModularRealmAuthenticator modularRealmAuthenticator(){
+        CustomModularRealmAuthenticator authenticator = new CustomModularRealmAuthenticator();
+        authenticator.setAuthenticationStrategy(new AtLeastOneSuccessfulStrategy());
+        return authenticator;
     }
 
 
@@ -148,7 +190,7 @@ public class ShiroConfig {
 
     /**
      * 开启shiro权限注解生效
-     * @param securityManager
+     * @param securityManager 安全管理器
      * @return
      */
     @Bean("authorizationAttributeSourceAdvisor")

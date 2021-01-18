@@ -1,0 +1,150 @@
+
+### 改动不大
+
+修改 sys_user 表索引为
+
+### 1. 先删除 原有老索引
+alter table sys_user drop index unique_username ;
+
+### 2. 增加新索引
+alter table sys_user add index `sys_user_index` (`username`,`real_name`);
+
+### 3. 增加表
+-- ----------------------------
+-- Table structure for test_car
+-- ----------------------------
+DROP TABLE IF EXISTS `test_car`;
+CREATE TABLE `test_car` (
+  `id` bigint(19) NOT NULL COMMENT '主键',
+  `car_name` varchar(20) COLLATE utf8mb4_general_ci NOT NULL COMMENT '汽车名称',
+  `car_type` varchar(20) COLLATE utf8mb4_general_ci NOT NULL COMMENT '汽车类型',
+  `car_brand` varchar(50) COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '汽车品牌',
+  `produce_data` date NOT NULL COMMENT '生产日期',
+  `iz_usable` char(1) COLLATE utf8mb4_general_ci NOT NULL COMMENT '是否启用',
+  `tenant_id` bigint(19) DEFAULT NULL COMMENT '多租户ID',
+  `deleted` char(1) COLLATE utf8mb4_general_ci NOT NULL COMMENT '删除标记:0未删除，1删除',
+  `version` int(10) NOT NULL COMMENT '版本号(乐观锁)',
+  `create_by` bigint(19) NOT NULL COMMENT '创建用户',
+  `create_time` datetime NOT NULL COMMENT '创建日期',
+  `update_by` bigint(19) NOT NULL COMMENT '修改用户',
+  `update_time` datetime NOT NULL COMMENT '修改日期',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='测试汽车';
+
+-- ----------------------------
+-- Records of test_car
+-- ----------------------------
+BEGIN;
+INSERT INTO `test_car` VALUES (1340634224709677058, '奔驰GXX', 'Gxx', '奔驰', '2020-12-20', '1', 1, '0', 0, 1313694379541635074, '2020-12-20 20:24:42', 1313694379541635074, '2020-12-20 20:24:42');
+INSERT INTO `test_car` VALUES (1340634337075081217, '北汽绅宝', '电动', '绅宝', '2020-12-13', '1', 1, '0', 0, 1313694379541635074, '2020-12-20 20:25:08', 1313694379541635074, '2020-12-20 20:25:08');
+INSERT INTO `test_car` VALUES (1340634432696823810, '宝马7系', '烧油', '宝马', '2020-12-20', '0', 1, '0', 0, 1313694379541635074, '2020-12-20 20:25:31', 1313694379541635074, '2020-12-20 20:25:31');
+INSERT INTO `test_car` VALUES (1340634485616357378, '测试', '123', '123', '2020-12-07', '0', 1, '1', 0, 1313694379541635074, '2020-12-20 20:25:44', 1313694379541635074, '2020-12-20 20:25:44');
+INSERT INTO `test_car` VALUES (1340635288087375874, '宝马7系', '烧油', '宝马', '2020-12-20', '0', 1, '0', 0, 1313694379541635074, '2020-12-20 20:28:55', 1313694379541635074, '2020-12-20 20:28:55');
+INSERT INTO `test_car` VALUES (1340635288095764482, '北汽绅宝', '电动', '绅宝', '2020-12-13', '1', 1, '0', 0, 1313694379541635074, '2020-12-20 20:28:55', 1313694379541635074, '2020-12-20 20:28:55');
+INSERT INTO `test_car` VALUES (1340635288099958786, '奔驰GXX', 'Gxx', '奔驰', '2020-12-20', '1', 1, '0', 0, 1313694379541635074, '2020-12-20 20:28:55', 1313694379541635074, '2020-12-20 20:28:55');
+COMMIT;
+
+-- ----------------------------
+-- Table structure for test_car_copy1
+-- ----------------------------
+DROP TABLE IF EXISTS `test_car_copy1`;
+CREATE TABLE `test_car_copy1` (
+  `id` bigint(19) NOT NULL COMMENT '主键',
+  `car_name` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '汽车名称',
+  `car_type` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '汽车类型',
+  `car_brand` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '汽车品牌',
+  `produce_data` date NOT NULL COMMENT '生产日期',
+  `iz_usable` char(1) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '是否启用',
+  `tenant_id` bigint(19) DEFAULT NULL COMMENT '多租户ID',
+  `deleted` char(1) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '删除标记:0未删除，1删除',
+  `version` int(10) NOT NULL COMMENT '版本号(乐观锁)',
+  `create_by` bigint(19) NOT NULL COMMENT '创建用户',
+  `create_time` datetime NOT NULL COMMENT '创建日期',
+  `update_by` bigint(19) NOT NULL COMMENT '修改用户',
+  `update_time` datetime NOT NULL COMMENT '修改日期',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='测试';
+
+-- ----------------------------
+-- Table structure for test_car_copy2
+-- ----------------------------
+DROP TABLE IF EXISTS `test_car_copy2`;
+CREATE TABLE `test_car_copy2` (
+  `id` bigint(19) NOT NULL COMMENT '主键',
+  `car_name` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '汽车名称',
+  `car_type` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '汽车类型',
+  `car_brand` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '汽车品牌',
+  `produce_data` date NOT NULL COMMENT '生产日期',
+  `iz_usable` char(1) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '是否启用',
+  `tenant_id` bigint(19) DEFAULT NULL COMMENT '多租户ID',
+  `deleted` char(1) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '删除标记:0未删除，1删除',
+  `version` int(10) NOT NULL COMMENT '版本号(乐观锁)',
+  `create_by` bigint(19) NOT NULL COMMENT '创建用户',
+  `create_time` datetime NOT NULL COMMENT '创建日期',
+  `update_by` bigint(19) NOT NULL COMMENT '修改用户',
+  `update_time` datetime NOT NULL COMMENT '修改日期',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='测试';
+
+-- ----------------------------
+-- Table structure for test_car_copy3
+-- ----------------------------
+DROP TABLE IF EXISTS `test_car_copy3`;
+CREATE TABLE `test_car_copy3` (
+  `id` bigint(19) NOT NULL COMMENT '主键',
+  `car_name` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '汽车名称',
+  `car_type` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '汽车类型',
+  `car_brand` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '汽车品牌',
+  `produce_data` date NOT NULL COMMENT '生产日期',
+  `iz_usable` char(1) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '是否启用',
+  `tenant_id` bigint(19) DEFAULT NULL COMMENT '多租户ID',
+  `deleted` char(1) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '删除标记:0未删除，1删除',
+  `version` int(10) NOT NULL COMMENT '版本号(乐观锁)',
+  `create_by` bigint(19) NOT NULL COMMENT '创建用户',
+  `create_time` datetime NOT NULL COMMENT '创建日期',
+  `update_by` bigint(19) NOT NULL COMMENT '修改用户',
+  `update_time` datetime NOT NULL COMMENT '修改日期',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='测试';
+
+-- ----------------------------
+-- Table structure for test_car_copy4
+-- ----------------------------
+DROP TABLE IF EXISTS `test_car_copy4`;
+CREATE TABLE `test_car_copy4` (
+  `id` bigint(19) NOT NULL COMMENT '主键',
+  `car_name` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '汽车名称',
+  `car_type` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '汽车类型',
+  `car_brand` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '汽车品牌',
+  `produce_data` date NOT NULL COMMENT '生产日期',
+  `iz_usable` char(1) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '是否启用',
+  `tenant_id` bigint(19) DEFAULT NULL COMMENT '多租户ID',
+  `deleted` char(1) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '删除标记:0未删除，1删除',
+  `version` int(10) NOT NULL COMMENT '版本号(乐观锁)',
+  `create_by` bigint(19) NOT NULL COMMENT '创建用户',
+  `create_time` datetime NOT NULL COMMENT '创建日期',
+  `update_by` bigint(19) NOT NULL COMMENT '修改用户',
+  `update_time` datetime NOT NULL COMMENT '修改日期',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='测试';
+
+-- ----------------------------
+-- Table structure for test_car_copy5
+-- ----------------------------
+DROP TABLE IF EXISTS `test_car_copy5`;
+CREATE TABLE `test_car_copy5` (
+  `id` bigint(19) NOT NULL COMMENT '主键',
+  `car_name` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '汽车名称',
+  `car_type` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '汽车类型',
+  `car_brand` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '汽车品牌',
+  `produce_data` date NOT NULL COMMENT '生产日期',
+  `iz_usable` char(1) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '是否启用',
+  `tenant_id` bigint(19) DEFAULT NULL COMMENT '多租户ID',
+  `deleted` char(1) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '删除标记:0未删除，1删除',
+  `version` int(10) NOT NULL COMMENT '版本号(乐观锁)',
+  `create_by` bigint(19) NOT NULL COMMENT '创建用户',
+  `create_time` datetime NOT NULL COMMENT '创建日期',
+  `update_by` bigint(19) NOT NULL COMMENT '修改用户',
+  `update_time` datetime NOT NULL COMMENT '修改日期',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='测试';

@@ -53,9 +53,8 @@ public class UserCachingOperationNameGenerator {
   private String startingWith(String prefix) {
     if (generated.containsKey(prefix)) {
       generated.put(prefix, generated.get(prefix) + 1);
-      String nextUniqueOperationName = String.format("%s_%s", prefix, generated.get(prefix));
       //log.warn("组件中存在相同的方法名称，自动生成组件方法唯一名称进行替换: {}", nextUniqueOperationName);
-      return nextUniqueOperationName;
+      return String.format("%s_%s", prefix, generated.get(prefix));
     } else {
       generated.put(prefix, 0);
       return prefix;

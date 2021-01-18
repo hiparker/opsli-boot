@@ -80,6 +80,13 @@ public interface IUserService extends CrudServiceInterface<SysUser, UserModel> {
      */
     boolean updatePassword(UserPassword userPassword);
 
+    /**
+     * 重置密码
+     * @param userPassword
+     * @return
+     */
+    boolean resetPassword(UserPassword userPassword);
+
 
     /**
      * 更新用户最后登录IP

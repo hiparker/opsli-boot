@@ -15,6 +15,7 @@
  */
 package org.opsli.modulars.system.dict.service.impl;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.google.common.collect.Lists;
@@ -28,6 +29,7 @@ import org.opsli.common.utils.HumpUtil;
 import org.opsli.core.base.service.impl.CrudServiceImpl;
 import org.opsli.core.cache.pushsub.enums.CacheType;
 import org.opsli.core.cache.pushsub.msgs.DictMsgFactory;
+import org.opsli.core.msg.CoreMsg;
 import org.opsli.core.persistence.querybuilder.GenQueryBuilder;
 import org.opsli.core.persistence.querybuilder.QueryBuilder;
 import org.opsli.core.utils.DictUtil;
@@ -41,10 +43,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 
 /**
@@ -94,7 +93,10 @@ public class DictDetailServiceImpl extends CrudServiceImpl<DictDetailMapper, Sys
                     dictWrapperList.add(dictWrapperModel);
                 }
                 // 删除缓存
-                DictUtil.delAll(ret.getTypeCode());
+                this.clearCache(Collections.singletonList(
+                        ret.getTypeCode()
+                ));
+
                 // 广播缓存数据 - 通知其他服务器同步数据
                 redisPlugin.sendMessage(
                         DictMsgFactory.createMsg(dictWrapperList, CacheType.DELETE)
@@ -138,7 +140,10 @@ public class DictDetailServiceImpl extends CrudServiceImpl<DictDetailMapper, Sys
                     dictWrapperList.add(dictWrapperModel);
                 }
                 // 删除缓存
-                DictUtil.delAll(oldModel.getTypeCode());
+                this.clearCache(Collections.singletonList(
+                        oldModel.getTypeCode()
+                ));
+
                 // 广播缓存数据 - 通知其他服务器同步数据
                 redisPlugin.sendMessage(
                         DictMsgFactory.createMsg(dictWrapperList, CacheType.DELETE)
@@ -156,6 +161,7 @@ public class DictDetailServiceImpl extends CrudServiceImpl<DictDetailMapper, Sys
      * @return
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public boolean delete(String id) {
         DictDetailModel dictModel = this.get(id);
         boolean ret = super.delete(id);
@@ -171,7 +177,9 @@ public class DictDetailServiceImpl extends CrudServiceImpl<DictDetailMapper, Sys
                     dictWrapperList.add(dictWrapperModel);
                 }
                 // 删除缓存
-                DictUtil.delAll(dictModel.getTypeCode());
+                this.clearCache(Collections.singletonList(
+                        dictModel.getTypeCode()
+                ));
                 // 广播缓存数据 - 通知其他服务器同步数据
                 redisPlugin.sendMessage(
                         DictMsgFactory.createMsg(dictWrapperList, CacheType.DELETE)
@@ -187,10 +195,16 @@ public class DictDetailServiceImpl extends CrudServiceImpl<DictDetailMapper, Sys
      * @return
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public boolean delete(DictDetailModel model) {
         DictDetailModel dictModel = this.get(model);
         boolean ret = super.delete(model);
         if(ret){
+            // 删除缓存
+            this.clearCache(Collections.singletonList(
+                    dictModel.getTypeCode()
+            ));
+
             List<DictDetailModel> listByTypeCode = this.findListByTypeCode(dictModel.getTypeCode());
             if(listByTypeCode != null && listByTypeCode.size() > 0){
                 List<DictWrapper> dictWrapperList = Lists.newArrayListWithCapacity(listByTypeCode.size());
@@ -202,7 +216,9 @@ public class DictDetailServiceImpl extends CrudServiceImpl<DictDetailMapper, Sys
                     dictWrapperList.add(dictWrapperModel);
                 }
                 // 删除缓存
-                DictUtil.delAll(dictModel.getTypeCode());
+                this.clearCache(Collections.singletonList(
+                        dictModel.getTypeCode()
+                ));
                 // 广播缓存数据 - 通知其他服务器同步数据
                 redisPlugin.sendMessage(
                         DictMsgFactory.createMsg(dictWrapperList, CacheType.DELETE)
@@ -218,6 +234,7 @@ public class DictDetailServiceImpl extends CrudServiceImpl<DictDetailMapper, Sys
      * @return
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public boolean deleteAll(String[] ids) {
         QueryBuilder<SysDictDetail> queryBuilder = new GenQueryBuilder<>();
         QueryWrapper<SysDictDetail> queryWrapper = queryBuilder.build();
@@ -242,10 +259,11 @@ public class DictDetailServiceImpl extends CrudServiceImpl<DictDetailMapper, Sys
                     typeCodes.add(dictWrapperModel.getTypeCode());
                 }
 
+                List<String> typeCodeList = Lists.newArrayListWithCapacity(typeCodes.size());
+                typeCodeList.addAll(typeCodes);
+
                 // 删除缓存
-                for (String typeCode : typeCodes) {
-                    DictUtil.delAll(typeCode);
-                }
+                this.clearCache(typeCodeList);
 
                 // 广播缓存数据 - 通知其他服务器同步数据
                 redisPlugin.sendMessage(
@@ -263,6 +281,7 @@ public class DictDetailServiceImpl extends CrudServiceImpl<DictDetailMapper, Sys
      * @return
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public boolean deleteAll(Collection<DictDetailModel> models) {
 
         QueryBuilder<SysDictDetail> queryBuilder = new GenQueryBuilder<>();
@@ -294,10 +313,11 @@ public class DictDetailServiceImpl extends CrudServiceImpl<DictDetailMapper, Sys
                     typeCodes.add(dictWrapperModel.getTypeCode());
                 }
 
+                List<String> typeCodeList = Lists.newArrayListWithCapacity(typeCodes.size());
+                typeCodeList.addAll(typeCodes);
+
                 // 删除缓存
-                for (String typeCode : typeCodes) {
-                    DictUtil.delAll(typeCode);
-                }
+                this.clearCache(typeCodeList);
 
                 // 广播缓存数据 - 通知其他服务器同步数据
                 redisPlugin.sendMessage(
@@ -339,7 +359,9 @@ public class DictDetailServiceImpl extends CrudServiceImpl<DictDetailMapper, Sys
                     dictWrapperList.add(dictWrapperModel);
                 }
                 // 删除缓存
-                DictUtil.delAll(dictModel.getTypeCode());
+                this.clearCache(Collections.singletonList(
+                        dictModel.getTypeCode()
+                ));
                 // 广播缓存数据 - 通知其他服务器同步数据
                 redisPlugin.sendMessage(
                         DictMsgFactory.createMsg(dictWrapperList, CacheType.DELETE)
@@ -372,6 +394,32 @@ public class DictDetailServiceImpl extends CrudServiceImpl<DictDetailMapper, Sys
         List<SysDictDetail> list = this.findList(queryWrapper);
         // 转化对象
         return super.transformTs2Ms(list);
+    }
+
+
+    // ================
+
+    /**
+     * 清除缓存
+     * @param typeCodeList
+     */
+    private void clearCache(List<String> typeCodeList) {
+        // 删除缓存
+        if (CollUtil.isNotEmpty(typeCodeList)) {
+            int cacheCount = 0;
+            for (String typeCode : typeCodeList) {
+                cacheCount++;
+                boolean tmp = DictUtil.delAll(typeCode);
+                if(tmp){
+                    cacheCount--;
+                }
+            }
+            // 判断删除状态
+            if(cacheCount != 0){
+                // 删除缓存失败
+                throw new ServiceException(CoreMsg.CACHE_DEL_EXCEPTION);
+            }
+        }
     }
 }
 

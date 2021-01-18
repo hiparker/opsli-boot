@@ -15,9 +15,14 @@
  */
 package org.opsli.modulars.system.tenant.service.impl;
 
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.convert.Convert;
+import com.google.common.collect.Lists;
 import org.opsli.api.wrapper.system.tenant.TenantModel;
 import org.opsli.common.exception.ServiceException;
 import org.opsli.core.base.service.impl.CrudServiceImpl;
+import org.opsli.core.msg.CoreMsg;
+import org.opsli.core.utils.TenantUtil;
 import org.opsli.modulars.system.SystemMsg;
 import org.opsli.modulars.system.tenant.entity.SysTenant;
 import org.opsli.modulars.system.tenant.mapper.TenantMapper;
@@ -25,6 +30,10 @@ import org.opsli.modulars.system.tenant.service.ITenantService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 
 /**
@@ -73,9 +82,125 @@ public class TenantServiceImpl extends CrudServiceImpl<TenantMapper, SysTenant, 
             throw new ServiceException(SystemMsg.EXCEPTION_TENANT_UNIQUE);
         }
 
-        return super.update(model);
+        TenantModel tenantModel = super.update(model);
+        if(tenantModel != null){
+            // 清除缓存
+            this.clearCache(Collections.singletonList(model.getId()));
+        }
+        return tenantModel;
     }
 
+
+    /**
+     * 删除
+     * @param id ID
+     * @return
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public boolean delete(String id) {
+        TenantModel tenantModel = this.get(id);
+        if(tenantModel == null){
+            return false;
+        }
+
+        boolean ret = super.delete(id);
+
+        if(ret){
+            // 清除缓存
+            this.clearCache(Collections.singletonList(tenantModel.getId()));
+        }
+
+        return ret;
+    }
+
+    /**
+     * 删除
+     * @param model 数据模型
+     * @return
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public boolean delete(TenantModel model) {
+        TenantModel tenantModel = this.get(model);
+        if(tenantModel == null){
+            return false;
+        }
+
+        boolean ret = super.delete(model);
+
+        if(ret){
+            // 清除缓存
+            this.clearCache(Collections.singletonList(tenantModel.getId()));
+        }
+
+        return ret;
+    }
+
+    /**
+     * 删除 - 多个
+     * @param ids id数组
+     * @return
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public boolean deleteAll(String[] ids) {
+        List<String> idList = Convert.toList(String.class, ids);
+
+        boolean ret = super.deleteAll(ids);
+        if(ret){
+            // 清除缓存
+            this.clearCache(idList);
+        }
+        return ret;
+    }
+
+
+    /**
+     * 删除 - 多个
+     * @param models 封装模型
+     * @return
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public boolean deleteAll(Collection<TenantModel> models) {
+        List<String> idList = Lists.newArrayListWithCapacity(models.size());
+        for (TenantModel model : models) {
+            idList.add(model.getId());
+        }
+
+        boolean ret = super.deleteAll(models);
+        if(ret){
+            // 清除缓存
+            this.clearCache(idList);
+        }
+        return ret;
+    }
+
+    // ============
+
+    /**
+     * 清除缓存
+     * @param tenantIds
+     */
+    private void clearCache(List<String> tenantIds){
+        // 清空缓存
+        if(CollUtil.isNotEmpty(tenantIds)){
+            int cacheCount = 0;
+            for (String tenantId : tenantIds) {
+                cacheCount++;
+                boolean tmp = TenantUtil.refreshTenant(tenantId);
+                if(tmp){
+                    cacheCount--;
+                }
+            }
+            // 判断删除状态
+            if(cacheCount != 0){
+                // 删除缓存失败
+                throw new ServiceException(CoreMsg.CACHE_DEL_EXCEPTION);
+            }
+        }
+    }
 
 }
 

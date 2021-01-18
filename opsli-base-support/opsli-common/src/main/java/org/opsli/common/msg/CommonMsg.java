@@ -30,12 +30,14 @@ public enum CommonMsg implements BaseMsg {
     /** Controller 参数默认序列化 */
     EXCEPTION_CONTROLLER_MODEL(10100,"序列化对象失败！"),
 
+    /** 创建文件失败 */
+    EXCEPTION_CREATE_FILE_ERROR(10101,"创建文件失败！"),
 
 
     ;
 
-    private int code;
-    private String message;
+    private final int code;
+    private final String message;
 
     CommonMsg(int code, String message){
         this.code = code;

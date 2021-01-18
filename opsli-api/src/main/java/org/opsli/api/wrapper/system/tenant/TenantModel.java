@@ -53,7 +53,7 @@ public class TenantModel extends ApiWrapper {
     // 验证器
     @ValidationArgs({ValiArgsType.IS_NOT_NULL})
     @ValidationArgsLenMax(1)
-    private Character izUsable;
+    private String izUsable;
 
     /** 备注 */
     @ApiModelProperty(value = "备注")

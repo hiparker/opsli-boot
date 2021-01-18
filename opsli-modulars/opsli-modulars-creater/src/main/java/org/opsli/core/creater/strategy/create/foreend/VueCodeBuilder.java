@@ -15,7 +15,6 @@
  */
 package org.opsli.core.creater.strategy.create.foreend;
 
-import cn.hutool.core.convert.Convert;
 import cn.hutool.core.date.DateUtil;
 import com.jfinal.kit.Kv;
 import org.apache.commons.lang3.StringUtils;
@@ -75,11 +74,11 @@ public enum VueCodeBuilder {
         List<CreaterTableColumnModel> briefQueryList = new ArrayList<>(2);
         // 更多检索
         List<CreaterTableColumnModel> moreQueryList = new ArrayList<>();
-        for (int i = 0; i < columnList.size(); i++) {
-            if(StringUtils.isNotBlank(columnList.get(i).getQueryType()) &&
-                    columnList.get(i).getIzShowList().equals(DictType.NO_YES_YES.getCode())
-                ){
-                queryList.add(columnList.get(i));
+        for (CreaterTableColumnModel createrTableColumnModel : columnList) {
+            if (StringUtils.isNotBlank(createrTableColumnModel.getQueryType()) &&
+                    createrTableColumnModel.getIzShowList().equals(DictType.NO_YES_YES.getCode())
+            ) {
+                queryList.add(createrTableColumnModel);
             }
         }
         // 筛选数据
@@ -130,7 +129,7 @@ public enum VueCodeBuilder {
         List<CreaterTableColumnModel> columnList = builderModel.getModel().getColumnList();
         List<List<CreaterTableColumnModel>> formList = new ArrayList<>();
         Map<String,List<String>> valiDict = new HashMap<>();
-        Set<String> validataTypes = new HashSet<>();
+        Set<String> validateTypesSet = new HashSet<>();
         // 处理验证数据
         for (CreaterTableColumnModel columnModel : columnList) {
             // 数据库字段名转驼峰
@@ -159,14 +158,14 @@ public enum VueCodeBuilder {
                     );
                 }
 
-                validataTypes.addAll(validateTypeList);
+                validateTypesSet.addAll(validateTypeList);
                 valiDict.put(columnModel.getFieldName(), validateTypeList);
             }
         }
 
         // 处理数据
         if(columnList.size() == 1){
-            if(columnList.get(0).getIzShowForm().equals(DictType.NO_YES_YES.getCode()) &&
+            if(DictType.NO_YES_YES.getCode().equals(columnList.get(0).getIzShowForm()) &&
                 StringUtils.isNotBlank(columnList.get(0).getShowType())
                 ){
                 List<CreaterTableColumnModel> formTmpList = new ArrayList<>();
@@ -176,7 +175,7 @@ public enum VueCodeBuilder {
         }else{
             for (int i = 0; i < columnList.size(); i+=2) {
                 List<CreaterTableColumnModel> formTmpList = new ArrayList<>();
-                if(columnList.get(i).getIzShowForm().equals(DictType.NO_YES_YES.getCode()) &&
+                if(DictType.NO_YES_YES.getCode().equals(columnList.get(i).getIzShowForm()) &&
                         StringUtils.isNotBlank(columnList.get(i).getShowType())
                 ){
                     formTmpList.add(columnList.get(i));
@@ -188,17 +187,17 @@ public enum VueCodeBuilder {
             }
         }
 
-        StringBuilder validataTypeStb = new StringBuilder();
-        for (String validataType : validataTypes) {
-            validataTypeStb.append(validataType);
-            validataTypeStb.append(", ");
+        StringBuilder validateTypeStb = new StringBuilder();
+        for (String validateType : validateTypesSet) {
+            validateTypeStb.append(validateType);
+            validateTypeStb.append(", ");
         }
 
         String codeStr = EnjoyUtil.render("/foreend/components/TemplateEdit.html",
                 this.createKv(builderModel)
                         .set("formList", formList)
                         .set("valiDict", valiDict)
-                        .set("validataTypes", validataTypeStb.toString())
+                        .set("validateTypes", validateTypeStb.toString())
         );
 
         StringBuilder path = new StringBuilder();
@@ -219,6 +218,52 @@ public enum VueCodeBuilder {
         Map<String,String> entityMap = new HashMap<>();
         entityMap.put(ZipUtils.FILE_PATH, path.toString());
         entityMap.put(ZipUtils.FILE_NAME, builderModel.getModel().getTableName()+"ManagementEdit.vue");
+        entityMap.put(ZipUtils.FILE_DATA, codeStr);
+        return entityMap;
+    }
+
+
+    /**
+     * 生成 Import
+     * @param builderModelTmp
+     * @return
+     */
+    public Map<String,String> createImport(CreaterBuilderModel builderModelTmp, String dataStr){
+        CreaterBuilderModel builderModel =
+                WrapperUtil.cloneTransformInstance(builderModelTmp, CreaterBuilderModel.class);
+        List<CreaterTableColumnModel> columnList = builderModel.getModel().getColumnList();
+        // 处理数据
+        for (CreaterTableColumnModel columnModel : columnList) {
+            // 数据库字段名转驼峰
+            columnModel.setFieldName(
+                    HumpUtil.underlineToHump(
+                            columnModel.getFieldName()
+                    )
+            );
+        }
+
+        String codeStr = EnjoyUtil.render("/foreend/components/TemplateImport.html",
+                this.createKv(builderModel)
+        );
+
+        StringBuilder path = new StringBuilder();
+        path.append(CodeBuilder.BASE_PATH).append(dataStr).append(CodeBuilder.FOREEND_PATH)
+                .append("/").append("vue")
+                .append("/").append("views").append("/").append("modules")
+                .append("/").append(builderModel.getModuleName())
+                .append("/").append("components").append("/");
+        if(StringUtils.isNotBlank(builderModel.getSubModuleName())){
+            path = new StringBuilder();
+            path.append(CodeBuilder.BASE_PATH).append(dataStr).append(CodeBuilder.FOREEND_PATH)
+                    .append("/").append("vue")
+                    .append("/").append("views").append("/").append("modules")
+                    .append("/").append(builderModel.getModuleName())
+                    .append("/").append(builderModel.getSubModuleName())
+                    .append("/").append("components").append("/");
+        }
+        Map<String,String> entityMap = new HashMap<>();
+        entityMap.put(ZipUtils.FILE_PATH, path.toString());
+        entityMap.put(ZipUtils.FILE_NAME, builderModel.getModel().getTableName()+"ManagementImport.vue");
         entityMap.put(ZipUtils.FILE_DATA, codeStr);
         return entityMap;
     }

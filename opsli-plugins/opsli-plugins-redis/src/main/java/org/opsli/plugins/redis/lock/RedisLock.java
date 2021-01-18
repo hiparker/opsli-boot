@@ -55,7 +55,7 @@ public class RedisLock {
     private String identifier;
 
     /** 线程锁 */
-    private AtomicInteger atomicInteger;
+    private final AtomicInteger atomicInteger;
 
     /**
      * 构造函数

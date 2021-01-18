@@ -15,8 +15,9 @@
 */
 package org.opsli.modulars.gentest.user.web;
 
-import org.opsli.api.web.system.role.RoleApi;
-import org.opsli.core.base.service.interfaces.CrudServiceInterface;
+import cn.hutool.core.convert.Convert;
+import cn.hutool.core.util.ReflectUtil;
+import org.opsli.common.annotation.RequiresPermissionsCus;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -35,6 +36,8 @@ import org.opsli.modulars.gentest.user.entity.TestUser;
 import org.opsli.api.wrapper.gentest.user.TestUserModel;
 import org.opsli.modulars.gentest.user.service.ITestUserService;
 import org.opsli.api.web.gentest.user.TestUserRestApi;
+
+import java.lang.reflect.Method;
 
 /**
 * @BelongsProject: opsli-boot
@@ -139,29 +142,34 @@ public class TestUserRestController extends BaseRestController<TestUser, TestUse
     @RequiresPermissions("gentest_user_update")
     @EnableLog
     @Override
-    public ResultVo<?> delAll(String[] ids){
-        IService.deleteAll(ids);
+    public ResultVo<?> delAll(String ids){
+        String[] idArray = Convert.toStrArray(ids);
+        IService.deleteAll(idArray);
         return ResultVo.success("批量删除用户成功");
     }
 
 
     /**
     * 用户 Excel 导出
+    * 注：这里 RequiresPermissionsCus 引入的是 自定义鉴权注解
     * @param request request
     * @param response response
     * @return ResultVo
     */
     @ApiOperation(value = "导出Excel", notes = "导出Excel")
-    @RequiresPermissions("gentest_user_export")
+    @RequiresPermissionsCus("gentest_user_export")
     @EnableLog
     @Override
-    public ResultVo<?> exportExcel(HttpServletRequest request, HttpServletResponse response) {
-        QueryBuilder<TestUser> queryBuilder = new WebQueryBuilder<>(TestUser.class, request.getParameterMap());
-        return super.excelExport(RoleApi.TITLE, queryBuilder.build(), response);
+    public void exportExcel(HttpServletRequest request, HttpServletResponse response) {
+        // 当前方法
+        Method method = ReflectUtil.getMethodByName(this.getClass(), "exportExcel");
+        QueryBuilder<TestUser> queryBuilder = new WebQueryBuilder<>(entityClazz, request.getParameterMap());
+        super.excelExport(TestUserRestApi.TITLE, queryBuilder.build(), response, method);
     }
 
     /**
     * 用户 Excel 导入
+    * 注：这里 RequiresPermissions 引入的是 Shiro原生鉴权注解
     * @param request 文件流 request
     * @return ResultVo
     */
@@ -169,20 +177,23 @@ public class TestUserRestController extends BaseRestController<TestUser, TestUse
     @RequiresPermissions("gentest_user_import")
     @EnableLog
     @Override
-    public ResultVo<?> excelImport(MultipartHttpServletRequest request) {
-        return super.excelImport(request);
+    public ResultVo<?> importExcel(MultipartHttpServletRequest request) {
+        return super.importExcel(request);
     }
 
     /**
     * 用户 Excel 下载导入模版
+    * 注：这里 RequiresPermissionsCus 引入的是 自定义鉴权注解
     * @param response response
     * @return ResultVo
     */
     @ApiOperation(value = "导出Excel模版", notes = "导出Excel模版")
-    @RequiresPermissions("gentest_user_import")
+    @RequiresPermissionsCus("gentest_user_import")
     @Override
-    public ResultVo<?> importTemplate(HttpServletResponse response) {
-        return super.importTemplate(RoleApi.TITLE, response);
+    public void importTemplate(HttpServletResponse response) {
+        // 当前方法
+        Method method = ReflectUtil.getMethodByName(this.getClass(), "importTemplate");
+        super.importTemplate(TestUserRestApi.TITLE, response, method);
     }
 
 }

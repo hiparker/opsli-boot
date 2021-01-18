@@ -20,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.authc.IncorrectCredentialsException;
 import org.apache.shiro.authc.LockedAccountException;
+import org.apache.shiro.authc.pam.UnsupportedTokenException;
 import org.apache.shiro.authz.AuthorizationException;
 import org.opsli.api.base.result.ResultVo;
 import org.opsli.common.exception.*;
@@ -143,6 +144,19 @@ public class GlobalExceptionHandler {
                 );
     }
 
+    /**
+     * 拦截 自定义 Shiro 认证异常
+     */
+    @ExceptionHandler(UnsupportedTokenException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ResponseBody
+    public ResultVo<?> unsupportedTokenException(UnsupportedTokenException e) {
+        // 找不到认证授权器
+        return ResultVo.error(TokenMsg.EXCEPTION_NOT_REALM.getCode(),
+                TokenMsg.EXCEPTION_NOT_REALM.getMessage()
+        );
+    }
+
 
     /**
      * 拦截 自定义 Token 认证异常
@@ -200,9 +214,9 @@ public class GlobalExceptionHandler {
         //log.error("数据异常：{}",e.getMessage(),e);
         // 默认值异常
         if(StringUtils.contains(e.getMessage(),SQL_EXCEPTION)){
-            String Field = e.getMessage().replaceAll("Field '","")
+            String field = e.getMessage().replaceAll("Field '","")
                     .replaceAll("' doesn't have a default value","");
-            String msg = StrFormatter.format(CoreMsg.SQL_EXCEPTION_NOT_HAVE_DEFAULT_VALUE.getMessage(), Field);
+            String msg = StrFormatter.format(CoreMsg.SQL_EXCEPTION_NOT_HAVE_DEFAULT_VALUE.getMessage(), field);
             return ResultVo.error(CoreMsg.SQL_EXCEPTION_NOT_HAVE_DEFAULT_VALUE.getCode(), msg);
         }
         String msg = StrFormatter.format(CoreMsg.SQL_EXCEPTION_UNKNOWN.getMessage(), e.getMessage());

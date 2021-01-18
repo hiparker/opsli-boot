@@ -52,7 +52,7 @@ import java.util.stream.Collectors;
 public class RoleMenuRefRestController implements RoleMenuRefApi {
 
     /** 内置数据 */
-    private static final char LOCK_DATA = '1';
+    private static final String LOCK_DATA = "1";
 
     @Value("${opsli.enable-demo}")
     private boolean enableDemo;
@@ -68,7 +68,6 @@ public class RoleMenuRefRestController implements RoleMenuRefApi {
      * @return ResultVo
      */
     @RequiresPermissions("system_role_setPerms")
-    @EnableLog
     @Override
     public ResultVo<?> getPerms(RoleMenuRefModel model) {
         if(model == null){
@@ -115,7 +114,7 @@ public class RoleMenuRefRestController implements RoleMenuRefApi {
 
         RoleModel roleModel = iRoleService.get(model.getRoleId());
         // 内置数据 只有超级管理员可以修改
-        if(LOCK_DATA == roleModel.getIzLock() ){
+        if(roleModel != null && LOCK_DATA.equals(roleModel.getIzLock()) ){
             UserModel user = UserUtil.getUser();
             if(!UserUtil.SUPER_ADMIN.equals(user.getUsername())){
                 throw new ServiceException(SystemMsg.EXCEPTION_LOCK_DATA);

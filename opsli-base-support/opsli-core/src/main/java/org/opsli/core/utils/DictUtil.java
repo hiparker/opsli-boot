@@ -15,15 +15,16 @@
  */
 package org.opsli.core.utils;
 
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.collection.ListUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.opsli.api.base.result.ResultVo;
 import org.opsli.api.web.system.dict.DictDetailApi;
-import org.opsli.api.web.system.menu.MenuApi;
-import org.opsli.api.wrapper.system.dict.DictWrapper;
 import org.opsli.api.wrapper.system.dict.DictDetailModel;
+import org.opsli.api.wrapper.system.dict.DictWrapper;
 import org.opsli.common.constants.CacheConstants;
 import org.opsli.common.constants.DictConstants;
 import org.opsli.core.cache.local.CacheUtil;
@@ -144,7 +145,6 @@ public class DictUtil {
         }finally {
             // ============ 释放锁
             redisLockPlugins.unLock(redisLock);
-            redisLock = null;
         }
 
         // 如果名称还是 为空 则赋默认值
@@ -232,7 +232,6 @@ public class DictUtil {
         }finally {
             // ============ 释放锁
             redisLockPlugins.unLock(redisLock);
-            redisLock = null;
         }
 
 
@@ -275,7 +274,8 @@ public class DictUtil {
                 dictWrapperModels.add(dictWrapperModel);
             }
             if(!dictWrapperModels.isEmpty()){
-                return dictWrapperModels;
+                // 排序
+                return sortDictWrappers(dictWrapperModels);
             }
 
             // 防止缓存穿透判断
@@ -320,7 +320,8 @@ public class DictUtil {
                     dictWrapperModels.add(dictWrapperModel);
                 }
                 if(!dictWrapperModels.isEmpty()){
-                    return dictWrapperModels;
+                    // 排序
+                    return sortDictWrappers(dictWrapperModels);
                 }
 
 
@@ -346,7 +347,6 @@ public class DictUtil {
             }finally {
                 // ============ 释放锁
                 redisLockPlugins.unLock(redisLock);
-                redisLock = null;
             }
 
 
@@ -361,6 +361,28 @@ public class DictUtil {
             log.error(e.getMessage(),e);
             dictWrapperModels = Lists.newArrayList();
         }
+
+        // 排序
+        return sortDictWrappers(dictWrapperModels);
+    }
+
+    /**
+     * 字典排序
+     * @param dictWrapperModels
+     * @return
+     */
+    private static List<DictWrapper> sortDictWrappers(List<DictWrapper> dictWrapperModels) {
+        ListUtil.sort(dictWrapperModels, (o1, o2) -> {
+            int oInt1 = Integer.MAX_VALUE;
+            int oInt2 = Integer.MAX_VALUE;
+            if(o1 != null && o1.getModel() != null){
+                oInt1 = o1.getModel().getSortNo()==null?oInt1:o1.getModel().getSortNo();
+            }
+            if(o2 != null && o2.getModel() != null){
+                oInt2 = o2.getModel().getSortNo()==null?oInt2:o2.getModel().getSortNo();
+            }
+            return Integer.compare(oInt1, oInt2);
+        });
         return dictWrapperModels;
     }
 
@@ -374,13 +396,13 @@ public class DictUtil {
      * @return
      */
     public static void put(DictWrapper model){
+        // 清除缓存
+        DictUtil.del(model);
+
         CacheUtil.putEdenHash(DictConstants.CACHE_PREFIX_NAME + model.getTypeCode(),
                 model.getDictName(), model.getModel());
         CacheUtil.putEdenHash(DictConstants.CACHE_PREFIX_VALUE + model.getTypeCode(),
                 model.getDictValue(), model.getModel());
-        // 删除 空属性 拦截
-        CacheUtil.delNilFlag(DictConstants.CACHE_PREFIX_NAME + model.getTypeCode() + ":" + model.getDictName());
-        CacheUtil.delNilFlag(DictConstants.CACHE_PREFIX_VALUE + model.getTypeCode() + ":" + model.getTypeCode());
     }
 
     /**
@@ -388,12 +410,64 @@ public class DictUtil {
      * @param model 字典模型
      * @return
      */
-    public static void del(DictWrapper model){
-        CacheUtil.delEdenHash(DictConstants.CACHE_PREFIX_NAME + model.getTypeCode(), model.getDictName());
-        CacheUtil.delEdenHash(DictConstants.CACHE_PREFIX_VALUE + model.getTypeCode(), model.getDictValue());
-        // 删除 空属性 拦截
-        CacheUtil.delNilFlag(DictConstants.CACHE_PREFIX_NAME + model.getTypeCode() + ":" + model.getDictName());
-        CacheUtil.delNilFlag(DictConstants.CACHE_PREFIX_VALUE + model.getTypeCode() + ":" + model.getTypeCode());
+    public static boolean del(DictWrapper model){
+        if(model == null){
+            return true;
+        }
+
+        boolean hasNilFlagByName = CacheUtil.hasNilFlag(DictConstants.CACHE_PREFIX_NAME +
+                model.getTypeCode() + ":" + model.getDictName());
+        boolean hasNilFlagByValue = CacheUtil.hasNilFlag(DictConstants.CACHE_PREFIX_VALUE +
+                model.getTypeCode() + ":" + model.getDictValue());
+
+        DictWrapper dictByName = CacheUtil.get(DictConstants.CACHE_PREFIX_NAME + model.getTypeCode(),
+                DictWrapper.class);
+        DictWrapper dictByValue = CacheUtil.get(DictConstants.CACHE_PREFIX_VALUE + model.getTypeCode(),
+                DictWrapper.class);
+
+        // 计数器
+        int count = 0;
+        if (hasNilFlagByName){
+            count++;
+            // 清除空拦截
+            boolean tmp = CacheUtil.delNilFlag(DictConstants.CACHE_PREFIX_NAME +
+                    model.getTypeCode() + ":" + model.getDictName());
+            if(tmp){
+                count--;
+            }
+        }
+
+        if (hasNilFlagByValue){
+            count++;
+            // 清除空拦截
+            boolean tmp = CacheUtil.delNilFlag(DictConstants.CACHE_PREFIX_VALUE +
+                    model.getTypeCode() + ":" + model.getDictValue());
+            if(tmp){
+                count--;
+            }
+        }
+
+        if (dictByName != null){
+            count++;
+            // 清除空拦截
+            boolean tmp = CacheUtil.delEdenHash(DictConstants.CACHE_PREFIX_NAME +
+                    model.getTypeCode(), model.getDictName());
+            if(tmp){
+                count--;
+            }
+        }
+
+        if (dictByValue != null){
+            count++;
+            // 清除空拦截
+            boolean tmp = CacheUtil.delEdenHash(DictConstants.CACHE_PREFIX_VALUE +
+                    model.getTypeCode(), model.getDictValue());
+            if(tmp){
+                count--;
+            }
+        }
+
+        return count == 0;
     }
 
     /**
@@ -401,11 +475,21 @@ public class DictUtil {
      * @param typeCode 字典编号
      * @return
      */
-    public static void delAll(String typeCode){
+    public static boolean delAll(String typeCode){
         List<DictWrapper> dictWrapperList = DictUtil.getDictList(typeCode);
-        for (DictWrapper dictWrapperModel : dictWrapperList) {
-            DictUtil.del(dictWrapperModel);
+        if(CollUtil.isEmpty(dictWrapperList)){
+            return true;
         }
+
+        // 计数器
+        int count = dictWrapperList.size();
+        for (DictWrapper dictWrapperModel : dictWrapperList) {
+            boolean tmp = DictUtil.del(dictWrapperModel);
+            if(tmp){
+                count--;
+            }
+        }
+        return count == 0;
     }
 
 

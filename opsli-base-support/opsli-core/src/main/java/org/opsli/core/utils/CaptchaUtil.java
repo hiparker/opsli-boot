@@ -17,12 +17,10 @@ package org.opsli.core.utils;
 
 import com.google.code.kaptcha.Producer;
 import org.apache.commons.lang3.StringUtils;
-import org.opsli.api.web.system.dict.DictDetailApi;
 import org.opsli.common.constants.CacheConstants;
 import org.opsli.common.exception.TokenException;
 import org.opsli.common.utils.Props;
 import org.opsli.core.msg.TokenMsg;
-import org.opsli.plugins.redis.RedisLockPlugins;
 import org.opsli.plugins.redis.RedisPlugin;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
@@ -89,22 +87,28 @@ public class CaptchaUtil{
      * @param code
      * @return
      */
-    public static boolean validate(String uuid, String code) {
+    public static void validate(String uuid, String code) {
+        // 判断UUID 是否为空
         if(StringUtils.isEmpty(uuid)){
-            return false;
+            throw new TokenException(TokenMsg.EXCEPTION_CAPTCHA_UUID_NULL);
+        }
+
+        // 判断 验证码是否为空
+        if(StringUtils.isEmpty(code)){
+            throw new TokenException(TokenMsg.EXCEPTION_CAPTCHA_CODE_NULL);
         }
 
         // 验证码
         String codeTemp = (String) redisPlugin.get(PREFIX_NAME + PREFIX + uuid);
-
         if(StringUtils.isEmpty(codeTemp)){
             throw new TokenException(TokenMsg.EXCEPTION_CAPTCHA_NULL);
         }
 
-        // 删除验证码
-        //redisPlugin.del(PREFIX_NAME + PREFIX + uuid);
-
-        return codeTemp.equalsIgnoreCase(code);
+        // 验证 验证码是否正确
+        boolean captchaFlag = codeTemp.equalsIgnoreCase(code);
+        if(!captchaFlag){
+            throw new TokenException(TokenMsg.EXCEPTION_CAPTCHA_ERROR);
+        }
     }
 
 

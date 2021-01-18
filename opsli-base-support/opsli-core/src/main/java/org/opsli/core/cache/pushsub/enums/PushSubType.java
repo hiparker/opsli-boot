@@ -36,6 +36,9 @@ public enum PushSubType {
     /** 组织数据 */
     ORG,
 
+    /** 租户 */
+    TENANT,
+
     /** 热点数据 */
     HOT_DATA,
 

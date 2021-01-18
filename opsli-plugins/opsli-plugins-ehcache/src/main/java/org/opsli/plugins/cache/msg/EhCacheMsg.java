@@ -37,8 +37,8 @@ public enum EhCacheMsg implements BaseMsg {
     ;
 
 
-    private int code;
-    private String message;
+    private final int code;
+    private final String message;
 
     EhCacheMsg(int code, String message){
         this.code = code;

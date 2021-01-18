@@ -40,6 +40,6 @@ public class TokenThreadLocal {
     public static void remove() {
         try {
             TOKEN_DATA.remove();
-        }catch (Exception e){}
+        }catch (Exception ignored){}
     }
 }
