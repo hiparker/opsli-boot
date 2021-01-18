@@ -76,6 +76,8 @@
         <commons.io.version>2.8.0</commons.io.version>
         <guava.version>29.0-jre</guava.version>
         <hutool.version>5.4.2</hutool.version>
+        <oshi.version>3.9.1</oshi.version>
+        <jna.version>4.5.2</jna.version>
         <ehcache.version>3.9.0</ehcache.version>
         <kaptcha.version>0.0.9</kaptcha.version>
         <shiro.version>1.6.0</shiro.version>
@@ -263,6 +265,17 @@
             <version>${snakeyaml.version}</version>
         </dependency>
 
+        <!--OSHI系统监控-->
+        <dependency>
+            <groupId>com.github.oshi</groupId>
+            <artifactId>oshi-core</artifactId>
+            <version>${oshi.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>net.java.dev.jna</groupId>
+            <artifactId>jna-platform</artifactId>
+            <version>${jna.version}</version>
+        </dependency>
         <!-- ———————————————————— 集成工具 - 结束 ———————————————————— -->
 
     </dependencies>

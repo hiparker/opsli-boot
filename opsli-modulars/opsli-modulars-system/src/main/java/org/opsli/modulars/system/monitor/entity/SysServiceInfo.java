@@ -7,10 +7,10 @@ package org.opsli.modulars.system.monitor.entity;
 import lombok.Data;
 
 @Data
-public class SysInfo {
+public class SysServiceInfo {
 
     private String name;
 
-    private String value;
+    private Object value;
 
 }

@@ -4,16 +4,26 @@
  */
 package org.opsli.core.monitor;
 
+import cn.hutool.core.net.NetUtil;
+import cn.hutool.core.util.NumberUtil;
 import lombok.Data;
 import org.opsli.core.monitor.utils.*;
+import oshi.SystemInfo;
+import oshi.hardware.CentralProcessor;
+import oshi.hardware.GlobalMemory;
 import oshi.hardware.HardwareAbstractionLayer;
+import oshi.software.os.FileSystem;
+import oshi.software.os.OSFileStore;
+import oshi.software.os.OperatingSystem;
+import oshi.util.Util;
 
 import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Properties;
 
 @Data
-public class SystemInfo implements Serializable {
+public class SystemHardwareInfo implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private static final int OSHI_WAIT_SECOND = 1000;
@@ -47,17 +57,44 @@ public class SystemInfo implements Serializable {
     public void copyTo() throws Exception {
         SystemInfo si = new SystemInfo();
         HardwareAbstractionLayer hal = si.getHardware();
-
+        OperatingSystem operatingSystem = si.getOperatingSystem();
         setCpuInfo(hal.getProcessor());
 
         setMemInfo(hal.getMemory());
 
-        setSysInfo();
+        setSysInfo(operatingSystem);
 
         setJvmInfo();
 
+        setSysFiles(operatingSystem);
+    }
+
+
+    public void copyToCupInof() throws Exception {
+        SystemInfo si = new SystemInfo();
+        HardwareAbstractionLayer hal = si.getHardware();
+        setCpuInfo(hal.getProcessor());
+    }
+    public void copyToMemInof() throws Exception {
+        SystemInfo si = new SystemInfo();
+        HardwareAbstractionLayer hal = si.getHardware();
+        setMemInfo(hal.getMemory());
+    }
+    public void copyToSysInof() throws Exception {
+        SystemInfo si = new SystemInfo();
+        setSysInfo(si.getOperatingSystem());
+    }
+    public void copyToJvmInof() throws Exception {
+        SystemInfo si = new SystemInfo();
+        HardwareAbstractionLayer hal = si.getHardware();
+        setJvmInfo();
+    }
+    public void copyToSysFilesInof() throws Exception {
+        SystemInfo si = new SystemInfo();
         setSysFiles(si.getOperatingSystem());
     }
+
+
 
     /**
      * 设置CPU信息
@@ -67,16 +104,17 @@ public class SystemInfo implements Serializable {
         long[] prevTicks = processor.getSystemCpuLoadTicks();
         Util.sleep(OSHI_WAIT_SECOND);
         long[] ticks = processor.getSystemCpuLoadTicks();
-        long nice = ticks[TickType.NICE.getIndex()] - prevTicks[TickType.NICE.getIndex()];
-        long irq = ticks[TickType.IRQ.getIndex()] - prevTicks[TickType.IRQ.getIndex()];
-        long softirq = ticks[TickType.SOFTIRQ.getIndex()] - prevTicks[TickType.SOFTIRQ.getIndex()];
-        long steal = ticks[TickType.STEAL.getIndex()] - prevTicks[TickType.STEAL.getIndex()];
-        long cSys = ticks[TickType.SYSTEM.getIndex()] - prevTicks[TickType.SYSTEM.getIndex()];
-        long user = ticks[TickType.USER.getIndex()] - prevTicks[TickType.USER.getIndex()];
-        long iowait = ticks[TickType.IOWAIT.getIndex()] - prevTicks[TickType.IOWAIT.getIndex()];
-        long idle = ticks[TickType.IDLE.getIndex()] - prevTicks[TickType.IDLE.getIndex()];
+        long nice = ticks[CentralProcessor.TickType.NICE.getIndex()] - prevTicks[CentralProcessor.TickType.NICE.getIndex()];
+        long irq = ticks[CentralProcessor.TickType.IRQ.getIndex()] - prevTicks[CentralProcessor.TickType.IRQ.getIndex()];
+        long softirq = ticks[CentralProcessor.TickType.SOFTIRQ.getIndex()] - prevTicks[CentralProcessor.TickType.SOFTIRQ.getIndex()];
+        long steal = ticks[CentralProcessor.TickType.STEAL.getIndex()] - prevTicks[CentralProcessor.TickType.STEAL.getIndex()];
+        long cSys = ticks[CentralProcessor.TickType.SYSTEM.getIndex()] - prevTicks[CentralProcessor.TickType.SYSTEM.getIndex()];
+        long user = ticks[CentralProcessor.TickType.USER.getIndex()] - prevTicks[CentralProcessor.TickType.USER.getIndex()];
+        long iowait = ticks[CentralProcessor.TickType.IOWAIT.getIndex()] - prevTicks[CentralProcessor.TickType.IOWAIT.getIndex()];
+        long idle = ticks[CentralProcessor.TickType.IDLE.getIndex()] - prevTicks[CentralProcessor.TickType.IDLE.getIndex()];
         long totalCpu = user + nice + cSys + idle + iowait + irq + softirq + steal;
         cpu.setCpuNum(processor.getLogicalProcessorCount());
+        cpu.setCpuName(processor.getName());
         cpu.setTotal(totalCpu);
         cpu.setSys(cSys);
         cpu.setUsed(user);
@@ -96,9 +134,9 @@ public class SystemInfo implements Serializable {
     /**
      * 设置服务器信息
      */
-    private void setSysInfo() {
+    private void setSysInfo(OperatingSystem operatingSystem) {
         Properties props = System.getProperties();
-        sys.setComputerName(IpUtil.getHostName());
+        sys.setComputerName(operatingSystem.getNetworkParams().getHostName());
         sys.setComputerIp(NetUtil.getLocalhostStr());
         sys.setOsName(props.getProperty("os.name"));
         sys.setOsArch(props.getProperty("os.arch"));
@@ -134,7 +172,7 @@ public class SystemInfo implements Serializable {
             sysFile.setTotal(convertFileSize(total));
             sysFile.setFree(convertFileSize(free));
             sysFile.setUsed(convertFileSize(used));
-            sysFile.setUsage(NumberUtil.round(NumberUtil.mul(used, total, 4), 100).doubleValue());
+            sysFile.setUsage(NumberUtil.mul(NumberUtil.div(used, total, 4), 100));
             sysFiles.add(sysFile);
         }
     }
@@ -161,4 +199,5 @@ public class SystemInfo implements Serializable {
             return String.format("%d B" , size);
         }
     }
+
 }
