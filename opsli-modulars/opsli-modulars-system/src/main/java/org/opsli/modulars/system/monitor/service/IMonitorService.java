@@ -15,16 +15,36 @@ import java.util.List;
  */
 public interface IMonitorService {
 
-    Sys getSysInfo() throws Exception;
+    /**
+     * 获得系统信息
+     * @return
+     */
+    Sys getSysInfo();
 
 
-    CPU getCpuInfo() throws Exception;
+    /**
+     * 获得CPU信息
+     * @return
+     */
+    CPU getCpuInfo();
 
 
-    Mem getMemInfo() throws Exception;
+    /**
+     * 获得内存信息
+     * @return
+     */
+    Mem getMemInfo();
 
-    JVM getJVMInfo() throws Exception;
+    /**
+     * 获得JVM信息
+     * @return
+     */
+    JVM getJVMInfo();
 
-    List<SysFile> getSysFiles() throws Exception;
+    /**
+     * 获得系统磁盘信息
+     * @return
+     */
+    List<SysFile> getSysFiles();
 
 }

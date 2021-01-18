@@ -4,6 +4,7 @@
  */
 package org.opsli.modulars.system.monitor.web;
 
+import com.google.common.collect.Maps;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -36,8 +37,8 @@ public class MonitorController {
     @RequiresPermissions("system_monitor_select")
     @RequestMapping("/getSystemInfo")
     @ApiOperation(value = "当前服务器信息", notes = "当前服务器信息")
-    public ResultVo<?> getSystemInfo() throws Exception {
-        Map<String,Object> map = new HashMap<>();
+    public ResultVo<?> getSystemInfo() {
+        Map<String,Object> map = Maps.newHashMapWithExpectedSize(5);
         //服务器信息
         map.put("systemInfo",iMonitorService.getSysInfo());
         //CPU信息
@@ -58,8 +59,9 @@ public class MonitorController {
     @RequiresPermissions("system_monitor_select")
     @RequestMapping("/getCpuInfo")
     @ApiOperation(value = "当前CPU信息", notes = "当前CPU信息")
-    public ResultVo<?> getCpuInfo(HttpServletRequest request) throws Exception {
-        return ResultVo.success(iMonitorService.getCpuInfo());
+    public ResultVo<?> getCpuInfo() {
+        return ResultVo.success(
+                iMonitorService.getCpuInfo());
     }
 
     /**
@@ -69,8 +71,9 @@ public class MonitorController {
     @RequiresPermissions("system_monitor_select")
     @RequestMapping("/getMemInfo")
     @ApiOperation(value = "当前内存信息", notes = "当前内存信息")
-    public ResultVo<?> getMemInfo(HttpServletRequest request) throws Exception {
-        return ResultVo.success(iMonitorService.getMemInfo());
+    public ResultVo<?> getMemInfo() {
+        return ResultVo.success(
+                iMonitorService.getMemInfo());
     }
 
     /**
@@ -80,8 +83,9 @@ public class MonitorController {
     @RequiresPermissions("system_monitor_select")
     @RequestMapping("/getJVMInfo")
     @ApiOperation(value = "当前JVM信息", notes = "当前JVM信息")
-    public ResultVo<?> getJVMInfo(HttpServletRequest request) throws Exception {
-        return ResultVo.success(iMonitorService.getJVMInfo());
+    public ResultVo<?> getJVMInfo() {
+        return ResultVo.success(
+                iMonitorService.getJVMInfo());
     }
 
 }

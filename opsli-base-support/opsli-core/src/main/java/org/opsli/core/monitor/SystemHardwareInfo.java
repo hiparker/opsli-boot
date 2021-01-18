@@ -60,7 +60,7 @@ public class SystemHardwareInfo implements Serializable {
     private List<SysFile> sysFiles = Lists.newLinkedList();
 
 
-    public void copyTo() throws Exception {
+    public void copyTo() {
         SystemInfo si = new SystemInfo();
         HardwareAbstractionLayer hal = si.getHardware();
         OperatingSystem operatingSystem = si.getOperatingSystem();
@@ -76,26 +76,26 @@ public class SystemHardwareInfo implements Serializable {
     }
 
 
-    public void copyToCupInfo() throws Exception {
+    public void copyToCupInfo() {
         SystemInfo si = new SystemInfo();
         HardwareAbstractionLayer hal = si.getHardware();
         setCpuInfo(hal.getProcessor());
     }
-    public void copyToMemInfo() throws Exception {
+    public void copyToMemInfo() {
         SystemInfo si = new SystemInfo();
         HardwareAbstractionLayer hal = si.getHardware();
         setMemInfo(hal.getMemory());
     }
-    public void copyToSysInfo() throws Exception {
+    public void copyToSysInfo() {
         SystemInfo si = new SystemInfo();
         setSysInfo(si.getOperatingSystem());
     }
-    public void copyToJvmInfo() throws Exception {
+    public void copyToJvmInfo() {
         SystemInfo si = new SystemInfo();
         HardwareAbstractionLayer hal = si.getHardware();
         setJvmInfo();
     }
-    public void copyToSysFilesInfo() throws Exception {
+    public void copyToSysFilesInfo() {
         SystemInfo si = new SystemInfo();
         setSysFiles(si.getOperatingSystem());
     }

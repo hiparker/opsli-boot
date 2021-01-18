@@ -19,48 +19,38 @@ import java.util.List;
 @Service
 public class MonitorServiceImpl implements IMonitorService {
 
-    /**
-     * 获取服务器信息
-     * @return
-     * @throws Exception
-     */
+
     @Override
-    public Sys getSysInfo() throws Exception {
+    public Sys getSysInfo() {
         SystemHardwareInfo systemHardwareInfo = new SystemHardwareInfo();
         systemHardwareInfo.copyToSysInfo();
         return systemHardwareInfo.getSys();
     }
 
 
-    /**
-     * 获取CPU信息
-     * @return
-     * @throws Exception
-     */
-
     @Override
-    public CPU getCpuInfo() throws Exception {
+    public CPU getCpuInfo() {
         SystemHardwareInfo systemHardwareInfo = new SystemHardwareInfo();
         systemHardwareInfo.copyToCupInfo();
         return systemHardwareInfo.getCpu();
     }
 
     @Override
-    public Mem getMemInfo() throws Exception {
+    public Mem getMemInfo() {
         SystemHardwareInfo systemHardwareInfo = new SystemHardwareInfo();
         systemHardwareInfo.copyToMemInfo();
         return systemHardwareInfo.getMem();
     }
 
     @Override
-    public JVM getJVMInfo() throws Exception {
+    public JVM getJVMInfo() {
         SystemHardwareInfo systemHardwareInfo = new SystemHardwareInfo();
         systemHardwareInfo.copyToJvmInfo();
         return systemHardwareInfo.getJvm();
     }
 
     @Override
-    public List<SysFile> getSysFiles() throws Exception {
+    public List<SysFile> getSysFiles() {
         SystemHardwareInfo systemHardwareInfo = new SystemHardwareInfo();
         systemHardwareInfo.copyToSysFilesInfo();
         return systemHardwareInfo.getSysFiles();
