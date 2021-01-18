@@ -11,6 +11,11 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+/**
+ * 系统监控
+ *
+ * @author 薛佳琪
+ */
 @Service
 public class MonitorServiceImpl implements IMonitorService {
 

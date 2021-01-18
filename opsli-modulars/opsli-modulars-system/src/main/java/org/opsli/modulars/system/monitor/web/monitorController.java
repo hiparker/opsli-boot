@@ -16,6 +16,11 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * 系统监控
+ *
+ * @author 薛佳琪
+ */
 @Slf4j
 @ApiRestController("/sys/monitor")
 public class monitorController {

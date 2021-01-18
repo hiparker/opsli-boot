@@ -6,6 +6,11 @@ package org.opsli.modulars.system.monitor.entity;
 
 import lombok.Data;
 
+/**
+ * 系统监控
+ *
+ * @author 薛佳琪
+ */
 @Data
 public class SysServiceInfo {
 
