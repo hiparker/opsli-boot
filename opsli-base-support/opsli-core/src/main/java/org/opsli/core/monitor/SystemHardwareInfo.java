@@ -6,6 +6,7 @@ package org.opsli.core.monitor;
 
 import cn.hutool.core.net.NetUtil;
 import cn.hutool.core.util.NumberUtil;
+import com.google.common.collect.Lists;
 import lombok.Data;
 import org.opsli.core.monitor.utils.*;
 import oshi.SystemInfo;
@@ -18,7 +19,6 @@ import oshi.software.os.OperatingSystem;
 import oshi.util.Util;
 
 import java.io.Serializable;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
 /**
@@ -28,8 +28,10 @@ import java.util.Properties;
  */
 @Data
 public class SystemHardwareInfo implements Serializable {
+
     private static final long serialVersionUID = 1L;
 
+    /** 监控等待时间 */
     private static final int OSHI_WAIT_SECOND = 1000;
 
     /**
@@ -55,7 +57,7 @@ public class SystemHardwareInfo implements Serializable {
     /**
      * 磁盘相关信息
      */
-    private List<SysFile> sysFiles = new LinkedList<SysFile>();
+    private List<SysFile> sysFiles = Lists.newLinkedList();
 
 
     public void copyTo() throws Exception {
@@ -74,26 +76,26 @@ public class SystemHardwareInfo implements Serializable {
     }
 
 
-    public void copyToCupInof() throws Exception {
+    public void copyToCupInfo() throws Exception {
         SystemInfo si = new SystemInfo();
         HardwareAbstractionLayer hal = si.getHardware();
         setCpuInfo(hal.getProcessor());
     }
-    public void copyToMemInof() throws Exception {
+    public void copyToMemInfo() throws Exception {
         SystemInfo si = new SystemInfo();
         HardwareAbstractionLayer hal = si.getHardware();
         setMemInfo(hal.getMemory());
     }
-    public void copyToSysInof() throws Exception {
+    public void copyToSysInfo() throws Exception {
         SystemInfo si = new SystemInfo();
         setSysInfo(si.getOperatingSystem());
     }
-    public void copyToJvmInof() throws Exception {
+    public void copyToJvmInfo() throws Exception {
         SystemInfo si = new SystemInfo();
         HardwareAbstractionLayer hal = si.getHardware();
         setJvmInfo();
     }
-    public void copyToSysFilesInof() throws Exception {
+    public void copyToSysFilesInfo() throws Exception {
         SystemInfo si = new SystemInfo();
         setSysFiles(si.getOperatingSystem());
     }
@@ -106,23 +108,26 @@ public class SystemHardwareInfo implements Serializable {
     private void setCpuInfo(CentralProcessor processor) {
         // CPU信息
         long[] prevTicks = processor.getSystemCpuLoadTicks();
+
+        // OSHI 等待睡眠
         Util.sleep(OSHI_WAIT_SECOND);
+
         long[] ticks = processor.getSystemCpuLoadTicks();
         long nice = ticks[CentralProcessor.TickType.NICE.getIndex()] - prevTicks[CentralProcessor.TickType.NICE.getIndex()];
         long irq = ticks[CentralProcessor.TickType.IRQ.getIndex()] - prevTicks[CentralProcessor.TickType.IRQ.getIndex()];
-        long softirq = ticks[CentralProcessor.TickType.SOFTIRQ.getIndex()] - prevTicks[CentralProcessor.TickType.SOFTIRQ.getIndex()];
+        long softIrq = ticks[CentralProcessor.TickType.SOFTIRQ.getIndex()] - prevTicks[CentralProcessor.TickType.SOFTIRQ.getIndex()];
         long steal = ticks[CentralProcessor.TickType.STEAL.getIndex()] - prevTicks[CentralProcessor.TickType.STEAL.getIndex()];
         long cSys = ticks[CentralProcessor.TickType.SYSTEM.getIndex()] - prevTicks[CentralProcessor.TickType.SYSTEM.getIndex()];
         long user = ticks[CentralProcessor.TickType.USER.getIndex()] - prevTicks[CentralProcessor.TickType.USER.getIndex()];
-        long iowait = ticks[CentralProcessor.TickType.IOWAIT.getIndex()] - prevTicks[CentralProcessor.TickType.IOWAIT.getIndex()];
+        long ioWait = ticks[CentralProcessor.TickType.IOWAIT.getIndex()] - prevTicks[CentralProcessor.TickType.IOWAIT.getIndex()];
         long idle = ticks[CentralProcessor.TickType.IDLE.getIndex()] - prevTicks[CentralProcessor.TickType.IDLE.getIndex()];
-        long totalCpu = user + nice + cSys + idle + iowait + irq + softirq + steal;
+        long totalCpu = user + nice + cSys + idle + ioWait + irq + softIrq + steal;
         cpu.setCpuNum(processor.getLogicalProcessorCount());
         cpu.setCpuName(processor.getName());
         cpu.setTotal(totalCpu);
         cpu.setSys(cSys);
         cpu.setUsed(user);
-        cpu.setWait(iowait);
+        cpu.setWait(ioWait);
         cpu.setFree(idle);
     }
 

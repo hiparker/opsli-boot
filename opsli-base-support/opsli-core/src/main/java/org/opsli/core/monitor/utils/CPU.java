@@ -15,6 +15,7 @@ import java.io.Serializable;
  */
 @Data
 public class CPU implements Serializable {
+
     private static final long serialVersionUID = 1L;
 
     /**
@@ -50,6 +51,8 @@ public class CPU implements Serializable {
      * CUP当前空闲率
      */
     private double free;
+
+    // =================
 
     public double getTotal() {
         return NumberUtil.round(NumberUtil.mul(total, 100), 2).doubleValue();

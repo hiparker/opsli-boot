@@ -19,6 +19,7 @@ import java.util.Date;
  */
 @Data
 public class JVM implements Serializable {
+
     private static final long serialVersionUID = 1L;
 
     /**
@@ -98,12 +99,13 @@ public class JVM implements Serializable {
     public double getUsage() {
         return NumberUtil.mul(NumberUtil.div(total - free, total, 4), 100);
     }
+
     /**
      * 获取JDK名称
      */
     public String getName() {
         return ManagementFactory.getRuntimeMXBean().getVmName();
-    }/**
+    }
 
 
     /**

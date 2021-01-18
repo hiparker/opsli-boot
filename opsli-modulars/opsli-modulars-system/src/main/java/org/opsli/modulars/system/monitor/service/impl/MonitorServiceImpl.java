@@ -27,7 +27,7 @@ public class MonitorServiceImpl implements IMonitorService {
     @Override
     public Sys getSysInfo() throws Exception {
         SystemHardwareInfo systemHardwareInfo = new SystemHardwareInfo();
-        systemHardwareInfo.copyToSysInof();
+        systemHardwareInfo.copyToSysInfo();
         return systemHardwareInfo.getSys();
     }
 
@@ -41,28 +41,28 @@ public class MonitorServiceImpl implements IMonitorService {
     @Override
     public CPU getCpuInfo() throws Exception {
         SystemHardwareInfo systemHardwareInfo = new SystemHardwareInfo();
-        systemHardwareInfo.copyToCupInof();
+        systemHardwareInfo.copyToCupInfo();
         return systemHardwareInfo.getCpu();
     }
 
     @Override
     public Mem getMemInfo() throws Exception {
         SystemHardwareInfo systemHardwareInfo = new SystemHardwareInfo();
-        systemHardwareInfo.copyToMemInof();
+        systemHardwareInfo.copyToMemInfo();
         return systemHardwareInfo.getMem();
     }
 
     @Override
     public JVM getJVMInfo() throws Exception {
         SystemHardwareInfo systemHardwareInfo = new SystemHardwareInfo();
-        systemHardwareInfo.copyToJvmInof();
+        systemHardwareInfo.copyToJvmInfo();
         return systemHardwareInfo.getJvm();
     }
 
     @Override
     public List<SysFile> getSysFiles() throws Exception {
         SystemHardwareInfo systemHardwareInfo = new SystemHardwareInfo();
-        systemHardwareInfo.copyToSysFilesInof();
+        systemHardwareInfo.copyToSysFilesInfo();
         return systemHardwareInfo.getSysFiles();
     }
 

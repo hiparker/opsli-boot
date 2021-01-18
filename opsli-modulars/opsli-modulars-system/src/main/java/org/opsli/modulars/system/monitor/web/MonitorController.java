@@ -23,7 +23,7 @@ import java.util.Map;
  */
 @Slf4j
 @ApiRestController("/sys/monitor")
-public class monitorController {
+public class MonitorController {
 
     @Autowired
     private IMonitorService monitorService;
