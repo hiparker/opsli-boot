@@ -8,7 +8,11 @@ import cn.hutool.core.util.NumberUtil;
 import lombok.Data;
 
 import java.io.Serializable;
-
+/**
+ * 系统监控
+ *
+ * @author 薛佳琪
+ */
 @Data
 public class CPU implements Serializable {
     private static final long serialVersionUID = 1L;

@@ -7,7 +7,11 @@ package org.opsli.core.monitor.utils;
 import lombok.Data;
 
 import java.io.Serializable;
-
+/**
+ * 系统监控
+ *
+ * @author 薛佳琪
+ */
 @Data
 public class SysFile implements Serializable {
     private static final long serialVersionUID = 1L;

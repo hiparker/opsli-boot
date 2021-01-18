@@ -12,7 +12,11 @@ import lombok.Data;
 import java.io.Serializable;
 import java.lang.management.ManagementFactory;
 import java.util.Date;
-
+/**
+ * 系统监控
+ *
+ * @author 薛佳琪
+ */
 @Data
 public class JVM implements Serializable {
     private static final long serialVersionUID = 1L;

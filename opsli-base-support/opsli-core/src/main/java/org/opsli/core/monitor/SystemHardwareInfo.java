@@ -21,7 +21,11 @@ import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
-
+/**
+ * 系统监控
+ *
+ * @author 薛佳琪
+ */
 @Data
 public class SystemHardwareInfo implements Serializable {
     private static final long serialVersionUID = 1L;
