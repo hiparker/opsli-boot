@@ -91,8 +91,6 @@ public class SystemHardwareInfo implements Serializable {
         setSysInfo(si.getOperatingSystem());
     }
     public void copyToJvmInfo() {
-        SystemInfo si = new SystemInfo();
-        HardwareAbstractionLayer hal = si.getHardware();
         setJvmInfo();
     }
     public void copyToSysFilesInfo() {
@@ -162,6 +160,8 @@ public class SystemHardwareInfo implements Serializable {
         jvm.setFree(Runtime.getRuntime().freeMemory());
         jvm.setVersion(props.getProperty("java.version"));
         jvm.setHome(props.getProperty("java.home"));
+        jvm.setVendor(props.getProperty("java.vendor"));
+        jvm.setVendorUrl(props.getProperty("java.vendor.url"));
     }
 
     /**

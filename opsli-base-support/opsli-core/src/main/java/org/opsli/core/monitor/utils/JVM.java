@@ -67,10 +67,16 @@ public class JVM implements Serializable {
      */
     private String runTime;
 
+
+    /** Java的运行环境供应商 */
+    private String vendor;
+
     /**
-     * JAVA名称
+     * Java的运行环境供应商 URL
      */
-    private String name;
+    private String vendorUrl;
+
+    // =============================
 
     public double getTotal() {
         return NumberUtil.div(total, (1024 * 1024), 2);
@@ -100,8 +106,24 @@ public class JVM implements Serializable {
         return NumberUtil.mul(NumberUtil.div(total - free, total, 4), 100);
     }
 
+    public String getVendor() {
+        return vendor;
+    }
+
+    public void setVendor(String vendor) {
+        this.vendor = vendor;
+    }
+
+    public String getVendorUrl() {
+        return vendorUrl;
+    }
+
+    public void setVendorUrl(String vendorUrl) {
+        this.vendorUrl = vendorUrl;
+    }
+
     /**
-     * 获取JDK名称
+     * 获取 JVM 虚拟机名称
      */
     public String getName() {
         return ManagementFactory.getRuntimeMXBean().getVmName();
