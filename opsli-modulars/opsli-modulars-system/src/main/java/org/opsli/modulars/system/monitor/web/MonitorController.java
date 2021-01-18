@@ -27,6 +27,7 @@ public class MonitorController {
 
     @Autowired
     private IMonitorService monitorService;
+
     /**
      * 查询服务器信息
      * @return ResultVo
