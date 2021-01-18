@@ -6,6 +6,7 @@ package org.opsli.modulars.system.monitor.web;
 
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.opsli.api.base.result.ResultVo;
 import org.opsli.common.annotation.ApiRestController;
 import org.opsli.modulars.system.monitor.service.IMonitorService;
@@ -26,54 +27,61 @@ import java.util.Map;
 public class MonitorController {
 
     @Autowired
-    private IMonitorService monitorService;
+    private IMonitorService iMonitorService;
 
     /**
      * 查询服务器信息
      * @return ResultVo
      */
+    @RequiresPermissions("system_monitor_select")
     @RequestMapping("/getSystemInfo")
     @ApiOperation(value = "当前服务器信息", notes = "当前服务器信息")
-    public ResultVo<?> getSystemInfo(HttpServletRequest request) throws Exception {
+    public ResultVo<?> getSystemInfo() throws Exception {
         Map<String,Object> map = new HashMap<>();
         //服务器信息
-        map.put("systemInfo",monitorService.getSysInfo());
+        map.put("systemInfo",iMonitorService.getSysInfo());
         //CPU信息
-        map.put("cpuInfo",monitorService.getCpuInfo());
+        map.put("cpuInfo",iMonitorService.getCpuInfo());
         //内存信息
-        map.put("memInfo",monitorService.getMemInfo());
+        map.put("memInfo",iMonitorService.getMemInfo());
         //JVM信息
-        map.put("JVMInfo",monitorService.getJVMInfo());
+        map.put("JVMInfo",iMonitorService.getJVMInfo());
         //磁盘信息
-        map.put("sysFileInfo",monitorService.getSysFiles());
+        map.put("sysFileInfo",iMonitorService.getSysFiles());
         return ResultVo.success(map);
     }
+
     /**
      * 查询CPU信息
      * @return ResultVo
      */
+    @RequiresPermissions("system_monitor_select")
     @RequestMapping("/getCpuInfo")
     @ApiOperation(value = "当前CPU信息", notes = "当前CPU信息")
     public ResultVo<?> getCpuInfo(HttpServletRequest request) throws Exception {
-        return ResultVo.success(monitorService.getCpuInfo());
+        return ResultVo.success(iMonitorService.getCpuInfo());
     }
+
     /**
      * 查询内存信息
      * @return ResultVo
      */
+    @RequiresPermissions("system_monitor_select")
     @RequestMapping("/getMemInfo")
     @ApiOperation(value = "当前内存信息", notes = "当前内存信息")
     public ResultVo<?> getMemInfo(HttpServletRequest request) throws Exception {
-        return ResultVo.success(monitorService.getMemInfo());
+        return ResultVo.success(iMonitorService.getMemInfo());
     }
+
     /**
      * 查询JVM信息
      * @return ResultVo
      */
+    @RequiresPermissions("system_monitor_select")
     @RequestMapping("/getJVMInfo")
     @ApiOperation(value = "当前JVM信息", notes = "当前JVM信息")
     public ResultVo<?> getJVMInfo(HttpServletRequest request) throws Exception {
-        return ResultVo.success(monitorService.getJVMInfo());
+        return ResultVo.success(iMonitorService.getJVMInfo());
     }
 
 }
