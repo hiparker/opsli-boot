@@ -76,7 +76,7 @@ public class LoginRestController {
     private IUserService iUserService;
 
     /**
-     * 登录
+     * 登录 登录数据加密
      */
     @Limiter
     @ApiOperation(value = "登录", notes = "登录")
