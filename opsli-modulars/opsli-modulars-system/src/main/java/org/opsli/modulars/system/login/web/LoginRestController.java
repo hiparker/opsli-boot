@@ -68,7 +68,7 @@ import java.util.Map;
 public class LoginRestController {
 
     /** 登录是否开启 RSA加密 */
-    @Value("${opsli.login.loginRsa:false}")
+    @Value("${opsli.login.login-rsa:false}")
     private boolean loginRsa;
 
 
