@@ -121,7 +121,7 @@ public enum AsymmetricCryptoUtil {
      */
     public Object decryptedDataToObj(RSA rsa, String data){
         Object obj;
-        String decryptedData = AsymmetricCryptoUtil.INSTANCE.decryptedData(rsa, data);
+        String decryptedData = this.decryptedData(rsa, data);
         try{
             obj = JSONObject.parse(decryptedData);
         }catch (Exception e){
