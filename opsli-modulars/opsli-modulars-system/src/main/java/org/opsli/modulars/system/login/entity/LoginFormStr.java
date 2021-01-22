@@ -31,28 +31,11 @@ import org.opsli.common.enums.ValiArgsType;
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class LoginForm {
+public class LoginFormStr {
 
-    /** 用户名 */
-    @ApiModelProperty(value = "用户名")
-    @ValidationArgs({ValiArgsType.IS_NOT_NULL,ValiArgsType.IS_GENERAL})
-    @ValidationArgsLenMax(50)
-    private String username;
-
-    /** 密码 */
-    @ApiModelProperty(value = "密码")
-    @ValidationArgs(ValiArgsType.IS_NOT_NULL)
-    @ValidationArgsLenMin(6)
-    private String password;
-
-    /** 验证码 */
-    @ApiModelProperty(value = "验证码")
-    @ValidationArgsLenMax(30)
-    private String captcha;
-
-    /** UUID */
-    @ApiModelProperty(value = "UUID")
-    @ValidationArgs(ValiArgsType.IS_NOT_NULL)
-    private String uuid;
+    /** 登录信息 */
+    @ApiModelProperty(value = "登录信息")
+    @ValidationArgs({ValiArgsType.IS_NOT_NULL})
+    private String loginFormStr;
 
 }

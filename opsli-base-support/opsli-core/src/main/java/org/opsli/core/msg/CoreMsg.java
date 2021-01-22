@@ -69,6 +69,9 @@ public enum CoreMsg implements BaseMsg {
 
     /** 其他 */
     OTHER_EXCEPTION_LIMITER(10700,"当前系统繁忙，请稍后再试"),
+    OTHER_EXCEPTION_RSA_EN(10701,"RSA非对称加密失败"),
+    OTHER_EXCEPTION_RSA_DE(10701,"RSA非对称解密失败"),
+    OTHER_EXCEPTION_RSA_REFLEX(10702,"RSA非对称解密反射失败"),
 
     ;
 

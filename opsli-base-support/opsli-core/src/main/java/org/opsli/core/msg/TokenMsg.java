@@ -47,6 +47,7 @@ public enum TokenMsg implements BaseMsg {
     EXCEPTION_LOGIN_ACCOUNT_LOCK(12104,"账号已锁定，请{}后，再次尝试"),
     EXCEPTION_LOGIN_TENANT_NOT_USABLE(12105,"租户未启用，请联系管理员"),
     EXCEPTION_LOGIN_NULL(12106,"请输入账号密码"),
+    EXCEPTION_LOGIN_DECRYPT(12107,"登录账号密码解析失败"),
 
     /**
      * 其他

@@ -194,12 +194,24 @@ opsli:
 
   # 登录设置
   login:
+    # 登录开启RSA加密
+    loginRsa: true
     # 失败次数
     slip-count: 5
     # 失败N次后弹出验证码 （超过验证码阈值 弹出验证码）
     slip-verify-count: 3
     # 失败锁定时间(秒)
     slip-lock-speed: 300
+
+    # 登录
+    login:
+      # 登录开启RSA加密
+      loginRsa: true
+      # 失败次数
+      slip-count: 5
+      # 锁定时间(秒)
+      slip-lock-speed: 300
+
 
   # Excel 最大操作数量 防止OOM
   excel-max-count: 20000

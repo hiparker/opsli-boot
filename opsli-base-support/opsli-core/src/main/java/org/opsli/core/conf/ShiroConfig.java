@@ -95,6 +95,7 @@ public class ShiroConfig {
 
         // 登录接口拦截
         filterMap.put("/sys/login", "anon");
+        filterMap.put("/sys/publicKey", "anon");
         filterMap.put("/sys/slipCount", "anon");
         filterMap.put("/captcha.jpg", "anon");
 
