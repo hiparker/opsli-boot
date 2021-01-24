@@ -31,6 +31,9 @@ public interface OrderConstants {
     /** token */
     int TOKEN_AOP_SORT = 150;
 
+    /** 请求加解密 */
+    int ENCRYPT_ADN_DECRYPT_AOP_SORT = 160;
+
     /** 热点数据加载顺序 */
     int HOT_DATA_ORDER = 180;
 

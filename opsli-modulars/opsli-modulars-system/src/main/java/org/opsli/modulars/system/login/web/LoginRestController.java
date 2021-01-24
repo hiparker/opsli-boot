@@ -15,8 +15,6 @@
  */
 package org.opsli.modulars.system.login.web;
 
-import cn.hutool.core.convert.Convert;
-import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Maps;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -26,6 +24,7 @@ import org.opsli.api.base.result.ResultVo;
 import org.opsli.api.utils.ValidationUtil;
 import org.opsli.api.wrapper.system.tenant.TenantModel;
 import org.opsli.api.wrapper.system.user.UserModel;
+import org.opsli.common.annotation.InterfaceEncryptAndDecrypt;
 import org.opsli.common.annotation.Limiter;
 import org.opsli.common.api.TokenThreadLocal;
 import org.opsli.common.enums.AlertType;
@@ -33,14 +32,13 @@ import org.opsli.common.exception.TokenException;
 import org.opsli.common.thread.refuse.AsyncProcessQueueReFuse;
 import org.opsli.common.utils.IPUtil;
 import org.opsli.common.utils.OutputStreamUtil;
+import org.opsli.core.aspect.InterfaceEncryptAndDecryptAop;
 import org.opsli.core.msg.TokenMsg;
 import org.opsli.core.security.shiro.realm.JwtRealm;
 import org.opsli.core.utils.*;
 import org.opsli.modulars.system.login.entity.LoginForm;
-import org.opsli.modulars.system.login.entity.LoginFormStr;
 import org.opsli.modulars.system.user.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -67,41 +65,18 @@ import java.util.Map;
 @RestController
 public class LoginRestController {
 
-    /** 登录是否开启 RSA加密 */
-    @Value("${opsli.login.login-rsa:false}")
-    private boolean loginRsa;
-
-
     @Autowired
     private IUserService iUserService;
+
 
     /**
      * 登录 登录数据加密
      */
     @Limiter
+    @InterfaceEncryptAndDecrypt(responseEncrypt = false)
     @ApiOperation(value = "登录", notes = "登录")
     @PostMapping("/sys/login")
-    public ResultVo<?> login(@RequestBody LoginFormStr formStr, HttpServletRequest request){
-        // 非空验证
-        if(formStr == null || StringUtils.isBlank(formStr.getLoginFormStr())){
-            throw new TokenException(TokenMsg.EXCEPTION_LOGIN_NULL);
-        }
-
-        LoginForm form;
-        try{
-            Object loginFromObj;
-            if(loginRsa){
-                loginFromObj = AsymmetricCryptoUtil.INSTANCE.decryptedDataToObj(formStr.getLoginFormStr());
-            }else {
-                loginFromObj = JSONObject.parse(formStr.getLoginFormStr());
-            }
-            form = Convert.convert(LoginForm.class, loginFromObj);
-        }catch (Exception e){
-            log.error("登录账号密码解析失败 - 解析值：["+formStr.getLoginFormStr()+"]",e.getMessage(), e);
-            // 登录账号密码解析失败
-            throw new TokenException(TokenMsg.EXCEPTION_LOGIN_DECRYPT);
-        }
-
+    public ResultVo<?> login(@RequestBody LoginForm form, HttpServletRequest request){
         // 非空验证
         if(form == null){
             throw new TokenException(TokenMsg.EXCEPTION_LOGIN_NULL);
@@ -109,7 +84,6 @@ public class LoginRestController {
 
         // 验证登录对象
         ValidationUtil.verify(form);
-
 
         // 判断账号是否临时锁定
         UserTokenUtil.verifyLockAccount(form.getUsername());
@@ -234,7 +208,7 @@ public class LoginRestController {
     public ResultVo<?> getPublicKey(){
         return ResultVo.success(
                 "操作成功!",
-                AsymmetricCryptoUtil.INSTANCE.getPublicKey()
+                InterfaceEncryptAndDecryptAop.getRsaPublicKey()
         );
     }
 

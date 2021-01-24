@@ -28,6 +28,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 import org.apache.poi.ss.usermodel.FillPatternType;
+import org.opsli.api.base.encrypt.BaseEncrypt;
 import org.opsli.plugins.excel.annotation.ExcelInfo;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -57,7 +58,7 @@ import java.util.Date;
 @HeadFontStyle(fontName = "Arial",color = 9,fontHeightInPoints = 10)
 @HeadStyle(fillPatternType = FillPatternType.SOLID_FOREGROUND, fillForegroundColor = 23)
 @ColumnWidth(22)
-public abstract class ApiWrapper implements Serializable {
+public abstract class ApiWrapper extends BaseEncrypt implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 

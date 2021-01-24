@@ -22,6 +22,7 @@ import cn.hutool.crypto.asymmetric.KeyType;
 import cn.hutool.crypto.asymmetric.RSA;
 import com.alibaba.fastjson.JSONObject;
 import org.opsli.common.exception.ServiceException;
+import org.opsli.common.utils.Props;
 import org.opsli.core.msg.CoreMsg;
 
 import java.util.Collection;
@@ -31,10 +32,10 @@ import java.util.Collection;
  *
  * @author 周鹏程
  */
-public enum AsymmetricCryptoUtil {
+public enum EncryptAndDecryptByRsaUtil {
 
-    /** 实例 */
-    INSTANCE;
+    /** 默认实例 */
+    INSTANCE();
 
     /** RSA KEY */
     private final String rsaKey = "data";
@@ -42,10 +43,10 @@ public enum AsymmetricCryptoUtil {
     /** RSA对象 */
     private final RSA rsa;
 
-    AsymmetricCryptoUtil(){
-        // 初始化RSA对象
+    EncryptAndDecryptByRsaUtil(){
         this.rsa = this.createRsa();
     }
+
 
     /**
      * 生成 RSA 对象
@@ -72,6 +73,14 @@ public enum AsymmetricCryptoUtil {
      */
     public String getPublicKey(){
         return rsa.getPublicKeyBase64();
+    }
+
+    /**
+     * 获得私钥
+     * @return String
+     */
+    public String getPrivateKey(){
+        return rsa.getPrivateKeyBase64();
     }
 
     /**

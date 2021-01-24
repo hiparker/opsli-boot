@@ -3,8 +3,10 @@ import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Maps;
 import lombok.Data;
 import org.junit.Test;
-import org.opsli.core.utils.AsymmetricCryptoUtil;
+import org.opsli.core.utils.EncryptAndDecryptByRsaUtil;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -18,7 +20,7 @@ public class RsaTest {
      */
     @Test
     public void getPublicKey(){
-        System.out.println(AsymmetricCryptoUtil.INSTANCE.getPublicKey());
+        System.out.println(EncryptAndDecryptByRsaUtil.INSTANCE.getPublicKey());
 
     }
 
@@ -36,18 +38,24 @@ public class RsaTest {
 //        t1.setName( "张三");
 //        t1.setAge( 16);
 
+        List<Integer> list = new ArrayList<>();
+        list.add(1);
+        list.add(2);
+        list.add(111);
+
         Object parse = JSONObject.parse("{\"username\":\"demo\",\"password\":\"Aa123456\",\"captcha\":\"\",\"uuid\":\"0d3eea43edf19e4ed0e88aae8d56878046a5\"}");
 
         // 加密
-        String encryptedData = AsymmetricCryptoUtil.INSTANCE.encryptedData(parse);
+        String encryptedData = EncryptAndDecryptByRsaUtil.INSTANCE.encryptedData(list);
         System.out.println(encryptedData);
 
         // 解密
-        String decryptedData = AsymmetricCryptoUtil.INSTANCE.decryptedData(encryptedData);
-        Object decryptedDataToObj = AsymmetricCryptoUtil.INSTANCE.decryptedDataToObj(encryptedData);
+        String decryptedData = EncryptAndDecryptByRsaUtil.INSTANCE.decryptedData(encryptedData);
+        Object decryptedDataToObj = EncryptAndDecryptByRsaUtil.INSTANCE.decryptedDataToObj(encryptedData);
         System.out.println(decryptedData);
 
         // 解密
+        List<Integer> integers = Convert.toList(Integer.class, decryptedDataToObj);
         //Map<String, Object> stringObjectMap = Convert.toMap(String.class, Object.class, decryptedData);
         //Map<String, Object> stringObjectMap = Convert.toMap(String.class, Object.class, decryptedDataToObj);
 

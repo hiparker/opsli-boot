@@ -119,12 +119,10 @@ public final class RateLimiterUtil {
         RateLimiterInner rateLimiterInner = rateLimiterInnerMap.get(resource);
         // 如果为空 则创建一个新的限流器
         if(rateLimiterInner == null){
-            System.out.println(456);
             rateLimiterInner = new RateLimiterInner();
             rateLimiterInner.setQps(dfQps);
             rateLimiterInner.setRateLimiter(RateLimiter.create(dfQps));
             rateLimiterInnerMap.put(resource, rateLimiterInner);
-
         }else{
             qps = rateLimiterInner.getQps();
         }

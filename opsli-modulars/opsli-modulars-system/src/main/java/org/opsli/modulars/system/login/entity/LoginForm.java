@@ -18,6 +18,7 @@ package org.opsli.modulars.system.login.entity;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.opsli.api.base.encrypt.BaseEncrypt;
 import org.opsli.common.annotation.validation.ValidationArgs;
 import org.opsli.common.annotation.validation.ValidationArgsLenMax;
 import org.opsli.common.annotation.validation.ValidationArgsLenMin;
@@ -31,7 +32,7 @@ import org.opsli.common.enums.ValiArgsType;
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class LoginForm {
+public class LoginForm extends BaseEncrypt {
 
     /** 用户名 */
     @ApiModelProperty(value = "用户名")
@@ -52,7 +53,6 @@ public class LoginForm {
 
     /** UUID */
     @ApiModelProperty(value = "UUID")
-    @ValidationArgs(ValiArgsType.IS_NOT_NULL)
     private String uuid;
 
 }
