@@ -194,8 +194,6 @@ opsli:
 
   # 登录设置
   login:
-    # 登录开启RSA加密
-    login-rsa: true
     # 失败次数
     slip-count: 5
     # 失败N次后弹出验证码 （超过验证码阈值 弹出验证码）
