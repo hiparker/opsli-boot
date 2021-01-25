@@ -23,6 +23,7 @@ import lombok.EqualsAndHashCode;
 import org.opsli.api.base.warpper.ApiWrapper;
 import org.opsli.common.annotation.validation.ValidationArgs;
 import org.opsli.common.annotation.validation.ValidationArgsLenMax;
+import org.opsli.common.annotation.validation.ValidationArgsLenMin;
 import org.opsli.common.enums.ValiArgsType;
 import org.opsli.plugins.excel.annotation.ExcelInfo;
 
@@ -50,6 +51,7 @@ public class UserModel extends ApiWrapper {
     @ApiModelProperty(value = "登录密码")
     @ExcelIgnore
     // 验证器
+    @ValidationArgsLenMin(6)
     @ValidationArgsLenMax(50)
     private String password;
 

@@ -276,6 +276,12 @@ public class UserServiceImpl extends CrudServiceImpl<UserMapper, SysUser, UserMo
         if(userModel == null){
             return false;
         }
+
+        // 判断老密码是否等于新密码
+        if(userPassword.getOldPassword().equals(userPassword.getNewPassword())){
+            throw new ServiceException(SystemMsg.EXCEPTION_USER_PASSWORD_EQ_ERROR);
+        }
+
         // 获得 处理后 老密码
         String orlPassword = UserUtil.handlePassword(userPassword.getOldPassword(),
                 userModel.getSecretkey());

@@ -22,6 +22,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.opsli.common.annotation.validation.ValidationArgs;
 import org.opsli.common.annotation.validation.ValidationArgsLenMax;
+import org.opsli.common.annotation.validation.ValidationArgsLenMin;
 import org.opsli.common.enums.ValiArgsType;
 
 import java.io.Serializable;
@@ -48,6 +49,7 @@ public class UserPassword implements Serializable {
     @ApiModelProperty(value = "旧密码")
     // 验证器
     @ValidationArgs({ValiArgsType.IS_NOT_NULL})
+    @ValidationArgsLenMin(6)
     @ValidationArgsLenMax(50)
     private String oldPassword;
 
@@ -55,6 +57,7 @@ public class UserPassword implements Serializable {
     @ApiModelProperty(value = "新密码")
     // 验证器
     @ValidationArgs({ValiArgsType.IS_NOT_NULL})
+    @ValidationArgsLenMin(6)
     @ValidationArgsLenMax(50)
     private String newPassword;
 
