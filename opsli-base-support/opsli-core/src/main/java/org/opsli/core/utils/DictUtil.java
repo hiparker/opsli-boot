@@ -420,9 +420,11 @@ public class DictUtil {
         boolean hasNilFlagByValue = CacheUtil.hasNilFlag(DictConstants.CACHE_PREFIX_VALUE +
                 model.getTypeCode() + ":" + model.getDictValue());
 
-        DictWrapper dictByName = CacheUtil.get(DictConstants.CACHE_PREFIX_NAME + model.getTypeCode(),
+        DictWrapper dictByName = CacheUtil.getHash(DictConstants.CACHE_PREFIX_NAME + model.getTypeCode(),
+                model.getDictName(),
                 DictWrapper.class);
-        DictWrapper dictByValue = CacheUtil.get(DictConstants.CACHE_PREFIX_VALUE + model.getTypeCode(),
+        DictWrapper dictByValue = CacheUtil.getHash(DictConstants.CACHE_PREFIX_VALUE + model.getTypeCode(),
+                model.getDictValue(),
                 DictWrapper.class);
 
         // 计数器
