@@ -1,18 +1,3 @@
-/**
- * Copyright 2020 OPSLI 快速开发平台 https://www.opsli.com
- * <p>
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License. You may obtain a copy of
- * the License at
- * <p>
- * http://www.apache.org/licenses/LICENSE-2.0
- * <p>
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
- * License for the specific language governing permissions and limitations under
- * the License.
- */
 package org.opsli.api.base.result;
 
 import com.alibaba.fastjson.JSONObject;
@@ -22,6 +7,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import org.springframework.http.HttpStatus;
+
 import java.io.Serializable;
 
 /**
@@ -41,6 +27,11 @@ import java.io.Serializable;
 public class ResultVo<T> implements Serializable {
 
 	private static final long serialVersionUID = 1L;
+
+	/** 默认成功信息 */
+	private static final String DEF_SUCCESS_MSG = "操作成功！";
+	/** 默认失败信息 */
+	private static final String DEF_ERROR_MSG = "操作失败！";
 
 	/** 成功状态 */
 	@ApiModelProperty(value = "成功状态")
@@ -92,7 +83,7 @@ public class ResultVo<T> implements Serializable {
 	public ResultVo() {
 		// 初始化值
 		this.success = true;
-		this.msg = "操作成功！";
+		this.msg = DEF_SUCCESS_MSG;
 		this.code = HttpStatus.OK.value();
 		this.timestamp = System.currentTimeMillis();
 	}
@@ -103,7 +94,7 @@ public class ResultVo<T> implements Serializable {
 	 * 返回成功状态
 	 * @return ResultVo<Object>
 	 */
-	@JsonIgnore//返回对象时忽略此属性
+	@JsonIgnore
 	public static ResultVo<Object> success() {
 		return new ResultVo<>();
 	}
@@ -113,7 +104,7 @@ public class ResultVo<T> implements Serializable {
 	 * @param msg 返回信息
 	 * @return ResultVo<Object>
 	 */
-	@JsonIgnore//返回对象时忽略此属性
+	@JsonIgnore
 	public static ResultVo<Object> success(String msg) {
 		ResultVo<Object> ret = new ResultVo<>();
 		ret.setMsg(msg);
@@ -126,7 +117,7 @@ public class ResultVo<T> implements Serializable {
 	 * @param <T> 泛型
 	 * @return ResultVo<T>
 	 */
-	@JsonIgnore//返回对象时忽略此属性
+	@JsonIgnore
 	public static <T> ResultVo<T> success(T data) {
 		ResultVo<T> ret = new ResultVo<>();
 		ret.setData(data);
@@ -140,9 +131,26 @@ public class ResultVo<T> implements Serializable {
 	 * @param <T> 泛型
 	 * @return ResultVo<T>
 	 */
-	@JsonIgnore//返回对象时忽略此属性
+	@JsonIgnore
 	public static <T> ResultVo<T> success(String msg, T data) {
 		ResultVo<T> ret = new ResultVo<>();
+		ret.setMsg(msg);
+		ret.setData(data);
+		return ret;
+	}
+
+	/**
+	 * 返回成功状态
+	 * @param msg 返回信息
+	 * @param data 返回数据
+	 * @param <T> 泛型
+	 * @return ResultVo<T>
+	 */
+	@JsonIgnore
+	public static <T> ResultVo<T> success(Integer code, String msg, T data) {
+		ResultVo<T> ret = new ResultVo<>();
+		ret.setCode(code);
+		ret.setMsg(msg);
 		ret.setData(data);
 		return ret;
 	}
@@ -150,16 +158,25 @@ public class ResultVo<T> implements Serializable {
 
 	/**
 	 * 返回错误状态
+	 * @return ResultVo<Object>
+	 */
+	@JsonIgnore
+	public static ResultVo<Object> error() {
+		return ResultVo.error(
+				HttpStatus.INTERNAL_SERVER_ERROR.value()
+				, DEF_ERROR_MSG, null);
+	}
+
+	/**
+	 * 返回错误状态
 	 * @param msg 返回信息
 	 * @return ResultVo<Object>
 	 */
-	@JsonIgnore//返回对象时忽略此属性
-	public static <T> ResultVo<T> error(String msg) {
-		ResultVo<T> ret = new ResultVo<>();
-		ret.setMsg(msg);
-		ret.setCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
-		ret.setSuccess(false);
-		return ret;
+	@JsonIgnore
+	public static ResultVo<Object> error(String msg) {
+		return ResultVo.error(
+				HttpStatus.INTERNAL_SERVER_ERROR.value()
+				, msg, null);
 	}
 
 	/**
@@ -168,13 +185,9 @@ public class ResultVo<T> implements Serializable {
 	 * @param msg 返回信息
 	 * @return ResultVo<T>
 	 */
-	@JsonIgnore//返回对象时忽略此属性
-	public static <T> ResultVo<T> error(int code, String msg) {
-		ResultVo<T> ret = new ResultVo<>();
-		ret.setMsg(msg);
-		ret.setCode(code);
-		ret.setSuccess(false);
-		return ret;
+	@JsonIgnore
+	public static ResultVo<Object> error(Integer code, String msg) {
+		return ResultVo.error(code, msg, null);
 	}
 
 	/**
@@ -184,8 +197,8 @@ public class ResultVo<T> implements Serializable {
 	 * @param <T> 泛型
 	 * @return ResultVo<T>
 	 */
-	@JsonIgnore//返回对象时忽略此属性
-	public static <T> ResultVo<T> error(int code, String msg, T data) {
+	@JsonIgnore
+	public static <T> ResultVo<T> error(Integer code, String msg, T data) {
 		ResultVo<T> ret = new ResultVo<>();
 		ret.setMsg(msg);
 		ret.setCode(code);

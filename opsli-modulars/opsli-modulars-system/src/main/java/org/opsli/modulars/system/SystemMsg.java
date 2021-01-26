@@ -58,6 +58,7 @@ public enum SystemMsg implements BaseMsg {
     EXCEPTION_USER_NO_UNIQUE(20306,"该工号已存在"),
     EXCEPTION_ORG_NOT_NULL(20307,"组织不可为空"),
     EXCEPTION_USER_ORG_ERROR(20308,"用户组织设置失败"),
+    EXCEPTION_USER_NULL(20309,"暂无该用户"),
 
 
     /**

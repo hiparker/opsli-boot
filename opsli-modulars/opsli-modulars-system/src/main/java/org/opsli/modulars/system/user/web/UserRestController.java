@@ -38,6 +38,7 @@ import org.opsli.common.annotation.ApiRestController;
 import org.opsli.common.annotation.EnableLog;
 import org.opsli.common.annotation.RequiresPermissionsCus;
 import org.opsli.common.constants.MyBatisConstants;
+import org.opsli.common.exception.ServiceException;
 import org.opsli.common.exception.TokenException;
 import org.opsli.common.utils.HumpUtil;
 import org.opsli.common.utils.WrapperUtil;
@@ -50,6 +51,7 @@ import org.opsli.core.persistence.querybuilder.QueryBuilder;
 import org.opsli.core.persistence.querybuilder.WebQueryBuilder;
 import org.opsli.core.utils.OrgUtil;
 import org.opsli.core.utils.UserUtil;
+import org.opsli.modulars.system.SystemMsg;
 import org.opsli.modulars.system.org.entity.SysOrg;
 import org.opsli.modulars.system.org.service.ISysOrgService;
 import org.opsli.modulars.system.org.web.SysOrgRestController;
@@ -462,10 +464,11 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
     @Override
     public ResultVo<UserModel> getUserByUsername(String username) {
         UserModel userModel = IService.queryByUserName(username);
-        if(userModel != null){
-            return ResultVo.success(userModel);
+        if(userModel == null){
+            // 暂无该用户
+            throw new ServiceException(SystemMsg.EXCEPTION_USER_NULL);
         }
-        return ResultVo.error("没有该用户");
+        return ResultVo.success(userModel);
     }
 
     /**

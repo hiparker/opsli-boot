@@ -80,7 +80,8 @@ public class TableRestController extends BaseRestController<CreaterTable, Create
         );
 
         if(currModel == null){
-            return ResultVo.error("暂无数据");
+            // 暂无数据
+            throw new CreaterException(CreaterMsg.EXCEPTION_OTHER_NULL);
         }
 
         List<CreaterTableColumnModel> columnModelList = iTableColumnService.

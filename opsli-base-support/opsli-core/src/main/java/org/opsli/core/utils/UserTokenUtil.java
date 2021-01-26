@@ -103,7 +103,7 @@ public class UserTokenUtil {
     public static ResultVo<Map<String,Object>> createToken(UserModel user) {
         if (user == null) {
             // 生成Token失败
-            return ResultVo.error(TokenMsg.EXCEPTION_TOKEN_CREATE_ERROR.getMessage());
+            throw new TokenException(TokenMsg.EXCEPTION_TOKEN_CREATE_ERROR);
         }
 
         Map<String,Object> map = Maps.newHashMapWithExpectedSize(2);
@@ -136,14 +136,11 @@ public class UserTokenUtil {
                 map.put("expire", endTimestamp);
                 return ResultVo.success(map);
             }
-
-            // 生成Token失败
-            return ResultVo.error(TokenMsg.EXCEPTION_TOKEN_CREATE_ERROR.getMessage());
-
         }catch (Exception e){
             log.error(e.getMessage() , e);
-            return ResultVo.error(e.getMessage());
         }
+        // 生成Token失败
+        throw new TokenException(TokenMsg.EXCEPTION_TOKEN_CREATE_ERROR);
     }
 
     /**

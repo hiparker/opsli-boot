@@ -81,7 +81,7 @@ public class CustomShiroFilter extends AuthenticatingFilter {
             httpResponse.setHeader("Access-Control-Allow-Headers", httpServletRequest.getHeader("Access-Control-Request-Headers"));
             httpResponse.setContentType("application/json; charset=utf-8");
             // 401 Token失效，请重新登录
-            ResultVo<Object> error = ResultVo.error(TokenMsg.EXCEPTION_TOKEN_LOSE_EFFICACY.getCode(),
+            ResultVo<?> error = ResultVo.error(TokenMsg.EXCEPTION_TOKEN_LOSE_EFFICACY.getCode(),
                     TokenMsg.EXCEPTION_TOKEN_LOSE_EFFICACY.getMessage());
             httpResponse.getWriter().print(error.toJsonStr());
             return false;
@@ -102,7 +102,7 @@ public class CustomShiroFilter extends AuthenticatingFilter {
         try {
             //处理登录失败的异常
             Throwable throwable = e.getCause() == null ? e : e.getCause();
-            ResultVo<Object> error = ResultVo.error(TokenMsg.EXCEPTION_TOKEN_LOSE_EFFICACY.getCode(),
+            ResultVo<?> error = ResultVo.error(TokenMsg.EXCEPTION_TOKEN_LOSE_EFFICACY.getCode(),
                     throwable.getMessage());
             httpResponse.getWriter().print(error.toJsonStr());
         } catch (IOException ignored) {}

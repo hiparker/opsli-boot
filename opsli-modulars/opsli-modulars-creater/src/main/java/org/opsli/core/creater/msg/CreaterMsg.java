@@ -54,9 +54,13 @@ public enum CreaterMsg implements BaseMsg {
      * 生成
      */
     EXCEPTION_CREATE_NULL(50140,"生成失败，数据为空"),
-    EXCEPTION_CREATE_TABLE_NULL(50140,"生成失败，暂无表数据"),
-    EXCEPTION_CREATE_FIELD_NULL(50121,"生成失败，暂无表字段"),
+    EXCEPTION_CREATE_TABLE_NULL(50141,"生成失败，暂无表数据"),
+    EXCEPTION_CREATE_FIELD_NULL(50142,"生成失败，暂无表字段"),
 
+    /**
+     * 其他
+     */
+    EXCEPTION_OTHER_NULL(50200,"暂无数据"),
 
     ;
 
