@@ -161,9 +161,9 @@ public enum EncryptAndDecryptByRsaUtil {
      */
     public String decryptedData(RSA rsa,String data){
         //解密,因为编码传值时有空格出现
-        data = data.replaceAll(" ", "+");
         String decryptStr;
         try{
+            data = data.replaceAll(" ", "+");
             String tmp = rsa.decryptStr(data, KeyType.PrivateKey);
             JSONObject jsonObject = JSONObject.parseObject(tmp);
             Object obj = jsonObject.get(rsaKey);
