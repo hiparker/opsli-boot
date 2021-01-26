@@ -13,9 +13,11 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.opsli.core.aspect;
+package org.opsli.core.filters.aspect;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.convert.Convert;
+import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.core.util.TypeUtil;
 import cn.hutool.crypto.asymmetric.RSA;
@@ -35,8 +37,10 @@ import org.opsli.core.utils.EncryptAndDecryptByRsaUtil;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
+import java.util.Map;
 
 import static org.opsli.common.constants.OrderConstants.ENCRYPT_ADN_DECRYPT_AOP_SORT;
 
@@ -130,7 +134,22 @@ public class InterfaceEncryptAndDecryptAop {
 
                         // 根据方法类型转化对象
                         Type type = TypeUtil.getParamType(method, i);
-                        args[i] = Convert.convert(type, dataToObj);
+                        Object obj = Convert.convert(type, dataToObj);
+                        // 修改缓存中设备数据 空值不覆盖
+                        Map<String, Object> modelBeanMap = BeanUtil.beanToMap(obj);
+                        modelBeanMap.entrySet().removeIf(entry -> entry.getValue() == null);
+
+                        // 反射赋值
+                        Field[] fields = ReflectUtil.getFields(arg.getClass());
+                        for (Field f : fields) {
+                            Object val = modelBeanMap.get(f.getName());
+                            if(val == null){
+                                continue;
+                            }
+
+                            //根据需要，将相关属性赋上默认值
+                            BeanUtil.setProperty(arg, f.getName(), val);
+                        }
                     }
                 }
             }

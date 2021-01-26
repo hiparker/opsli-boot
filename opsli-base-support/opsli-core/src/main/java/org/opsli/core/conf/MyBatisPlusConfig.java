@@ -16,10 +16,9 @@
 package org.opsli.core.conf;
 
 import com.baomidou.mybatisplus.extension.plugins.OptimisticLockerInterceptor;
-import com.baomidou.mybatisplus.extension.plugins.inner.OptimisticLockerInnerInterceptor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.session.SqlSessionFactory;
-import org.opsli.core.conf.mybatis.AutoFillInterceptor;
+import org.opsli.core.filters.interceptor.MybatisAutoFillInterceptor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
@@ -52,7 +51,7 @@ public class MyBatisPlusConfig {
 	 */
 	@Bean
 	public String myInterceptor(SqlSessionFactory sqlSessionFactory) {
-		sqlSessionFactory.getConfiguration().addInterceptor(new AutoFillInterceptor());
+		sqlSessionFactory.getConfiguration().addInterceptor(new MybatisAutoFillInterceptor());
 		return "interceptor";
 	}
 

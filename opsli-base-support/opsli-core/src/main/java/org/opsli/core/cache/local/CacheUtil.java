@@ -23,7 +23,7 @@ import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.opsli.common.constants.CacheConstants;
 import org.opsli.common.utils.Props;
-import org.opsli.core.aspect.CacheDataAop;
+import org.opsli.core.filters.aspect.CacheDataAop;
 import org.opsli.plugins.cache.EhCachePlugin;
 import org.opsli.plugins.redis.RedisPlugin;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -32,7 +32,7 @@ import org.opsli.common.exception.TokenException;
 import org.opsli.common.thread.refuse.AsyncProcessQueueReFuse;
 import org.opsli.common.utils.IPUtil;
 import org.opsli.common.utils.OutputStreamUtil;
-import org.opsli.core.aspect.InterfaceEncryptAndDecryptAop;
+import org.opsli.core.filters.aspect.InterfaceEncryptAndDecryptAop;
 import org.opsli.core.msg.TokenMsg;
 import org.opsli.core.security.shiro.realm.JwtRealm;
 import org.opsli.core.utils.*;

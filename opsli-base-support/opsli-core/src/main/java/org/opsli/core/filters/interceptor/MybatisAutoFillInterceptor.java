@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.opsli.core.conf.mybatis;
+package org.opsli.core.filters.interceptor;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.convert.Convert;
@@ -46,11 +46,13 @@ import java.util.*;
  *      自定义查询SQL的话 一定要注意 ， 如果有租户设置 一定要加上多租户查询
  *
  * 参考地址：https://www.cnblogs.com/qingshan-tang/p/13299701.html
+ *
+ * @author Parker
  */
 @Component
 @Slf4j
 @Intercepts(@Signature(type = Executor.class, method = "update", args = {MappedStatement.class, Object.class}))
-public class AutoFillInterceptor implements Interceptor {
+public class MybatisAutoFillInterceptor implements Interceptor {
 
     private static final String ET = "et";
 
@@ -104,7 +106,6 @@ public class AutoFillInterceptor implements Interceptor {
         Date currDate = DateUtil.date();
         Field[] fields = ReflectUtil.getFields(arg.getClass());
         for (Field f : fields) {
-            f.setAccessible(true);
             switch (f.getName()) {
                 // 创建人
                 case MyBatisConstants.FIELD_CREATE_BY:
@@ -150,7 +151,6 @@ public class AutoFillInterceptor implements Interceptor {
                 default:
                     break;
             }
-            f.setAccessible(false);
         }
     }
 
@@ -179,7 +179,6 @@ public class AutoFillInterceptor implements Interceptor {
         }
         fields = ReflectUtil.getFields(arg.getClass());
         for (Field f : fields) {
-            f.setAccessible(true);
             switch (f.getName()) {
                 // 更新人
                 case MyBatisConstants.FIELD_UPDATE_BY:
@@ -196,7 +195,6 @@ public class AutoFillInterceptor implements Interceptor {
                 default:
                     break;
             }
-            f.setAccessible(false);
         }
     }
 
