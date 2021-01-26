@@ -112,7 +112,7 @@ public class MybatisAutoFillInterceptor implements Interceptor {
                     // 如果创建人 为空则进行默认赋值
                     Object createValue = ReflectUtil.getFieldValue(arg, f.getName());
                     if(StringUtils.isBlank(Convert.toStr(createValue))){
-                        setProperty(arg, MyBatisConstants.FIELD_CREATE_BY, UserUtil.getUser().getId());
+                        BeanUtil.setProperty(arg, MyBatisConstants.FIELD_CREATE_BY, UserUtil.getUser().getId());
                     }
                     break;
                 // 更新人
@@ -120,24 +120,24 @@ public class MybatisAutoFillInterceptor implements Interceptor {
                     // 如果更新人 为空则进行默认赋值
                     Object updateValue = ReflectUtil.getFieldValue(arg, f.getName());
                     if(StringUtils.isBlank(Convert.toStr(updateValue))){
-                        setProperty(arg, MyBatisConstants.FIELD_UPDATE_BY, UserUtil.getUser().getId());
+                        BeanUtil.setProperty(arg, MyBatisConstants.FIELD_UPDATE_BY, UserUtil.getUser().getId());
                     }
                     break;
                 // 创建日期
                 case MyBatisConstants.FIELD_CREATE_TIME:
-                    setProperty(arg, MyBatisConstants.FIELD_CREATE_TIME, currDate);
+                    BeanUtil.setProperty(arg, MyBatisConstants.FIELD_CREATE_TIME, currDate);
                     break;
                 // 更新日期
                 case MyBatisConstants.FIELD_UPDATE_TIME:
-                    setProperty(arg, MyBatisConstants.FIELD_UPDATE_TIME, currDate);
+                    BeanUtil.setProperty(arg, MyBatisConstants.FIELD_UPDATE_TIME, currDate);
                     break;
                 // 乐观锁
                 case MyBatisConstants.FIELD_OPTIMISTIC_LOCK:
-                    setProperty(arg, MyBatisConstants.FIELD_OPTIMISTIC_LOCK, 0);
+                    BeanUtil.setProperty(arg, MyBatisConstants.FIELD_OPTIMISTIC_LOCK, 0);
                     break;
                 // 逻辑删除
                 case MyBatisConstants.FIELD_DELETE_LOGIC:
-                    setProperty(arg, MyBatisConstants.FIELD_DELETE_LOGIC,  MyBatisConstants.LOGIC_NOT_DELETE_VALUE);
+                    BeanUtil.setProperty(arg, MyBatisConstants.FIELD_DELETE_LOGIC,  MyBatisConstants.LOGIC_NOT_DELETE_VALUE);
                     break;
                 // 多租户设置
                 case MyBatisConstants.FIELD_TENANT:
@@ -145,7 +145,7 @@ public class MybatisAutoFillInterceptor implements Interceptor {
                     // 如果租户ID 为空则进行默认赋值
                     Object tenantValue = ReflectUtil.getFieldValue(arg, f.getName());
                     if(StringUtils.isBlank(Convert.toStr(tenantValue))){
-                        setProperty(arg, MyBatisConstants.FIELD_TENANT,  UserUtil.getTenantId());
+                        BeanUtil.setProperty(arg, MyBatisConstants.FIELD_TENANT,  UserUtil.getTenantId());
                     }
                     break;
                 default:
@@ -185,12 +185,12 @@ public class MybatisAutoFillInterceptor implements Interceptor {
                     // 如果更新人 为空则进行默认赋值
                     Object updateValue = ReflectUtil.getFieldValue(arg, f.getName());
                     if(StringUtils.isBlank(Convert.toStr(updateValue))){
-                        setProperty(arg, MyBatisConstants.FIELD_UPDATE_BY, UserUtil.getUser().getId());
+                        BeanUtil.setProperty(arg, MyBatisConstants.FIELD_UPDATE_BY, UserUtil.getUser().getId());
                     }
                     break;
                 // 更新日期
                 case MyBatisConstants.FIELD_UPDATE_TIME:
-                    setProperty(arg, MyBatisConstants.FIELD_UPDATE_TIME, DateUtil.date());
+                    BeanUtil.setProperty(arg, MyBatisConstants.FIELD_UPDATE_TIME, DateUtil.date());
                     break;
                 default:
                     break;
@@ -199,16 +199,6 @@ public class MybatisAutoFillInterceptor implements Interceptor {
     }
 
     // =======================================
-
-    /**
-     * 为对象的操作属性赋值
-     *
-     * @param bean bean对象
-     */
-    private void setProperty(Object bean, String name, Object value) {
-        //根据需要，将相关属性赋上默认值
-        BeanUtil.setProperty(bean, name, value);
-    }
 
     @Override
     public Object plugin(Object o) {
