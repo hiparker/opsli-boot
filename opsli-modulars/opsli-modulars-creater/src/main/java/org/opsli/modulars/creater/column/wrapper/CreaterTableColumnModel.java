@@ -64,14 +64,12 @@ public class CreaterTableColumnModel extends ApiWrapper {
     @ApiModelProperty(value = "字段长度")
     @ExcelProperty(value = "字段长度", order = 4)
     @ExcelInfo
-    @ValidationArgsLenMax(6)
     private Integer fieldLength;
 
     /** 字段精度 */
     @ApiModelProperty(value = "字段精度")
     @ExcelProperty(value = "字段精度", order = 5)
     @ExcelInfo
-    @ValidationArgsLenMax(6)
     private Integer fieldPrecision;
 
     /** 字段描述 */
