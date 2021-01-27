@@ -15,12 +15,14 @@
  */
 package org.opsli.modulars.creater.createrlogs.service.impl;
 
+import cn.hutool.core.collection.CollUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.opsli.common.utils.WrapperUtil;
 import org.opsli.core.base.service.impl.CrudServiceImpl;
 import org.opsli.core.creater.exception.CreaterException;
 import org.opsli.core.creater.msg.CreaterMsg;
 import org.opsli.core.creater.strategy.create.CodeBuilder;
+import org.opsli.core.persistence.Page;
 import org.opsli.core.persistence.querybuilder.GenQueryBuilder;
 import org.opsli.core.persistence.querybuilder.QueryBuilder;
 import org.opsli.modulars.creater.column.service.ITableColumnService;
@@ -88,9 +90,16 @@ public class CreateLogsServiceImpl extends CrudServiceImpl<CreaterLogsMapper, Cr
                 new GenQueryBuilder<>();
         QueryWrapper<CreaterLogs> wrapper = queryBuilder.build();
         wrapper.eq("table_id", tableId);
-        return super.transformT2M(
-                this.getOne(wrapper)
-        );
+
+        CreaterLogsModel model = null;
+        Page<CreaterLogs, CreaterLogsModel> page = new Page<>(1,1);
+        page.setQueryWrapper(wrapper);
+        page = this.findPage(page);
+        if(page != null && CollUtil.isNotEmpty(page.getList())){
+            model = page.getList().get(0);
+        }
+
+        return model;
     }
 
     @Override
