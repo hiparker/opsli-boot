@@ -51,6 +51,23 @@
 > -  账号: admin
 > -  密码: 123456
 
+## 系统预览
+![opsli-1](https://gitee.com/hiparker/opsli-ui/raw/master/repository-images/opsli-1.jpg)
+
+![opsli-2](https://gitee.com/hiparker/opsli-ui/raw/master/repository-images/opsli-2.jpg)
+
+![opsli-3](https://gitee.com/hiparker/opsli-ui/raw/master/repository-images/opsli-3.jpg)
+
+![opsli-4](https://gitee.com/hiparker/opsli-ui/raw/master/repository-images/opsli-4.jpg)
+
+![opsli-5](https://gitee.com/hiparker/opsli-ui/raw/master/repository-images/opsli-5.jpg)
+
+![opsli-7](https://gitee.com/hiparker/opsli-ui/raw/master/repository-images/opsli-7.jpg)
+
+![opsli-8](https://gitee.com/hiparker/opsli-ui/raw/master/repository-images/opsli-8.jpg)
+
+![opsli-9](https://gitee.com/hiparker/opsli-ui/raw/master/repository-images/opsli-9.jpg)
+
 ## 代码结构
 ```
 .
