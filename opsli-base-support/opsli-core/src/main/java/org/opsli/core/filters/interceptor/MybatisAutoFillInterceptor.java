@@ -19,6 +19,7 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ReflectUtil;
+import com.baomidou.mybatisplus.annotation.TableField;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.binding.MapperMethod;
@@ -106,6 +107,15 @@ public class MybatisAutoFillInterceptor implements Interceptor {
         Date currDate = DateUtil.date();
         Field[] fields = ReflectUtil.getFields(arg.getClass());
         for (Field f : fields) {
+            // 如果设置为忽略字段 则直接跳过不处理
+            TableField tableField = f.getAnnotation(TableField.class);
+            if(tableField != null){
+                boolean exist = tableField.exist();
+                if(!exist){
+                    continue;
+                }
+            }
+
             switch (f.getName()) {
                 // 创建人
                 case MyBatisConstants.FIELD_CREATE_BY:
@@ -179,6 +189,15 @@ public class MybatisAutoFillInterceptor implements Interceptor {
         }
         fields = ReflectUtil.getFields(arg.getClass());
         for (Field f : fields) {
+            // 如果设置为忽略字段 则直接跳过不处理
+            TableField tableField = f.getAnnotation(TableField.class);
+            if(tableField != null){
+                boolean exist = tableField.exist();
+                if(!exist){
+                    continue;
+                }
+            }
+
             switch (f.getName()) {
                 // 更新人
                 case MyBatisConstants.FIELD_UPDATE_BY:
