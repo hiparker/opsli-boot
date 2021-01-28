@@ -133,10 +133,11 @@ public class UserServiceImpl extends CrudServiceImpl<UserMapper, SysUser, UserMo
         model.setSecretkey(null);
         model.setLoginIp(null);
 
+        UserModel userModel = super.get(model);
         UserModel update = super.update(model);
         if(update != null){
             // 刷新用户缓存
-            this.clearCache(Collections.singletonList(update));
+            this.clearCache(Collections.singletonList(userModel));
         }
 
         return update;
