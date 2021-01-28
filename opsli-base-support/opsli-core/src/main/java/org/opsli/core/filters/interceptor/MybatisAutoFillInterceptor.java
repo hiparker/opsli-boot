@@ -20,6 +20,7 @@ import cn.hutool.core.convert.Convert;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ReflectUtil;
 import com.baomidou.mybatisplus.annotation.TableField;
+import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.binding.MapperMethod;
@@ -103,15 +104,25 @@ public class MybatisAutoFillInterceptor implements Interceptor {
         if(arg == null ){
             return;
         }
+
+        // 排除字段
+        List<String> existField = Lists.newArrayList();
+
         // 当前时间
         Date currDate = DateUtil.date();
         Field[] fields = ReflectUtil.getFields(arg.getClass());
         for (Field f : fields) {
+            // 判断是否是排除字段
+            if(existField.contains(f.getName())){
+                continue;
+            }
+
             // 如果设置为忽略字段 则直接跳过不处理
             TableField tableField = f.getAnnotation(TableField.class);
             if(tableField != null){
                 boolean exist = tableField.exist();
                 if(!exist){
+                    existField.add(f.getName());
                     continue;
                 }
             }
@@ -173,6 +184,9 @@ public class MybatisAutoFillInterceptor implements Interceptor {
             return;
         }
 
+        // 排除字段
+        List<String> existField = Lists.newArrayList();
+
         // 2020-09-19
         // 修改这儿 有可能会拿到一个 MapperMethod，需要特殊处理
         Field[] fields;
@@ -189,11 +203,17 @@ public class MybatisAutoFillInterceptor implements Interceptor {
         }
         fields = ReflectUtil.getFields(arg.getClass());
         for (Field f : fields) {
+            // 判断是否是排除字段
+            if(existField.contains(f.getName())){
+                continue;
+            }
+
             // 如果设置为忽略字段 则直接跳过不处理
             TableField tableField = f.getAnnotation(TableField.class);
             if(tableField != null){
                 boolean exist = tableField.exist();
                 if(!exist){
+                    existField.add(f.getName());
                     continue;
                 }
             }
