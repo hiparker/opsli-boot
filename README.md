@@ -3,7 +3,7 @@
  <img width="500" src="https://gitee.com/hiparker/opsli-ui/raw/master/repository-images/logo.png"/>
  <br/> <br/>
 
-[![AUR](https://img.shields.io/badge/license-Apache%20License%202.0-blue.svg)](https://github.com/hiparker/opsli-boot/blob/master/LICENSE) [![spring-boot](https://img.shields.io/badge/spring--boot-2.3.3.RELEASE-green.svg)](http://spring.io/projects/spring-boot) [![mybatis-plus](https://img.shields.io/badge/mybatis--plus-3.4.0-blue.svg)](http://mp.baomidou.com) [![hutool](https://img.shields.io/badge/hutool-5.5.5-blue.svg)](https://www.hutool.cn) [![GitHub stars](https://img.shields.io/github/stars/hiparker/opsli-boot.svg?style=social&label=Stars)](https://github.com/hiparker/opsli-boot) [![GitHub forks](https://img.shields.io/github/forks/hiparker/opsli-boot.svg?style=social&label=Fork)](https://github.com/hiparker/opsli-boot)
+[![AUR](https://img.shields.io/badge/license-Apache%20License%202.0-blue.svg)](https://github.com/hiparker/opsli-boot/blob/master/LICENSE) [![spring-boot](https://img.shields.io/badge/spring--boot-2.3.3.RELEASE-green.svg)](http://spring.io/projects/spring-boot) [![mybatis-plus](https://img.shields.io/badge/mybatis--plus-3.4.0-blue.svg)](http://mp.baomidou.com) [![hutool](https://img.shields.io/badge/hutool-5.5.5-blue.svg)](https://www.hutool.cn) [![Stars](https://img.shields.io/github/stars/hiparker/opsli-boot?style=flat-square&label=Stars&logo=github)](https://github.com/hiparker/opsli-boot) [![Forks](https://img.shields.io/github/forks/hiparker/opsli-boot?style=flat-square&label=Forks&logo=github)](https://github.com/hiparker/opsli-boot)
 </div>
 
 ## 关于
