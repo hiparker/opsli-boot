@@ -32,6 +32,7 @@ import org.opsli.common.constants.TokenConstants;
 import org.opsli.common.constants.TokenTypeConstants;
 import org.opsli.common.exception.TokenException;
 import org.opsli.common.utils.Props;
+import org.opsli.core.autoconfigure.GlobalProperties;
 import org.opsli.core.msg.TokenMsg;
 import org.opsli.plugins.redis.RedisPlugin;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,7 +56,7 @@ import static org.opsli.common.constants.OrderConstants.UTIL_ORDER;
 @Slf4j
 @Order(UTIL_ORDER)
 @Component
-@AutoConfigureAfter({RedisPlugin.class})
+@AutoConfigureAfter({GlobalProperties.class, RedisPlugin.class})
 @Lazy(false)
 public class UserTokenUtil {
 
@@ -68,11 +69,11 @@ public class UserTokenUtil {
     /** 账号失败锁定KEY */
     public static final String ACCOUNT_SLIP_LOCK_PREFIX;
     /** 账号失败阈值 */
-    public static final int ACCOUNT_SLIP_COUNT;
+    public static int ACCOUNT_SLIP_COUNT;
     /** 账号失败N次后弹出验证码 */
-    public static final int ACCOUNT_SLIP_VERIFY_COUNT;
+    public static int ACCOUNT_SLIP_VERIFY_COUNT;
     /** 账号锁定时间 */
-    public static final int ACCOUNT_SLIP_LOCK_SPEED;
+    public static int ACCOUNT_SLIP_LOCK_SPEED;
 
     /** Redis插件 */
     private static RedisPlugin redisPlugin;
@@ -88,16 +89,13 @@ public class UserTokenUtil {
         ACCOUNT_SLIP_COUNT_PREFIX = PREFIX_NAME + "account:slip:count:";
         ACCOUNT_SLIP_LOCK_PREFIX = PREFIX_NAME + "account:slip:lock:";
 
-        // 配置数据
-        ACCOUNT_SLIP_COUNT = props.getInt("opsli.login.slip-count", 5);
-        ACCOUNT_SLIP_VERIFY_COUNT = props.getInt("opsli.login.slip-verify-count", 3);
-        ACCOUNT_SLIP_LOCK_SPEED = props.getInt("opsli.login.slip-lock-speed", 300);
+
     }
 
 
     /**
      * 根据 user 创建Token
-     * @param user
+     * @param user 用户
      * @return
      */
     public static ResultVo<Map<String,Object>> createToken(UserModel user) {
@@ -145,7 +143,7 @@ public class UserTokenUtil {
 
     /**
      * 根据 Token 获得用户ID
-     * @param token
+     * @param token token
      * @return
      */
     public static String getUserIdByToken(String token) {
@@ -161,7 +159,7 @@ public class UserTokenUtil {
 
     /**
      * 根据 Token 获得 username
-     * @param token
+     * @param token token
      * @return
      */
     public static String getUserNameByToken(String token) {
@@ -179,7 +177,7 @@ public class UserTokenUtil {
 
     /**
      * 退出登陆
-     * @param token
+     * @param token token
      */
     public static void logout(String token) {
         if(StringUtils.isEmpty(token)){
@@ -206,7 +204,7 @@ public class UserTokenUtil {
 
     /**
      * 验证 token
-     * @param token
+     * @param token token
      */
     public static boolean verify(String token) {
         if(StringUtils.isEmpty(token)){
@@ -341,4 +339,33 @@ public class UserTokenUtil {
         UserTokenUtil.redisPlugin = redisPlugin;
     }
 
+    @Autowired
+    public void setAccountSlipCount(GlobalProperties globalProperties) {
+        if(globalProperties != null && globalProperties.getAuth() != null
+                && globalProperties.getAuth().getLogin() != null
+            ){
+            ACCOUNT_SLIP_COUNT = globalProperties.getAuth()
+                    .getLogin().getSlipCount();
+        }
+    }
+
+    @Autowired
+    public void setAccountSlipVerifyCount(GlobalProperties globalProperties) {
+        if(globalProperties != null && globalProperties.getAuth() != null
+                && globalProperties.getAuth().getLogin() != null
+            ){
+            ACCOUNT_SLIP_VERIFY_COUNT = globalProperties.getAuth()
+                    .getLogin().getSlipVerifyCount();
+        }
+    }
+
+    @Autowired
+    public void setAccountSlipLockSpeed(GlobalProperties globalProperties) {
+        if(globalProperties != null && globalProperties.getAuth() != null
+                && globalProperties.getAuth().getLogin() != null
+        ){
+            ACCOUNT_SLIP_LOCK_SPEED = globalProperties.getAuth()
+                    .getLogin().getSlipLockSpeed();
+        }
+    }
 }

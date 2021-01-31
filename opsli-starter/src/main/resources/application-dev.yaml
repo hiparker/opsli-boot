@@ -60,10 +60,8 @@ knife4j:
 
 # opsli 自定义配置
 opsli:
-
   # 演示模式
   enable-demo: false
-
   # web 上传文件路径
   web:
     upload-path: /Users/system/Documents/work/tmp/opsli

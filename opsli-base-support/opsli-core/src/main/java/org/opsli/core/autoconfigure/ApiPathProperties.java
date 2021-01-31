@@ -13,9 +13,8 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.opsli.api.conf.prop;
+package org.opsli.core.autoconfigure;
 
-import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
@@ -25,9 +24,16 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @ConfigurationProperties(prefix = "server.servlet.api.path")
-@Data
 public class ApiPathProperties {
 
-    String globalPrefix = "api";
+    /** 专门针对 Controller层接口路径前缀全局配置 */
+    private String globalPrefix;
 
+    public String getGlobalPrefix() {
+        return globalPrefix;
+    }
+
+    public void setGlobalPrefix(String globalPrefix) {
+        this.globalPrefix = globalPrefix;
+    }
 }

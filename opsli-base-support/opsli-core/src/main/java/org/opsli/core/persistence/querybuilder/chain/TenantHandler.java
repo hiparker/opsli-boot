@@ -20,10 +20,8 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.apache.commons.lang3.StringUtils;
 import org.opsli.api.wrapper.system.user.UserModel;
 import org.opsli.common.constants.MyBatisConstants;
-import org.opsli.common.exception.ServiceException;
 import org.opsli.common.utils.HumpUtil;
 import org.opsli.core.base.entity.BaseEntity;
-import org.opsli.core.msg.CoreMsg;
 import org.opsli.core.utils.UserUtil;
 
 /**

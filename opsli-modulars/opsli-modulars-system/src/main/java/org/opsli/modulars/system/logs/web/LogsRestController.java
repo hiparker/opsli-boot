@@ -23,7 +23,7 @@ import org.opsli.api.web.system.logs.LogsApi;
 import org.opsli.api.wrapper.system.logs.LogsModel;
 import org.opsli.common.annotation.ApiRestController;
 import org.opsli.common.annotation.EnableLog;
-import org.opsli.core.base.concroller.BaseRestController;
+import org.opsli.core.base.controller.BaseRestController;
 import org.opsli.core.persistence.Page;
 import org.opsli.core.persistence.querybuilder.QueryBuilder;
 import org.opsli.core.persistence.querybuilder.WebQueryBuilder;

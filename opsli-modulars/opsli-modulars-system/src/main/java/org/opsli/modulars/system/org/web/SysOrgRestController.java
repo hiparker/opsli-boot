@@ -36,7 +36,7 @@ import org.opsli.common.annotation.RequiresPermissionsCus;
 import org.opsli.common.constants.MyBatisConstants;
 import org.opsli.common.utils.HumpUtil;
 import org.opsli.common.utils.WrapperUtil;
-import org.opsli.core.base.concroller.BaseRestController;
+import org.opsli.core.base.controller.BaseRestController;
 import org.opsli.core.base.entity.HasChildren;
 import org.opsli.core.persistence.querybuilder.GenQueryBuilder;
 import org.opsli.core.persistence.querybuilder.QueryBuilder;

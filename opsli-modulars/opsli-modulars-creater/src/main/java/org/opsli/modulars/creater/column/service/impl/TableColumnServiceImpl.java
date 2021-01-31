@@ -17,7 +17,7 @@ package org.opsli.modulars.creater.column.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.apache.commons.lang3.StringUtils;
-import org.opsli.api.utils.ValidationUtil;
+import org.opsli.core.utils.ValidationUtil;
 import org.opsli.common.exception.ServiceException;
 import org.opsli.core.base.service.impl.CrudServiceImpl;
 import org.opsli.core.creater.exception.CreaterException;

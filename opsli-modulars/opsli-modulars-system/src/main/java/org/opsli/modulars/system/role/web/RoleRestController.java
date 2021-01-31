@@ -20,6 +20,7 @@ import cn.hutool.core.util.ReflectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.opsli.api.base.result.ResultVo;
 import org.opsli.api.web.system.role.RoleApi;
@@ -30,7 +31,7 @@ import org.opsli.common.annotation.EnableLog;
 import org.opsli.common.annotation.RequiresPermissionsCus;
 import org.opsli.common.constants.MyBatisConstants;
 import org.opsli.common.exception.ServiceException;
-import org.opsli.core.base.concroller.BaseRestController;
+import org.opsli.core.base.controller.BaseRestController;
 import org.opsli.core.persistence.Page;
 import org.opsli.core.persistence.querybuilder.GenQueryBuilder;
 import org.opsli.core.persistence.querybuilder.QueryBuilder;
@@ -132,7 +133,7 @@ public class RoleRestController extends BaseRestController<SysRole, RoleModel, I
             if(roleModel != null && LOCK_DATA.equals(roleModel.getIzLock()) ){
                 UserModel user = UserUtil.getUser();
 
-                if(!UserUtil.SUPER_ADMIN.equals(user.getUsername())){
+                if(!StringUtils.equals(UserUtil.SUPER_ADMIN, user.getUsername())){
                     throw new ServiceException(SystemMsg.EXCEPTION_LOCK_DATA);
                 }
             }
@@ -161,7 +162,7 @@ public class RoleRestController extends BaseRestController<SysRole, RoleModel, I
         // 内置数据 只有超级管理员可以修改
         if(roleModel != null && LOCK_DATA.equals(roleModel.getIzLock()) ){
             UserModel user = UserUtil.getUser();
-            if(!UserUtil.SUPER_ADMIN.equals(user.getUsername())){
+            if(!StringUtils.equals(UserUtil.SUPER_ADMIN, user.getUsername())){
                 throw new ServiceException(SystemMsg.EXCEPTION_LOCK_DATA);
             }
         }
@@ -197,7 +198,7 @@ public class RoleRestController extends BaseRestController<SysRole, RoleModel, I
                 // 内置数据 只有超级管理员可以修改
                 if(sysRole != null && LOCK_DATA.equals(sysRole.getIzLock()) ){
                     UserModel user = UserUtil.getUser();
-                    if(!UserUtil.SUPER_ADMIN.equals(user.getUsername())){
+                    if(!StringUtils.equals(UserUtil.SUPER_ADMIN, user.getUsername())){
                         throw new ServiceException(SystemMsg.EXCEPTION_LOCK_DATA);
                     }
                 }

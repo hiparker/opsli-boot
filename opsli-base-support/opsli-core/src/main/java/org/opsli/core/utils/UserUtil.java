@@ -28,7 +28,7 @@ import org.opsli.api.wrapper.system.menu.MenuModel;
 import org.opsli.api.wrapper.system.user.UserModel;
 import org.opsli.common.api.TokenThreadLocal;
 import org.opsli.common.exception.TokenException;
-import org.opsli.common.utils.Props;
+import org.opsli.core.autoconfigure.GlobalProperties;
 import org.opsli.core.cache.local.CacheUtil;
 import org.opsli.core.cache.pushsub.msgs.UserMsgFactory;
 import org.opsli.core.msg.TokenMsg;
@@ -55,12 +55,9 @@ import static org.opsli.common.constants.OrderConstants.UTIL_ORDER;
 @Slf4j
 @Order(UTIL_ORDER)
 @Component
-@AutoConfigureAfter({RedisPlugin.class , RedisLockPlugins.class, UserApi.class})
+@AutoConfigureAfter({GlobalProperties.class, RedisPlugin.class , RedisLockPlugins.class, UserApi.class})
 @Lazy(false)
 public class UserUtil {
-
-    /** 超级管理员 */
-    public static final String SUPER_ADMIN;
 
     /** 前缀 */
     public static final String PREFIX_ID = "userId:";
@@ -79,15 +76,12 @@ public class UserUtil {
     /** 用户Service */
     private static UserApi userApi;
 
-
-    static{
-        Props props = new Props("application.yaml");
-        SUPER_ADMIN = props.getStr("opsli.superadmin","system");
-    }
+    /** 超级管理员 */
+    public static String SUPER_ADMIN;
 
     /**
      * 获得当前系统登陆用户
-     * @return
+     * @return UserModel
      */
     public static UserModel getUser(){
         String token = TokenThreadLocal.get();
@@ -108,8 +102,8 @@ public class UserUtil {
 
     /**
      * 根据ID 获得用户
-     * @param userId
-     * @return
+     * @param userId 用户ID
+     * @return UserModel
      */
     public static UserModel getUser(String userId){
         // 先从缓存里拿
@@ -176,8 +170,8 @@ public class UserUtil {
 
     /**
      * 根据 userName 获得用户
-     * @param userName
-     * @return
+     * @param userName 用户名
+     * @return UserModel
      */
     public static UserModel getUserByUserName(String userName){
         // 先从缓存里拿
@@ -238,8 +232,8 @@ public class UserUtil {
 
     /**
      * 根据 userId 获得用户角色列表
-     * @param userId
-     * @return
+     * @param userId 用户ID
+     * @return List
      */
     public static List<String> getUserRolesByUserId(String userId){
         List<String> roles = null;
@@ -325,8 +319,8 @@ public class UserUtil {
 
     /**
      * 根据 userId 获得用户权限列表
-     * @param userId
-     * @return
+     * @param userId 用户ID
+     * @return List
      */
     public static List<String> getUserAllPermsByUserId(String userId){
         List<String> permissions = null;
@@ -412,8 +406,8 @@ public class UserUtil {
 
     /**
      * 根据 userId 获得用户菜单
-     * @param userId
-     * @return
+     * @param userId 用户ID
+     * @return List
      */
     public static List<MenuModel> getMenuListByUserId(String userId){
         List<MenuModel> menus = null;
@@ -521,8 +515,8 @@ public class UserUtil {
 
     /**
      * 刷新用户 - 删就完了
-     * @param user
-     * @return
+     * @param user 用户
+     * @return boolean
      */
     public static boolean refreshUser(UserModel user){
         if(user == null || StringUtils.isEmpty(user.getId())){
@@ -587,8 +581,8 @@ public class UserUtil {
 
     /**
      * 刷新用户角色 - 删就完了
-     * @param userId
-     * @return
+     * @param userId 用户ID
+     * @return boolean
      */
     public static boolean refreshUserRoles(String userId){
         Object obj = CacheUtil.get(PREFIX_ID_ROLES + userId);
@@ -626,8 +620,8 @@ public class UserUtil {
 
     /**
      * 刷新用户权限 - 删就完了
-     * @param userId
-     * @return
+     * @param userId 用户ID
+     * @return boolean
      */
     public static boolean refreshUserAllPerms(String userId){
         Object obj = CacheUtil.get(PREFIX_ID_PERMISSIONS + userId);
@@ -665,8 +659,8 @@ public class UserUtil {
 
     /**
      * 刷新用户菜单 - 删就完了
-     * @param userId
-     * @return
+     * @param userId 用户ID
+     * @return boolean
      */
     public static boolean refreshUserMenus(String userId){
         Object obj = CacheUtil.get(PREFIX_ID_MENUS + userId);
@@ -704,7 +698,7 @@ public class UserUtil {
 
     /**
      * 获得 租户ID
-     * @return
+     * @return String
      */
     public static String getTenantId(){
         // 判断权限 如果是 admin 超级管理员 则租户ID清空 且findList 不做处理 否则默认都会做处理
@@ -713,7 +707,7 @@ public class UserUtil {
         UserModel user = getUser();
 
         // 如果是超级管理员 则不进行租户处理
-        if(SUPER_ADMIN.equals(user.getUsername())){
+        if(StringUtils.equals(SUPER_ADMIN, user.getUsername())){
             return null;
         }
         return user.getTenantId();
@@ -723,7 +717,7 @@ public class UserUtil {
      * 处理密码
      * @param password 密码
      * @param secretkey 盐值
-     * @return
+     * @return String
      */
     public static String handlePassword(String password, String secretkey){
         return new Md5Hash(password, secretkey).toHex();
@@ -732,17 +726,26 @@ public class UserUtil {
     // =====================================
 
     @Autowired
-    public  void setRedisPlugin(RedisPlugin redisPlugin) {
+    public void setRedisPlugin(RedisPlugin redisPlugin) {
         UserUtil.redisPlugin = redisPlugin;
     }
 
     @Autowired
-    public  void setRedisLockPlugins(RedisLockPlugins redisLockPlugins) {
+    public void setRedisLockPlugins(RedisLockPlugins redisLockPlugins) {
         UserUtil.redisLockPlugins = redisLockPlugins;
     }
 
     @Autowired
-    public  void setUserApi(UserApi userApi) {
+    public void setUserApi(UserApi userApi) {
         UserUtil.userApi = userApi;
     }
+
+    @Autowired
+    public void setSuperAdmin(GlobalProperties globalProperties) {
+        // 获得 超级管理员
+        if(globalProperties != null && globalProperties.getAuth() != null ){
+            UserUtil.SUPER_ADMIN = globalProperties.getAuth().getSuperAdmin();
+        }
+    }
+
 }

@@ -34,7 +34,7 @@ import org.opsli.common.annotation.ApiRestController;
 import org.opsli.common.annotation.EnableLog;
 import org.opsli.common.annotation.RequiresPermissionsCus;
 import org.opsli.common.utils.WrapperUtil;
-import org.opsli.core.base.concroller.BaseRestController;
+import org.opsli.core.base.controller.BaseRestController;
 import org.opsli.core.general.StartPrint;
 import org.opsli.core.persistence.Page;
 import org.opsli.core.persistence.querybuilder.GenQueryBuilder;
@@ -82,7 +82,7 @@ public class MenuRestController extends BaseRestController<SysMenu, MenuModel, I
         UserModel user = UserUtil.getUser();
 
         // 获得全量数据
-        if(UserUtil.SUPER_ADMIN.equals(user.getUsername())){
+        if(StringUtils.equals(UserUtil.SUPER_ADMIN, user.getUsername())){
             List<SysMenu> menuList = IService.findList(queryBuilder.build());
             menuModelList = WrapperUtil.transformInstance(menuList, modelClazz);
         }else {

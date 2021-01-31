@@ -42,7 +42,7 @@ import org.opsli.common.exception.ServiceException;
 import org.opsli.common.exception.TokenException;
 import org.opsli.common.utils.HumpUtil;
 import org.opsli.common.utils.WrapperUtil;
-import org.opsli.core.base.concroller.BaseRestController;
+import org.opsli.core.base.controller.BaseRestController;
 import org.opsli.core.msg.CoreMsg;
 import org.opsli.core.msg.TokenMsg;
 import org.opsli.core.persistence.Page;
@@ -59,7 +59,6 @@ import org.opsli.modulars.system.user.entity.SysUser;
 import org.opsli.modulars.system.user.entity.SysUserAndOrg;
 import org.opsli.modulars.system.user.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
@@ -84,11 +83,6 @@ import java.util.Map;
 @ApiRestController("/sys/user")
 public class UserRestController extends BaseRestController<SysUser, UserModel, IUserService>
         implements UserApi {
-
-    @Value("${opsli.web.upload-path}")
-    private String basedir;
-    @Value("${opsli.default-pass}")
-    private String defaultPass;
 
     @Autowired
     private ISysOrgService iSysOrgService;
@@ -125,7 +119,7 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
         userInfo.setPerms(userAllPermsByUserId);
 
         // 判断是否是超级管理员
-        if(UserUtil.SUPER_ADMIN.equals(userInfo.getUsername())){
+        if(StringUtils.equals(UserUtil.SUPER_ADMIN, user.getUsername())){
             userInfo.setIzSuperAdmin(true);
         }
 
@@ -209,7 +203,7 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
 
             String date = DateUtil.format(DateUtil.date(), "yyyyMMdd");
             String dateTime = DateUtil.format(DateUtil.date(), "yyyyMMddHHmmss");
-            String packageName = basedir + staticPath+"/"+date;
+            String packageName = globalProperties.getWeb().getUploadPath() + staticPath+"/"+date;
             String fileName = dateTime+"-"+ IdUtil.simpleUUID() +".jpg";
             File file = new File(packageName+"/"+fileName);
             MultipartFile multipartFile = files.get(0);
@@ -264,7 +258,7 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
         super.demoError();
 
         UserPassword userPassword = new UserPassword();
-        userPassword.setNewPassword(defaultPass);
+        userPassword.setNewPassword(globalProperties.getAuth().getDefaultPass());
         userPassword.setUserId(userId);
 
         boolean resetPasswordFlag = IService.resetPassword(userPassword);
@@ -272,7 +266,7 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
             return ResultVo.error("重置密码失败");
         }
 
-        return ResultVo.success("重置密码成功！默认密码为：" + defaultPass);
+        return ResultVo.success("重置密码成功！默认密码为：" + globalProperties.getAuth().getDefaultPass());
     }
 
     /**

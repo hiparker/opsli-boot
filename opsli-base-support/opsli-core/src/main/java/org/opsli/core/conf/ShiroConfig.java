@@ -30,11 +30,13 @@ import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
 import org.opsli.common.utils.Props;
+import org.opsli.core.autoconfigure.GlobalProperties;
 import org.opsli.core.security.shiro.authenticator.CustomModularRealmAuthenticator;
 import org.opsli.core.security.shiro.filter.CustomShiroFilter;
 import org.opsli.core.security.shiro.realm.FlagRealm;
 import org.opsli.plugins.redis.conf.RedisPluginConfig;
 import org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -68,6 +70,9 @@ public class ShiroConfig {
         URL_EXCLUSION = props.getList("opsli.token-auth.url-exclusion");
         API_URL_PREFIX = props.getStr("server.servlet.api.path.global-prefix","");
     }
+
+    @Autowired
+    GlobalProperties globalProperties;
 
     /**
      * filer

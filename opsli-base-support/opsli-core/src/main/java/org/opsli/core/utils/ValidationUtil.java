@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.opsli.api.utils;
+package org.opsli.core.utils;
 
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.lang.Validator;
@@ -21,7 +21,7 @@ import cn.hutool.core.util.ReflectUtil;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.opsli.api.msg.ValidationMsg;
+import org.opsli.core.msg.ValidationMsg;
 import org.opsli.api.wrapper.system.dict.DictModel;
 import org.opsli.common.annotation.validation.ValidationArgs;
 import org.opsli.common.annotation.validation.ValidationArgsLenMax;

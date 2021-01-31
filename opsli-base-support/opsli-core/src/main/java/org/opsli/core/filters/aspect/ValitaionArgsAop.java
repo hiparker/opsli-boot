@@ -21,7 +21,7 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
 import org.opsli.api.base.warpper.ApiWrapper;
-import org.opsli.api.utils.ValidationUtil;
+import org.opsli.core.utils.ValidationUtil;
 import org.opsli.common.exception.ServiceException;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;

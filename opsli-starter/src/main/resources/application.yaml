@@ -156,18 +156,14 @@ mybatis-plus:
 
 
 
-# opsli 自定义配置
+# OPSLI 自定义配置
 opsli:
-
+  # 系统名称
   system-name: "OPSLI 快速开发平台"
+  # 系统启动时间 为空则默认 真实当前系统启动时间
+  system-starter-time: "2020-09-10 00:00:00"
 
-  # token 认证
-  token-auth:
-    # 排除过滤url 格式 - List
-    url-exclusion:
-      - "/test.html"
-
-  # Java 软防火墙
+  # 软防火墙
   waf:
     # 开启防护
     enable: true
@@ -179,40 +175,62 @@ opsli:
     order: 0
     # 设置xss防护的url拦截路径
     url-patterns: "/*"
-    # 排除过滤url
+    # 排除过滤URL
     url-exclusion:
       - "/doc.html"
       - "/static/file"
 
-  # 超级管理员账号
-  superadmin: system
-  # token 有效时间 （分钟） 2小时
-  token-effective-time: 120
+  # 认证
+  auth:
+    # 超级管理员账号
+    super-admin: system
+    # 重置默认密码 密码至少包含大小写字母，数字，且不少于6位
+    default-pass: Aa123456
+    # Token
+    token:
+      # 默认加密盐值（每个系统需要不一致防止被破解）
+      secret: 53c0e33c9d4c5538969abf2fcf48351d
+      # 有效时间 （分钟） 2小时
+      effective-time: 120
+      # 排除过滤URL
+      url-exclusion:
+        - "/test.html"
 
-  # 重置默认密码
-  default-pass: Aa123456
+    # 登录设置
+    login:
+      # 失败次数
+      slip-count: 5
+      # 失败N次后弹出验证码 （超过验证码阈值 弹出验证码）
+      slip-verify-count: 3
+      # 失败锁定时间(秒)
+      slip-lock-speed: 300
 
-  # 登录设置
-  login:
-    # 失败次数
-    slip-count: 5
-    # 失败N次后弹出验证码 （超过验证码阈值 弹出验证码）
-    slip-verify-count: 3
-    # 失败锁定时间(秒)
-    slip-lock-speed: 300
+  # Excel
+  excel:
+    # Excel 最大导入操作数量 防止OOM
+    import-max-count: 20000
+    # Excel 最大导出操作数量 防止OOM
+    export-max-count: 20000
 
   #加解密
   encrypt-decrypt:
+    enable: rsa
     # RSA 加密算法
     rsa:
       # 公钥
       public-key: "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCakyyq8rfkmKvKB2fz3hUeuD6tgParCmZmRc1OoL5EN+yXghQmDIrcZhewLZZLUpLQd3T3cRxKaW30nWNfoteNHgKjGYGu4+BZoyHZ8ltTmrolYGopiSwBMhO7kwAD4IK1PZHaoF2wPISH35ubbugykav7dTaWBDuNkvyBiv8qMQIDAQAB"
       # 私钥
       private-key: "MIICdgIBADANBgkqhkiG9w0BAQEFAASCAmAwggJcAgEAAoGBAJqTLKryt+SYq8oHZ/PeFR64Pq2A9qsKZmZFzU6gvkQ37JeCFCYMitxmF7AtlktSktB3dPdxHEppbfSdY1+i140eAqMZga7j4FmjIdnyW1OauiVgaimJLAEyE7uTAAPggrU9kdqgXbA8hIffm5tu6DKRq/t1NpYEO42S/IGK/yoxAgMBAAECgYEAiWu+klwm0LxKPdpHuK7/58e1MVst8PHWB6aW2AhgHxX46NlkQE92RGsfNCnTLDPFAkCxZCrTE/SXJJmn9yY2qoS26OV0PbTGajk96M8lDi9JSmWCNV1eywPecObSyvtPd5jaPtq2jkgNY/hHJjH6kV7UAFZuaSK7jxskfq7uR2ECQQDPfmGjPiMc65+LE9U7jC4LokyUi1yCgN6AY5MgF6fkxUVJD2mtl9BqRK7qE0OnsRb0NzID3PSfa7aA2I0Rlsj/AkEAvrXUBQ6hfuEwD1896qpSJUr7tLidby/3jYwSoewuydDT2duDc2ZCz4/U/1NpxSxWT10ZZi2ExsFZn/3PDylczwJARA3oijkcHSUu69eybVh51bkCswnOasNHtwZxv+niWEdXhTH38EbFxcUHNaDh5MNRiwH7dobm+M7EShg8lJNHEwJAclRdU97OkFr9zeliHCGZd4P5XAFlWHfgJ7p2nR4Teqe3qZ6Aspj2qqpmnd7qxOrsn02H4YqeU+0sBs9I56T7XwJAAg8wHrh/FAPY96mAya0bpv6zm/7bave17vs+8B+fhBEHHuvetfv8Xi/RkXL0rjE4LaTHefoUbZPNbIhNYiN0CQ=="
+    # SM2 加密算法
+    sm2:
+      # 公钥
+      public-key: "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCakyyq8rfkmKvKB2fz3hUeuD6tgParCmZmRc1OoL5EN+yXghQmDIrcZhewLZZLUpLQd3T3cRxKaW30nWNfoteNHgKjGYGu4+BZoyHZ8ltTmrolYGopiSwBMhO7kwAD4IK1PZHaoF2wPISH35ubbugykav7dTaWBDuNkvyBiv8qMQIDAQAB"
+      # 私钥
+      private-key: "MIICdgIBADANBgkqhkiG9w0BAQEFAASCAmAwggJcAgEAAoGBAJqTLKryt+SYq8oHZ/PeFR64Pq2A9qsKZmZFzU6gvkQ37JeCFCYMitxmF7AtlktSktB3dPdxHEppbfSdY1+i140eAqMZga7j4FmjIdnyW1OauiVgaimJLAEyE7uTAAPggrU9kdqgXbA8hIffm5tu6DKRq/t1NpYEO42S/IGK/yoxAgMBAAECgYEAiWu+klwm0LxKPdpHuK7/58e1MVst8PHWB6aW2AhgHxX46NlkQE92RGsfNCnTLDPFAkCxZCrTE/SXJJmn9yY2qoS26OV0PbTGajk96M8lDi9JSmWCNV1eywPecObSyvtPd5jaPtq2jkgNY/hHJjH6kV7UAFZuaSK7jxskfq7uR2ECQQDPfmGjPiMc65+LE9U7jC4LokyUi1yCgN6AY5MgF6fkxUVJD2mtl9BqRK7qE0OnsRb0NzID3PSfa7aA2I0Rlsj/AkEAvrXUBQ6hfuEwD1896qpSJUr7tLidby/3jYwSoewuydDT2duDc2ZCz4/U/1NpxSxWT10ZZi2ExsFZn/3PDylczwJARA3oijkcHSUu69eybVh51bkCswnOasNHtwZxv+niWEdXhTH38EbFxcUHNaDh5MNRiwH7dobm+M7EShg8lJNHEwJAclRdU97OkFr9zeliHCGZd4P5XAFlWHfgJ7p2nR4Teqe3qZ6Aspj2qqpmnd7qxOrsn02H4YqeU+0sBs9I56T7XwJAAg8wHrh/FAPY96mAya0bpv6zm/7bave17vs+8B+fhBEHHuvetfv8Xi/RkXL0rjE4LaTHefoUbZPNbIhNYiN0CQ=="
 
-  # Excel 最大操作数量 防止OOM
-  excel-max-count: 20000
 
-  # 系统启动时间 为空则默认 真实当前系统启动时间
-  system-starter-time: "2020-09-10 00:00:00"
+
+
+
+
 

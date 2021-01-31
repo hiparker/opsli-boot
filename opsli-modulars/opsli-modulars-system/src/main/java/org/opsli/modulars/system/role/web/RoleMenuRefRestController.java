@@ -17,6 +17,7 @@ package org.opsli.modulars.system.role.web;
 
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.opsli.api.base.result.ResultVo;
 import org.opsli.api.web.system.role.RoleMenuRefApi;
@@ -116,7 +117,7 @@ public class RoleMenuRefRestController implements RoleMenuRefApi {
         // 内置数据 只有超级管理员可以修改
         if(roleModel != null && LOCK_DATA.equals(roleModel.getIzLock()) ){
             UserModel user = UserUtil.getUser();
-            if(!UserUtil.SUPER_ADMIN.equals(user.getUsername())){
+            if(!StringUtils.equals(UserUtil.SUPER_ADMIN, user.getUsername())){
                 throw new ServiceException(SystemMsg.EXCEPTION_LOCK_DATA);
             }
         }
@@ -140,7 +141,7 @@ public class RoleMenuRefRestController implements RoleMenuRefApi {
     private void demoError(){
         UserModel user = UserUtil.getUser();
         // 演示模式 不允许操作 （超级管理员可以操作）
-        if(enableDemo && !UserUtil.SUPER_ADMIN.equals(user.getUsername())){
+        if(enableDemo && !StringUtils.equals(UserUtil.SUPER_ADMIN, user.getUsername())){
             throw new ServiceException(CoreMsg.EXCEPTION_ENABLE_DEMO);
         }
     }

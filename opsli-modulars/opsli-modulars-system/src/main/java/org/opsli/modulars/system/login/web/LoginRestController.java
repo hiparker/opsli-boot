@@ -21,7 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.opsli.api.base.result.ResultVo;
-import org.opsli.api.utils.ValidationUtil;
+import org.opsli.core.utils.ValidationUtil;
 import org.opsli.api.wrapper.system.tenant.TenantModel;
 import org.opsli.api.wrapper.system.user.UserModel;
 import org.opsli.common.annotation.InterfaceEncryptAndDecrypt;
@@ -116,7 +116,7 @@ public class LoginRestController {
         }
 
         // 如果不是超级管理员 需要验证租户是否生效
-        if(!UserUtil.SUPER_ADMIN.equals(user.getUsername())){
+        if(!StringUtils.equals(UserUtil.SUPER_ADMIN, user.getUsername())){
             TenantModel tenant = TenantUtil.getTenant(user.getTenantId());
             if(tenant == null){
                 throw new TokenException(TokenMsg.EXCEPTION_LOGIN_TENANT_NOT_USABLE);

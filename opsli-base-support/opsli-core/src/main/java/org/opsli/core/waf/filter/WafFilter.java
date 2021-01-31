@@ -22,6 +22,7 @@ import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 
 /**
  * 防火墙
@@ -34,7 +35,7 @@ public class WafFilter implements Filter {
 	private boolean enableXssFilter = false;
 	private boolean enableSqlFilter = false;
 
-	private List<String> urlExclusion;
+	private Set<String> urlExclusion;
 
 
 	@Override
@@ -74,7 +75,7 @@ public class WafFilter implements Filter {
 		this.enableSqlFilter = enableSqlFilter;
 	}
 
-	public void setUrlExclusion(List<String> urlExclusion) {
+	public void setUrlExclusion(Set<String> urlExclusion) {
 		this.urlExclusion = urlExclusion;
 	}
 }

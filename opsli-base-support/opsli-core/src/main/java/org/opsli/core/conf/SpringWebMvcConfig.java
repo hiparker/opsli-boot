@@ -13,12 +13,11 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.opsli.api.conf;
+package org.opsli.core.conf;
 
 import lombok.extern.slf4j.Slf4j;
-import org.opsli.api.conf.prop.ApiPathProperties;
 import org.opsli.common.annotation.ApiRestController;
-import org.opsli.common.utils.Props;
+import org.opsli.core.autoconfigure.ApiPathProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.cors.CorsConfiguration;
@@ -36,14 +35,6 @@ import javax.annotation.Resource;
 @Slf4j
 @Configuration
 public class SpringWebMvcConfig implements WebMvcConfigurer {
-
-	/** 虚拟根路径 */
-	private static final String BASE_DIR;
-	static {
-		Props props = new Props("application.yaml");
-		BASE_DIR = props.getStr("server.tomcat.basedir");
-	}
-
 
 	@Resource
 	private ApiPathProperties apiPathProperties;

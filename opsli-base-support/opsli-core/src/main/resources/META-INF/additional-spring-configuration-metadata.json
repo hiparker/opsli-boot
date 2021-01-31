@@ -1,0 +1,194 @@
+{
+  "properties": [
+    {
+      "name": "server.servlet.api.path.global-prefix",
+      "type": "java.lang.String",
+      "defaultValue": "api",
+      "description": "专门针对 Controller层接口路径前缀全局配置."
+    },
+    {
+      "name": "spring.cache-conf.prefix",
+      "type": "java.lang.String",
+      "defaultValue": "opsli",
+      "description": "缓存配置项 前缀."
+    },
+    {
+      "name": "spring.cache.enable",
+      "type": "java.lang.Boolean",
+      "defaultValue": false,
+      "description": "是否启用本地缓存 (默认不启用， 如果业务对于缓存依赖较高可启用本地缓存作为一级缓存)."
+    },
+    {
+      "name": "spring.redis.pushsub.enable",
+      "type": "java.lang.Boolean",
+      "defaultValue": false,
+      "description": "开启消息订阅."
+    },
+    {
+      "name": "knife4j.basic.enable",
+      "type": "java.lang.Boolean",
+      "defaultValue": false,
+      "description": "knife4j 开启Swagger的Basic认证功能,默认是false."
+    },
+    {
+      "name": "knife4j.basic.username",
+      "type": "java.lang.String",
+      "defaultValue": "admin",
+      "description": "knife4j Basic认证用户名."
+    },
+    {
+      "name": "knife4j.basic.password",
+      "type": "java.lang.String",
+      "defaultValue": "123456",
+      "description": "knife4j Basic认证密码."
+    },
+    {
+      "name": "knife4j.production",
+      "type": "java.lang.Boolean",
+      "defaultValue": true,
+      "description": "knife4j 是否生产环境 （生产环境默认屏蔽文档）."
+    },
+    {
+      "name": "log.path",
+      "type": "java.lang.String",
+      "defaultValue": "",
+      "description": "日志存储地址."
+    },
+
+
+
+
+    {
+      "name": "opsli.system-name",
+      "sourceType": "org.opsli.core.autoconfigure.GlobalProperties",
+      "defaultValue": "OPSLI 快速开发平台",
+      "description": "系统名称."
+    },
+    {
+      "name": "opsli.system-starter-time",
+      "sourceType": "org.opsli.core.autoconfigure.GlobalProperties",
+      "description": "系统启动时间 为空则默认 真实当前系统启动时间."
+    },
+    {
+      "name": "opsli.enable-demo",
+      "sourceType": "org.opsli.core.autoconfigure.GlobalProperties",
+      "defaultValue": false,
+      "description": "是否开启演示模式."
+    },
+
+
+
+    {
+      "name": "opsli.waf.enable",
+      "sourceType": "org.opsli.core.autoconfigure.GlobalProperties$Waf",
+      "defaultValue": false,
+      "description": "软防火墙是否开启."
+    },
+    {
+      "name": "opsli.waf.xss-filter",
+      "sourceType": "org.opsli.core.autoconfigure.GlobalProperties$Waf",
+      "defaultValue": false,
+      "description": "软防火墙 xss 过滤开启状态."
+    },
+    {
+      "name": "opsli.waf.sql-filter",
+      "sourceType": "org.opsli.core.autoconfigure.GlobalProperties$Waf",
+      "defaultValue": false,
+      "description": "软防火墙 sql 过滤开启状态."
+    },
+    {
+      "name": "opsli.waf.url-patterns",
+      "sourceType": "org.opsli.core.autoconfigure.GlobalProperties$Waf",
+      "defaultValue": [
+        "/*"
+      ],
+      "description": "软防火墙 过滤器需要过滤的路径."
+    },
+    {
+      "name": "opsli.waf.url-exclusion",
+      "sourceType": "org.opsli.core.autoconfigure.GlobalProperties$Waf",
+      "description": "软防火墙 过滤器需要排除过滤的路径."
+    },
+    {
+      "name": "opsli.waf.order",
+      "sourceType": "org.opsli.core.autoconfigure.GlobalProperties$Waf",
+      "defaultValue": 0,
+      "description": "软防火墙 过滤器的优先级，值越小优先级越高."
+    },
+
+
+
+    {
+      "name": "opsli.web.upload-path",
+      "sourceType": "org.opsli.core.autoconfigure.GlobalProperties$Web",
+      "defaultValue": "",
+      "description": "Web 上传地址."
+    },
+
+
+
+    {
+      "name": "opsli.auth.super-admin",
+      "sourceType": "org.opsli.core.autoconfigure.GlobalProperties$Auth",
+      "defaultValue": "system",
+      "description": "认证类 超级管理员账户."
+    },
+    {
+      "name": "opsli.auth.default-pass",
+      "sourceType": "org.opsli.core.autoconfigure.GlobalProperties$Auth",
+      "defaultValue": "Aa123456",
+      "description": "认证类 默认密码 (密码至少包含大小写字母，数字，且不少于6位)."
+    },
+
+    {
+      "name": "opsli.auth.token.secret",
+      "sourceType": "org.opsli.core.autoconfigure.GlobalProperties$Auth$Token",
+      "defaultValue": "53c0e33c9d4c5538969abf2fcf48351d",
+      "description": "认证类 Token 有效时间."
+    },
+    {
+      "name": "opsli.auth.token.effective-time",
+      "sourceType": "org.opsli.core.autoconfigure.GlobalProperties$Auth$Token",
+      "defaultValue": 120,
+      "description": "认证类 Token 有效时间."
+    },
+    {
+      "name": "opsli.auth.token.url-exclusion",
+      "sourceType": "org.opsli.core.autoconfigure.GlobalProperties$Auth$Token",
+      "description": "认证类 Token 排除URL."
+    },
+
+    {
+      "name": "opsli.auth.login.slip-count",
+      "sourceType": "org.opsli.core.autoconfigure.GlobalProperties$Auth$Login",
+      "defaultValue": 3,
+      "description": "认证类 登录 失败次数."
+    },
+    {
+      "name": "opsli.auth.login.slip-verify-count",
+      "sourceType": "org.opsli.core.autoconfigure.GlobalProperties$Auth$Login",
+      "defaultValue": 3,
+      "description": "认证类 登录 失败N次后弹出验证码 （超过验证码阈值 弹出验证码）."
+    },
+    {
+      "name": "opsli.auth.login.slip-lock-speed",
+      "sourceType": "org.opsli.core.autoconfigure.GlobalProperties$Auth$Login",
+      "description": "认证类 登录 失败锁定时间(秒)."
+    },
+
+
+
+    {
+      "name": "opsli.excel.import-max-count",
+      "sourceType": "org.opsli.core.autoconfigure.GlobalProperties$Excel",
+      "defaultValue": 20000,
+      "description": "Excel 导入最大操作数."
+    },
+    {
+      "name": "opsli.excel.export-max-count",
+      "sourceType": "org.opsli.core.autoconfigure.GlobalProperties$Excel",
+      "defaultValue": 20000,
+      "description": "Excel 导出最大操作数."
+    }
+  ]
+}

@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.opsli.core.base.concroller;
+package org.opsli.core.base.controller;
 
 
 import cn.hutool.core.collection.CollUtil;
@@ -37,6 +37,7 @@ import org.opsli.common.exception.TokenException;
 import org.opsli.common.msg.CommonMsg;
 import org.opsli.common.utils.OutputStreamUtil;
 import org.opsli.common.utils.WrapperUtil;
+import org.opsli.core.autoconfigure.GlobalProperties;
 import org.opsli.core.base.entity.BaseEntity;
 import org.opsli.core.base.service.interfaces.CrudServiceInterface;
 import org.opsli.core.cache.local.CacheUtil;
@@ -49,7 +50,6 @@ import org.opsli.plugins.excel.exception.ExcelPluginException;
 import org.opsli.plugins.redis.RedisLockPlugins;
 import org.opsli.plugins.redis.lock.RedisLock;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -77,9 +77,6 @@ import java.util.List;
 @RestController
 public abstract class BaseRestController <T extends BaseEntity, E extends ApiWrapper, S extends CrudServiceInterface<T,E>>{
 
-    @Value("${opsli.enable-demo}")
-    private boolean enableDemo;
-
     /** 开启热点数据状态 */
     protected boolean hotDataFlag = false;
 
@@ -92,14 +89,19 @@ public abstract class BaseRestController <T extends BaseEntity, E extends ApiWra
     /** Model 泛型游标 */
     private static final int MODEL_INDEX = 1;
 
-    /** Excel 最大操作数量 防止OOM */
-    @Value("${opsli.excel-max-count:20000}")
-    private Integer excelMaxCount;
+    /** 配置类 */
+    @Autowired
+    protected GlobalProperties globalProperties;
 
+    /** 子类Service */
     @Autowired(required = false)
     protected S IService;
+
+    /** Redis分布式锁 */
     @Autowired
     private RedisLockPlugins redisLockPlugins;
+
+    /** Excel工具类 */
     @Autowired
     private ExcelUtil excelUtil;
 
@@ -107,8 +109,8 @@ public abstract class BaseRestController <T extends BaseEntity, E extends ApiWra
      * 默认 直接设置 传入数据的
      * 根据id 从缓存 直接查询 数据对象
      *
-     * @param id
-     * @return
+     * @param id id
+     * @return E
      */
     @ModelAttribute
     public E get(@RequestParam(required=false) String id) {
@@ -191,8 +193,8 @@ public abstract class BaseRestController <T extends BaseEntity, E extends ApiWra
 
     /**
      * Excel 导入
-     * @param request
-     * @return
+     * @param request request
+     * @return ResultVo
      */
     protected ResultVo<?> importExcel(MultipartHttpServletRequest request){
         // 计时器
@@ -210,8 +212,9 @@ public abstract class BaseRestController <T extends BaseEntity, E extends ApiWra
         try {
             List<E> modelList = excelUtil.readExcel(files.get(0), modelClazz);
             if(CollUtil.isNotEmpty(modelList)){
-                if(modelList.size() > excelMaxCount){
-                    String maxError = StrUtil.format(CoreMsg.EXCEL_HANDLE_MAX.getMessage(), modelList.size(), excelMaxCount);
+                if(modelList.size() > globalProperties.getExcel().getImportMaxCount()){
+                    String maxError = StrUtil.format(CoreMsg.EXCEL_HANDLE_MAX.getMessage(), modelList.size(),
+                            globalProperties.getExcel().getImportMaxCount());
                     // 清空 list
                     modelList.clear();
                     // 超出最大导出数量
@@ -253,7 +256,7 @@ public abstract class BaseRestController <T extends BaseEntity, E extends ApiWra
     /**
      * 下载导入模板
      * @param fileName 文件名称
-     * @param response
+     * @param response response
      */
     protected void importTemplate(String fileName, HttpServletResponse response, Method method){
         this.excelExport(fileName + " 模版 ",null, response, method);
@@ -306,8 +309,9 @@ public abstract class BaseRestController <T extends BaseEntity, E extends ApiWra
             if(queryWrapper != null){
                 // 获得数量 大于 阈值 禁止导出， 防止OOM
                 int count = IService.count(queryWrapper);
-                if(count > excelMaxCount){
-                    String maxError = StrUtil.format(CoreMsg.EXCEL_HANDLE_MAX.getMessage(), count, excelMaxCount);
+                if(count > globalProperties.getExcel().getExportMaxCount()){
+                    String maxError = StrUtil.format(CoreMsg.EXCEL_HANDLE_MAX.getMessage(), count,
+                            globalProperties.getExcel().getExportMaxCount());
                     // 超出最大导出数量
                     throw new ExcelPluginException(CoreMsg.EXCEL_HANDLE_MAX.getCode(), maxError);
                 }
@@ -353,7 +357,8 @@ public abstract class BaseRestController <T extends BaseEntity, E extends ApiWra
     protected void demoError(){
         UserModel user = UserUtil.getUser();
         // 演示模式 不允许操作 （超级管理员可以操作）
-        if(enableDemo && !UserUtil.SUPER_ADMIN.equals(user.getUsername())){
+        if(globalProperties.isEnableDemo() &&
+                !StringUtils.equals(UserUtil.SUPER_ADMIN, user.getUsername())){
             throw new ServiceException(CoreMsg.EXCEPTION_ENABLE_DEMO);
         }
     }
@@ -382,7 +387,7 @@ public abstract class BaseRestController <T extends BaseEntity, E extends ApiWra
 
     /**
      * 创建包装类泛型对象
-     * @return
+     * @return E
      */
     private E createModel() {
         try {
@@ -397,7 +402,7 @@ public abstract class BaseRestController <T extends BaseEntity, E extends ApiWra
 
     /**
      * 获得 泛型 Clazz
-     * @return
+     * @return Class<E>
      */
     private Class<E> getModelClass(){
         Class<E> tClass = null;
@@ -410,7 +415,7 @@ public abstract class BaseRestController <T extends BaseEntity, E extends ApiWra
 
     /**
      * 获得 泛型 Clazz
-     * @return
+     * @return Class<T>
      */
     private Class<T> getEntityClass(){
         Class<T> tClass = null;

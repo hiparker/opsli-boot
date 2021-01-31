@@ -15,11 +15,11 @@
  */
 package org.opsli.core.conf;
 
-import org.opsli.core.waf.WafProperties;
+import cn.hutool.core.convert.Convert;
+import org.opsli.core.autoconfigure.GlobalProperties;
 import org.opsli.core.waf.filter.WafFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -34,26 +34,25 @@ import javax.servlet.DispatcherType;
  * @date 2020-10-09
  */
 @Configuration
-@EnableConfigurationProperties({WafProperties.class})
 public class WafConfig {
 
 	@Autowired
-	WafProperties wafProperties;
+	GlobalProperties globalProperties;
 
 	@Bean
-	@ConditionalOnProperty(prefix = WafProperties.WAF, name = "enable", havingValue = "true", matchIfMissing = false)
-	public FilterRegistrationBean xssFilterRegistration() {
+	@ConditionalOnProperty(prefix = GlobalProperties.PREFIX +".waf", name = "enable", havingValue = "true", matchIfMissing = false)
+	public FilterRegistrationBean<WafFilter> wafFilterRegistration() {
 		WafFilter wafFilter = new WafFilter();
-		wafFilter.setUrlExclusion(wafProperties.getUrlExclusion());
-		wafFilter.setEnableSqlFilter(wafProperties.isSqlFilter());
-		wafFilter.setEnableXssFilter(wafProperties.isXssFilter());
+		wafFilter.setUrlExclusion(globalProperties.getWaf().getUrlExclusion());
+		wafFilter.setEnableSqlFilter(globalProperties.getWaf().isSqlFilter());
+		wafFilter.setEnableXssFilter(globalProperties.getWaf().isXssFilter());
 
-		FilterRegistrationBean registration = new FilterRegistrationBean();
+		FilterRegistrationBean<WafFilter> registration = new FilterRegistrationBean<>();
 		registration.setDispatcherTypes(DispatcherType.REQUEST);
 		registration.setFilter(wafFilter);
-		registration.addUrlPatterns(wafProperties.getUrlPatterns());
-		registration.setName(wafProperties.getName());
-		registration.setOrder(wafProperties.getOrder());
+		registration.addUrlPatterns(Convert.toStrArray(globalProperties.getWaf().getUrlPatterns()));
+		registration.setName(WafFilter.class.getSimpleName());
+		registration.setOrder(globalProperties.getWaf().getOrder());
 		return registration;
 	}
 
