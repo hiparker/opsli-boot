@@ -24,13 +24,12 @@ import org.opsli.api.wrapper.system.user.UserModel;
 import org.opsli.api.wrapper.system.user.UserRoleRefModel;
 import org.opsli.common.annotation.ApiRestController;
 import org.opsli.common.exception.ServiceException;
-import org.opsli.core.autoconfigure.GlobalProperties;
+import org.opsli.core.autoconfigure.properties.GlobalProperties;
 import org.opsli.core.msg.CoreMsg;
 import org.opsli.core.utils.UserUtil;
 import org.opsli.modulars.system.SystemMsg;
 import org.opsli.modulars.system.user.service.IUserRoleRefService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 
 
 /**

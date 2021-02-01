@@ -37,7 +37,7 @@ import org.opsli.common.exception.TokenException;
 import org.opsli.common.msg.CommonMsg;
 import org.opsli.common.utils.OutputStreamUtil;
 import org.opsli.common.utils.WrapperUtil;
-import org.opsli.core.autoconfigure.GlobalProperties;
+import org.opsli.core.autoconfigure.properties.GlobalProperties;
 import org.opsli.core.base.entity.BaseEntity;
 import org.opsli.core.base.service.interfaces.CrudServiceInterface;
 import org.opsli.core.cache.local.CacheUtil;

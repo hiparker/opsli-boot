@@ -13,11 +13,11 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.opsli.core.conf;
+package org.opsli.core.autoconfigure.conf;
 
 import lombok.extern.slf4j.Slf4j;
 import org.opsli.common.annotation.ApiRestController;
-import org.opsli.core.autoconfigure.ApiPathProperties;
+import org.opsli.core.autoconfigure.properties.ApiPathProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.cors.CorsConfiguration;

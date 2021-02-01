@@ -21,7 +21,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.opsli.core.autoconfigure.DbSourceProperties;
+import org.opsli.core.autoconfigure.properties.DbSourceProperties;
 import org.opsli.core.creater.enums.DataBaseType;
 import org.opsli.core.utils.SpringContextHolder;
 import org.opsli.modulars.creater.importable.entity.DatabaseColumn;

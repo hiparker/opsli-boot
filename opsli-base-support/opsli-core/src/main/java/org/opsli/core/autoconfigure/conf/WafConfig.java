@@ -13,17 +13,17 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.opsli.core.conf;
+package org.opsli.core.autoconfigure.conf;
 
 import cn.hutool.core.convert.Convert;
-import org.opsli.core.autoconfigure.GlobalProperties;
+import org.opsli.core.autoconfigure.properties.GlobalProperties;
 import org.opsli.core.waf.filter.WafFilter;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import javax.annotation.Resource;
 import javax.servlet.DispatcherType;
 
 /**
@@ -36,7 +36,7 @@ import javax.servlet.DispatcherType;
 @Configuration
 public class WafConfig {
 
-	@Autowired
+	@Resource
 	private GlobalProperties globalProperties;
 
 	@Bean

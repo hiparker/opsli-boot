@@ -16,7 +16,6 @@
 package org.opsli.common.constants;
 
 
-import org.opsli.common.utils.Props;
 
 /**
  * @BelongsProject: opsli-boot
@@ -25,40 +24,31 @@ import org.opsli.common.utils.Props;
  * @CreateTime: 2020-09-18 18:46
  * @Description: MyBatis 常量
  */
-public final class MyBatisConstants {
+public interface MyBatisConstants {
 
 
     /** 逻辑删除值 */
-    public static final String  LOGIC_DELETE_VALUE;
+    String  LOGIC_DELETE_VALUE = "1";
     /** 逻辑不删除值 */
-    public static final String  LOGIC_NOT_DELETE_VALUE;
+    String  LOGIC_NOT_DELETE_VALUE = "0";
 
 
     /** ID */
-    public static final String FIELD_ID = "id";
+    String FIELD_ID = "id";
     /** PID */
-    public static final String FIELD_PARENT_ID = "parentId";
+    String FIELD_PARENT_ID = "parentId";
     /** 创建人 */
-    public static final String FIELD_CREATE_BY = "createBy";
+    String FIELD_CREATE_BY = "createBy";
     /** 更新时间 */
-    public static final String FIELD_CREATE_TIME = "createTime";
+    String FIELD_CREATE_TIME = "createTime";
     /** 更新人 */
-    public static final String FIELD_UPDATE_BY = "updateBy";
+    String FIELD_UPDATE_BY = "updateBy";
     /** 更新时间 */
-    public static final String FIELD_UPDATE_TIME = "updateTime";
+    String FIELD_UPDATE_TIME = "updateTime";
     /** 逻辑删除 */
-    public static final String FIELD_DELETE_LOGIC = "deleted";
+    String FIELD_DELETE_LOGIC = "deleted";
     /** 乐观锁 */
-    public static final String FIELD_OPTIMISTIC_LOCK = "version";
+    String FIELD_OPTIMISTIC_LOCK = "version";
     /** 多租户字段 */
-    public static final String FIELD_TENANT = "tenantId";
-
-
-    static {
-        Props props = new Props("application.yaml");
-        LOGIC_DELETE_VALUE = props.getStr("mybatis-plus.global-config.db-config.logic-delete-value","1");
-        LOGIC_NOT_DELETE_VALUE = props.getStr("mybatis-plus.global-config.db-config.logic-not-delete-value","0");
-    }
-
-    private MyBatisConstants(){}
+    String FIELD_TENANT = "tenantId";
 }

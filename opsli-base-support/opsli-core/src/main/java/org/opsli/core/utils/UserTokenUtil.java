@@ -32,7 +32,7 @@ import org.opsli.common.constants.TokenConstants;
 import org.opsli.common.constants.TokenTypeConstants;
 import org.opsli.common.exception.TokenException;
 import org.opsli.common.utils.Props;
-import org.opsli.core.autoconfigure.GlobalProperties;
+import org.opsli.core.autoconfigure.properties.GlobalProperties;
 import org.opsli.core.msg.TokenMsg;
 import org.opsli.plugins.redis.RedisPlugin;
 import org.springframework.beans.factory.annotation.Autowired;

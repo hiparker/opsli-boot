@@ -13,16 +13,15 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.opsli.core.conf;
+package org.opsli.core.autoconfigure.conf;
 
 import com.fasterxml.classmate.TypeResolver;
 import com.github.xiaoymin.knife4j.spring.annotations.EnableKnife4j;
 import com.google.common.collect.Lists;
 import io.swagger.annotations.ApiOperation;
-import org.opsli.core.autoconfigure.GlobalProperties;
+import org.opsli.core.autoconfigure.properties.GlobalProperties;
 import org.opsli.core.utils.UserTokenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -38,6 +37,7 @@ import springfox.documentation.spi.service.contexts.SecurityContext;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
+import javax.annotation.Resource;
 import java.util.List;
 
 /**
@@ -50,8 +50,8 @@ import java.util.List;
 public class SwaggerConfig {
 
     /** 配置类 */
-    @Autowired
-    protected GlobalProperties globalProperties;
+    @Resource
+    private GlobalProperties globalProperties;
 
     private final TypeResolver typeResolver;
 

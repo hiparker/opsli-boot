@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.opsli.core.conf;
+package org.opsli.core.autoconfigure.conf;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ClassUtil;
@@ -29,15 +29,12 @@ import org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSource
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
-import org.opsli.common.utils.Props;
-import org.opsli.core.autoconfigure.GlobalProperties;
+import org.opsli.core.autoconfigure.properties.ApiPathProperties;
+import org.opsli.core.autoconfigure.properties.GlobalProperties;
 import org.opsli.core.security.shiro.authenticator.CustomModularRealmAuthenticator;
 import org.opsli.core.security.shiro.filter.CustomShiroFilter;
 import org.opsli.core.security.shiro.realm.FlagRealm;
-import org.opsli.plugins.redis.conf.RedisPluginConfig;
 import org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
@@ -57,30 +54,17 @@ import java.util.Set;
  * @date 2017-04-20 18:33
  */
 @Configuration
-@AutoConfigureAfter(RedisPluginConfig.class)
 public class ShiroConfig {
 
-    /** 获得排除URL */
-    private static final List<String> URL_EXCLUSION;
-    /** API前缀 */
-    private static final String API_URL_PREFIX;
-
-    static{
-        Props props = new Props("application.yaml");
-        URL_EXCLUSION = props.getList("opsli.token-auth.url-exclusion");
-        API_URL_PREFIX = props.getStr("server.servlet.api.path.global-prefix","");
-    }
-
-    @Autowired
-    GlobalProperties globalProperties;
 
     /**
      * filer
      * @param securityManager 安全管理器
-     * @return
+     * @return ShiroFilterFactoryBean
      */
     @Bean("shiroFilter")
-    public ShiroFilterFactoryBean shirFilter(SecurityManager securityManager) {
+    public ShiroFilterFactoryBean shirFilter(SecurityManager securityManager,
+                                             GlobalProperties globalProperties, ApiPathProperties apiPathProperties) {
         ShiroFilterFactoryBean shiroFilter = new ShiroFilterFactoryBean();
         shiroFilter.setSecurityManager(securityManager);
 
@@ -92,9 +76,14 @@ public class ShiroConfig {
         Map<String, String> filterMap = Maps.newLinkedHashMap();
 
         // 加载排除URL
-        if(CollUtil.isNotEmpty(URL_EXCLUSION)){
-            for (String excUrl : URL_EXCLUSION) {
-                filterMap.put(excUrl, "anon");
+        if(globalProperties.getAuth() != null &&
+                globalProperties.getAuth().getToken() != null){
+            Set<String> urlExclusion = globalProperties.getAuth().getToken().getUrlExclusion();
+
+            if(CollUtil.isNotEmpty(urlExclusion)){
+                for (String excUrl : urlExclusion) {
+                    filterMap.put(excUrl, "anon");
+                }
             }
         }
 
@@ -105,8 +94,8 @@ public class ShiroConfig {
         filterMap.put("/captcha.jpg", "anon");
 
         // 导出Excel\模版 不做自动拦截 手动拦截
-        filterMap.put(API_URL_PREFIX + "/**/exportExcel", "anon");
-        filterMap.put(API_URL_PREFIX + "/**/importExcel/template", "anon");
+        filterMap.put(apiPathProperties.getGlobalPrefix() + "/**/exportExcel", "anon");
+        filterMap.put(apiPathProperties.getGlobalPrefix() + "/**/importExcel/template", "anon");
 
         filterMap.put("/webjars/**", "anon");
         filterMap.put("/druid/**", "anon");
@@ -197,7 +186,7 @@ public class ShiroConfig {
     /**
      * 开启shiro权限注解生效
      * @param securityManager 安全管理器
-     * @return
+     * @return AuthorizationAttributeSourceAdvisor
      */
     @Bean("authorizationAttributeSourceAdvisor")
     public AuthorizationAttributeSourceAdvisor authorizationAttributeSourceAdvisor(SecurityManager securityManager) {

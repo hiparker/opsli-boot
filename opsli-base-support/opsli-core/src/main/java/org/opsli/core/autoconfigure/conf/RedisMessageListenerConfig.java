@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.opsli.core.conf;
+package org.opsli.core.autoconfigure.conf;
 
 import lombok.extern.slf4j.Slf4j;
 import org.opsli.core.cache.pushsub.receiver.RedisPushSubReceiver;

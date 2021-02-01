@@ -60,20 +60,20 @@
 
     {
       "name": "opsli.system-name",
-      "sourceType": "org.opsli.core.autoconfigure.GlobalProperties",
+      "sourceType": "org.opsli.core.autoconfigure.properties.GlobalProperties",
       "type": "java.lang.String",
       "defaultValue": "OPSLI 快速开发平台",
       "description": "系统名称."
     },
     {
       "name": "opsli.system-starter-time",
-      "sourceType": "org.opsli.core.autoconfigure.GlobalProperties",
+      "sourceType": "org.opsli.core.autoconfigure.properties.GlobalProperties",
       "type": "java.lang.String",
       "description": "系统启动时间 为空则默认 真实当前系统启动时间."
     },
     {
       "name": "opsli.enable-demo",
-      "sourceType": "org.opsli.core.autoconfigure.GlobalProperties",
+      "sourceType": "org.opsli.core.autoconfigure.properties.GlobalProperties",
       "type": "java.lang.Boolean",
       "defaultValue": false,
       "description": "是否开启演示模式."
@@ -83,28 +83,28 @@
 
     {
       "name": "opsli.waf.enable",
-      "sourceType": "org.opsli.core.autoconfigure.GlobalProperties$Waf",
+      "sourceType": "org.opsli.core.autoconfigure.properties.GlobalProperties$Waf",
       "type": "java.lang.Boolean",
       "defaultValue": false,
       "description": "软防火墙是否开启."
     },
     {
       "name": "opsli.waf.xss-filter",
-      "sourceType": "org.opsli.core.autoconfigure.GlobalProperties$Waf",
+      "sourceType": "org.opsli.core.autoconfigure.properties.GlobalProperties$Waf",
       "type": "java.lang.Boolean",
       "defaultValue": false,
       "description": "软防火墙 xss 过滤开启状态."
     },
     {
       "name": "opsli.waf.sql-filter",
-      "sourceType": "org.opsli.core.autoconfigure.GlobalProperties$Waf",
+      "sourceType": "org.opsli.core.autoconfigure.properties.GlobalProperties$Waf",
       "type": "java.lang.Boolean",
       "defaultValue": false,
       "description": "软防火墙 sql 过滤开启状态."
     },
     {
       "name": "opsli.waf.url-patterns",
-      "sourceType": "org.opsli.core.autoconfigure.GlobalProperties$Waf",
+      "sourceType": "org.opsli.core.autoconfigure.properties.GlobalProperties$Waf",
       "type": "java.util.Set<java.lang.String>",
       "defaultValue": [
         "/*"
@@ -113,13 +113,13 @@
     },
     {
       "name": "opsli.waf.url-exclusion",
-      "sourceType": "org.opsli.core.autoconfigure.GlobalProperties$Waf",
+      "sourceType": "org.opsli.core.autoconfigure.properties.GlobalProperties$Waf",
       "type": "java.util.Set<java.lang.String>",
       "description": "软防火墙 过滤器需要排除过滤的路径."
     },
     {
       "name": "opsli.waf.order",
-      "sourceType": "org.opsli.core.autoconfigure.GlobalProperties$Waf",
+      "sourceType": "org.opsli.core.autoconfigure.properties.GlobalProperties$Waf",
       "type": "java.lang.Integer",
       "defaultValue": 0,
       "description": "软防火墙 过滤器的优先级，值越小优先级越高."
@@ -129,7 +129,7 @@
 
     {
       "name": "opsli.web.upload-path",
-      "sourceType": "org.opsli.core.autoconfigure.GlobalProperties$Web",
+      "sourceType": "org.opsli.core.autoconfigure.properties.GlobalProperties$Web",
       "type": "java.lang.String",
       "defaultValue": "",
       "description": "Web 上传地址."
@@ -139,14 +139,14 @@
 
     {
       "name": "opsli.auth.super-admin",
-      "sourceType": "org.opsli.core.autoconfigure.GlobalProperties$Auth",
+      "sourceType": "org.opsli.core.autoconfigure.properties.GlobalProperties$Auth",
       "type": "java.lang.String",
       "defaultValue": "system",
       "description": "认证类 超级管理员账户."
     },
     {
       "name": "opsli.auth.default-pass",
-      "sourceType": "org.opsli.core.autoconfigure.GlobalProperties$Auth",
+      "sourceType": "org.opsli.core.autoconfigure.properties.GlobalProperties$Auth",
       "type": "java.lang.String",
       "defaultValue": "Aa123456",
       "description": "认证类 默认密码 (密码至少包含大小写字母，数字，且不少于6位)."
@@ -154,42 +154,42 @@
 
     {
       "name": "opsli.auth.token.secret",
-      "sourceType": "org.opsli.core.autoconfigure.GlobalProperties$Auth$Token",
+      "sourceType": "org.opsli.core.autoconfigure.properties.GlobalProperties$Auth$Token",
       "type": "java.lang.String",
       "defaultValue": "53c0e33c9d4c5538969abf2fcf48351d",
       "description": "认证类 Token 盐值."
     },
     {
       "name": "opsli.auth.token.effective-time",
-      "sourceType": "org.opsli.core.autoconfigure.GlobalProperties$Auth$Token",
+      "sourceType": "org.opsli.core.autoconfigure.properties.GlobalProperties$Auth$Token",
       "type": "java.lang.Integer",
       "defaultValue": 120,
       "description": "认证类 Token 有效时间."
     },
     {
       "name": "opsli.auth.token.url-exclusion",
-      "sourceType": "org.opsli.core.autoconfigure.GlobalProperties$Auth$Token",
+      "sourceType": "org.opsli.core.autoconfigure.properties.GlobalProperties$Auth$Token",
       "type": "java.util.Set<java.lang.String>",
       "description": "认证类 Token 排除URL."
     },
 
     {
       "name": "opsli.auth.login.slip-count",
-      "sourceType": "org.opsli.core.autoconfigure.GlobalProperties$Auth$Login",
+      "sourceType": "org.opsli.core.autoconfigure.properties.GlobalProperties$Auth$Login",
       "type": "java.lang.Integer",
       "defaultValue": 5,
       "description": "认证类 登录 失败次数."
     },
     {
       "name": "opsli.auth.login.slip-verify-count",
-      "sourceType": "org.opsli.core.autoconfigure.GlobalProperties$Auth$Login",
+      "sourceType": "org.opsli.core.autoconfigure.properties.GlobalProperties$Auth$Login",
       "type": "java.lang.Integer",
       "defaultValue": 3,
       "description": "认证类 登录 失败N次后弹出验证码 （超过验证码阈值 弹出验证码）."
     },
     {
       "name": "opsli.auth.login.slip-lock-speed",
-      "sourceType": "org.opsli.core.autoconfigure.GlobalProperties$Auth$Login",
+      "sourceType": "org.opsli.core.autoconfigure.properties.GlobalProperties$Auth$Login",
       "type": "java.lang.Integer",
       "defaultValue": 300,
       "description": "认证类 登录 失败锁定时间(秒)."
@@ -199,14 +199,14 @@
 
     {
       "name": "opsli.excel.import-max-count",
-      "sourceType": "org.opsli.core.autoconfigure.GlobalProperties$Excel",
+      "sourceType": "org.opsli.core.autoconfigure.properties.GlobalProperties$Excel",
       "type": "java.lang.Integer",
       "defaultValue": 20000,
       "description": "Excel 导入最大操作数."
     },
     {
       "name": "opsli.excel.export-max-count",
-      "sourceType": "org.opsli.core.autoconfigure.GlobalProperties$Excel",
+      "sourceType": "org.opsli.core.autoconfigure.properties.GlobalProperties$Excel",
       "type": "java.lang.Integer",
       "defaultValue": 20000,
       "description": "Excel 导出最大操作数."

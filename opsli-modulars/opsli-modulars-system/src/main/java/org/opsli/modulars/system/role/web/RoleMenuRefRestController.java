@@ -27,7 +27,7 @@ import org.opsli.api.wrapper.system.user.UserModel;
 import org.opsli.common.annotation.ApiRestController;
 import org.opsli.common.annotation.EnableLog;
 import org.opsli.common.exception.ServiceException;
-import org.opsli.core.autoconfigure.GlobalProperties;
+import org.opsli.core.autoconfigure.properties.GlobalProperties;
 import org.opsli.core.msg.CoreMsg;
 import org.opsli.core.utils.UserUtil;
 import org.opsli.modulars.system.SystemMsg;
@@ -35,7 +35,6 @@ import org.opsli.modulars.system.menu.entity.SysMenu;
 import org.opsli.modulars.system.role.service.IRoleMenuRefService;
 import org.opsli.modulars.system.role.service.IRoleService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 
 import java.util.List;
 import java.util.Map;

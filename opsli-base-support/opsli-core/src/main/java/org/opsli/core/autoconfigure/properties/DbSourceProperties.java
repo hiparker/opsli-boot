@@ -1,4 +1,4 @@
-package org.opsli.core.autoconfigure;
+package org.opsli.core.autoconfigure.properties;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;

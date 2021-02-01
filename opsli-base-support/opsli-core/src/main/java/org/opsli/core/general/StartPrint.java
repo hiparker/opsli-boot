@@ -21,11 +21,11 @@ import cn.hutool.core.lang.Console;
 import cn.hutool.core.thread.ThreadUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.opsli.core.autoconfigure.GlobalProperties;
+import org.opsli.core.autoconfigure.properties.GlobalProperties;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Date;
@@ -138,9 +138,9 @@ public class StartPrint {
 
     /***
      * 初始化
-     * @param globalProperties
+     * @param globalProperties 配置类
      */
-    @PostConstruct
+    @Autowired
     public void init(GlobalProperties globalProperties){
         if(globalProperties != null){
             // 设置系统名称

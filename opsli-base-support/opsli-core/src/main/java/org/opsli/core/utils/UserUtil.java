@@ -28,7 +28,7 @@ import org.opsli.api.wrapper.system.menu.MenuModel;
 import org.opsli.api.wrapper.system.user.UserModel;
 import org.opsli.common.api.TokenThreadLocal;
 import org.opsli.common.exception.TokenException;
-import org.opsli.core.autoconfigure.GlobalProperties;
+import org.opsli.core.autoconfigure.properties.GlobalProperties;
 import org.opsli.core.cache.local.CacheUtil;
 import org.opsli.core.cache.pushsub.msgs.UserMsgFactory;
 import org.opsli.core.msg.TokenMsg;
