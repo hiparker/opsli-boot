@@ -15,6 +15,7 @@
  */
 package org.opsli.modulars.creater.importable.service;
 
+import org.opsli.core.creater.enums.DataBaseType;
 import org.opsli.modulars.creater.importable.entity.DatabaseColumn;
 import org.opsli.modulars.creater.importable.entity.DatabaseTable;
 
@@ -33,7 +34,7 @@ public interface DatabaseTableService {
      * 获得类型
      * @return
      */
-    String getType();
+    DataBaseType getType();
 
     /**
      * 获得当前库中 所有表

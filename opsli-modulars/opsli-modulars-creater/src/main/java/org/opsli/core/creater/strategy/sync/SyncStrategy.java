@@ -15,6 +15,7 @@
  */
 package org.opsli.core.creater.strategy.sync;
 
+import org.opsli.core.creater.enums.DataBaseType;
 import org.opsli.modulars.creater.table.wrapper.CreaterTableAndColumnModel;
 
 /**
@@ -30,7 +31,7 @@ public interface SyncStrategy {
      * 获得分类
      * @return
      */
-    String getType();
+    DataBaseType getType();
 
     /**
      * 执行 同步操作

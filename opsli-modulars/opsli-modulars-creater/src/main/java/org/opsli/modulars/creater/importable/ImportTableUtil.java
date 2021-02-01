@@ -15,20 +15,25 @@
  */
 package org.opsli.modulars.creater.importable;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ClassUtil;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
-import org.opsli.common.utils.Props;
-import org.opsli.core.creater.strategy.sync.SyncStrategy;
+import org.apache.commons.lang3.StringUtils;
+import org.opsli.core.autoconfigure.DbSourceProperties;
+import org.opsli.core.creater.enums.DataBaseType;
 import org.opsli.core.utils.SpringContextHolder;
 import org.opsli.modulars.creater.importable.entity.DatabaseColumn;
 import org.opsli.modulars.creater.importable.entity.DatabaseTable;
 import org.opsli.modulars.creater.importable.service.DatabaseTableService;
-import org.opsli.modulars.creater.table.wrapper.CreaterTableAndColumnModel;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.lang.reflect.Modifier;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -44,55 +49,130 @@ import java.util.concurrent.ConcurrentMap;
 @Configuration
 public class ImportTableUtil{
 
-    /** 数据库名 */
-    public static final String DB_NAME;
-    /** 数据库类型 */
-    public static final String DB_TYPE;
     /** 处理方法集合 */
-    private static final ConcurrentMap<String, DatabaseTableService> HANDLER_MAP = new ConcurrentHashMap<>();
-
+    private static final ConcurrentMap<DataBaseType, DatabaseTableService> HANDLER_MAP = new ConcurrentHashMap<>();
+    /** 数据库类型 */
+    private static final Map<String, DataBaseType> DB_TYPE_MAP;
+    /** 指定 master 数据库 */
+    private static final String ASSIGN_DB = "master";
     static {
-        Props props = new Props("creater.yaml");
-        DB_NAME = props.getStr("opsli.db-name","opsli-boot");
-        DB_TYPE = props.getStr("opsli.db-type");
+        DB_TYPE_MAP = Maps.newHashMap();
+        DB_TYPE_MAP.put("com.mysql.jdbc.Driver", DataBaseType.MYSQL);
+        DB_TYPE_MAP.put("com.mysql.cj.jdbc.Driver", DataBaseType.MYSQL);
+        DB_TYPE_MAP.put("com.microsoft.jdbc.sqlserver.SQLServerDriver", DataBaseType.SQL_SERVER);
+        DB_TYPE_MAP.put("com.microsoft.sqlserver.jdbc.SQLServerDriver", DataBaseType.SQL_SERVER);
+        DB_TYPE_MAP.put("com.sybase.jdbc.SybDriver", DataBaseType.SYBASE);
+        DB_TYPE_MAP.put("oracle.jdbc.driver.OracleDriver", DataBaseType.ORACLE);
+        DB_TYPE_MAP.put("org.postgresql.Driver", DataBaseType.POSTGRE_SQL);
+        DB_TYPE_MAP.put("com.ibm.db2.jdbc.app.DB2.Driver", DataBaseType.DB2);
+    }
+
+    /** 数据库信息 */
+    private static DbSourceProperties dbSourceProperties;
+
+    /**
+     * 获得 数据库类型
+     * @return 数据库类型
+     */
+    public static DataBaseType getDbType(){
+        if(dbSourceProperties != null){
+            Map<String, DbSourceProperties.DataSourceInfo> dataSourceInfoMap = dbSourceProperties.getDataSourceInfoMap();
+            DbSourceProperties.DataSourceInfo dataSourceInfo = dataSourceInfoMap.get(ASSIGN_DB);
+            if(dataSourceInfo != null){
+                return DB_TYPE_MAP.get(dataSourceInfo.getDriverClassName());
+            }
+        }
+        return null;
     }
 
     /**
      * 获得当前数据库中表
-     * @return
+     * @return List
      */
     public static List<DatabaseTable> findTables() {
-        DatabaseTableService databaseTableService = HANDLER_MAP.get(DB_TYPE);
-        if(databaseTableService == null){
-            return null;
-        }
-        return databaseTableService.findTables(DB_NAME);
+        return ImportTableUtil.findTables(null);
     }
 
     /**
      * 获得当前数据库中表
-     * @param tableName
-     * @return
+     * @param tableName 表名
+     * @return List
      */
     public static List<DatabaseTable> findTables(String tableName) {
-        DatabaseTableService databaseTableService = HANDLER_MAP.get(DB_TYPE);
-        if(databaseTableService == null){
+        Map<String, DbSourceProperties.DataSourceInfo> dataSourceInfoMap =
+                dbSourceProperties.getDataSourceInfoMap();
+        // 非法判断
+        if(CollUtil.isEmpty(dataSourceInfoMap)){
             return null;
         }
-        return databaseTableService.findTables(DB_NAME, tableName);
+
+
+        List<DatabaseTable> databaseTables = Lists.newArrayList();
+        for (Map.Entry<String, DbSourceProperties.DataSourceInfo> dataSourceInfoEntry
+                : dataSourceInfoMap.entrySet()) {
+            // 如果master不为空 且 多数据源不为主数据源 则不进行处理
+            if(!StringUtils.equals(ASSIGN_DB, dataSourceInfoEntry.getKey())){
+                continue;
+            }
+
+            // 数据源
+            String key = dataSourceInfoEntry.getKey();
+            DbSourceProperties.DataSourceInfo dataSource = dataSourceInfoEntry.getValue();
+
+            // 根据类型获得查询器
+            DataBaseType dataBaseType = DB_TYPE_MAP.get(dataSource.getDriverClassName());
+            DatabaseTableService databaseTableService = HANDLER_MAP.get(dataBaseType);
+            if(databaseTableService == null){
+                continue;
+            }
+
+            // 获得当前库下表集合
+            List<DatabaseTable> tables;
+            if(StringUtils.isNotEmpty(tableName)){
+                tables = databaseTableService.findTables(dataSource.getDbName(), tableName);
+            }else{
+                tables = databaseTableService.findTables(dataSource.getDbName());
+            }
+
+            // 如果不为空则存入集合
+            if(CollUtil.isNotEmpty(tables)){
+                for (DatabaseTable table : tables) {
+                    table.setDbSource(key);
+                }
+                databaseTables.addAll(tables);
+            }
+        }
+
+        return databaseTables;
     }
 
     /**
      * 获得表字段
-     * @param tableName
-     * @return
+     * @param tableName 表名
+     * @return List
      */
     public static List<DatabaseColumn> findColumns(String tableName) {
-        DatabaseTableService databaseTableService = HANDLER_MAP.get(DB_TYPE);
+
+        Map<String, DbSourceProperties.DataSourceInfo> dataSourceInfoMap =
+                dbSourceProperties.getDataSourceInfoMap();
+        // 非法判断
+        if(CollUtil.isEmpty(dataSourceInfoMap)){
+            return null;
+        }
+
+        DbSourceProperties.DataSourceInfo dataSource = dataSourceInfoMap.get(ASSIGN_DB);
+        if(dataSource == null){
+            return null;
+        }
+
+        // 根据类型获得查询器
+        DataBaseType dataBaseType = DB_TYPE_MAP.get(dataSource.getDriverClassName());
+        DatabaseTableService databaseTableService = HANDLER_MAP.get(dataBaseType);
         if(databaseTableService == null){
             return null;
         }
-        return databaseTableService.findColumns(DB_NAME, tableName);
+
+        return databaseTableService.findColumns(dataSource.getDbName(), tableName);
     }
 
 
@@ -119,4 +199,8 @@ public class ImportTableUtil{
         }
     }
 
+    @Autowired
+    public void setDbSourceProperties(DbSourceProperties dbSourceProperties) {
+        ImportTableUtil.dbSourceProperties = dbSourceProperties;
+    }
 }

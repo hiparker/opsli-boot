@@ -243,7 +243,7 @@ public class TableServiceImpl extends CrudServiceImpl<TableMapper, CreaterTable,
             createrTableModel.setTableName(table.getTableName());
             createrTableModel.setOldTableName(table.getTableName());
             createrTableModel.setIzSync("1");
-            createrTableModel.setJdbcType(ImportTableUtil.DB_TYPE);
+            createrTableModel.setJdbcType(ImportTableUtil.getDbType()!=null?ImportTableUtil.getDbType().getDb():null);
             createrTableModel.setTableType("0");
             createrTableModel.setColumnList(columnModels);
             createrTableModel.setIzApi(true);

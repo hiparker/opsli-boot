@@ -17,6 +17,7 @@ package org.opsli.core.creater.strategy.sync.util;
 
 import cn.hutool.core.util.ClassUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.opsli.core.creater.enums.DataBaseType;
 import org.opsli.core.creater.strategy.sync.SyncStrategy;
 import org.opsli.core.utils.SpringContextHolder;
 import org.opsli.modulars.creater.table.wrapper.CreaterTableAndColumnModel;
@@ -38,11 +39,11 @@ import java.util.concurrent.ConcurrentMap;
  */
 @Slf4j
 @Configuration
-public class SQLSyncUtil {
+public class SqlSyncUtil {
 
 
     /** 处理方法集合 */
-    private static final ConcurrentMap<String, SyncStrategy> HANDLER_MAP = new ConcurrentHashMap<>();
+    private static final ConcurrentMap<DataBaseType, SyncStrategy> HANDLER_MAP = new ConcurrentHashMap<>();
 
 
     @Bean
@@ -74,7 +75,11 @@ public class SQLSyncUtil {
             return;
         }
 
-        SyncStrategy syncStrategy = HANDLER_MAP.get(model.getJdbcType());
+        // 获得数据库类型 枚举
+        String jdbcType = model.getJdbcType();
+        DataBaseType dbType = DataBaseType.getDbType(jdbcType);
+
+        SyncStrategy syncStrategy = HANDLER_MAP.get(dbType);
         if(syncStrategy != null){
             syncStrategy.execute(model);
         }

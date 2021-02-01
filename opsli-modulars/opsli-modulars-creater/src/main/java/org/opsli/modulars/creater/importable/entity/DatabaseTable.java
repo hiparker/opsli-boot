@@ -28,6 +28,8 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = false)
 public class DatabaseTable {
 
+    /** 数据源 */
+    private String dbSource;
 
     /** 数据库 */
     private String dbName;
@@ -37,7 +39,6 @@ public class DatabaseTable {
 
     /** 描述 */
     private String tableComments;
-
 
     // ========================================
 

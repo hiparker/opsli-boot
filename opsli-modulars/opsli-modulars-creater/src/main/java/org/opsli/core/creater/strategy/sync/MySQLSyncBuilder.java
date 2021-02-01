@@ -18,6 +18,7 @@ package org.opsli.core.creater.strategy.sync;
 import org.apache.commons.lang3.StringUtils;
 import org.opsli.common.enums.DictType;
 import org.opsli.common.utils.Props;
+import org.opsli.core.creater.enums.DataBaseType;
 import org.opsli.core.creater.exception.CreaterException;
 import org.opsli.core.creater.msg.CreaterMsg;
 import org.opsli.core.creater.strategy.sync.mysql.entity.FieldTypeAttribute;
@@ -66,8 +67,8 @@ public class MySQLSyncBuilder implements SyncStrategy {
     private ITableService iTableService;
 
     @Override
-    public String getType() {
-        return "mysql";
+    public DataBaseType getType() {
+        return DataBaseType.MYSQL;
     }
 
     /**

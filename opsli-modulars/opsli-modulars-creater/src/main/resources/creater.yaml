@@ -1,8 +1,5 @@
+# 暂时只支持 mysql
 opsli:
-  # 数据库类型 mysql （oracle 暂不支持）
-  db-type: mysql
-  # 数据库名
-  db-name: opsli-boot
   # 排除表 防止代码生成器直接 非法删除关键表
   exclude-tables:
     - creater_table

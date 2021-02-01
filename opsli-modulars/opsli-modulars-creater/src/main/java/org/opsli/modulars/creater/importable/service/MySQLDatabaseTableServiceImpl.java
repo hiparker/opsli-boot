@@ -17,7 +17,7 @@ package org.opsli.modulars.creater.importable.service;
 
 import org.apache.commons.lang3.StringUtils;
 import org.opsli.common.utils.Props;
-import org.opsli.modulars.creater.importable.constants.DbType;
+import org.opsli.core.creater.enums.DataBaseType;
 import org.opsli.modulars.creater.importable.entity.DatabaseColumn;
 import org.opsli.modulars.creater.importable.entity.DatabaseTable;
 import org.opsli.modulars.creater.importable.mapper.MySQLDatabaseTableMapper;
@@ -52,8 +52,8 @@ public class MySQLDatabaseTableServiceImpl implements DatabaseTableService {
     private ITableService iTableService;
 
     @Override
-    public String getType() {
-        return DbType.DB_MYSQL;
+    public DataBaseType getType() {
+        return DataBaseType.MYSQL;
     }
 
     @Override

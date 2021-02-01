@@ -27,7 +27,7 @@ import org.opsli.common.utils.WrapperUtil;
 import org.opsli.core.base.controller.BaseRestController;
 import org.opsli.core.creater.exception.CreaterException;
 import org.opsli.core.creater.msg.CreaterMsg;
-import org.opsli.core.creater.strategy.sync.util.SQLSyncUtil;
+import org.opsli.core.creater.strategy.sync.util.SqlSyncUtil;
 import org.opsli.core.msg.CoreMsg;
 import org.opsli.core.persistence.Page;
 import org.opsli.core.persistence.querybuilder.QueryBuilder;
@@ -227,7 +227,7 @@ public class TableRestController extends BaseRestController<CreaterTable, Create
         currModel.setColumnList(columnModelList);
 
         // 执行同步操作
-        SQLSyncUtil.execute(currModel);
+        SqlSyncUtil.execute(currModel);
 
         return ResultVo.success("同步成功");
     }
