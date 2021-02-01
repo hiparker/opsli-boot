@@ -24,6 +24,7 @@ import org.opsli.api.wrapper.system.user.UserModel;
 import org.opsli.api.wrapper.system.user.UserOrgRefModel;
 import org.opsli.common.annotation.ApiRestController;
 import org.opsli.common.exception.ServiceException;
+import org.opsli.core.autoconfigure.GlobalProperties;
 import org.opsli.core.msg.CoreMsg;
 import org.opsli.core.utils.UserUtil;
 import org.opsli.modulars.system.SystemMsg;
@@ -43,8 +44,9 @@ import org.springframework.beans.factory.annotation.Value;
 @ApiRestController("/sys/user/org")
 public class UserOrgRefRestController implements UserOrgRefApi {
 
-    @Value("${opsli.enable-demo}")
-    private boolean enableDemo;
+    /** 配置类 */
+    @Autowired
+    protected GlobalProperties globalProperties;
 
     @Autowired
     private IUserOrgRefService iUserOrgRefService;
@@ -78,7 +80,8 @@ public class UserOrgRefRestController implements UserOrgRefApi {
     private void demoError(){
         UserModel user = UserUtil.getUser();
         // 演示模式 不允许操作 （超级管理员可以操作）
-        if(enableDemo && !StringUtils.equals(UserUtil.SUPER_ADMIN, user.getUsername())){
+        if(globalProperties.isEnableDemo() &&
+                !StringUtils.equals(UserUtil.SUPER_ADMIN, user.getUsername())){
             throw new ServiceException(CoreMsg.EXCEPTION_ENABLE_DEMO);
         }
     }

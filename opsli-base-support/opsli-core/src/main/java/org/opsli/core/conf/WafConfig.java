@@ -37,7 +37,7 @@ import javax.servlet.DispatcherType;
 public class WafConfig {
 
 	@Autowired
-	GlobalProperties globalProperties;
+	private GlobalProperties globalProperties;
 
 	@Bean
 	@ConditionalOnProperty(prefix = GlobalProperties.PREFIX +".waf", name = "enable", havingValue = "true", matchIfMissing = false)

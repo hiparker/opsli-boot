@@ -21,9 +21,11 @@ import cn.hutool.core.lang.Console;
 import cn.hutool.core.thread.ThreadUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.opsli.core.autoconfigure.GlobalProperties;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Date;
@@ -120,13 +122,41 @@ public class StartPrint {
         private static final StartPrint INSTANCE = new StartPrint();
     }
 
-    @Value("${opsli.system-name:OPSLI快速开发平台}")
-    public void setSystemName(String systemName) {
+
+
+    @Value("${server.port:8080}")
+    public void setServerPort(String serverPort) {
+        StartPrint.serverPort = serverPort;
+    }
+
+    @Value("${server.servlet.context-path:/opsli-boot}")
+    public void setServerContextPath(String serverContextPath) {
+        StartPrint.serverContextPath = serverContextPath;
+    }
+
+    // ===============================
+
+    /***
+     * 初始化
+     * @param globalProperties
+     */
+    @PostConstruct
+    public void init(GlobalProperties globalProperties){
+        if(globalProperties != null){
+            // 设置系统名称
+            this.setSystemName(globalProperties.getSystemName());
+            // 设置系统启动时间
+            this.setStarterDate(globalProperties.getSystemStarterTime());
+        }
+    }
+
+    // ==============================
+
+    private void setSystemName(String systemName) {
         StartPrint.systemName = systemName;
     }
 
-    @Value("${opsli.system-starter-time}")
-    public void setStarterDate(String starterDate) {
+    private void setStarterDate(String starterDate) {
         // 非空验证
         if(StringUtils.isEmpty(starterDate)){
             StartPrint.starterDate = DateUtil.date().toString();
@@ -144,16 +174,6 @@ public class StartPrint {
         }
 
         StartPrint.starterDate = starterDate;
-    }
-
-    @Value("${server.port:8080}")
-    public void setServerPort(String serverPort) {
-        StartPrint.serverPort = serverPort;
-    }
-
-    @Value("${server.servlet.context-path:/opsli-boot}")
-    public void setServerContextPath(String serverContextPath) {
-        StartPrint.serverContextPath = serverContextPath;
     }
 
 }

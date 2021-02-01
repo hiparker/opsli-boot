@@ -740,10 +740,16 @@ public class UserUtil {
         UserUtil.userApi = userApi;
     }
 
+    /**
+     * 初始化
+     * @param globalProperties 配置类
+     */
     @Autowired
-    public void setSuperAdmin(GlobalProperties globalProperties) {
-        // 获得 超级管理员
-        if(globalProperties != null && globalProperties.getAuth() != null ){
+    public void init(GlobalProperties globalProperties){
+        if(globalProperties != null && globalProperties.getAuth() != null
+                && globalProperties.getAuth().getToken() != null
+            ){
+            // 获得 超级管理员
             UserUtil.SUPER_ADMIN = globalProperties.getAuth().getSuperAdmin();
         }
     }

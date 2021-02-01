@@ -15,6 +15,8 @@
  */
 package org.opsli.core.autoconfigure;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
@@ -24,16 +26,11 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @ConfigurationProperties(prefix = "server.servlet.api.path")
+@Data
+@EqualsAndHashCode(callSuper = false)
 public class ApiPathProperties {
 
     /** 专门针对 Controller层接口路径前缀全局配置 */
     private String globalPrefix;
 
-    public String getGlobalPrefix() {
-        return globalPrefix;
-    }
-
-    public void setGlobalPrefix(String globalPrefix) {
-        this.globalPrefix = globalPrefix;
-    }
 }

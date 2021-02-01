@@ -334,38 +334,27 @@ public class UserTokenUtil {
         return token;
     }
 
+    /**
+     * 初始化
+     * @param globalProperties 配置类
+     */
     @Autowired
-    public  void setRedisPlugin(RedisPlugin redisPlugin) {
-        UserTokenUtil.redisPlugin = redisPlugin;
-    }
-
-    @Autowired
-    public void setAccountSlipCount(GlobalProperties globalProperties) {
+    public void init(GlobalProperties globalProperties, RedisPlugin redisPlugin){
         if(globalProperties != null && globalProperties.getAuth() != null
                 && globalProperties.getAuth().getLogin() != null
             ){
-            ACCOUNT_SLIP_COUNT = globalProperties.getAuth()
+            // 账号失败阈值
+            UserTokenUtil.ACCOUNT_SLIP_COUNT = globalProperties.getAuth()
                     .getLogin().getSlipCount();
-        }
-    }
-
-    @Autowired
-    public void setAccountSlipVerifyCount(GlobalProperties globalProperties) {
-        if(globalProperties != null && globalProperties.getAuth() != null
-                && globalProperties.getAuth().getLogin() != null
-            ){
-            ACCOUNT_SLIP_VERIFY_COUNT = globalProperties.getAuth()
+            // 账号失败N次后弹出验证码
+            UserTokenUtil.ACCOUNT_SLIP_VERIFY_COUNT = globalProperties.getAuth()
                     .getLogin().getSlipVerifyCount();
-        }
-    }
-
-    @Autowired
-    public void setAccountSlipLockSpeed(GlobalProperties globalProperties) {
-        if(globalProperties != null && globalProperties.getAuth() != null
-                && globalProperties.getAuth().getLogin() != null
-        ){
-            ACCOUNT_SLIP_LOCK_SPEED = globalProperties.getAuth()
+            // 账号锁定时间
+            UserTokenUtil.ACCOUNT_SLIP_LOCK_SPEED = globalProperties.getAuth()
                     .getLogin().getSlipLockSpeed();
         }
+
+        // Redis 插件
+        UserTokenUtil.redisPlugin = redisPlugin;
     }
 }

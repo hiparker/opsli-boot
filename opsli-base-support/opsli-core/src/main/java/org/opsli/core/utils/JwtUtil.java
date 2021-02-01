@@ -104,24 +104,22 @@ public class JwtUtil {
 
     // ==================
 
+    /**
+     * 初始化
+     * @param globalProperties 配置类
+     */
     @Autowired
-    public void setExpire(GlobalProperties globalProperties) {
-        // 获得 Token失效时间
-        if(globalProperties != null && globalProperties.getAuth() != null
-            && globalProperties.getAuth().getToken() != null
-            ){
-            EXPIRE = globalProperties.getAuth()
-                    .getToken().getEffectiveTime() * 60 * 1000;
-        }
-    }
-
-    @Autowired
-    public void setEncryptJwtInitialSecret(GlobalProperties globalProperties) {
-        // 获得 Token初始盐值
+    public void init(GlobalProperties globalProperties){
+        //
         if(globalProperties != null && globalProperties.getAuth() != null
                 && globalProperties.getAuth().getToken() != null
-        ){
-            ENCRYPT_JWT_INITIAL_SECRET = globalProperties.getAuth()
+            ){
+            // 获得 Token失效时间
+            JwtUtil.EXPIRE = globalProperties.getAuth()
+                    .getToken().getEffectiveTime() * 60 * 1000;
+
+            // 获得 Token初始盐值
+            JwtUtil.ENCRYPT_JWT_INITIAL_SECRET = globalProperties.getAuth()
                     .getToken().getSecret();
         }
     }
