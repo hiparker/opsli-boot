@@ -119,7 +119,7 @@ public abstract class BaseRestController <T extends BaseEntity, E extends ApiWra
             // 如果开启缓存 先从缓存读
             if(hotDataFlag){
                 model = WrapperUtil.transformInstance(
-                        CacheUtil.get(id, entityClazz),modelClazz);
+                        CacheUtil.getTimed(entityClazz, id), modelClazz);
                 if(model != null){
                     return model;
                 }
@@ -147,7 +147,7 @@ public abstract class BaseRestController <T extends BaseEntity, E extends ApiWra
 
                         // 如果获得锁 则 再次检查缓存里有没有， 如果有则直接退出， 没有的话才发起数据库请求
                         model = WrapperUtil.transformInstance(
-                                CacheUtil.get(id, entityClazz),modelClazz);
+                                CacheUtil.getTimed(entityClazz, id),modelClazz);
                         if(model != null){
                             return model;
                         }

@@ -22,15 +22,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.opsli.api.wrapper.system.dict.DictWrapper;
 import org.opsli.common.constants.CacheConstants;
 import org.opsli.common.constants.DictConstants;
+import org.opsli.common.enums.CacheType;
 import org.opsli.core.cache.local.CacheUtil;
-import org.opsli.core.cache.pushsub.enums.CacheType;
+import org.opsli.core.cache.pushsub.enums.CacheHandleType;
 import org.opsli.core.cache.pushsub.enums.DictModelType;
 import org.opsli.core.cache.pushsub.enums.MsgArgsType;
 import org.opsli.core.cache.pushsub.enums.PushSubType;
 import org.opsli.plugins.cache.EhCachePlugin;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -54,7 +54,7 @@ public class DictHandler implements RedisPushSubHandler{
     @Override
     public void handler(JSONObject msgJson) {
         DictModelType dictModelType = DictModelType.valueOf((String) msgJson.get(MsgArgsType.DICT_MODEL_TYPE.toString()));
-        CacheType type = CacheType.valueOf((String) msgJson.get(MsgArgsType.DICT_TYPE.toString()));
+        CacheHandleType type = CacheHandleType.valueOf((String) msgJson.get(MsgArgsType.DICT_TYPE.toString()));
 
         if(DictModelType.COLLECTION == dictModelType){
             Object dictListObj = msgJson.get(MsgArgsType.DICT_MODELS.toString());
@@ -81,29 +81,29 @@ public class DictHandler implements RedisPushSubHandler{
      * @param dictWrapperModel
      * @param type
      */
-    private void handler(DictWrapper dictWrapperModel, CacheType type){
+    private void handler(DictWrapper dictWrapperModel, CacheHandleType type){
 
         // 解析 key
-        String ehKeyByName = CacheUtil.handleKey(CacheConstants.EDEN_HASH_DATA,
-                DictConstants.CACHE_PREFIX_NAME + dictWrapperModel.getTypeCode() + ":" + dictWrapperModel.getDictName());
-        String ehKeyByValue = CacheUtil.handleKey(CacheConstants.EDEN_HASH_DATA,
-                DictConstants.CACHE_PREFIX_VALUE + dictWrapperModel.getTypeCode() + ":" + dictWrapperModel.getDictValue());
+        String ehKeyByName = CacheUtil.handleKey(CacheType.EDEN_HASH, DictConstants.CACHE_PREFIX_NAME +
+                        dictWrapperModel.getTypeCode() + ":" + dictWrapperModel.getDictName());
+        String ehKeyByValue = CacheUtil.handleKey(CacheType.EDEN_HASH, DictConstants.CACHE_PREFIX_VALUE +
+                dictWrapperModel.getTypeCode() + ":" + dictWrapperModel.getDictValue());
 
         // 缓存更新
-        if(CacheType.UPDATE == type){
-            ehCachePlugin.delete(CacheConstants.HOT_DATA, ehKeyByName);
-            ehCachePlugin.delete(CacheConstants.HOT_DATA, ehKeyByValue);
+        if(CacheHandleType.UPDATE == type){
+            ehCachePlugin.delete(CacheConstants.EHCACHE_SPACE, ehKeyByName);
+            ehCachePlugin.delete(CacheConstants.EHCACHE_SPACE, ehKeyByValue);
 
             // 统一转换为 JSONObject
             String jsonStr = JSONObject.toJSONString(dictWrapperModel.getModel());
             JSONObject value = JSONObject.parseObject(jsonStr);
-            ehCachePlugin.put(CacheConstants.HOT_DATA, ehKeyByName, value);
-            ehCachePlugin.put(CacheConstants.HOT_DATA, ehKeyByValue, value);
+            ehCachePlugin.put(CacheConstants.EHCACHE_SPACE, ehKeyByName, value);
+            ehCachePlugin.put(CacheConstants.EHCACHE_SPACE, ehKeyByValue, value);
         }
         // 缓存删除
-        else if(CacheType.DELETE == type){
-            ehCachePlugin.delete(CacheConstants.HOT_DATA, ehKeyByName);
-            ehCachePlugin.delete(CacheConstants.HOT_DATA, ehKeyByValue);
+        else if(CacheHandleType.DELETE == type){
+            ehCachePlugin.delete(CacheConstants.EHCACHE_SPACE, ehKeyByName);
+            ehCachePlugin.delete(CacheConstants.EHCACHE_SPACE, ehKeyByValue);
         }
     }
 

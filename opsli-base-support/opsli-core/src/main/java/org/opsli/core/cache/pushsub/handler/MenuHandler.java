@@ -67,10 +67,10 @@ public class MenuHandler implements RedisPushSubHandler{
             return;
         }
 
+        String cacheKey = CacheUtil.handleKey(MenuUtil.PREFIX_CODE + menuCode);
+
         // 先删除
-        ehCachePlugin.delete(CacheConstants.HOT_DATA, MenuUtil.PREFIX_CODE + menuCode);
-        // 清除空拦截
-        CacheUtil.delNilFlag(MenuUtil.PREFIX_CODE + menuCode);
+        ehCachePlugin.delete(CacheConstants.EHCACHE_SPACE, cacheKey);
     }
 
 

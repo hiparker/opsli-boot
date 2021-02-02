@@ -15,7 +15,6 @@
  */
 package org.opsli.common.annotation.hotdata;
 
-import org.opsli.common.constants.CacheConstants;
 
 import java.lang.annotation.*;
 
@@ -41,7 +40,5 @@ import java.lang.annotation.*;
 @Documented
 public @interface HotDataPut {
 
-    /** 缓存源名字 */
-    String name() default CacheConstants.HOT_DATA;
 
 }

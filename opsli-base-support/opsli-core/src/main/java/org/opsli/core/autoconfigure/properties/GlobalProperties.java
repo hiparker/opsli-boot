@@ -14,12 +14,12 @@ import java.util.Set;
  * @date 2021-01-31 5:52 下午
  **/
 @Configuration
-@ConfigurationProperties(prefix = GlobalProperties.PREFIX)
+@ConfigurationProperties(prefix = GlobalProperties.PROP_PREFIX)
 @Data
 @EqualsAndHashCode(callSuper = false)
 public class GlobalProperties {
 
-    public static final String PREFIX = "opsli";
+    public static final String PROP_PREFIX = "opsli";
 
     /** 系统名称 */
     private String systemName;

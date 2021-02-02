@@ -40,7 +40,7 @@ public class WafConfig {
 	private GlobalProperties globalProperties;
 
 	@Bean
-	@ConditionalOnProperty(prefix = GlobalProperties.PREFIX +".waf", name = "enable", havingValue = "true", matchIfMissing = false)
+	@ConditionalOnProperty(prefix = GlobalProperties.PROP_PREFIX +".waf", name = "enable", havingValue = "true", matchIfMissing = false)
 	public FilterRegistrationBean<WafFilter> wafFilterRegistration() {
 		WafFilter wafFilter = new WafFilter();
 		wafFilter.setUrlExclusion(globalProperties.getWaf().getUrlExclusion());

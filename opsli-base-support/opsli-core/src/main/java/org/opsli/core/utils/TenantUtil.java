@@ -67,7 +67,7 @@ public class TenantUtil {
      */
     public static TenantModel getTenant(String tenantId){
         // 先从缓存里拿
-        TenantModel tenantModel = CacheUtil.get(PREFIX_CODE + tenantId, TenantModel.class);
+        TenantModel tenantModel = CacheUtil.getTimed(TenantModel.class, PREFIX_CODE + tenantId);
         if (tenantModel != null){
             return tenantModel;
         }
@@ -94,7 +94,7 @@ public class TenantUtil {
             }
 
             // 如果获得锁 则 再次检查缓存里有没有， 如果有则直接退出， 没有的话才发起数据库请求
-            tenantModel = CacheUtil.get(PREFIX_CODE + tenantId, TenantModel.class);
+            tenantModel = CacheUtil.getTimed(TenantModel.class, PREFIX_CODE + tenantId);
             if (tenantModel != null){
                 return tenantModel;
             }
@@ -138,7 +138,7 @@ public class TenantUtil {
         // 计数器
         int count = 0;
 
-        TenantModel tenantModel = CacheUtil.get(PREFIX_CODE + tenantId, TenantModel.class);
+        TenantModel tenantModel = CacheUtil.getTimed(TenantModel.class, PREFIX_CODE + tenantId);
         boolean hasNilFlag = CacheUtil.hasNilFlag(PREFIX_CODE + tenantId);
 
         // 只要不为空 则执行刷新

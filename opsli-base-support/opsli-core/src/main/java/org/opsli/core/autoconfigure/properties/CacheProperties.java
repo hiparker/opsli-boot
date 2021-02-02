@@ -13,36 +13,26 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.opsli.core.cache.pushsub.enums;
+package org.opsli.core.autoconfigure.properties;
+
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Component;
 
 /**
- * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.core.cache.pushsub.enums
- * @Author: Parker
- * @CreateTime: 2020-09-15 16:15
- * @Description: 发布订阅类型
+ * 接口路径前缀配置
+ * @author parker
  */
-public enum PushSubType {
+@Component
+@ConfigurationProperties(prefix = CacheProperties.PROP_PREFIX)
+@Data
+@EqualsAndHashCode(callSuper = false)
+public class CacheProperties {
 
-    /** 字典类型 */
-    DICT,
+    public static final String PROP_PREFIX = "spring.cache-conf";
 
-    /** 用户数据 */
-    USER,
-
-    /** 菜单数据 */
-    MENU,
-
-    /** 组织数据 */
-    ORG,
-
-    /** 租户 */
-    TENANT,
-
-    /** 热点数据 */
-    HOT_DATA,
-
-    ;
-
+    /** 缓存前缀 */
+    private String prefix;
 
 }

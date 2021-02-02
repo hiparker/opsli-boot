@@ -46,7 +46,7 @@ public class EhCachePluginImpl implements EhCachePlugin {
     @Override
     public boolean put(String cacheName, String key, Object value) {
         if(cacheManager == null){
-            return false;
+            return true;
         }
         boolean ret = false;
         try {
@@ -98,7 +98,7 @@ public class EhCachePluginImpl implements EhCachePlugin {
     @Override
     public boolean delete(String cacheName, String key) {
         if(cacheManager == null){
-            return false;
+            return true;
         }
         boolean ret = false;
         try {

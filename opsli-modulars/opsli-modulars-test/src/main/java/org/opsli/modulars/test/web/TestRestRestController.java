@@ -12,7 +12,7 @@ import org.opsli.api.wrapper.system.dict.DictWrapper;
 import org.opsli.api.wrapper.test.TestModel;
 import org.opsli.common.utils.WrapperUtil;
 import org.opsli.core.base.controller.BaseRestController;
-import org.opsli.core.cache.pushsub.enums.CacheType;
+import org.opsli.core.cache.pushsub.enums.CacheHandleType;
 import org.opsli.core.cache.pushsub.msgs.DictMsgFactory;
 import org.opsli.core.persistence.Page;
 import org.opsli.core.persistence.querybuilder.QueryBuilder;
@@ -85,7 +85,7 @@ public class TestRestRestController extends BaseRestController<TestEntity, TestM
     public ResultVo<?> sendMsg(){
         DictWrapper model = new DictWrapper();
 
-        BaseSubMessage msg = DictMsgFactory.createMsg(model, CacheType.UPDATE);
+        BaseSubMessage msg = DictMsgFactory.createMsg(model, CacheHandleType.UPDATE);
 
         boolean ret = redisPlugin.sendMessage(msg);
         if(ret){

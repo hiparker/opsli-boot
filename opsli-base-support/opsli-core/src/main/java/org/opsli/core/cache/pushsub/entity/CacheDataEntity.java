@@ -36,15 +36,12 @@ public class CacheDataEntity {
     /** key */
     private String key;
 
-    /** 数据类型 */
-    private PushSubType type;
-
     /** 缓存名称 */
     private String cacheName;
 
 
     public static void main(String[] args) {
-        CacheDataEntity ret = new CacheDataEntity("123", PushSubType.EDEN_DATA, "12aaaa");
+        CacheDataEntity ret = new CacheDataEntity("123", "12aaaa");
         System.out.println(ToStringBuilder.reflectionToString(ret));
     }
 }

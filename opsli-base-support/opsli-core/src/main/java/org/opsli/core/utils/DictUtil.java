@@ -27,6 +27,7 @@ import org.opsli.api.wrapper.system.dict.DictDetailModel;
 import org.opsli.api.wrapper.system.dict.DictWrapper;
 import org.opsli.common.constants.CacheConstants;
 import org.opsli.common.constants.DictConstants;
+import org.opsli.common.enums.CacheType;
 import org.opsli.core.cache.local.CacheUtil;
 import org.opsli.plugins.redis.RedisLockPlugins;
 import org.opsli.plugins.redis.RedisPlugin;
@@ -75,8 +76,8 @@ public class DictUtil {
     public static String getDictNameByValue(String typeCode, String dictValue, String defaultVal){
 
         String dictName = "";
-        DictDetailModel cacheModel = CacheUtil.getHash(DictConstants.CACHE_PREFIX_VALUE + typeCode,
-                dictValue, DictDetailModel.class);
+        DictDetailModel cacheModel = CacheUtil.getHash(DictDetailModel.class, DictConstants.CACHE_PREFIX_VALUE + typeCode,
+                dictValue);
         if (cacheModel != null){
             dictName = cacheModel.getDictName();
         }
@@ -108,8 +109,8 @@ public class DictUtil {
             }
 
             // 如果获得锁 则 再次检查缓存里有没有， 如果有则直接退出， 没有的话才发起数据库请求
-            cacheModel = CacheUtil.getHash(DictConstants.CACHE_PREFIX_VALUE + typeCode,
-                    dictValue, DictDetailModel.class);
+            cacheModel = CacheUtil.getHash(DictDetailModel.class, DictConstants.CACHE_PREFIX_VALUE + typeCode,
+                    dictValue);
             if (cacheModel != null){
                 dictName = cacheModel.getDictName();
             }
@@ -165,8 +166,8 @@ public class DictUtil {
     public static String getDictValueByName(String typeCode, String dictName, String defaultVal){
 
         String dictValue = "";
-        DictDetailModel cacheModel = CacheUtil.getHash(DictConstants.CACHE_PREFIX_NAME + typeCode,
-                dictName, DictDetailModel.class);
+        DictDetailModel cacheModel = CacheUtil.getHash(DictDetailModel.class, DictConstants.CACHE_PREFIX_NAME + typeCode,
+                dictName);
         if (cacheModel != null){
             dictValue = cacheModel.getDictValue();
         }
@@ -195,8 +196,8 @@ public class DictUtil {
             }
 
             // 如果获得锁 则 再次检查缓存里有没有， 如果有则直接退出， 没有的话才发起数据库请求
-            cacheModel = CacheUtil.getHash(DictConstants.CACHE_PREFIX_NAME + typeCode,
-                    dictName, DictDetailModel.class);
+            cacheModel = CacheUtil.getHash(DictDetailModel.class, DictConstants.CACHE_PREFIX_NAME + typeCode,
+                    dictName);
             if (cacheModel != null){
                 dictValue = cacheModel.getDictValue();
             }
@@ -251,7 +252,7 @@ public class DictUtil {
     public static List<DictWrapper> getDictList(String typeCode){
         List<DictWrapper> dictWrapperModels = Lists.newArrayList();
         try {
-            String key = CacheUtil.handleKey(CacheConstants.EDEN_HASH_DATA, DictConstants.CACHE_PREFIX_VALUE + typeCode);
+            String key = CacheUtil.handleKey(CacheType.EDEN_HASH, DictConstants.CACHE_PREFIX_VALUE + typeCode);
             Map<Object, Object> dictMap = redisPlugin.hGetAll(key);
             Set<Map.Entry<Object, Object>> entries = dictMap.entrySet();
             for (Map.Entry<Object, Object> entry : entries) {
@@ -297,7 +298,7 @@ public class DictUtil {
                 }
 
                 // 如果获得锁 则 再次检查缓存里有没有， 如果有则直接退出， 没有的话才发起数据库请求
-                key = CacheUtil.handleKey(CacheConstants.EDEN_HASH_DATA, DictConstants.CACHE_PREFIX_VALUE + typeCode);
+                key = CacheUtil.handleKey(CacheType.EDEN_HASH, DictConstants.CACHE_PREFIX_VALUE + typeCode);
                 dictMap = redisPlugin.hGetAll(key);
                 entries = dictMap.entrySet();
                 for (Map.Entry<Object, Object> entry : entries) {
@@ -315,6 +316,7 @@ public class DictUtil {
                     dictWrapperModel.setTypeCode(typeCode);
                     dictWrapperModel.setDictName(model.getDictName());
                     dictWrapperModel.setDictValue(model.getDictValue());
+                    dictWrapperModel.setModel(model);
                     dictWrapperModels.add(dictWrapperModel);
                 }
                 if(!dictWrapperModels.isEmpty()){
@@ -397,9 +399,9 @@ public class DictUtil {
         // 清除缓存
         DictUtil.del(model);
 
-        CacheUtil.putEdenHash(DictConstants.CACHE_PREFIX_NAME + model.getTypeCode(),
+        CacheUtil.putHash(DictConstants.CACHE_PREFIX_NAME + model.getTypeCode(),
                 model.getDictName(), model.getModel());
-        CacheUtil.putEdenHash(DictConstants.CACHE_PREFIX_VALUE + model.getTypeCode(),
+        CacheUtil.putHash(DictConstants.CACHE_PREFIX_VALUE + model.getTypeCode(),
                 model.getDictValue(), model.getModel());
     }
 
@@ -418,12 +420,12 @@ public class DictUtil {
         boolean hasNilFlagByValue = CacheUtil.hasNilFlag(DictConstants.CACHE_PREFIX_VALUE +
                 model.getTypeCode() + ":" + model.getDictValue());
 
-        DictWrapper dictByName = CacheUtil.getHash(DictConstants.CACHE_PREFIX_NAME + model.getTypeCode(),
-                model.getDictName(),
-                DictWrapper.class);
-        DictWrapper dictByValue = CacheUtil.getHash(DictConstants.CACHE_PREFIX_VALUE + model.getTypeCode(),
-                model.getDictValue(),
-                DictWrapper.class);
+        DictWrapper dictByName = CacheUtil.getHash(DictWrapper.class,
+                DictConstants.CACHE_PREFIX_NAME + model.getTypeCode(),
+                model.getDictName());
+        DictWrapper dictByValue = CacheUtil.getHash(DictWrapper.class,
+                DictConstants.CACHE_PREFIX_VALUE + model.getTypeCode(),
+                model.getDictValue());
 
         // 计数器
         int count = 0;
@@ -450,7 +452,7 @@ public class DictUtil {
         if (dictByName != null){
             count++;
             // 清除空拦截
-            boolean tmp = CacheUtil.delEdenHash(DictConstants.CACHE_PREFIX_NAME +
+            boolean tmp = CacheUtil.delHash(DictConstants.CACHE_PREFIX_NAME +
                     model.getTypeCode(), model.getDictName());
             if(tmp){
                 count--;
@@ -460,7 +462,7 @@ public class DictUtil {
         if (dictByValue != null){
             count++;
             // 清除空拦截
-            boolean tmp = CacheUtil.delEdenHash(DictConstants.CACHE_PREFIX_VALUE +
+            boolean tmp = CacheUtil.delHash(DictConstants.CACHE_PREFIX_VALUE +
                     model.getTypeCode(), model.getDictValue());
             if(tmp){
                 count--;

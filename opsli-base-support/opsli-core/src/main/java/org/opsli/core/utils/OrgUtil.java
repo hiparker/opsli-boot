@@ -66,7 +66,7 @@ public class OrgUtil {
      */
     public static UserOrgRefModel getOrgByUserId(String userId){
         // 先从缓存里拿
-        UserOrgRefModel orgRefModel = CacheUtil.get(PREFIX_CODE + userId, UserOrgRefModel.class);
+        UserOrgRefModel orgRefModel = CacheUtil.getTimed(UserOrgRefModel.class, PREFIX_CODE + userId);
         if (orgRefModel != null){
             return orgRefModel;
         }
@@ -93,7 +93,7 @@ public class OrgUtil {
             }
 
             // 如果获得锁 则 再次检查缓存里有没有， 如果有则直接退出， 没有的话才发起数据库请求
-            orgRefModel = CacheUtil.get(PREFIX_CODE + userId, UserOrgRefModel.class);
+            orgRefModel = CacheUtil.getTimed(UserOrgRefModel.class, PREFIX_CODE + userId);
             if (orgRefModel != null){
                 return orgRefModel;
             }
@@ -137,7 +137,7 @@ public class OrgUtil {
         // 计数器
         int count = 0;
 
-        UserOrgRefModel orgRefModel = CacheUtil.get(PREFIX_CODE + userId, UserOrgRefModel.class);
+        UserOrgRefModel orgRefModel = CacheUtil.getTimed(UserOrgRefModel.class, PREFIX_CODE + userId);
         boolean hasNilFlag = CacheUtil.hasNilFlag(PREFIX_CODE + userId);
 
         // 只要不为空 则执行刷新

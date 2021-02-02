@@ -18,8 +18,7 @@ package org.opsli.core.cache.pushsub.handler;
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.opsli.common.constants.CacheConstants;
-import org.opsli.core.cache.local.CacheUtil;
-import org.opsli.core.cache.pushsub.enums.CacheType;
+import org.opsli.core.cache.pushsub.enums.CacheHandleType;
 import org.opsli.core.cache.pushsub.enums.MsgArgsType;
 import org.opsli.core.cache.pushsub.enums.PushSubType;
 import org.opsli.plugins.cache.EhCachePlugin;
@@ -46,18 +45,16 @@ public class HotDataHandler implements RedisPushSubHandler{
     @Override
     public void handler(JSONObject msgJson) {
         String key = (String) msgJson.get(MsgArgsType.CACHE_DATA_KEY.toString());
+        String cacheName = (String) msgJson.get(MsgArgsType.CACHE_DATA_NAME.toString());
         Object value = msgJson.get(MsgArgsType.CACHE_DATA_VALUE.toString());
-        CacheType type = CacheType.valueOf((String )msgJson.get(MsgArgsType.CACHE_DATA_TYPE.toString()));
+        CacheHandleType type = CacheHandleType.valueOf((String )msgJson.get(MsgArgsType.CACHE_DATA_TYPE.toString()));
 
-        // 解析 key
-        String handleKey = CacheUtil.handleKey(CacheConstants.HOT_DATA, key);
-
-        if(CacheType.UPDATE == type){
-            ehCachePlugin.put(CacheConstants.HOT_DATA, handleKey, value);
+        if(CacheHandleType.UPDATE == type){
+            ehCachePlugin.put(CacheConstants.EHCACHE_SPACE, cacheName, value);
         }
         // 缓存删除
-        else if(CacheType.DELETE == type){
-            ehCachePlugin.delete(CacheConstants.HOT_DATA, handleKey);
+        else if(CacheHandleType.DELETE == type){
+            ehCachePlugin.delete(CacheConstants.EHCACHE_SPACE, cacheName);
         }
     }
 

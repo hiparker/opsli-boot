@@ -105,7 +105,7 @@ public class UserUtil {
      */
     public static UserModel getUser(String userId){
         // 先从缓存里拿
-        UserModel userModel = CacheUtil.get(PREFIX_ID + userId, UserModel.class);
+        UserModel userModel = CacheUtil.getTimed(UserModel.class, PREFIX_ID + userId);
         if (userModel != null){
             return userModel;
         }
@@ -133,7 +133,7 @@ public class UserUtil {
             }
 
             // 如果获得锁 则 再次检查缓存里有没有， 如果有则直接退出， 没有的话才发起数据库请求
-            userModel = CacheUtil.get(PREFIX_ID + userId, UserModel.class);
+            userModel = CacheUtil.getTimed(UserModel.class, PREFIX_ID + userId);
             if (userModel != null){
                 return userModel;
             }
@@ -173,7 +173,7 @@ public class UserUtil {
      */
     public static UserModel getUserByUserName(String userName){
         // 先从缓存里拿
-        UserModel userModel = CacheUtil.get(PREFIX_USERNAME + userName, UserModel.class);
+        UserModel userModel = CacheUtil.getTimed(UserModel.class, PREFIX_USERNAME + userName);
         if (userModel != null){
             return userModel;
         }
@@ -200,7 +200,7 @@ public class UserUtil {
             }
 
             // 如果获得锁 则 再次检查缓存里有没有， 如果有则直接退出， 没有的话才发起数据库请求
-            userModel = CacheUtil.get(PREFIX_USERNAME + userName, UserModel.class);
+            userModel = CacheUtil.getTimed(UserModel.class, PREFIX_USERNAME + userName);
             if (userModel != null){
                 return userModel;
             }
@@ -238,7 +238,7 @@ public class UserUtil {
 
         // 先从缓存里拿
         try {
-            Object obj = CacheUtil.get(PREFIX_ID_ROLES + userId);
+            Object obj = CacheUtil.getTimed(PREFIX_ID_ROLES + userId);
             if(obj instanceof List){
                 List<String> list = Convert.toList(String.class, obj);
                 if (!list.isEmpty()) {
@@ -277,7 +277,7 @@ public class UserUtil {
 
             // 如果获得锁 则 再次检查缓存里有没有， 如果有则直接退出， 没有的话才发起数据库请求
             try {
-                Object obj = CacheUtil.get(PREFIX_ID_ROLES + userId);
+                Object obj = CacheUtil.getTimed(PREFIX_ID_ROLES + userId);
                 if(obj instanceof List){
                     List<String> list = Convert.toList(String.class, obj);
                     if (!list.isEmpty()) {
@@ -325,7 +325,7 @@ public class UserUtil {
 
         // 先从缓存里拿
         try {
-            Object obj = CacheUtil.get(PREFIX_ID_PERMISSIONS + userId);
+            Object obj = CacheUtil.getTimed(PREFIX_ID_PERMISSIONS + userId);
             if(obj instanceof List){
                 List<String> list = Convert.toList(String.class, obj);
                 if (!list.isEmpty()) {
@@ -365,7 +365,7 @@ public class UserUtil {
 
             // 如果获得锁 则 再次检查缓存里有没有， 如果有则直接退出， 没有的话才发起数据库请求
             try {
-                Object obj = CacheUtil.get(PREFIX_ID_PERMISSIONS + userId);
+                Object obj = CacheUtil.getTimed(PREFIX_ID_PERMISSIONS + userId);
                 if(obj instanceof List){
                     List<String> list = Convert.toList(String.class, obj);
                     if (!list.isEmpty()) {
@@ -412,7 +412,7 @@ public class UserUtil {
 
         // 先从缓存里拿
         try {
-            Object obj = CacheUtil.get(PREFIX_ID_MENUS + userId);
+            Object obj = CacheUtil.getTimed(PREFIX_ID_MENUS + userId);
             if(obj instanceof List){
                 List<?> list = Convert.toList(obj);
                 if (!list.isEmpty()) {
@@ -462,7 +462,7 @@ public class UserUtil {
 
             // 如果获得锁 则 再次检查缓存里有没有， 如果有则直接退出， 没有的话才发起数据库请求
             try {
-                Object obj = CacheUtil.get(PREFIX_ID_MENUS + userId);
+                Object obj = CacheUtil.getTimed(PREFIX_ID_MENUS + userId);
                 if(obj instanceof List){
                     List<?> list = Convert.toList(obj);
                     if (!list.isEmpty()) {
@@ -521,9 +521,8 @@ public class UserUtil {
             return true;
         }
 
-        UserModel userModelById = CacheUtil.get(PREFIX_ID + user.getId(), UserModel.class);
-        UserModel userModelByUsername = CacheUtil.get(PREFIX_USERNAME + user.getUsername(),
-                                                            UserModel.class);
+        UserModel userModelById = CacheUtil.getTimed(UserModel.class, PREFIX_ID + user.getId());
+        UserModel userModelByUsername = CacheUtil.getTimed(UserModel.class, PREFIX_USERNAME + user.getUsername());
 
         boolean hasNilFlagById = CacheUtil.hasNilFlag(PREFIX_ID + user.getId());
         boolean hasNilFlagByName = CacheUtil.hasNilFlag(PREFIX_USERNAME + user.getUsername());
@@ -583,7 +582,7 @@ public class UserUtil {
      * @return boolean
      */
     public static boolean refreshUserRoles(String userId){
-        Object obj = CacheUtil.get(PREFIX_ID_ROLES + userId);
+        Object obj = CacheUtil.getTimed(PREFIX_ID_ROLES + userId);
         boolean hasNilFlag = CacheUtil.hasNilFlag(PREFIX_ID_ROLES + userId);
 
         // 计数器
@@ -622,7 +621,7 @@ public class UserUtil {
      * @return boolean
      */
     public static boolean refreshUserAllPerms(String userId){
-        Object obj = CacheUtil.get(PREFIX_ID_PERMISSIONS + userId);
+        Object obj = CacheUtil.getTimed(PREFIX_ID_PERMISSIONS + userId);
         boolean hasNilFlag = CacheUtil.hasNilFlag(PREFIX_ID_PERMISSIONS + userId);
 
         // 计数器
@@ -661,7 +660,7 @@ public class UserUtil {
      * @return boolean
      */
     public static boolean refreshUserMenus(String userId){
-        Object obj = CacheUtil.get(PREFIX_ID_MENUS + userId);
+        Object obj = CacheUtil.getTimed(PREFIX_ID_MENUS + userId);
         boolean hasNilFlag = CacheUtil.hasNilFlag(PREFIX_ID_MENUS + userId);
 
         // 计数器

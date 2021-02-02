@@ -22,7 +22,7 @@ package org.opsli.core.cache.pushsub.enums;
  * @CreateTime: 2020-09-16 22:28
  * @Description: 缓存操作类型
  */
-public enum CacheType {
+public enum CacheHandleType {
 
     /** 更新 */
     UPDATE,

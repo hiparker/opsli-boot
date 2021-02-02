@@ -19,8 +19,8 @@
         </resources>
     </cache-template>
 
-    <!-- hotData 热点数据，它使用名为opsliDefaults的<cache-template>，并将其主键覆盖到更广泛的类型 -->
-    <cache alias="hotData" uses-template="opsliDefaults">
+    <!-- timed 时效数据，它使用名为opsliDefaults的<cache-template>，并将其主键覆盖到更广泛的类型 -->
+    <cache alias="timed" uses-template="opsliDefaults">
         <!--缓存到期配置-->
         <expiry>
             <!-- 只允许配秒 -->

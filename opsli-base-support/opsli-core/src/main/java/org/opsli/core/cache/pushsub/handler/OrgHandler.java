@@ -22,7 +22,6 @@ import org.opsli.common.constants.CacheConstants;
 import org.opsli.core.cache.local.CacheUtil;
 import org.opsli.core.cache.pushsub.enums.MsgArgsType;
 import org.opsli.core.cache.pushsub.enums.PushSubType;
-import org.opsli.core.utils.MenuUtil;
 import org.opsli.core.utils.OrgUtil;
 import org.opsli.plugins.cache.EhCachePlugin;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,10 +67,10 @@ public class OrgHandler implements RedisPushSubHandler{
             return;
         }
 
+        String cacheKey = CacheUtil.handleKey(OrgUtil.PREFIX_CODE + userId);
+
         // 先删除
-        ehCachePlugin.delete(CacheConstants.HOT_DATA, OrgUtil.PREFIX_CODE + userId);
-        // 清除空拦截
-        CacheUtil.delNilFlag(OrgUtil.PREFIX_CODE + userId);
+        ehCachePlugin.delete(CacheConstants.EHCACHE_SPACE, cacheKey);
     }
 
 

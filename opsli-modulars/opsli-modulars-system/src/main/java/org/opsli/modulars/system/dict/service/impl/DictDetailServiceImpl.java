@@ -27,7 +27,7 @@ import org.opsli.common.constants.MyBatisConstants;
 import org.opsli.common.exception.ServiceException;
 import org.opsli.common.utils.HumpUtil;
 import org.opsli.core.base.service.impl.CrudServiceImpl;
-import org.opsli.core.cache.pushsub.enums.CacheType;
+import org.opsli.core.cache.pushsub.enums.CacheHandleType;
 import org.opsli.core.cache.pushsub.msgs.DictMsgFactory;
 import org.opsli.core.msg.CoreMsg;
 import org.opsli.core.persistence.querybuilder.GenQueryBuilder;
@@ -99,7 +99,7 @@ public class DictDetailServiceImpl extends CrudServiceImpl<DictDetailMapper, Sys
 
                 // 广播缓存数据 - 通知其他服务器同步数据
                 redisPlugin.sendMessage(
-                        DictMsgFactory.createMsg(dictWrapperList, CacheType.DELETE)
+                        DictMsgFactory.createMsg(dictWrapperList, CacheHandleType.DELETE)
                 );
             }
         }
@@ -146,7 +146,7 @@ public class DictDetailServiceImpl extends CrudServiceImpl<DictDetailMapper, Sys
 
                 // 广播缓存数据 - 通知其他服务器同步数据
                 redisPlugin.sendMessage(
-                        DictMsgFactory.createMsg(dictWrapperList, CacheType.DELETE)
+                        DictMsgFactory.createMsg(dictWrapperList, CacheHandleType.DELETE)
                 );
             }
         }
@@ -182,7 +182,7 @@ public class DictDetailServiceImpl extends CrudServiceImpl<DictDetailMapper, Sys
                 ));
                 // 广播缓存数据 - 通知其他服务器同步数据
                 redisPlugin.sendMessage(
-                        DictMsgFactory.createMsg(dictWrapperList, CacheType.DELETE)
+                        DictMsgFactory.createMsg(dictWrapperList, CacheHandleType.DELETE)
                 );
             }
         }
@@ -221,7 +221,7 @@ public class DictDetailServiceImpl extends CrudServiceImpl<DictDetailMapper, Sys
                 ));
                 // 广播缓存数据 - 通知其他服务器同步数据
                 redisPlugin.sendMessage(
-                        DictMsgFactory.createMsg(dictWrapperList, CacheType.DELETE)
+                        DictMsgFactory.createMsg(dictWrapperList, CacheHandleType.DELETE)
                 );
             }
         }
@@ -267,7 +267,7 @@ public class DictDetailServiceImpl extends CrudServiceImpl<DictDetailMapper, Sys
 
                 // 广播缓存数据 - 通知其他服务器同步数据
                 redisPlugin.sendMessage(
-                        DictMsgFactory.createMsg(dictWrapperModels, CacheType.DELETE)
+                        DictMsgFactory.createMsg(dictWrapperModels, CacheHandleType.DELETE)
                 );
             }
 
@@ -321,7 +321,7 @@ public class DictDetailServiceImpl extends CrudServiceImpl<DictDetailMapper, Sys
 
                 // 广播缓存数据 - 通知其他服务器同步数据
                 redisPlugin.sendMessage(
-                        DictMsgFactory.createMsg(dictWrapperModels, CacheType.DELETE)
+                        DictMsgFactory.createMsg(dictWrapperModels, CacheHandleType.DELETE)
                 );
             }
         }
@@ -364,7 +364,7 @@ public class DictDetailServiceImpl extends CrudServiceImpl<DictDetailMapper, Sys
                 ));
                 // 广播缓存数据 - 通知其他服务器同步数据
                 redisPlugin.sendMessage(
-                        DictMsgFactory.createMsg(dictWrapperList, CacheType.DELETE)
+                        DictMsgFactory.createMsg(dictWrapperList, CacheHandleType.DELETE)
                 );
             }
         }

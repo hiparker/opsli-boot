@@ -88,12 +88,12 @@ public class UserHandler implements RedisPushSubHandler{
             return;
         }
 
+        String cacheKeyById = CacheUtil.handleKey(UserUtil.PREFIX_ID + userId);
+        String cacheKeyByName = CacheUtil.handleKey(UserUtil.PREFIX_USERNAME + username);
+
         // 先删除
-        ehCachePlugin.delete(CacheConstants.HOT_DATA, UserUtil.PREFIX_ID + userId);
-        ehCachePlugin.delete(CacheConstants.HOT_DATA, UserUtil.PREFIX_USERNAME + username);
-        // 清除空拦截
-        CacheUtil.delNilFlag(UserUtil.PREFIX_ID + userId);
-        CacheUtil.delNilFlag(UserUtil.PREFIX_USERNAME + username);
+        ehCachePlugin.delete(CacheConstants.EHCACHE_SPACE, cacheKeyById);
+        ehCachePlugin.delete(CacheConstants.EHCACHE_SPACE, cacheKeyByName);
     }
 
     /**
@@ -113,10 +113,10 @@ public class UserHandler implements RedisPushSubHandler{
             return;
         }
 
+        String cacheKey = CacheUtil.handleKey(UserUtil.PREFIX_ID_ROLES + userId);
+
         // 先删除
-        ehCachePlugin.delete(CacheConstants.HOT_DATA, UserUtil.PREFIX_ID_ROLES + userId);
-        // 清除空拦截
-        CacheUtil.delNilFlag(UserUtil.PREFIX_ID_ROLES + userId);
+        ehCachePlugin.delete(CacheConstants.EHCACHE_SPACE, cacheKey);
     }
 
     /**
@@ -136,10 +136,10 @@ public class UserHandler implements RedisPushSubHandler{
             return;
         }
 
+        String cacheKey = CacheUtil.handleKey(UserUtil.PREFIX_ID_PERMISSIONS + userId);
+
         // 先删除
-        ehCachePlugin.delete(CacheConstants.HOT_DATA, UserUtil.PREFIX_ID_PERMISSIONS + userId);
-        // 清除空拦截
-        CacheUtil.delNilFlag(UserUtil.PREFIX_ID_PERMISSIONS + userId);
+        ehCachePlugin.delete(CacheConstants.EHCACHE_SPACE, cacheKey);
     }
 
     /**
@@ -159,10 +159,10 @@ public class UserHandler implements RedisPushSubHandler{
             return;
         }
 
+        String cacheKey = CacheUtil.handleKey(UserUtil.PREFIX_ID_MENUS + userId);
+
         // 先删除
-        ehCachePlugin.delete(CacheConstants.HOT_DATA, UserUtil.PREFIX_ID_MENUS + userId);
-        // 清除空拦截
-        CacheUtil.delNilFlag(UserUtil.PREFIX_ID_MENUS + userId);
+        ehCachePlugin.delete(CacheConstants.EHCACHE_SPACE, cacheKey);
     }
 
 

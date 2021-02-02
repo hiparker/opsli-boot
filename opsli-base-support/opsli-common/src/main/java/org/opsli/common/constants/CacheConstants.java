@@ -26,12 +26,10 @@ public interface CacheConstants {
 
     String PREFIX_NAME = "opsli";
 
-    /** 热点数据 */
-    String HOT_DATA = "hotData";
+    /** Ehcache 缓存存放空间 */
+    String EHCACHE_SPACE = "timed";
 
-    /** 永久常量 */
-    String EDEN_DATA = "edenData";
+    /** 热数据前缀 */
+    String HOT_DATA_PREFIX = "hot_data";
 
-    /** 永久Hash常量 */
-    String EDEN_HASH_DATA = "edenHashData";
 }

@@ -16,6 +16,7 @@
 package org.opsli.core.filters.aspect;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.convert.Convert;
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -27,12 +28,9 @@ import org.opsli.api.base.warpper.ApiWrapper;
 import org.opsli.common.annotation.hotdata.EnableHotData;
 import org.opsli.common.annotation.hotdata.HotDataDel;
 import org.opsli.common.annotation.hotdata.HotDataPut;
-import org.opsli.common.constants.CacheConstants;
-import org.opsli.common.utils.Props;
 import org.opsli.core.cache.local.CacheUtil;
 import org.opsli.core.cache.pushsub.entity.CacheDataEntity;
-import org.opsli.core.cache.pushsub.enums.CacheType;
-import org.opsli.core.cache.pushsub.enums.PushSubType;
+import org.opsli.core.cache.pushsub.enums.CacheHandleType;
 import org.opsli.core.cache.pushsub.msgs.CacheDataMsgFactory;
 import org.opsli.plugins.redis.RedisPlugin;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,15 +55,6 @@ import static org.opsli.common.constants.OrderConstants.HOT_DATA_ORDER;
 @Aspect
 @Component
 public class CacheDataAop {
-
-    /** 热点数据前缀 */
-    public static final String PREFIX_NAME;
-    static{
-        // 缓存前缀
-        Props props = new Props("application.yaml");
-        PREFIX_NAME = props.getStr("spring.cache-conf.prefix",CacheConstants.PREFIX_NAME) + ":";
-    }
-
 
     @Autowired
     private RedisPlugin redisPlugin;
@@ -94,7 +83,9 @@ public class CacheDataAop {
             return returnValue;
         }
 
-        List<CacheDataEntity> cacheDataEntityList = this.putHandlerData(point, returnValue);
+        String simpleName = point.getTarget().getClass().getSimpleName();
+
+        List<CacheDataEntity> cacheDataEntityList = this.putHandlerData(point, returnValue, simpleName);
         // 非法判断
         if(CollUtil.isEmpty(cacheDataEntityList)){
             return returnValue;
@@ -103,18 +94,12 @@ public class CacheDataAop {
         for (CacheDataEntity cacheDataEntity : cacheDataEntityList) {
             // 更新缓存数据
             // 热点数据
-            if(CacheConstants.HOT_DATA.equals(cacheDataEntity.getCacheName())){
-                CacheUtil.putByKeyOriginal(cacheDataEntity.getKey(), returnValue);
-            }
-            // 永久数据
-            else if(CacheConstants.EDEN_DATA.equals(cacheDataEntity.getCacheName())) {
-                CacheUtil.putEdenByKeyOriginal(cacheDataEntity.getKey(), returnValue);
-            }
+            CacheUtil.put(cacheDataEntity.getKey(), returnValue);
 
             // 广播缓存数据 - 通知其他服务器同步数据
             redisPlugin.sendMessage(
-                    CacheDataMsgFactory.createMsg(cacheDataEntity.getType(),
-                            cacheDataEntity.getKey(), returnValue, CacheType.UPDATE)
+                    CacheDataMsgFactory.createMsg(
+                            cacheDataEntity, returnValue, CacheHandleType.UPDATE)
             );
         }
 
@@ -138,6 +123,8 @@ public class CacheDataAop {
             return returnValue;
         }
 
+        String simpleName = point.getTarget().getClass().getSimpleName();
+
         // 删除状态判断
         try {
             Boolean ret = (Boolean) returnValue;
@@ -149,7 +136,7 @@ public class CacheDataAop {
             return returnValue;
         }
 
-        List<CacheDataEntity> cacheDataEntityList = this.delHandlerData(point, args);
+        List<CacheDataEntity> cacheDataEntityList = this.delHandlerData(point, args, simpleName);
         // 非法判断
         if(CollUtil.isEmpty(cacheDataEntityList)){
             return returnValue;
@@ -161,8 +148,8 @@ public class CacheDataAop {
 
             // 广播缓存数据 - 通知其他服务器同步数据
             redisPlugin.sendMessage(
-                    CacheDataMsgFactory.createMsg(cacheDataEntity.getType(),
-                            cacheDataEntity.getKey(), returnValue, CacheType.DELETE)
+                    CacheDataMsgFactory.createMsg(
+                            cacheDataEntity, returnValue, CacheHandleType.DELETE)
             );
         }
 
@@ -177,7 +164,7 @@ public class CacheDataAop {
      * PUT 处理数据
      * @param point
      */
-    private List<CacheDataEntity> putHandlerData(ProceedingJoinPoint point, Object returnValue){
+    private List<CacheDataEntity> putHandlerData(ProceedingJoinPoint point, Object returnValue, String simpleName){
         // 这里 只对 继承了 ApiWrapper 的类做处理
         if(!(returnValue instanceof ApiWrapper)){
             return null;
@@ -195,24 +182,15 @@ public class CacheDataAop {
             }
 
             // 获取注解参数
-            HotDataPut aCache= objMethod.getAnnotation(HotDataPut.class);
+            HotDataPut aCache = objMethod.getAnnotation(HotDataPut.class);
             if(aCache != null){
-                // 获得缓存类型
-                PushSubType type = this.judgeCacheType(aCache.name());
-                if(type == null) {
-                    // 如果都不是 则直接退出 不走缓存
-                    return null;
-                }
-                // key 前缀
-                StringBuilder keyBuf = this.judgeCacheKeyBuf(aCache.name());
-
                 // 这里 只对 继承了 BaseEntity 的类做处理
                 ApiWrapper apiWrapper = (ApiWrapper) returnValue;
 
-                // key 存储ID
-                String key = keyBuf.append(apiWrapper.getId()).toString();
+                // 热数据 前缀增加 方法类名称 减小ID 冲撞
+                String cacheKey = CacheUtil.handleKey(simpleName +":"+ apiWrapper.getId());
 
-                CacheDataEntity ret = new CacheDataEntity(key, type ,aCache.name());
+                CacheDataEntity ret = new CacheDataEntity(apiWrapper.getId() , cacheKey);
                 // 存放数据
                 this.putCacheData(cacheDataEntities, ret);
 
@@ -229,7 +207,7 @@ public class CacheDataAop {
      * DEL 处理数据
      * @param point
      */
-    private List<CacheDataEntity> delHandlerData(ProceedingJoinPoint point, Object[] args){
+    private List<CacheDataEntity> delHandlerData(ProceedingJoinPoint point, Object[] args, String simpleName){
         if(args == null || args.length == 0){
             return null;
         }
@@ -248,54 +226,41 @@ public class CacheDataAop {
             // 获取注解参数
             HotDataDel aCache= objMethod.getAnnotation(HotDataDel.class);
             if(aCache != null){
-                // 获得缓存类型
-                PushSubType type = this.judgeCacheType(aCache.name());
-                if(type == null) {
-                    // 如果都不是 则直接退出 不走缓存
-                    return null;
-                }
-                // key 前缀
-                StringBuilder keyBuf = this.judgeCacheKeyBuf(aCache.name());
+
+                List<String> keyList = null;
 
                 // 处理数据
                 for (Object arg : args) {
-                    if (arg instanceof String) {
+                    if (arg instanceof ApiWrapper) {
                         // key 存储ID
-                        String key = keyBuf.toString() + arg;
-                        CacheDataEntity ret = new CacheDataEntity(key, type ,aCache.name());
-                        // 存放数据
-                        this.putCacheData(cacheDataEntities, ret);
-                    } else if (arg instanceof String[]) {
-                        String[] ids = (String[]) arg;
-                        for (String id : ids) {
-                            // key 存储ID
-                            String key = keyBuf.toString() + id;
-                            CacheDataEntity ret = new CacheDataEntity(key, type ,aCache.name());
-                            // 存放数据
-                            this.putCacheData(cacheDataEntities, ret);
-                        }
-                    } else if (arg instanceof ApiWrapper) {
-                        // key 存储ID
-                        ApiWrapper apiWrapper = (ApiWrapper) arg;
-                        String key = keyBuf.toString() + apiWrapper.getId();
-                        CacheDataEntity ret = new CacheDataEntity(key, type ,aCache.name());
-                        // 存放数据
-                        this.putCacheData(cacheDataEntities, ret);
+                        ApiWrapper apiWrapper = Convert.convert(ApiWrapper.class, arg);
+                        keyList = Convert.toList(String.class, apiWrapper.getId());
                     } else if (arg instanceof Collection) {
                         try {
-                            Collection<ApiWrapper> baseEntityList = (Collection<ApiWrapper>) arg;
+                            keyList = Lists.newArrayList();
+                            List<ApiWrapper> baseEntityList = Convert.toList(ApiWrapper.class, arg);
                             for (ApiWrapper baseEntity : baseEntityList) {
-                                // key 存储ID
-                                String key = keyBuf.toString() + baseEntity.getId();
-                                CacheDataEntity ret = new CacheDataEntity(key, type ,aCache.name());
-                                // 存放数据
-                                this.putCacheData(cacheDataEntities, ret);
+                                keyList.add(baseEntity.getId());
                             }
                         }catch (Exception e){
                             log.error(e.getMessage(),e);
                         }
+                    }else {
+                        keyList = Convert.toList(String.class, arg);
                     }
                 }
+
+
+                if(keyList != null && CollUtil.isNotEmpty(keyList)){
+                    for (String key : keyList) {
+                        // 热数据 前缀增加 方法类名称 减小ID 冲撞
+                        String cacheKey = CacheUtil.handleKey(simpleName +":"+ key);
+                        CacheDataEntity ret = new CacheDataEntity(key , cacheKey);
+                        // 存放数据
+                        this.putCacheData(cacheDataEntities, ret);
+                    }
+                }
+
                 return cacheDataEntities;
             }
         }catch (Exception e){
@@ -336,41 +301,5 @@ public class CacheDataAop {
         cacheDataList.add(cacheData);
     }
 
-    /**
-     * 判断缓存Key
-     * @param cacheName
-     * @return
-     */
-    private StringBuilder judgeCacheKeyBuf(String cacheName){
-        // key 前缀
-        StringBuilder keyBuf = new StringBuilder(PREFIX_NAME);
-        // 热点数据
-        if(CacheConstants.HOT_DATA.equals(cacheName)){
-            keyBuf.append(CacheConstants.HOT_DATA).append(":");
-        }
-        // 系统数据
-        else if(CacheConstants.EDEN_DATA.equals(cacheName)){
-            keyBuf.append(CacheConstants.EDEN_DATA).append(":");
-        }
-        return keyBuf;
-    }
-
-    /**
-     * 判断缓存类型
-     * @param cacheName
-     * @return
-     */
-    private PushSubType judgeCacheType(String cacheName){
-        PushSubType type = null;
-        // 热点数据
-        if(CacheConstants.HOT_DATA.equals(cacheName)){
-            type = PushSubType.HOT_DATA;
-        }
-        // 系统数据
-        else if(CacheConstants.EDEN_DATA.equals(cacheName)){
-            type = PushSubType.EDEN_DATA;
-        }
-        return type;
-    }
 
 }

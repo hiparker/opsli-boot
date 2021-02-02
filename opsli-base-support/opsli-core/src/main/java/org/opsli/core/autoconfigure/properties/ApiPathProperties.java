@@ -25,10 +25,12 @@ import org.springframework.stereotype.Component;
  * @author parker
  */
 @Component
-@ConfigurationProperties(prefix = "server.servlet.api.path")
+@ConfigurationProperties(prefix = ApiPathProperties.PROP_PREFIX)
 @Data
 @EqualsAndHashCode(callSuper = false)
 public class ApiPathProperties {
+
+    public static final String PROP_PREFIX = "server.servlet.api.path";
 
     /** 专门针对 Controller层接口路径前缀全局配置 */
     private String globalPrefix;

@@ -67,7 +67,7 @@ public class MenuUtil {
      */
     public static MenuModel getMenuByCode(String menuCode){
         // 先从缓存里拿
-        MenuModel menuModel = CacheUtil.get(PREFIX_CODE + menuCode, MenuModel.class);
+        MenuModel menuModel = CacheUtil.getTimed(MenuModel.class, PREFIX_CODE + menuCode);
         if (menuModel != null){
             return menuModel;
         }
@@ -94,7 +94,7 @@ public class MenuUtil {
             }
 
             // 如果获得锁 则 再次检查缓存里有没有， 如果有则直接退出， 没有的话才发起数据库请求
-            menuModel = CacheUtil.get(PREFIX_CODE + menuCode, MenuModel.class);
+            menuModel = CacheUtil.getTimed(MenuModel.class, PREFIX_CODE + menuCode);
             if (menuModel != null){
                 return menuModel;
             }
@@ -138,7 +138,7 @@ public class MenuUtil {
         // 计数器
         int count = 0;
 
-        MenuModel menuModel = CacheUtil.get(PREFIX_CODE + menu.getMenuCode(), MenuModel.class);
+        MenuModel menuModel = CacheUtil.getTimed(MenuModel.class, PREFIX_CODE + menu.getMenuCode());
         boolean hasNilFlag = CacheUtil.hasNilFlag(PREFIX_CODE + menu.getMenuCode());
 
         // 只要不为空 则执行刷新

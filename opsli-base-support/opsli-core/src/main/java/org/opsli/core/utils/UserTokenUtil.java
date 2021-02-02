@@ -33,6 +33,7 @@ import org.opsli.common.constants.TokenTypeConstants;
 import org.opsli.common.exception.TokenException;
 import org.opsli.common.utils.Props;
 import org.opsli.core.autoconfigure.properties.GlobalProperties;
+import org.opsli.core.cache.local.CacheUtil;
 import org.opsli.core.msg.TokenMsg;
 import org.opsli.plugins.redis.RedisPlugin;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -76,18 +77,12 @@ public class UserTokenUtil {
     /** Redis插件 */
     private static RedisPlugin redisPlugin;
 
-    /** 热点数据前缀 */
-    public static final String PREFIX_NAME;
 
     static{
         // 缓存前缀
-        Props props = new Props("application.yaml");
-        PREFIX_NAME = props.getStr("spring.cache-conf.prefix", CacheConstants.PREFIX_NAME) + ":";
-        TICKET_PREFIX = PREFIX_NAME + "ticket:";
-        ACCOUNT_SLIP_COUNT_PREFIX = PREFIX_NAME + "account:slip:count:";
-        ACCOUNT_SLIP_LOCK_PREFIX = PREFIX_NAME + "account:slip:lock:";
-
-
+        TICKET_PREFIX = CacheUtil.PREFIX_NAME + "ticket:";
+        ACCOUNT_SLIP_COUNT_PREFIX = CacheUtil.PREFIX_NAME + "account:slip:count:";
+        ACCOUNT_SLIP_LOCK_PREFIX = CacheUtil.PREFIX_NAME + "account:slip:lock:";
     }
 
 

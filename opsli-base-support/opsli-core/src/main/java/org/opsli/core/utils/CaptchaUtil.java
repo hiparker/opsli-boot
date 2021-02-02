@@ -20,6 +20,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.opsli.common.constants.CacheConstants;
 import org.opsli.common.exception.TokenException;
 import org.opsli.common.utils.Props;
+import org.opsli.core.cache.local.CacheUtil;
 import org.opsli.core.msg.TokenMsg;
 import org.opsli.plugins.redis.RedisPlugin;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,18 +51,11 @@ public class CaptchaUtil{
     private static RedisPlugin redisPlugin;
     /** 谷歌验证码 */
     private static  Producer producer;
-    /** 热点数据前缀 */
-    public static final String PREFIX_NAME;
-    static{
-        // 缓存前缀
-        Props props = new Props("application.yaml");
-        PREFIX_NAME = props.getStr("spring.cache-conf.prefix", CacheConstants.PREFIX_NAME) + ":";
-    }
 
     /**
      * 获得验证码
-     * @param uuid
-     * @return
+     * @param uuid UUID
+     * @return BufferedImage
      */
     public static BufferedImage getCaptcha(String uuid) {
         if(StringUtils.isBlank(uuid)){
@@ -71,7 +65,7 @@ public class CaptchaUtil{
         //生成文字验证码
         String code = producer.createText();
 
-        boolean ret = redisPlugin.put(PREFIX_NAME + PREFIX + uuid, code, TIME_OUT);
+        boolean ret = redisPlugin.put(CacheUtil.PREFIX_NAME + PREFIX + uuid, code, TIME_OUT);
 
         if(ret){
             return producer.createImage(code);
@@ -81,9 +75,8 @@ public class CaptchaUtil{
 
     /**
      * 校验验证码
-     * @param uuid
-     * @param code
-     * @return
+     * @param uuid UUID
+     * @param code CODE
      */
     public static void validate(String uuid, String code) {
         // 判断UUID 是否为空
@@ -97,7 +90,7 @@ public class CaptchaUtil{
         }
 
         // 验证码
-        String codeTemp = (String) redisPlugin.get(PREFIX_NAME + PREFIX + uuid);
+        String codeTemp = (String) redisPlugin.get(CacheUtil.PREFIX_NAME + PREFIX + uuid);
         if(StringUtils.isEmpty(codeTemp)){
             throw new TokenException(TokenMsg.EXCEPTION_CAPTCHA_NULL);
         }
@@ -112,8 +105,8 @@ public class CaptchaUtil{
 
     /**
      * 删除验证码
-     * @param uuid
-     * @return
+     * @param uuid UUID
+     * @return boolean
      */
     public static boolean delCaptcha(String uuid) {
         if(StringUtils.isEmpty(uuid)){
@@ -121,7 +114,7 @@ public class CaptchaUtil{
         }
 
         //删除验证码
-        return redisPlugin.del(PREFIX_NAME + PREFIX + uuid);
+        return redisPlugin.del(CacheUtil.PREFIX_NAME + PREFIX + uuid);
     }
 
 

@@ -56,7 +56,9 @@ public enum DataBaseType {
         return this.desc;
     }
 
-    private DataBaseType(final String db, final String desc) {
+    // ================
+
+    DataBaseType(final String db, final String desc) {
         this.db = db;
         this.desc = desc;
     }
