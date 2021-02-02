@@ -59,8 +59,6 @@ public enum MsgArgsType {
 
     /** 缓存数据Key */
     CACHE_DATA_KEY,
-    /** 缓存数据Key */
-    CACHE_DATA_NAME,
     /** 缓存数据Value */
     CACHE_DATA_VALUE,
     /** 缓存数据Type */

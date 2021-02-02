@@ -65,7 +65,7 @@ public class CaptchaUtil{
         //生成文字验证码
         String code = producer.createText();
 
-        boolean ret = redisPlugin.put(CacheUtil.PREFIX_NAME + PREFIX + uuid, code, TIME_OUT);
+        boolean ret = redisPlugin.put(CacheUtil.getPrefixName() + PREFIX + uuid, code, TIME_OUT);
 
         if(ret){
             return producer.createImage(code);
@@ -90,7 +90,7 @@ public class CaptchaUtil{
         }
 
         // 验证码
-        String codeTemp = (String) redisPlugin.get(CacheUtil.PREFIX_NAME + PREFIX + uuid);
+        String codeTemp = (String) redisPlugin.get(CacheUtil.getPrefixName() + PREFIX + uuid);
         if(StringUtils.isEmpty(codeTemp)){
             throw new TokenException(TokenMsg.EXCEPTION_CAPTCHA_NULL);
         }
@@ -114,7 +114,7 @@ public class CaptchaUtil{
         }
 
         //删除验证码
-        return redisPlugin.del(CacheUtil.PREFIX_NAME + PREFIX + uuid);
+        return redisPlugin.del(CacheUtil.getPrefixName() + PREFIX + uuid);
     }
 
 

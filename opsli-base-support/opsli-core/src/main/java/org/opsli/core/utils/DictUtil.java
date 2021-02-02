@@ -25,7 +25,6 @@ import org.opsli.api.base.result.ResultVo;
 import org.opsli.api.web.system.dict.DictDetailApi;
 import org.opsli.api.wrapper.system.dict.DictDetailModel;
 import org.opsli.api.wrapper.system.dict.DictWrapper;
-import org.opsli.common.constants.CacheConstants;
 import org.opsli.common.constants.DictConstants;
 import org.opsli.common.enums.CacheType;
 import org.opsli.core.cache.local.CacheUtil;

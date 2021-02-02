@@ -50,12 +50,11 @@ public final class CacheDataMsgFactory extends BaseSubMessage{
         // 数据
         JSONObject jsonObj = new JSONObject();
         jsonObj.put(MsgArgsType.CACHE_DATA_KEY.toString(),cacheDataEntity.getKey());
-        jsonObj.put(MsgArgsType.CACHE_DATA_NAME.toString(),cacheDataEntity.getCacheName());
         jsonObj.put(MsgArgsType.CACHE_DATA_VALUE.toString(),value);
         jsonObj.put(MsgArgsType.CACHE_DATA_TYPE.toString(), cacheHandleType.toString());
 
         // 热点数据 - 系统数据
-        baseSubMessage.build(CHANNEL,PushSubType.HOT_DATA.toString(),jsonObj);
+        baseSubMessage.build(CHANNEL, PushSubType.HOT_DATA.toString(), jsonObj);
         return baseSubMessage;
     }
 

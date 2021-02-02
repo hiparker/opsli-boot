@@ -17,7 +17,9 @@ package org.opsli.core.cache.pushsub.handler;
 
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.opsli.common.constants.CacheConstants;
+import org.opsli.core.cache.local.CacheUtil;
 import org.opsli.core.cache.pushsub.enums.CacheHandleType;
 import org.opsli.core.cache.pushsub.enums.MsgArgsType;
 import org.opsli.core.cache.pushsub.enums.PushSubType;
@@ -45,9 +47,15 @@ public class HotDataHandler implements RedisPushSubHandler{
     @Override
     public void handler(JSONObject msgJson) {
         String key = (String) msgJson.get(MsgArgsType.CACHE_DATA_KEY.toString());
-        String cacheName = (String) msgJson.get(MsgArgsType.CACHE_DATA_NAME.toString());
         Object value = msgJson.get(MsgArgsType.CACHE_DATA_VALUE.toString());
         CacheHandleType type = CacheHandleType.valueOf((String )msgJson.get(MsgArgsType.CACHE_DATA_TYPE.toString()));
+
+        if(StringUtils.isEmpty(key)){
+            return;
+        }
+
+        // 拼装缓存key
+        String cacheName = CacheUtil.handleKey(CacheConstants.HOT_DATA_PREFIX +":"+ key);
 
         if(CacheHandleType.UPDATE == type){
             ehCachePlugin.put(CacheConstants.EHCACHE_SPACE, cacheName, value);

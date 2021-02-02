@@ -36,12 +36,9 @@ public class CacheDataEntity {
     /** key */
     private String key;
 
-    /** 缓存名称 */
-    private String cacheName;
-
 
     public static void main(String[] args) {
-        CacheDataEntity ret = new CacheDataEntity("123", "12aaaa");
+        CacheDataEntity ret = new CacheDataEntity("123");
         System.out.println(ToStringBuilder.reflectionToString(ret));
     }
 }

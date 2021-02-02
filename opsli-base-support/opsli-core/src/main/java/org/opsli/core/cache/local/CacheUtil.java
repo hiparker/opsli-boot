@@ -74,7 +74,7 @@ public class CacheUtil {
     private static final String NIL_FLAG_PREFIX = "nil";
 
     /** 热点数据前缀 */
-    public static String PREFIX_NAME;
+    private static String PREFIX_NAME;
 
     static {
         try {
@@ -83,6 +83,13 @@ public class CacheUtil {
         }catch (Exception ignored){}
     }
 
+    /***
+     * 获得缓存前缀
+     * @return
+     */
+    public static String getPrefixName() {
+        return PREFIX_NAME;
+    }
 
     // ========================= GET =========================
 
@@ -408,19 +415,30 @@ public class CacheUtil {
     public static boolean del(final String key) {
         try {
             // 计数器
-            int count = 4;
+            int count = 0;
+
+            Object timed = CacheUtil.getTimed(key);
+            Object eden = CacheUtil.getEden(key);
 
             // 删除key 集合
-            List<String> cacheKeys = Lists.newArrayListWithCapacity(2);
-            // 处理 key - 时控数据
-            cacheKeys.add(
-                    CacheUtil.handleKey(CacheType.TIMED, key));
-            // 处理 key - 永久数据
-            cacheKeys.add(
-                    CacheUtil.handleKey(CacheType.TIMED, key));
+            List<String> cacheKeys = Lists.newArrayList();
+            if(timed != null){
+                count+=2;
+                // 处理 key - 时控数据
+                cacheKeys.add(
+                        CacheUtil.handleKey(CacheType.TIMED, key)
+                );
+            }
+            if(eden != null){
+                count+=2;
+                // 处理 key - 永久数据
+                cacheKeys.add(
+                        CacheUtil.handleKey(CacheType.EDEN, key));
+            }
 
             // 循环删除缓存数据
             for (String cacheKey : cacheKeys) {
+
                 // 删除 EhCache
                 boolean ehcacheRet = ehCachePlugin.delete(CacheConstants.EHCACHE_SPACE, cacheKey);
                 if(ehcacheRet){
@@ -571,8 +589,6 @@ public class CacheUtil {
     }
 
     /**
-     * TODO 待优化 XML
-     *
      * 读配置文件
      */
     private static void readPropertyXML() throws IOException {

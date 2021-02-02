@@ -71,7 +71,7 @@ public class SearchHisUtil {
         // 获得当前用户
         UserModel user = UserUtil.getUser();
 
-        String cacheKey = CacheUtil.PREFIX_NAME + CACHE_PREFIX + user.getUsername()  + ":" + key;
+        String cacheKey = CacheUtil.getPrefixName() + CACHE_PREFIX + user.getUsername()  + ":" + key;
 
         return redisPlugin.zReverseRange(cacheKey, 0, count - 1);
     }
@@ -97,7 +97,7 @@ public class SearchHisUtil {
             }
 
 
-            String cacheKey = CacheUtil.PREFIX_NAME + CACHE_PREFIX + user.getUsername()  + ":" + key;
+            String cacheKey = CacheUtil.getPrefixName() + CACHE_PREFIX + user.getUsername()  + ":" + key;
             String val = values[0];
 
             // 记录

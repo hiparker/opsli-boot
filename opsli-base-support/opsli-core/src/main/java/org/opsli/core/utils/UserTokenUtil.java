@@ -26,12 +26,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.crypto.hash.Md5Hash;
 import org.opsli.api.base.result.ResultVo;
 import org.opsli.api.wrapper.system.user.UserModel;
-import org.opsli.common.constants.CacheConstants;
 import org.opsli.common.constants.SignConstants;
 import org.opsli.common.constants.TokenConstants;
 import org.opsli.common.constants.TokenTypeConstants;
 import org.opsli.common.exception.TokenException;
-import org.opsli.common.utils.Props;
 import org.opsli.core.autoconfigure.properties.GlobalProperties;
 import org.opsli.core.cache.local.CacheUtil;
 import org.opsli.core.msg.TokenMsg;
@@ -80,9 +78,9 @@ public class UserTokenUtil {
 
     static{
         // 缓存前缀
-        TICKET_PREFIX = CacheUtil.PREFIX_NAME + "ticket:";
-        ACCOUNT_SLIP_COUNT_PREFIX = CacheUtil.PREFIX_NAME + "account:slip:count:";
-        ACCOUNT_SLIP_LOCK_PREFIX = CacheUtil.PREFIX_NAME + "account:slip:lock:";
+        TICKET_PREFIX = CacheUtil.getPrefixName() + "ticket:";
+        ACCOUNT_SLIP_COUNT_PREFIX = CacheUtil.getPrefixName() + "account:slip:count:";
+        ACCOUNT_SLIP_LOCK_PREFIX = CacheUtil.getPrefixName() + "account:slip:lock:";
     }
 
 

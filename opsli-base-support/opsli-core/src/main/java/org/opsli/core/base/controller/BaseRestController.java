@@ -32,6 +32,7 @@ import org.opsli.api.base.warpper.ApiWrapper;
 import org.opsli.api.wrapper.system.user.UserModel;
 import org.opsli.common.annotation.RequiresPermissionsCus;
 import org.opsli.common.annotation.hotdata.EnableHotData;
+import org.opsli.common.constants.CacheConstants;
 import org.opsli.common.exception.ServiceException;
 import org.opsli.common.exception.TokenException;
 import org.opsli.common.msg.CommonMsg;
@@ -119,7 +120,8 @@ public abstract class BaseRestController <T extends BaseEntity, E extends ApiWra
             // 如果开启缓存 先从缓存读
             if(hotDataFlag){
                 model = WrapperUtil.transformInstance(
-                        CacheUtil.getTimed(entityClazz, id), modelClazz);
+                        CacheUtil.getTimed(entityClazz, CacheConstants.HOT_DATA_PREFIX +":"+ id)
+                        , modelClazz);
                 if(model != null){
                     return model;
                 }
@@ -147,13 +149,14 @@ public abstract class BaseRestController <T extends BaseEntity, E extends ApiWra
 
                         // 如果获得锁 则 再次检查缓存里有没有， 如果有则直接退出， 没有的话才发起数据库请求
                         model = WrapperUtil.transformInstance(
-                                CacheUtil.getTimed(entityClazz, id),modelClazz);
+                                CacheUtil.getTimed(entityClazz, CacheConstants.HOT_DATA_PREFIX +":"+ id)
+                                , modelClazz);
                         if(model != null){
                             return model;
                         }
 
                         // 如果缓存没读到 则去数据库读
-                        model = WrapperUtil.transformInstance(IService.get(id),modelClazz);
+                        model = WrapperUtil.transformInstance(IService.get(id), modelClazz);
                     }catch (Exception e){
                         log.error(e.getMessage(), e);
                     }finally {

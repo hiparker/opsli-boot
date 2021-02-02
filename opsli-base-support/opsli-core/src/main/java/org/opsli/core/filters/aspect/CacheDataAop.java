@@ -28,6 +28,7 @@ import org.opsli.api.base.warpper.ApiWrapper;
 import org.opsli.common.annotation.hotdata.EnableHotData;
 import org.opsli.common.annotation.hotdata.HotDataDel;
 import org.opsli.common.annotation.hotdata.HotDataPut;
+import org.opsli.common.constants.CacheConstants;
 import org.opsli.core.cache.local.CacheUtil;
 import org.opsli.core.cache.pushsub.entity.CacheDataEntity;
 import org.opsli.core.cache.pushsub.enums.CacheHandleType;
@@ -75,7 +76,7 @@ public class CacheDataAop {
      */
     @Around("hotDataPut()")
     public Object hotDataPutProcess(ProceedingJoinPoint point) throws Throwable {
-        Object[] args= point.getArgs();
+        Object[] args = point.getArgs();
         Object returnValue = point.proceed(args);
         // 判断 方法上是否使用 EnableHotData注解 如果没有表示开启热数据 则直接跳过
         Annotation annotation = point.getTarget().getClass().getAnnotation(EnableHotData.class);
@@ -83,9 +84,7 @@ public class CacheDataAop {
             return returnValue;
         }
 
-        String simpleName = point.getTarget().getClass().getSimpleName();
-
-        List<CacheDataEntity> cacheDataEntityList = this.putHandlerData(point, returnValue, simpleName);
+        List<CacheDataEntity> cacheDataEntityList = this.putHandlerData(point, returnValue);
         // 非法判断
         if(CollUtil.isEmpty(cacheDataEntityList)){
             return returnValue;
@@ -94,13 +93,15 @@ public class CacheDataAop {
         for (CacheDataEntity cacheDataEntity : cacheDataEntityList) {
             // 更新缓存数据
             // 热点数据
-            CacheUtil.put(cacheDataEntity.getKey(), returnValue);
-
-            // 广播缓存数据 - 通知其他服务器同步数据
-            redisPlugin.sendMessage(
-                    CacheDataMsgFactory.createMsg(
-                            cacheDataEntity, returnValue, CacheHandleType.UPDATE)
-            );
+            boolean putRet = CacheUtil.put(CacheConstants.HOT_DATA_PREFIX +":"+ cacheDataEntity.getKey(),
+                    returnValue);
+            if(putRet){
+                // 广播缓存数据 - 通知其他服务器同步数据
+                redisPlugin.sendMessage(
+                        CacheDataMsgFactory.createMsg(
+                                cacheDataEntity, returnValue, CacheHandleType.UPDATE)
+                );
+            }
         }
 
         return returnValue;
@@ -123,8 +124,6 @@ public class CacheDataAop {
             return returnValue;
         }
 
-        String simpleName = point.getTarget().getClass().getSimpleName();
-
         // 删除状态判断
         try {
             Boolean ret = (Boolean) returnValue;
@@ -136,7 +135,7 @@ public class CacheDataAop {
             return returnValue;
         }
 
-        List<CacheDataEntity> cacheDataEntityList = this.delHandlerData(point, args, simpleName);
+        List<CacheDataEntity> cacheDataEntityList = this.delHandlerData(point, args);
         // 非法判断
         if(CollUtil.isEmpty(cacheDataEntityList)){
             return returnValue;
@@ -144,13 +143,14 @@ public class CacheDataAop {
 
         for (CacheDataEntity cacheDataEntity : cacheDataEntityList) {
             // 更新缓存数据 - 删除缓存
-            CacheUtil.del(cacheDataEntity.getKey());
-
-            // 广播缓存数据 - 通知其他服务器同步数据
-            redisPlugin.sendMessage(
-                    CacheDataMsgFactory.createMsg(
-                            cacheDataEntity, returnValue, CacheHandleType.DELETE)
-            );
+            boolean delRet = CacheUtil.del(CacheConstants.HOT_DATA_PREFIX +":"+ cacheDataEntity.getKey());
+            if(delRet){
+                // 广播缓存数据 - 通知其他服务器同步数据
+                redisPlugin.sendMessage(
+                        CacheDataMsgFactory.createMsg(
+                                cacheDataEntity, null, CacheHandleType.DELETE)
+                );
+            }
         }
 
         return returnValue;
@@ -164,7 +164,7 @@ public class CacheDataAop {
      * PUT 处理数据
      * @param point
      */
-    private List<CacheDataEntity> putHandlerData(ProceedingJoinPoint point, Object returnValue, String simpleName){
+    private List<CacheDataEntity> putHandlerData(ProceedingJoinPoint point, Object returnValue){
         // 这里 只对 继承了 ApiWrapper 的类做处理
         if(!(returnValue instanceof ApiWrapper)){
             return null;
@@ -187,10 +187,7 @@ public class CacheDataAop {
                 // 这里 只对 继承了 BaseEntity 的类做处理
                 ApiWrapper apiWrapper = (ApiWrapper) returnValue;
 
-                // 热数据 前缀增加 方法类名称 减小ID 冲撞
-                String cacheKey = CacheUtil.handleKey(simpleName +":"+ apiWrapper.getId());
-
-                CacheDataEntity ret = new CacheDataEntity(apiWrapper.getId() , cacheKey);
+                CacheDataEntity ret = new CacheDataEntity(apiWrapper.getId());
                 // 存放数据
                 this.putCacheData(cacheDataEntities, ret);
 
@@ -207,7 +204,7 @@ public class CacheDataAop {
      * DEL 处理数据
      * @param point
      */
-    private List<CacheDataEntity> delHandlerData(ProceedingJoinPoint point, Object[] args, String simpleName){
+    private List<CacheDataEntity> delHandlerData(ProceedingJoinPoint point, Object[] args){
         if(args == null || args.length == 0){
             return null;
         }
@@ -250,12 +247,9 @@ public class CacheDataAop {
                     }
                 }
 
-
                 if(keyList != null && CollUtil.isNotEmpty(keyList)){
                     for (String key : keyList) {
-                        // 热数据 前缀增加 方法类名称 减小ID 冲撞
-                        String cacheKey = CacheUtil.handleKey(simpleName +":"+ key);
-                        CacheDataEntity ret = new CacheDataEntity(key , cacheKey);
+                        CacheDataEntity ret = new CacheDataEntity(key);
                         // 存放数据
                         this.putCacheData(cacheDataEntities, ret);
                     }
@@ -295,7 +289,7 @@ public class CacheDataAop {
      */
     private void putCacheData(List<CacheDataEntity> cacheDataList, CacheDataEntity cacheData){
         // 非法判断
-        if(CollUtil.isEmpty(cacheDataList)){
+        if(cacheDataList == null){
             return;
         }
         cacheDataList.add(cacheData);
