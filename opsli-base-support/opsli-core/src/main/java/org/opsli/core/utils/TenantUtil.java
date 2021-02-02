@@ -43,7 +43,6 @@ import static org.opsli.common.constants.OrderConstants.UTIL_ORDER;
 @Slf4j
 @Order(UTIL_ORDER)
 @Component
-@AutoConfigureAfter({RedisPlugin.class , RedisLockPlugins.class, TenantApi.class})
 @Lazy(false)
 public class TenantUtil {
 

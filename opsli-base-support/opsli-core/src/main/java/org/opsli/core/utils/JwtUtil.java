@@ -14,7 +14,6 @@ import org.opsli.common.constants.TokenTypeConstants;
 import org.opsli.common.exception.JwtException;
 import org.opsli.core.msg.JwtMsg;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -32,7 +31,6 @@ import static org.opsli.common.constants.OrderConstants.UTIL_ORDER;
 @Order(UTIL_ORDER)
 @Lazy(false)
 @Component
-@AutoConfigureAfter({GlobalProperties.class})
 public class JwtUtil {
 
 

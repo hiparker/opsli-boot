@@ -59,7 +59,6 @@ import static org.opsli.common.constants.OrderConstants.UTIL_ORDER;
 @Slf4j
 @Order(UTIL_ORDER)
 @Component
-@AutoConfigureAfter({RedisPlugin.class , EhCachePlugin.class})
 public class CacheUtil {
 
     /** 热点数据缓存时间 秒 */

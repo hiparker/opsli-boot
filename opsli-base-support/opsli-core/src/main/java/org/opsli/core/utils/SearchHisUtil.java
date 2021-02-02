@@ -24,7 +24,6 @@ import org.opsli.common.utils.Props;
 import org.opsli.plugins.redis.RedisLockPlugins;
 import org.opsli.plugins.redis.RedisPlugin;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -45,7 +44,6 @@ import static org.opsli.common.constants.OrderConstants.UTIL_ORDER;
 @Order(UTIL_ORDER)
 @Component
 @Lazy(false)
-@AutoConfigureAfter({RedisPlugin.class , RedisLockPlugins.class})
 public class SearchHisUtil {
 
 

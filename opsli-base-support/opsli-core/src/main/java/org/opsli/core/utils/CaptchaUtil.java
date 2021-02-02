@@ -23,7 +23,6 @@ import org.opsli.common.utils.Props;
 import org.opsli.core.msg.TokenMsg;
 import org.opsli.plugins.redis.RedisPlugin;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -40,7 +39,6 @@ import static org.opsli.common.constants.OrderConstants.UTIL_ORDER;
  */
 @Component
 @Order(UTIL_ORDER)
-@AutoConfigureAfter({RedisPlugin.class})
 @Lazy(false)
 public class CaptchaUtil{
 
