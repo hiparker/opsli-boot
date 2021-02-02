@@ -16,17 +16,13 @@
 package org.opsli.core.cache.local;
 
 import cn.hutool.core.convert.Convert;
-import cn.hutool.core.util.EnumUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.XmlUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.RandomUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.opsli.common.constants.CacheConstants;
 import org.opsli.common.enums.CacheType;
-import org.opsli.common.constants.CacheConstants;
 import org.opsli.core.autoconfigure.properties.CacheProperties;
 import org.opsli.plugins.cache.EhCachePlugin;
 import org.opsli.plugins.redis.RedisPlugin;
@@ -40,7 +36,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.opsli.common.constants.OrderConstants.UTIL_ORDER;
