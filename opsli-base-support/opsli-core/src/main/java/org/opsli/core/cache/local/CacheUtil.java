@@ -393,17 +393,6 @@ public class CacheUtil {
             JSONObject cacheJson = new JSONObject();
             cacheJson.put(JSON_KEY, value);
 
-//            // 是否存入本地缓存
-//            if(isSaveLocal) {
-//                // 存入EhCache
-//                count++;
-//                boolean ehcacheRet = ehCachePlugin.put(CacheConstants.EHCACHE_SPACE,
-//                        cacheKey + ":" + field, jsonObject);
-//                if(ehcacheRet){
-//                    count--;
-//                }
-//            }
-
             // 存入Redis
             return redisPlugin.hPut(cacheKey, field, cacheJson);
         }catch (Exception e){
