@@ -211,8 +211,8 @@ public class UserTokenUtil {
             // 2. 校验当前缓存中token是否失效
             // 生成MD5 16进制码 用于缩减存储
             String signTokenHex = new Md5Hash(token).toHex();
-            Long  endTimestamp = (Long) redisPlugin.get(TICKET_PREFIX + signTokenHex);
-            if(endTimestamp == null){
+            boolean hasKey = redisPlugin.hasKey(TICKET_PREFIX + signTokenHex);
+            if(!hasKey){
                 return false;
             }
 
