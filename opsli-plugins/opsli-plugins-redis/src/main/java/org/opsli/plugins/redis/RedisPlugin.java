@@ -925,6 +925,21 @@ public class RedisPlugin {
 	}
 
 	/**
+	 * set添加元素
+	 *
+	 * @param key
+	 * @param values
+	 * @return
+	 */
+	public Long sPutAll(String key, Collection<Object> values) {
+		Object[] objects = {};
+		if(values != null){
+			objects = values.toArray();
+		}
+		return redisTemplate.opsForSet().add(key, objects);
+	}
+
+	/**
 	 * set移除元素
 	 *
 	 * @param key
@@ -942,8 +957,12 @@ public class RedisPlugin {
 	 * @param values
 	 * @return
 	 */
-	public Long sRemove(String key, Collection<Object> values) {
-		return redisTemplate.opsForSet().remove(key, values);
+	public Long sRemoveList(String key, Collection<Object> values) {
+		Object[] objects = {};
+		if(values != null){
+			objects = values.toArray();
+		}
+		return redisTemplate.opsForSet().remove(key, objects);
 	}
 
 

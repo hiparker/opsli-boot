@@ -60,8 +60,8 @@ import static org.opsli.common.constants.OrderConstants.UTIL_ORDER;
 @Component
 public class CacheUtil {
 
-    /** 热点数据缓存时间 秒 */
-    private static int TTL_HOT_DATA_TIME = 60000;
+    /** 热点数据缓存时间 秒 (6小时)*/
+    private static int TTL_HOT_DATA_TIME = 21600;
     /** 空缓存时间 秒 */
     private final static int TTL_NIL_DATA_TIME = 300;
     /** Redis插件 */
@@ -306,7 +306,7 @@ public class CacheUtil {
             }
 
             // 如果本地缓存找不到该缓存 则去远端缓存拉去缓存
-            cacheJson = (JSONObject) redisPlugin.hGet(key, field);
+            cacheJson = (JSONObject) redisPlugin.hGet(cacheKey, field);
             if(cacheJson != null){
                 // 判读是否需要 存入本地EhCache
                 if(isSaveLocal){
@@ -616,7 +616,7 @@ public class CacheUtil {
                                             Node ttlNode = expiryNodes.item(k);
                                             Node ttlValue = ttlNode.getFirstChild();
                                             // 默认 60000秒 6小时
-                                            TTL_HOT_DATA_TIME = Convert.toInt(ttlValue.getNodeValue(), 60000);
+                                            TTL_HOT_DATA_TIME = Convert.toInt(ttlValue.getNodeValue(), 21600);
                                             break;
                                         }
                                     }

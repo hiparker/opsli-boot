@@ -23,8 +23,8 @@
     <cache alias="timed" uses-template="opsliDefaults">
         <!--缓存到期配置-->
         <expiry>
-            <!-- 只允许配秒 -->
-            <ttl unit="seconds">60000</ttl>
+            <!-- 只允许配秒 默认 21600秒（6小时） -->
+            <ttl unit="seconds">21600</ttl>
         </expiry>
     </cache>
 
