@@ -110,7 +110,8 @@ public class UserTokenUtil {
             String signTokenHex = new Md5Hash(signToken).toHex();
 
             // 获得当前时间戳时间
-            long timestamp = Long.parseLong(JwtUtil.getClaim(signToken, SignConstants.TIMESTAMP));
+            long timestamp = Convert.toLong(
+                    JwtUtil.getClaim(signToken, SignConstants.TIMESTAMP));
             DateTime currDate = DateUtil.date(timestamp);
 
             // 获得失效偏移量时间
