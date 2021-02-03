@@ -117,9 +117,8 @@ public class UserTokenUtil {
             DateTime dateTime = DateUtil.offsetMillisecond(currDate, expire);
             long endTimestamp = dateTime.getTime();
 
-            // token 缓存真实失效时间 建议大于 最终时间 -- 多加了20分钟的失效时间
-            // 在redis存一份 token 是为了防止 认为造假
-            boolean tokenFlag = redisPlugin.put(TICKET_PREFIX + signTokenHex, endTimestamp, expire + 20);
+            // 在redis存一份 token 是为了防止 人为造假
+            boolean tokenFlag = redisPlugin.put(TICKET_PREFIX + signTokenHex, endTimestamp, expire);
             if(tokenFlag){
                 map.put("token", signToken);
                 map.put("expire", endTimestamp);
