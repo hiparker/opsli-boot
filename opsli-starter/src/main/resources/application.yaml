@@ -199,7 +199,7 @@ opsli:
     # 登录设置
     login:
       # 限制登录数量 -1 为无限大
-      limit-count: 4
+      limit-count: -1
       # 限制登录拒绝策略 after为后者 before为前者
       limit-refuse: after
       # 失败次数
