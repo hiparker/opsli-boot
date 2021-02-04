@@ -145,6 +145,12 @@ public class UserServiceImpl extends CrudServiceImpl<UserMapper, SysUser, UserMo
 
     @Override
     public boolean delete(String id) {
+        // 杜绝我删我自己行为
+        UserModel currUser = UserUtil.getUser();
+        if(StringUtils.equals(currUser.getId(), id)){
+            return false;
+        }
+
         UserModel userModel = super.get(id);
         boolean ret = super.delete(id);
         if(ret){
@@ -159,20 +165,42 @@ public class UserServiceImpl extends CrudServiceImpl<UserMapper, SysUser, UserMo
         UserModel userModel = null;
         if(model != null){
             userModel = this.get(model.getId());
+
+        }
+        // 非法判断
+        if(userModel == null){
+            return false;
+        }
+
+        // 杜绝我删我自己行为
+        UserModel currUser = UserUtil.getUser();
+        if(StringUtils.equals(currUser.getId(), userModel.getId())){
+            return false;
         }
 
         boolean ret = super.delete(model);
         if(ret){
-            if(userModel != null){
-                // 刷新用户缓存
-                this.clearCache(Collections.singletonList(userModel));
-            }
+            // 刷新用户缓存
+            this.clearCache(Collections.singletonList(userModel));
         }
         return ret;
     }
 
     @Override
     public boolean deleteAll(String[] ids) {
+        // 非法判断
+        if(ids == null){
+            return false;
+        }
+
+        // 杜绝我删我自己行为
+        UserModel currUser = UserUtil.getUser();
+        for (String id : ids) {
+            if(StringUtils.equals(currUser.getId(), id)){
+                return false;
+            }
+        }
+
         QueryBuilder<SysUser> queryBuilder = new GenQueryBuilder<>();
         QueryWrapper<SysUser> queryWrapper = queryBuilder.build();
         List<String> idList = Convert.toList(String.class, ids);
@@ -192,12 +220,19 @@ public class UserServiceImpl extends CrudServiceImpl<UserMapper, SysUser, UserMo
 
     @Override
     public boolean deleteAll(Collection<UserModel> models) {
+        // 非法判断
         if(CollUtil.isEmpty(models)){
             return false;
         }
 
+        // 杜绝我删我自己行为
+        UserModel currUser = UserUtil.getUser();
+
         List<String> idList = Lists.newArrayListWithCapacity(models.size());
         for (UserModel model : models) {
+            if(StringUtils.equals(currUser.getId(), model.getId())){
+                return false;
+            }
             idList.add(model.getId());
         }
 
