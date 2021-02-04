@@ -99,7 +99,7 @@ public class UserTokenUtil {
             // 如果当前登录开启 数量限制
             if(LOGIN_PROPERTIES.getLimitCount() > ACCOUNT_LIMIT_INFINITE){
                 // 当前用户已存在 Token数量
-                Long ticketLen = redisPlugin.sSize(TICKET_PREFIX + ":" + user.getUsername());
+                Long ticketLen = redisPlugin.sSize(TICKET_PREFIX + user.getUsername());
                 if(ticketLen !=null && ticketLen >= LOGIN_PROPERTIES.getLimitCount()){
                     // 如果是拒绝后者 则直接抛出异常
                     if(LoginLimitRefuse.AFTER == LOGIN_PROPERTIES.getLimitRefuse()){
@@ -108,7 +108,7 @@ public class UserTokenUtil {
                     }
                     // 如果是拒绝前者 则弹出前者
                     else {
-                        redisPlugin.sPop(TICKET_PREFIX + ":" + user.getUsername());
+                        redisPlugin.sPop(TICKET_PREFIX + user.getUsername());
                     }
                 }
             }
@@ -132,10 +132,10 @@ public class UserTokenUtil {
 
             // 在redis存一份 token 是为了防止 人为造假
             // 保存用户token
-            Long saveLong = redisPlugin.sPut(TICKET_PREFIX + ":" + user.getUsername(), signToken);
+            Long saveLong = redisPlugin.sPut(TICKET_PREFIX + user.getUsername(), signToken);
             if(saveLong != null && saveLong > 0){
                 // 设置该用户全部token失效时间， 如果这时又有新设备登录 则续命
-                redisPlugin.expire(TICKET_PREFIX + ":" + user.getUsername(), expire);
+                redisPlugin.expire(TICKET_PREFIX + user.getUsername(), expire);
 
                 TokenRet tokenRet = new TokenRet();
                 tokenRet.setToken(signToken);
@@ -144,6 +144,8 @@ public class UserTokenUtil {
                 return ResultVo.success(tokenRet);
             }
 
+        }catch (TokenException te){
+            throw te;
         }catch (Exception e){
             log.error(e.getMessage() , e);
         }
@@ -199,10 +201,10 @@ public class UserTokenUtil {
             UserModel user = UserUtil.getUser(userId);
             if(user != null){
                 // 删除Token信息
-                redisPlugin.sRemove(TICKET_PREFIX + ":" + user.getUsername(), token);
+                redisPlugin.sRemove(TICKET_PREFIX + user.getUsername(), token);
 
                 // 如果缓存中 无该用户任何Token信息 则删除用户缓存
-                Long size = redisPlugin.sSize(TICKET_PREFIX + ":" + user.getUsername());
+                Long size = redisPlugin.sSize(TICKET_PREFIX + user.getUsername());
                 if(size == null || size == 0L){
                     // 删除相关信息
                     UserUtil.refreshUser(user);
@@ -235,7 +237,7 @@ public class UserTokenUtil {
             // 生成MD5 16进制码 用于缩减存储
             // 删除相关信息
             String username = getUserNameByToken(token);
-            boolean hashKey = redisPlugin.sHashKey(TICKET_PREFIX + ":" + username, token);
+            boolean hashKey = redisPlugin.sHashKey(TICKET_PREFIX + username, token);
             if(!hashKey){
                 return false;
             }
