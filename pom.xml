@@ -71,7 +71,7 @@
         <oshi.version>3.9.1</oshi.version>
         <jna.version>4.5.2</jna.version>
         <ehcache.version>3.9.0</ehcache.version>
-        <kaptcha.version>0.0.9</kaptcha.version>
+        <captcha.version>1.6.2</captcha.version>
         <shiro.version>1.6.0</shiro.version>
         <bouncycastle.version>1.68</bouncycastle.version>
 
@@ -102,13 +102,12 @@
                 <scope>import</scope>
             </dependency>
 
-            <!-- kaptcha -->
+            <!-- captcha -->
             <dependency>
-                <groupId>com.github.axet</groupId>
-                <artifactId>kaptcha</artifactId>
-                <version>${kaptcha.version}</version>
+                <groupId>com.github.whvcse</groupId>
+                <artifactId>easy-captcha</artifactId>
+                <version>${captcha.version}</version>
             </dependency>
-
 
             <!-- JWT -->
             <dependency>

@@ -91,7 +91,7 @@ public class ShiroConfig {
         filterMap.put("/sys/login", "anon");
         filterMap.put("/sys/publicKey", "anon");
         filterMap.put("/sys/slipCount", "anon");
-        filterMap.put("/captcha.jpg", "anon");
+        filterMap.put("/captcha*", "anon");
 
         // 导出Excel\模版 不做自动拦截 手动拦截
         filterMap.put(apiPathProperties.getGlobalPrefix() + "/**/exportExcel", "anon");

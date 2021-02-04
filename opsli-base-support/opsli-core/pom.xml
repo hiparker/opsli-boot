@@ -54,10 +54,10 @@
             <version>3.3.1</version>
         </dependency>
 
-        <!-- kaptcha -->
+        <!-- captcha -->
         <dependency>
-            <groupId>com.github.axet</groupId>
-            <artifactId>kaptcha</artifactId>
+            <groupId>com.github.whvcse</groupId>
+            <artifactId>easy-captcha</artifactId>
         </dependency>
 
         <!-- JWT -->

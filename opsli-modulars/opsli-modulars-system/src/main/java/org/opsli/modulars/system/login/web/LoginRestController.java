@@ -183,21 +183,13 @@ public class LoginRestController {
      */
     @Limiter(alertType = AlertType.ALERT)
     @ApiOperation(value = "验证码", notes = "验证码")
-    @GetMapping("captcha.jpg")
+    @GetMapping("captcha")
     public void captcha(String uuid, HttpServletResponse response) throws IOException {
-        response.setHeader("Cache-Control", "no-store, no-cache");
-        response.setContentType("image/jpeg");
-
-        try {
-            //获取图片验证码
-            BufferedImage image = CaptchaUtil.getCaptcha(uuid);
-            if(image != null){
-                ServletOutputStream out = response.getOutputStream();
-                ImageIO.write(image, "jpg", out);
-                IOUtils.closeQuietly(out);
-            }
-        }catch (RuntimeException e){
-            OutputStreamUtil.exceptionResponse(e.getMessage(), response);
+        ServletOutputStream out = response.getOutputStream();
+        if(out != null){
+            response.setHeader("Cache-Control", "no-store, no-cache");
+            //生成图片验证码
+            CaptchaUtil.createCaptcha(uuid, out);
         }
     }
 
