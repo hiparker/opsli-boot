@@ -46,7 +46,7 @@ import org.opsli.api.web.gentest.carinfo.TestCarRestApi;
 * @CreateTime: 2020-12-20 20:12:57
 * @Description: 汽车信息 Controller
 */
-@Api(tags = "骑车信息")
+@Api(tags = "汽车信息")
 @Slf4j
 @ApiRestController("/gentest/carinfo")
 public class TestCarRestController extends BaseRestController<TestCar, TestCarModel, ITestCarService>
