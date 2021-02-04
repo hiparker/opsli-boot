@@ -18,6 +18,7 @@ package org.opsli.modulars.system.dict.web;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.ReflectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -55,6 +56,7 @@ import java.util.List;
  * @CreateTime: 2020-09-13 17:40
  * @Description: 数据字典明细
  */
+@Api(tags = "数据字典明细")
 @Slf4j
 @ApiRestController("/sys/dict/detail")
 public class DictDetailRestController extends BaseRestController<SysDictDetail, DictDetailModel, IDictDetailService>

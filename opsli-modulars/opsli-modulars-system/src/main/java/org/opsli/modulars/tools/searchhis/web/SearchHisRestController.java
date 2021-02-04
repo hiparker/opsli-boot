@@ -15,6 +15,7 @@
  */
 package org.opsli.modulars.tools.searchhis.web;
 
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.opsli.api.base.result.ResultVo;
@@ -23,7 +24,6 @@ import org.opsli.common.annotation.Limiter;
 import org.opsli.common.annotation.SearchHis;
 import org.opsli.core.utils.SearchHisUtil;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Set;
@@ -35,6 +35,7 @@ import java.util.Set;
  * @date 2020-05-23 13:30
  **
  */
+@Api(tags = "搜索历史记录")
 @Slf4j
 @ApiRestController("/tools/searchhis")
 public class SearchHisRestController {

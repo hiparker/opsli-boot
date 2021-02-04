@@ -17,6 +17,7 @@ package org.opsli.modulars.gentest.user.web;
 
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.ReflectUtil;
+import io.swagger.annotations.Api;
 import org.opsli.common.annotation.RequiresPermissionsCus;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -46,6 +47,7 @@ import java.lang.reflect.Method;
 * @CreateTime: 2020-11-22 12:12:05
 * @Description: 某系统用户 Controller
 */
+@Api(tags = "某系统用户")
 @Slf4j
 @ApiRestController("/gentest/user")
 public class TestUserRestController extends BaseRestController<TestUser, TestUserModel, ITestUserService>

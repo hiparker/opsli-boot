@@ -16,6 +16,7 @@
 package org.opsli.modulars.system.login.web;
 
 import com.google.common.collect.Maps;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -46,11 +47,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.imageio.ImageIO;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.Map;
 
@@ -63,6 +62,7 @@ import java.util.Map;
  * 不需要继承 api 接口
  *
  */
+@Api(tags = "登录相关")
 @Slf4j
 @RestController
 public class LoginRestController {

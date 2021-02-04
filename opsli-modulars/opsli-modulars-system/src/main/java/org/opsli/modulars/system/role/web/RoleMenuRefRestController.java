@@ -16,6 +16,7 @@
 package org.opsli.modulars.system.role.web;
 
 import com.google.common.collect.Lists;
+import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -46,8 +47,9 @@ import java.util.stream.Collectors;
  * @BelongsPackage: org.opsli.modulars.test.web
  * @Author: Parker
  * @CreateTime: 2020-09-13 17:40
- * @Description: 角色
+ * @Description: 角色权限
  */
+@Api(tags = "角色权限")
 @Slf4j
 @ApiRestController("/sys/role/perms")
 public class RoleMenuRefRestController implements RoleMenuRefApi {

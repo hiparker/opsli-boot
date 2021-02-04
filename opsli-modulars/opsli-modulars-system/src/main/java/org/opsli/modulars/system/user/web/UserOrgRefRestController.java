@@ -15,6 +15,7 @@
  */
 package org.opsli.modulars.system.user.web;
 
+import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -37,8 +38,9 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @BelongsPackage: org.opsli.modulars.test.web
  * @Author: Parker
  * @CreateTime: 2020-09-13 17:40
- * @Description: 角色
+ * @Description: 用户组织
  */
+@Api(tags = "用户组织")
 @Slf4j
 @ApiRestController("/sys/user/org")
 public class UserOrgRefRestController implements UserOrgRefApi {

@@ -25,6 +25,7 @@ import com.alibaba.excel.util.CollectionUtils;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
@@ -79,6 +80,7 @@ import java.util.Map;
  * @CreateTime: 2020-09-13 17:40
  * @Description: 用户信息
  */
+@Api(tags = "用户管理")
 @Slf4j
 @ApiRestController("/sys/user")
 public class UserRestController extends BaseRestController<SysUser, UserModel, IUserService>

@@ -17,6 +17,7 @@ package org.opsli.modulars.gentest.carinfo.web;
 
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.ReflectUtil;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.opsli.common.annotation.RequiresPermissionsCus;
@@ -45,6 +46,7 @@ import org.opsli.api.web.gentest.carinfo.TestCarRestApi;
 * @CreateTime: 2020-12-20 20:12:57
 * @Description: 汽车信息 Controller
 */
+@Api(tags = "骑车信息")
 @Slf4j
 @ApiRestController("/gentest/carinfo")
 public class TestCarRestController extends BaseRestController<TestCar, TestCarModel, ITestCarService>

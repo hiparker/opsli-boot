@@ -16,6 +16,7 @@
 package org.opsli.modulars.system.monitor.web;
 
 import com.google.common.collect.Maps;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -23,10 +24,9 @@ import org.opsli.api.base.result.ResultVo;
 import org.opsli.common.annotation.ApiRestController;
 import org.opsli.modulars.system.monitor.service.IMonitorService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import javax.servlet.http.HttpServletRequest;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -34,6 +34,7 @@ import java.util.Map;
  *
  * @author 薛佳琪
  */
+@Api(tags = "系统监控")
 @Slf4j
 @ApiRestController("/sys/monitor")
 public class MonitorController {
@@ -46,7 +47,7 @@ public class MonitorController {
      * @return ResultVo
      */
     @RequiresPermissions("devops_sysmonitor_select")
-    @RequestMapping("/getSystemInfo")
+    @GetMapping("/getSystemInfo")
     @ApiOperation(value = "当前服务器信息", notes = "当前服务器信息")
     public ResultVo<?> getSystemInfo() {
         Map<String,Object> map = Maps.newHashMapWithExpectedSize(5);
@@ -68,7 +69,7 @@ public class MonitorController {
      * @return ResultVo
      */
     @RequiresPermissions("devops_sysmonitor_select")
-    @RequestMapping("/getCpuInfo")
+    @GetMapping("/getCpuInfo")
     @ApiOperation(value = "当前CPU信息", notes = "当前CPU信息")
     public ResultVo<?> getCpuInfo() {
         return ResultVo.success(
@@ -80,7 +81,7 @@ public class MonitorController {
      * @return ResultVo
      */
     @RequiresPermissions("devops_sysmonitor_select")
-    @RequestMapping("/getMemInfo")
+    @GetMapping("/getMemInfo")
     @ApiOperation(value = "当前内存信息", notes = "当前内存信息")
     public ResultVo<?> getMemInfo() {
         return ResultVo.success(
@@ -92,7 +93,7 @@ public class MonitorController {
      * @return ResultVo
      */
     @RequiresPermissions("devops_sysmonitor_select")
-    @RequestMapping("/getJVMInfo")
+    @GetMapping("/getJVMInfo")
     @ApiOperation(value = "当前JVM信息", notes = "当前JVM信息")
     public ResultVo<?> getJVMInfo() {
         return ResultVo.success(

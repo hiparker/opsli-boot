@@ -15,6 +15,7 @@
  */
 package org.opsli.modulars.creater.createrlogs.web;
 
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -34,8 +35,9 @@ import javax.servlet.http.HttpServletResponse;
  * @BelongsProject: opsli-boot
  * @Author: Parker
  * @CreateTime: 2020-09-13 17:40
- * @Description: 代码生成器 - 表
+ * @Description: 代码生成器日志
  */
+@Api(tags = "代码生成器-日志")
 @Slf4j
 @ApiRestController("/creater/logs")
 public class CreaterLogsRestController extends BaseRestController<CreaterLogs, CreaterLogsModel, ICreateLogsService>

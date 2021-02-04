@@ -24,6 +24,7 @@ import cn.hutool.core.util.ReflectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -59,6 +60,7 @@ import java.util.Set;
 * @CreateTime: 2020-11-28 18:59:59
 * @Description: 组织机构表 Controller
 */
+@Api(tags = "组织机构管理")
 @Slf4j
 @ApiRestController("/sys/org")
 public class SysOrgRestController extends BaseRestController<SysOrg, SysOrgModel, ISysOrgService>

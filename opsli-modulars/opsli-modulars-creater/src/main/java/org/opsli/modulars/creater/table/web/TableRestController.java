@@ -16,6 +16,7 @@
 package org.opsli.modulars.creater.table.web;
 
 import cn.hutool.core.convert.Convert;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -52,6 +53,7 @@ import java.util.List;
  * @CreateTime: 2020-09-13 17:40
  * @Description: 代码生成器 - 表
  */
+@Api(tags = "代码生成器-表")
 @Slf4j
 @ApiRestController("/creater/table")
 public class TableRestController extends BaseRestController<CreaterTable, CreaterTableModel, ITableService>

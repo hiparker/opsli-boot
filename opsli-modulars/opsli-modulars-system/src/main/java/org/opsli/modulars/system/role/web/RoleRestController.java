@@ -18,6 +18,7 @@ package org.opsli.modulars.system.role.web;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.ReflectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -53,8 +54,9 @@ import java.util.List;
  * @BelongsPackage: org.opsli.modulars.test.web
  * @Author: Parker
  * @CreateTime: 2020-09-13 17:40
- * @Description: 角色
+ * @Description: 角色管理
  */
+@Api(tags = "角色管理")
 @Slf4j
 @ApiRestController("/sys/role")
 public class RoleRestController extends BaseRestController<SysRole, RoleModel, IRoleService>

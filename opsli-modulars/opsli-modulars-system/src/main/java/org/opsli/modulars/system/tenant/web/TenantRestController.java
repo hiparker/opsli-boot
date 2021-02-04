@@ -18,6 +18,7 @@ package org.opsli.modulars.system.tenant.web;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.ReflectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -48,8 +49,9 @@ import java.lang.reflect.Method;
  * @BelongsPackage: org.opsli.modulars.system.web
  * @Author: Parker
  * @CreateTime: 2020-09-13 17:40
- * @Description: 租户
+ * @Description: 租户管理
  */
+@Api(tags = "租户管理")
 @Slf4j
 @ApiRestController("/sys/tenant")
 public class TenantRestController extends BaseRestController<SysTenant, TenantModel, ITenantService>

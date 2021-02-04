@@ -2,6 +2,7 @@ package org.opsli.modulars.test.web;
 
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.ReflectUtil;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -31,6 +32,7 @@ import java.lang.reflect.Method;
  * @CreateTime: 2020-09-13 17:40
  * @Description: 测试类
  */
+@Api(tags = "测试类")
 @Slf4j
 @ApiRestController("/test")
 public class TestRestController extends BaseRestController<TestEntity, TestModel, ITestService>

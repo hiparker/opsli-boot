@@ -15,6 +15,7 @@
  */
 package org.opsli.modulars.system.logs.web;
 
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -38,8 +39,9 @@ import javax.servlet.http.HttpServletRequest;
  * @BelongsPackage: org.opsli.modulars.test.web
  * @Author: Parker
  * @CreateTime: 2020-09-13 17:40
- * @Description: 角色
+ * @Description: 系统日志
  */
+@Api(tags = "系统日志")
 @Slf4j
 @ApiRestController("/sys/logs")
 public class LogsRestController extends BaseRestController<SysLogs, LogsModel, ILogsService>
