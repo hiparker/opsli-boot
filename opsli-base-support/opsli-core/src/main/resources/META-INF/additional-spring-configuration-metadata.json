@@ -174,6 +174,18 @@
     },
 
     {
+      "name": "opsli.auth.login.limit-count",
+      "sourceType": "org.opsli.core.autoconfigure.properties.GlobalProperties$Auth$Login",
+      "type": "java.lang.Integer",
+      "defaultValue": -1,
+      "description": "限制登录数量 -1 为无限大."
+    },
+    {
+      "name": "opsli.auth.login.limit-refuse",
+      "sourceType": "org.opsli.core.autoconfigure.properties.GlobalProperties$Auth$Login",
+      "description": "限制登录拒绝策略 after为后者 before为前者."
+    },
+    {
       "name": "opsli.auth.login.slip-count",
       "sourceType": "org.opsli.core.autoconfigure.properties.GlobalProperties$Auth$Login",
       "type": "java.lang.Integer",

@@ -9,9 +9,10 @@ package org.opsli.common.enums;
 public enum AlertType {
 
     /** alert 弹出 */
-    ALERT(),
+    ALERT,
 
     /** JSON 回推*/
     JSON,
+
     ;
 }

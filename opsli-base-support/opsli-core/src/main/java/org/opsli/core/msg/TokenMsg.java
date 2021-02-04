@@ -30,6 +30,8 @@ public enum TokenMsg implements BaseMsg {
      * Token
      */
     EXCEPTION_TOKEN_CREATE_ERROR(12000,"生成Token失败"),
+    EXCEPTION_TOKEN_CREATE_LIMIT_ERROR(12001,"您的账号已在其他设备登录"),
+
     EXCEPTION_TOKEN_LOSE_EFFICACY(401,"Token失效，请重新登录"),
 
 

@@ -2,6 +2,7 @@ package org.opsli.core.autoconfigure.properties;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.opsli.common.enums.LoginLimitRefuse;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
@@ -129,6 +130,12 @@ public class GlobalProperties {
         @EqualsAndHashCode(callSuper = false)
         public static class Login {
 
+            /** 限制登录数量 -1 为无限大 */
+            private Integer limitCount;
+
+            /** 限制登录拒绝策略 after为后者 before为前者 */
+            private LoginLimitRefuse limitRefuse = LoginLimitRefuse.AFTER;
+
             /** 失败次数 */
             private Integer slipCount;
 
@@ -138,7 +145,9 @@ public class GlobalProperties {
             /** 失败锁定时间(秒) */
             private Integer slipLockSpeed;
 
+
         }
+
     }
 
     /**

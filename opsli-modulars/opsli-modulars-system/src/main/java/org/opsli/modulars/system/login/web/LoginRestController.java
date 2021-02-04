@@ -21,6 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.opsli.api.base.result.ResultVo;
+import org.opsli.core.autoconfigure.properties.GlobalProperties;
 import org.opsli.core.utils.ValidationUtil;
 import org.opsli.api.wrapper.system.tenant.TenantModel;
 import org.opsli.api.wrapper.system.user.UserModel;
@@ -38,6 +39,7 @@ import org.opsli.core.security.shiro.realm.JwtRealm;
 import org.opsli.core.utils.*;
 import org.opsli.modulars.system.login.entity.LoginForm;
 import org.opsli.modulars.system.user.service.IUserService;
+import org.opsli.plugins.redis.RedisPlugin;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -68,7 +70,6 @@ public class LoginRestController {
     @Autowired
     private IUserService iUserService;
 
-
     /**
      * 登录 登录数据加密
      */
@@ -76,7 +77,8 @@ public class LoginRestController {
     @InterfaceEncryptAndDecrypt(responseEncrypt = false)
     @ApiOperation(value = "登录", notes = "登录")
     @PostMapping("/sys/login")
-    public ResultVo<?> login(@RequestBody LoginForm form, HttpServletRequest request){
+    public ResultVo<UserTokenUtil.TokenRet> login(@RequestBody LoginForm form, HttpServletRequest request){
+
         // 非空验证
         if(form == null){
             throw new TokenException(TokenMsg.EXCEPTION_LOGIN_NULL);
@@ -92,7 +94,7 @@ public class LoginRestController {
         long slipCount = UserTokenUtil.getSlipCount(form.getUsername());
 
         // 失败次数超过 验证次数阈值 开启验证码验证
-        if(slipCount >= UserTokenUtil.ACCOUNT_SLIP_VERIFY_COUNT){
+        if(slipCount >= UserTokenUtil.LOGIN_PROPERTIES.getSlipVerifyCount()){
             CaptchaUtil.validate(form.getUuid(), form.getCaptcha());
         }
 
@@ -124,13 +126,13 @@ public class LoginRestController {
         }
 
         // 失败次数超过 验证次数阈值 开启验证码验证
-        if(slipCount >= UserTokenUtil.ACCOUNT_SLIP_VERIFY_COUNT){
+        if(slipCount >= UserTokenUtil.LOGIN_PROPERTIES.getSlipVerifyCount()){
             // 删除验证过后验证码
             CaptchaUtil.delCaptcha(form.getUuid());
         }
 
         //生成token，并保存到Redis
-        ResultVo<Map<String, Object>> resultVo = UserTokenUtil.createToken(user);
+        ResultVo<UserTokenUtil.TokenRet> resultVo = UserTokenUtil.createToken(user);
         if(resultVo.isSuccess()){
             // 异步保存IP
             AsyncProcessQueueReFuse.execute(()->{
@@ -170,7 +172,7 @@ public class LoginRestController {
         // 获得当前失败次数
         long slipCount = UserTokenUtil.getSlipCount(username);
         Map<String, Object> ret = Maps.newHashMap();
-        ret.put("base", UserTokenUtil.ACCOUNT_SLIP_VERIFY_COUNT);
+        ret.put("base", UserTokenUtil.LOGIN_PROPERTIES.getSlipVerifyCount());
         ret.put("curr", slipCount);
         return ResultVo.success(ret);
     }
@@ -212,7 +214,7 @@ public class LoginRestController {
         );
     }
 
-
+    // =================
 
     public static void main(String[] args) {
         String passwordStr = "Aa123456";
