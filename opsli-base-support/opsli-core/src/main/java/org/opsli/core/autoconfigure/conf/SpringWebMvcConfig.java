@@ -30,6 +30,7 @@ import javax.annotation.Resource;
 
 /**
  * 配置统一的后台接口访问路径的前缀
+ *
  * @author parker
  */
 @Slf4j

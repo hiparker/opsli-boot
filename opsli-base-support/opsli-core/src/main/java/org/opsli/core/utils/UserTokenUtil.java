@@ -62,26 +62,17 @@ public class UserTokenUtil {
     /** token 缓存名 */
     public static final String TOKEN_NAME = TokenConstants.ACCESS_TOKEN;
     /** 缓存前缀 */
-    private static final String TICKET_PREFIX;
+    private static String TICKET_PREFIX;
     /** 账号失败次数 */
-    public static final String ACCOUNT_SLIP_COUNT_PREFIX;
+    public static String ACCOUNT_SLIP_COUNT_PREFIX;
     /** 账号失败锁定KEY */
-    public static final String ACCOUNT_SLIP_LOCK_PREFIX;
+    public static String ACCOUNT_SLIP_LOCK_PREFIX;
     /** 限制登录数量 -1 为无限大 */
     public static final int ACCOUNT_LIMIT_INFINITE = -1;
     /** 登录配置信息 */
     public static GlobalProperties.Auth.Login LOGIN_PROPERTIES;
     /** Redis插件 */
     private static RedisPlugin redisPlugin;
-
-
-    static{
-        // 缓存前缀
-        TICKET_PREFIX = CacheUtil.getPrefixName() + "ticket:";
-        ACCOUNT_SLIP_COUNT_PREFIX = CacheUtil.getPrefixName() + "account:slip:count:";
-        ACCOUNT_SLIP_LOCK_PREFIX = CacheUtil.getPrefixName() + "account:slip:lock:";
-    }
-
 
     /**
      * 根据 user 创建Token
@@ -364,6 +355,11 @@ public class UserTokenUtil {
 
         // Redis 插件
         UserTokenUtil.redisPlugin = redisPlugin;
+
+        // 缓存前缀
+        TICKET_PREFIX = CacheUtil.getPrefixName() + "ticket:";
+        ACCOUNT_SLIP_COUNT_PREFIX = CacheUtil.getPrefixName() + "account:slip:count:";
+        ACCOUNT_SLIP_LOCK_PREFIX = CacheUtil.getPrefixName() + "account:slip:lock:";
     }
 
 

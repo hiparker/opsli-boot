@@ -17,6 +17,7 @@ package org.opsli.core.utils;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
+import cn.hutool.json.JSONUtil;
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -100,7 +101,7 @@ public final class LogUtil {
             // 设置IP
             logsModel.setRemoteAddr(clientIpAddress);
             // 设置参数
-            logsModel.setParams(ToStringBuilder.reflectionToString(args));
+            logsModel.setParams(JSONUtil.parse(args).toString());
             // 设置方法
             logsModel.setMethod(methodName);
             // 设置执行时长

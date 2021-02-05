@@ -17,7 +17,6 @@ package org.opsli.core.autoconfigure.conf;
 
 import lombok.extern.slf4j.Slf4j;
 import org.opsli.core.cache.pushsub.receiver.RedisPushSubReceiver;
-import org.opsli.plugins.redis.conf.RedisPluginConfig;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

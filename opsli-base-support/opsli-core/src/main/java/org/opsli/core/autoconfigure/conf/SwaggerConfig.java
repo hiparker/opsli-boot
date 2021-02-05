@@ -41,6 +41,8 @@ import javax.annotation.Resource;
 import java.util.List;
 
 /**
+ * Swagger 配置类
+ *
  * @author parker
  */
 @Configuration
