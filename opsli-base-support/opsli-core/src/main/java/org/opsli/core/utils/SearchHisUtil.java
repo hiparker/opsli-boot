@@ -48,7 +48,7 @@ public class SearchHisUtil {
     /** 搜索历史缓存数据KEY */
     private static final int DEFAULT_COUNT = 10;
 
-    private static final String CACHE_PREFIX = "his:username:";
+    private static final String CACHE_PREFIX = "his::username::";
 
     /** Redis插件 */
     private static RedisPlugin redisPlugin;

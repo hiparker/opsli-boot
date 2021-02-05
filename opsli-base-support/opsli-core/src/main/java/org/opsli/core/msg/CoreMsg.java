@@ -38,6 +38,7 @@ public enum CoreMsg implements BaseMsg {
      * Redis
      */
     REDIS_EXCEPTION_PUSH_SUB(10200,"Redis 订阅通道失败！"),
+    REDIS_EXCEPTION_LOCK(10201,"无法申领分布式锁"),
 
     /**
      * Excel

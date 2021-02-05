@@ -46,7 +46,7 @@ import static org.opsli.common.constants.OrderConstants.UTIL_ORDER;
 public class TenantUtil {
 
     /** 前缀 */
-    public static final String PREFIX_CODE = "tenant:id:";
+    public static final String PREFIX_CODE = "tenant::id::";
 
 
     /** Redis插件 */

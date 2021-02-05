@@ -58,7 +58,7 @@ public class CaptchaUtil {
     private static final List<CaptchaStrategy> CAPTCHA_STRATEGY_LIST;
 
     /** 缓存前缀 */
-    private static final String PREFIX = "temp:captcha:";
+    private static final String PREFIX = "temp::captcha::";
     /** 默认验证码保存 5 分钟 */
     private static final int TIME_OUT = 300;
     /** Redis插件 */

@@ -25,12 +25,12 @@ package org.opsli.common.constants;
 public interface DictConstants {
 
     /** 缓存前缀 NAME */
-    String CACHE_PREFIX_NAME = "dict:name:";
+    String CACHE_PREFIX_NAME = "dict::name::";
 
     /** 缓存前缀 VALUE*/
-    String CACHE_PREFIX_VALUE = "dict:value:";
+    String CACHE_PREFIX_VALUE = "dict::value::";
 
     /** 缓存前缀 LIST*/
-    String CACHE_PREFIX_LIST = "dict:list:";
+    String CACHE_PREFIX_LIST = "dict::list::";
 
 }

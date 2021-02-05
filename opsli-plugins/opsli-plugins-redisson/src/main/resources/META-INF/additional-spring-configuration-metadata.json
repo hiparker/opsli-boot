@@ -1,0 +1,36 @@
+{
+  "properties": [
+    {
+      "name": "redisson.lock.server.enable",
+      "sourceType": "org.opsli.plugins.redisson.entity.RedissonProperties",
+      "type": "java.lang.Boolean",
+      "defaultValue": false,
+      "description": "redissonLock 是否启用."
+    },
+    {
+      "name": "redisson.lock.server.address",
+      "sourceType": "org.opsli.plugins.redisson.entity.RedissonProperties",
+      "type": "java.lang.String",
+      "defaultValue": "127.0.0.1:6379",
+      "description": "redis主机地址，ip：port，有多个用半角逗号分隔."
+    },
+    {
+      "name": "redisson.lock.server.type",
+      "sourceType": "org.opsli.plugins.redisson.entity.RedissonProperties",
+      "description": "连接类型，支持standalone-单机节点，sentinel-哨兵，cluster-集群，masterslave-主从."
+    },
+    {
+      "name": "redisson.lock.server.password",
+      "sourceType": "org.opsli.plugins.redisson.entity.RedissonProperties",
+      "type": "java.lang.String",
+      "description": "redis 连接密码."
+    },
+    {
+      "name": "redisson.lock.server.database",
+      "sourceType": "org.opsli.plugins.redisson.entity.RedissonProperties",
+      "type": "java.lang.Integer",
+      "defaultValue": 0,
+      "description": "选取那个数据库 ."
+    }
+  ]
+}

@@ -44,6 +44,15 @@ spring:
         #password: 12345678
         #driver-class-name: com.mysql.cj.jdbc.Driver
 
+# Redisson 分布式锁
+redisson:
+  lock:
+    server:
+      enable: true
+      type: standalone
+      address: "127.0.0.1:6379"
+      password: 123456
+      database: 0
 
 # knife4j 文档 配置
 knife4j:
@@ -59,7 +68,6 @@ knife4j:
   production: false
 
 
-
 # opsli 自定义配置
 opsli:
   # 演示模式
@@ -71,3 +79,4 @@ opsli:
 # 系统日志
 log:
   path: /var/log
+

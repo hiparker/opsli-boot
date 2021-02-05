@@ -40,6 +40,13 @@
             <version>${plugins.version}</version>
         </dependency>
 
+        <!-- 引入Redisson插件 -->
+        <dependency>
+            <groupId>org.opsliframework.boot</groupId>
+            <artifactId>opsli-plugins-redisson</artifactId>
+            <version>${plugins.version}</version>
+        </dependency>
+
         <!-- 引入EhCache插件 -->
         <dependency>
             <groupId>org.opsliframework.boot</groupId>

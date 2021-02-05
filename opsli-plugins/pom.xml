@@ -20,6 +20,7 @@
         <module>opsli-plugins-redis</module>
         <module>opsli-plugins-ehcache</module>
         <module>opsli-plugins-excel</module>
+        <module>opsli-plugins-redisson</module>
     </modules>
 
     <dependencyManagement>

@@ -15,7 +15,9 @@
  */
 package org.opsli.core.utils;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
+import cn.hutool.core.thread.ThreadUtil;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Lists;
@@ -31,16 +33,19 @@ import org.opsli.common.exception.TokenException;
 import org.opsli.core.autoconfigure.properties.GlobalProperties;
 import org.opsli.core.cache.local.CacheUtil;
 import org.opsli.core.cache.pushsub.msgs.UserMsgFactory;
+import org.opsli.core.msg.CoreMsg;
 import org.opsli.core.msg.TokenMsg;
 import org.opsli.plugins.redis.RedisLockPlugins;
 import org.opsli.plugins.redis.RedisPlugin;
 import org.opsli.plugins.redis.lock.RedisLock;
+import org.opsli.plugins.redisson.RedissonLock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static org.opsli.common.constants.OrderConstants.UTIL_ORDER;
 
@@ -58,18 +63,18 @@ import static org.opsli.common.constants.OrderConstants.UTIL_ORDER;
 public class UserUtil {
 
     /** 前缀 */
-    public static final String PREFIX_ID = "userId:";
-    public static final String PREFIX_ID_ROLES = "userId:roles:";
-    public static final String PREFIX_ID_PERMISSIONS = "userId:permissions:";
-    public static final String PREFIX_ID_MENUS = "userId:menus:";
-    public static final String PREFIX_USERNAME = "username:";
+    public static final String PREFIX_ID = "userId::";
+    public static final String PREFIX_ID_ROLES = "userId::roles::";
+    public static final String PREFIX_ID_PERMISSIONS = "userId::permissions::";
+    public static final String PREFIX_ID_MENUS = "userId::menus::";
+    public static final String PREFIX_USERNAME = "username::";
 
 
     /** Redis插件 */
     private static RedisPlugin redisPlugin;
 
-    /** Redis分布式锁 */
-    private static RedisLockPlugins redisLockPlugins;
+    /** Redisson 分布式锁 */
+    private static RedissonLock REDISSON_LOCK;
 
     /** 用户Service */
     private static UserApi userApi;
@@ -104,36 +109,35 @@ public class UserUtil {
      * @return UserModel
      */
     public static UserModel getUser(String userId){
+
+        // 缓存Key
+        String cacheKey = PREFIX_ID + userId;
+
         // 先从缓存里拿
-        UserModel userModel = CacheUtil.getTimed(UserModel.class, PREFIX_ID + userId);
+        UserModel userModel = CacheUtil.getTimed(UserModel.class, cacheKey);
         if (userModel != null){
             return userModel;
         }
 
-
         // 拿不到 --------
         // 防止缓存穿透判断
-        boolean hasNilFlag = CacheUtil.hasNilFlag(PREFIX_ID + userId);
+        boolean hasNilFlag = CacheUtil.hasNilFlag(cacheKey);
         if(hasNilFlag){
             return null;
         }
 
-        // 锁凭证 redisLock 贯穿全程
-        RedisLock redisLock = new RedisLock();
-        redisLock.setLockName(PREFIX_ID + userId)
-                .setAcquireTimeOut(3000L)
-                .setLockTimeOut(5000L);
-
         try {
-            // 这里增加分布式锁 防止缓存击穿
-            // ============ 尝试加锁
-            redisLock = redisLockPlugins.tryLock(redisLock);
-            if(redisLock == null){
+            // 分布式上锁
+            boolean isLock = REDISSON_LOCK.tryLock(
+                    cacheKey, 5);
+            if(!isLock){
+                // 无法申领分布式锁
+                log.error(CoreMsg.REDIS_EXCEPTION_LOCK.getMessage());
                 return null;
             }
 
             // 如果获得锁 则 再次检查缓存里有没有， 如果有则直接退出， 没有的话才发起数据库请求
-            userModel = CacheUtil.getTimed(UserModel.class, PREFIX_ID + userId);
+            userModel = CacheUtil.getTimed(UserModel.class, cacheKey);
             if (userModel != null){
                 return userModel;
             }
@@ -147,18 +151,22 @@ public class UserUtil {
             if(resultVo.isSuccess()){
                 userModel = resultVo.getData();
                 // 存入缓存
-                CacheUtil.put(PREFIX_ID + userId, userModel);
+                CacheUtil.put(cacheKey, userModel);
             }
+
         }catch (Exception e){
-            log.error(e.getMessage(),e);
+            log.error(e.getMessage(), e);
         }finally {
-            // ============ 释放锁
-            redisLockPlugins.unLock(redisLock);
+            // 是否是当前线程
+            if(REDISSON_LOCK.isHeldByCurrentThread(cacheKey)){
+                // 释放锁
+                REDISSON_LOCK.unlock(cacheKey);
+            }
         }
 
         if(userModel == null){
             // 设置空变量 用于防止穿透判断
-            CacheUtil.putNilFlag(PREFIX_ID + userId);
+            CacheUtil.putNilFlag(cacheKey);
             return null;
         }
 
@@ -172,56 +180,58 @@ public class UserUtil {
      * @return UserModel
      */
     public static UserModel getUserByUserName(String userName){
+        // 缓存Key
+        String cacheKey = PREFIX_USERNAME + userName;
+
         // 先从缓存里拿
-        UserModel userModel = CacheUtil.getTimed(UserModel.class, PREFIX_USERNAME + userName);
+        UserModel userModel = CacheUtil.getTimed(UserModel.class, cacheKey);
         if (userModel != null){
             return userModel;
         }
 
         // 拿不到 --------
         // 防止缓存穿透判断
-        boolean hasNilFlag = CacheUtil.hasNilFlag(PREFIX_USERNAME + userName);
+        boolean hasNilFlag = CacheUtil.hasNilFlag(cacheKey);
         if(hasNilFlag){
             return null;
         }
 
-        // 锁凭证 redisLock 贯穿全程
-        RedisLock redisLock = new RedisLock();
-        redisLock.setLockName(PREFIX_USERNAME + userName)
-                .setAcquireTimeOut(3000L)
-                .setLockTimeOut(5000L);
-
         try {
-            // 这里增加分布式锁 防止缓存击穿
-            // ============ 尝试加锁
-            redisLock = redisLockPlugins.tryLock(redisLock);
-            if(redisLock == null){
+            // 分布式上锁
+            boolean isLock = REDISSON_LOCK.tryLock(
+                    cacheKey, 5);
+            if(!isLock){
+                // 无法申领分布式锁
+                log.error(CoreMsg.REDIS_EXCEPTION_LOCK.getMessage());
                 return null;
             }
 
             // 如果获得锁 则 再次检查缓存里有没有， 如果有则直接退出， 没有的话才发起数据库请求
-            userModel = CacheUtil.getTimed(UserModel.class, PREFIX_USERNAME + userName);
-            if (userModel != null){
+            userModel = CacheUtil.getTimed(UserModel.class, cacheKey);
+            if (userModel != null) {
                 return userModel;
             }
 
             // 查询数据库
             ResultVo<UserModel> resultVo = userApi.getUserByUsername(userName);
-            if(resultVo.isSuccess()){
+            if (resultVo.isSuccess()) {
                 userModel = resultVo.getData();
                 // 存入缓存
-                CacheUtil.put(PREFIX_USERNAME + userName, userModel);
+                CacheUtil.put(cacheKey, userModel);
             }
         }catch (Exception e){
-            log.error(e.getMessage(),e);
+            log.error(e.getMessage(), e);
         }finally {
-            // ============ 释放锁
-            redisLockPlugins.unLock(redisLock);
+            // 是否是当前线程
+            if(REDISSON_LOCK.isHeldByCurrentThread(cacheKey)){
+                // 释放锁
+                REDISSON_LOCK.unlock(cacheKey);
+            }
         }
 
         if(userModel == null){
             // 设置空变量 用于防止穿透判断
-            CacheUtil.putNilFlag(PREFIX_USERNAME + userName);
+            CacheUtil.putNilFlag(cacheKey);
             return null;
         }
 
@@ -234,80 +244,62 @@ public class UserUtil {
      * @return List
      */
     public static List<String> getUserRolesByUserId(String userId){
-        List<String> roles = null;
+        // 缓存Key
+        String cacheKey = PREFIX_ID_ROLES + userId;
+
+        List<String> roles;
 
         // 先从缓存里拿
-        try {
-            Object obj = CacheUtil.getTimed(PREFIX_ID_ROLES + userId);
-            if(obj instanceof List){
-                List<String> list = Convert.toList(String.class, obj);
-                if (!list.isEmpty()) {
-                    return list;
-                }
-            }else {
-                JSONArray jsonArray = Convert.convert(JSONArray.class, obj);
-                if (jsonArray != null && !jsonArray.isEmpty()) {
-                    return jsonArray.toJavaList(String.class);
-                }
-            }
-        }catch (Exception e){
-            log.error(e.getMessage(), e);
+        Object obj = CacheUtil.getTimed(cacheKey);
+        roles = Convert.toList(String.class, obj);
+        if(CollUtil.isNotEmpty(roles)){
+            return roles;
         }
 
         // 拿不到 --------
         // 防止缓存穿透判断
-        boolean hasNilFlag = CacheUtil.hasNilFlag(PREFIX_ID_ROLES + userId);
+        boolean hasNilFlag = CacheUtil.hasNilFlag(cacheKey);
         if(hasNilFlag){
             return null;
         }
 
-        // 锁凭证 redisLock 贯穿全程
-        RedisLock redisLock = new RedisLock();
-        redisLock.setLockName(PREFIX_ID_ROLES + userId)
-                .setAcquireTimeOut(3000L)
-                .setLockTimeOut(5000L);
-
         try {
-            // 这里增加分布式锁 防止缓存击穿
-            // ============ 尝试加锁
-            redisLock = redisLockPlugins.tryLock(redisLock);
-            if(redisLock == null){
+            // 分布式上锁
+            boolean isLock = REDISSON_LOCK.tryLock(
+                    cacheKey, 5);
+            if(!isLock){
+                // 无法申领分布式锁
+                log.error(CoreMsg.REDIS_EXCEPTION_LOCK.getMessage());
                 return null;
             }
 
             // 如果获得锁 则 再次检查缓存里有没有， 如果有则直接退出， 没有的话才发起数据库请求
-            try {
-                Object obj = CacheUtil.getTimed(PREFIX_ID_ROLES + userId);
-                if(obj instanceof List){
-                    List<String> list = Convert.toList(String.class, obj);
-                    if (!list.isEmpty()) {
-                        return list;
-                    }
-                }else {
-                    JSONArray jsonArray = Convert.convert(JSONArray.class, obj);
-                    if (jsonArray != null && !jsonArray.isEmpty()) {
-                        return jsonArray.toJavaList(String.class);
-                    }
-                }
-            }catch (Exception ignored){}
+            obj = CacheUtil.getTimed(cacheKey);
+            roles = Convert.toList(String.class, obj);
+            if(CollUtil.isNotEmpty(roles)){
+                return roles;
+            }
 
             // 查询数据库
             ResultVo<List<String>> resultVo = userApi.getRolesByUserId(userId);
             if(resultVo.isSuccess()){
                 roles = resultVo.getData();
                 // 存入缓存
-                CacheUtil.put(PREFIX_ID_ROLES + userId, roles);
+                CacheUtil.put(cacheKey, roles);
             }
         }catch (Exception e){
-            log.error(e.getMessage(),e);
+            log.error(e.getMessage(), e);
         }finally {
-            // ============ 释放锁
-            redisLockPlugins.unLock(redisLock);
+            // 是否是当前线程
+            if(REDISSON_LOCK.isHeldByCurrentThread(cacheKey)){
+                // 释放锁
+                REDISSON_LOCK.unlock(cacheKey);
+            }
         }
 
-        if(roles == null || roles.size() == 0){
+        if(CollUtil.isEmpty(roles)){
             // 设置空变量 用于防止穿透判断
-            CacheUtil.putNilFlag(PREFIX_ID_ROLES + userId);
+            CacheUtil.putNilFlag(cacheKey);
             return null;
         }
 
@@ -321,81 +313,63 @@ public class UserUtil {
      * @return List
      */
     public static List<String> getUserAllPermsByUserId(String userId){
-        List<String> permissions = null;
+
+        // 缓存Key
+        String cacheKey = PREFIX_ID_PERMISSIONS + userId;
+
+        List<String> permissions;
 
         // 先从缓存里拿
-        try {
-            Object obj = CacheUtil.getTimed(PREFIX_ID_PERMISSIONS + userId);
-            if(obj instanceof List){
-                List<String> list = Convert.toList(String.class, obj);
-                if (!list.isEmpty()) {
-                    return list;
-                }
-            }else {
-                JSONArray jsonArray = Convert.convert(JSONArray.class, obj);
-                if (jsonArray != null && !jsonArray.isEmpty()) {
-                    return jsonArray.toJavaList(String.class);
-                }
-            }
-        }catch (Exception e){
-            log.error(e.getMessage(), e);
+        Object obj = CacheUtil.getTimed(cacheKey);
+        permissions = Convert.toList(String.class, obj);
+        if(CollUtil.isNotEmpty(permissions)){
+            return permissions;
         }
-
 
         // 拿不到 --------
         // 防止缓存穿透判断
-        boolean hasNilFlag = CacheUtil.hasNilFlag(PREFIX_ID_PERMISSIONS + userId);
+        boolean hasNilFlag = CacheUtil.hasNilFlag(cacheKey);
         if(hasNilFlag){
             return null;
         }
 
-        // 锁凭证 redisLock 贯穿全程
-        RedisLock redisLock = new RedisLock();
-        redisLock.setLockName(PREFIX_ID_PERMISSIONS + userId)
-                .setAcquireTimeOut(3000L)
-                .setLockTimeOut(5000L);
-
         try {
-            // 这里增加分布式锁 防止缓存击穿
-            // ============ 尝试加锁
-            redisLock = redisLockPlugins.tryLock(redisLock);
-            if(redisLock == null){
+            // 分布式上锁
+            boolean isLock = REDISSON_LOCK.tryLock(
+                    cacheKey, 5);
+            if(!isLock){
+                // 无法申领分布式锁
+                log.error(CoreMsg.REDIS_EXCEPTION_LOCK.getMessage());
                 return null;
             }
 
             // 如果获得锁 则 再次检查缓存里有没有， 如果有则直接退出， 没有的话才发起数据库请求
-            try {
-                Object obj = CacheUtil.getTimed(PREFIX_ID_PERMISSIONS + userId);
-                if(obj instanceof List){
-                    List<String> list = Convert.toList(String.class, obj);
-                    if (!list.isEmpty()) {
-                        return list;
-                    }
-                }else {
-                    JSONArray jsonArray = Convert.convert(JSONArray.class, obj);
-                    if (jsonArray != null && !jsonArray.isEmpty()) {
-                        return jsonArray.toJavaList(String.class);
-                    }
-                }
-            }catch (Exception ignored){}
+            obj = CacheUtil.getTimed(cacheKey);
+            permissions = Convert.toList(String.class, obj);
+            if(CollUtil.isNotEmpty(permissions)){
+                return permissions;
+            }
 
             // 查询数据库
             ResultVo<List<String>> resultVo = userApi.getAllPerms(userId);
             if(resultVo.isSuccess()){
                 permissions = resultVo.getData();
                 // 存入缓存
-                CacheUtil.put(PREFIX_ID_PERMISSIONS + userId, permissions);
+                CacheUtil.put(cacheKey, permissions);
             }
         }catch (Exception e){
-            log.error(e.getMessage(),e);
+            log.error(e.getMessage(), e);
         }finally {
-            // ============ 释放锁
-            redisLockPlugins.unLock(redisLock);
+            // 是否是当前线程
+            if(REDISSON_LOCK.isHeldByCurrentThread(cacheKey)){
+                // 释放锁
+                REDISSON_LOCK.unlock(cacheKey);
+            }
         }
 
-        if(permissions == null || permissions.size() == 0){
+        if(CollUtil.isEmpty(permissions)){
             // 设置空变量 用于防止穿透判断
-            CacheUtil.putNilFlag(PREFIX_ID_PERMISSIONS + userId);
+            CacheUtil.putNilFlag(cacheKey);
             return null;
         }
 
@@ -408,101 +382,64 @@ public class UserUtil {
      * @return List
      */
     public static List<MenuModel> getMenuListByUserId(String userId){
-        List<MenuModel> menus = null;
+
+        // 缓存Key
+        String cacheKey = PREFIX_ID_MENUS + userId;
+
+        List<MenuModel> menus;
 
         // 先从缓存里拿
-        try {
-            Object obj = CacheUtil.getTimed(PREFIX_ID_MENUS + userId);
-            if(obj instanceof List){
-                List<?> list = Convert.toList(obj);
-                if (!list.isEmpty()) {
-                    List<MenuModel> menuModels = Lists.newArrayListWithCapacity(list.size());
-                    for (Object menuObj : list) {
-                        if(menuObj instanceof MenuModel){
-                            menuModels.add((MenuModel) menuObj);
-                        }else if(menuObj instanceof JSONObject){
-                            JSONObject jsonObject = (JSONObject) menuObj;
-                            MenuModel t = JSONObject.toJavaObject(jsonObject, MenuModel.class);
-                            menuModels.add(t);
-                        }
-                    }
-                    return menuModels;
-                }
-            }else {
-                JSONArray jsonArray = Convert.convert(JSONArray.class, obj);
-                if (jsonArray != null && !jsonArray.isEmpty()) {
-                    return jsonArray.toJavaList(MenuModel.class);
-                }
-            }
-        }catch (Exception e){
-            log.error(e.getMessage(), e);
+        Object obj = CacheUtil.getTimed(cacheKey);
+        menus = Convert.toList(MenuModel.class, obj);
+        if(CollUtil.isNotEmpty(menus)){
+            return menus;
         }
-
 
         // 拿不到 --------
         // 防止缓存穿透判断
-        boolean hasNilFlag = CacheUtil.hasNilFlag(PREFIX_ID_MENUS + userId);
+        boolean hasNilFlag = CacheUtil.hasNilFlag(cacheKey);
         if(hasNilFlag){
             return null;
         }
 
-        // 锁凭证 redisLock 贯穿全程
-        RedisLock redisLock = new RedisLock();
-        redisLock.setLockName(PREFIX_ID_MENUS + userId)
-                .setAcquireTimeOut(3000L)
-                .setLockTimeOut(5000L);
 
         try {
-            // 这里增加分布式锁 防止缓存击穿
-            // ============ 尝试加锁
-            redisLock = redisLockPlugins.tryLock(redisLock);
-            if(redisLock == null){
+            // 分布式上锁
+            boolean isLock = REDISSON_LOCK.tryLock(
+                    cacheKey, 5);
+            if(!isLock){
+                // 无法申领分布式锁
+                log.error(CoreMsg.REDIS_EXCEPTION_LOCK.getMessage());
                 return null;
             }
 
             // 如果获得锁 则 再次检查缓存里有没有， 如果有则直接退出， 没有的话才发起数据库请求
-            try {
-                Object obj = CacheUtil.getTimed(PREFIX_ID_MENUS + userId);
-                if(obj instanceof List){
-                    List<?> list = Convert.toList(obj);
-                    if (!list.isEmpty()) {
-                        List<MenuModel> menuModels = Lists.newArrayListWithCapacity(list.size());
-                        for (Object menuObj : list) {
-                            if(menuObj instanceof MenuModel){
-                                menuModels.add((MenuModel) menuObj);
-                            }else if(menuObj instanceof JSONObject){
-                                JSONObject jsonObject = (JSONObject) menuObj;
-                                MenuModel t = JSONObject.toJavaObject(jsonObject, MenuModel.class);
-                                menuModels.add(t);
-                            }
-                        }
-                        return menuModels;
-                    }
-                }else {
-                    JSONArray jsonArray = Convert.convert(JSONArray.class, obj);
-                    if (jsonArray != null && !jsonArray.isEmpty()) {
-                        return jsonArray.toJavaList(MenuModel.class);
-                    }
-                }
-            }catch (Exception ignored){}
+            obj = CacheUtil.getTimed(cacheKey);
+            menus = Convert.toList(MenuModel.class, obj);
+            if(CollUtil.isNotEmpty(menus)){
+                return menus;
+            }
 
             // 查询数据库
             ResultVo<List<MenuModel>> resultVo = userApi.getMenuListByUserId(userId);
             if(resultVo.isSuccess()){
                 menus = resultVo.getData();
                 // 存入缓存
-                CacheUtil.put(PREFIX_ID_MENUS + userId, menus);
+                CacheUtil.put(cacheKey, menus);
             }
         }catch (Exception e){
-            log.error(e.getMessage(),e);
+            log.error(e.getMessage(), e);
         }finally {
-            // ============ 释放锁
-            redisLockPlugins.unLock(redisLock);
+            // 是否是当前线程
+            if(REDISSON_LOCK.isHeldByCurrentThread(cacheKey)){
+                // 释放锁
+                REDISSON_LOCK.unlock(cacheKey);
+            }
         }
 
-        if(menus == null || menus.size() == 0){
+        if(CollUtil.isEmpty(menus)){
             // 设置空变量 用于防止穿透判断
-            CacheUtil.putNilFlag(PREFIX_ID_MENUS + userId);
+            CacheUtil.putNilFlag(cacheKey);
             return null;
         }
 
@@ -728,27 +665,24 @@ public class UserUtil {
     }
 
     @Autowired
-    public void setRedisLockPlugins(RedisLockPlugins redisLockPlugins) {
-        UserUtil.redisLockPlugins = redisLockPlugins;
-    }
-
-    @Autowired
     public void setUserApi(UserApi userApi) {
         UserUtil.userApi = userApi;
     }
+
 
     /**
      * 初始化
      * @param globalProperties 配置类
      */
     @Autowired
-    public void init(GlobalProperties globalProperties){
+    public void init(GlobalProperties globalProperties, RedissonLock redissonLock){
         if(globalProperties != null && globalProperties.getAuth() != null
                 && globalProperties.getAuth().getToken() != null
             ){
             // 获得 超级管理员
             UserUtil.SUPER_ADMIN = globalProperties.getAuth().getSuperAdmin();
         }
+        UserUtil.REDISSON_LOCK = redissonLock;
     }
 
 }

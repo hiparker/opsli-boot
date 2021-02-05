@@ -116,6 +116,13 @@
                 <version>${jwt.version}</version>
             </dependency>
 
+            <!-- Redisson -->
+            <dependency>
+                <groupId>org.redisson</groupId>
+                <artifactId>redisson</artifactId>
+                <version>3.15.0</version>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
 

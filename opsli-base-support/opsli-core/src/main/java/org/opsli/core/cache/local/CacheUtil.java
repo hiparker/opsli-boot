@@ -649,7 +649,7 @@ public class CacheUtil {
     public void init(CacheProperties cacheProperties){
         if(cacheProperties != null){
             // 获得 超级管理员
-            CacheUtil.PREFIX_NAME = Convert.toStr(cacheProperties.getPrefix(), "opsli") + ":";
+            CacheUtil.PREFIX_NAME = Convert.toStr(cacheProperties.getPrefix(), "opsli") + "::";
         }
     }
 
