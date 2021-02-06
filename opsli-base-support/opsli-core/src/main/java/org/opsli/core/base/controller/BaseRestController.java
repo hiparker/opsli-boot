@@ -120,7 +120,7 @@ public abstract class BaseRestController <T extends BaseEntity, E extends ApiWra
             // 如果开启缓存 先从缓存读
             if(hotDataFlag){
                 model = WrapperUtil.transformInstance(
-                        CacheUtil.getTimed(entityClazz, CacheConstants.HOT_DATA_PREFIX +":"+ id)
+                        CacheUtil.getTimed(entityClazz, CacheConstants.HOT_DATA_PREFIX +"::"+ id)
                         , modelClazz);
                 if(model != null){
                     return model;
@@ -130,12 +130,12 @@ public abstract class BaseRestController <T extends BaseEntity, E extends ApiWra
             boolean hasNilFlag = false;
             // 如果开启缓存 防止缓存穿透判断
             if(hotDataFlag){
-                hasNilFlag = CacheUtil.hasNilFlag("get:" + id);
+                hasNilFlag = CacheUtil.hasNilFlag("get::" + id);
             }
             if(!hasNilFlag){
                 // 锁凭证 redisLock 贯穿全程
                 RedisLock redisLock = new RedisLock();
-                redisLock.setLockName("getLock:"+id)
+                redisLock.setLockName("getLock::"+id)
                         .setAcquireTimeOut(3000L)
                         .setLockTimeOut(10000L);
                 // 这里增加分布式锁 防止缓存击穿
@@ -149,7 +149,7 @@ public abstract class BaseRestController <T extends BaseEntity, E extends ApiWra
 
                         // 如果获得锁 则 再次检查缓存里有没有， 如果有则直接退出， 没有的话才发起数据库请求
                         model = WrapperUtil.transformInstance(
-                                CacheUtil.getTimed(entityClazz, CacheConstants.HOT_DATA_PREFIX +":"+ id)
+                                CacheUtil.getTimed(entityClazz, CacheConstants.HOT_DATA_PREFIX +"::"+ id)
                                 , modelClazz);
                         if(model != null){
                             return model;
@@ -178,7 +178,7 @@ public abstract class BaseRestController <T extends BaseEntity, E extends ApiWra
                     }
                 }else {
                     // 设置空变量 用于防止穿透判断
-                    CacheUtil.putNilFlag("get:" + id);
+                    CacheUtil.putNilFlag("get::" + id);
                 }
             }
         }

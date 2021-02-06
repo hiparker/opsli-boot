@@ -1,12 +1,12 @@
 package org.opsli.plugins.redisson.strategy;
 
 
-import org.opsli.plugins.redisson.entity.RedissonProperties;
+import org.opsli.plugins.redisson.properties.RedissonProperties;
 import org.opsli.plugins.redisson.enums.RedissonType;
 import org.redisson.config.Config;
 
 /**
- * @Description: Redisson配置构建接口
+ * Redisson配置构建接口
  *
  * @author xub
  * @date 2019/6/20 下午3:35

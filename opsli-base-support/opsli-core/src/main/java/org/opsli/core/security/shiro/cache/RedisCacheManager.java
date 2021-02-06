@@ -45,7 +45,7 @@ public class RedisCacheManager implements CacheManager {
 		Cache cache = caches.get(name);
 
 		if (cache == null) {
-			cache = new RedisCache<K, V>(redisManager,keyPrefix + name + ":", expire, principalIdFieldName);
+			cache = new RedisCache<K, V>(redisManager,keyPrefix + name + "::", expire, principalIdFieldName);
 			caches.put(name, cache);
 		}
 		return cache;

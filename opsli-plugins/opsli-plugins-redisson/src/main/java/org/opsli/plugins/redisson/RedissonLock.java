@@ -3,12 +3,14 @@ package org.opsli.plugins.redisson;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.Redisson;
 import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 
 import java.util.concurrent.TimeUnit;
 
 /**
- * @Description: 针对源码Redisson进行一层封装
+ * 针对源码Redisson进行一层封装
  *
+ * 参考地址：https://github.com/yudiandemingzi/spring-boot-distributed-redisson
  * @author xub
  * @date 2019/6/19 下午10:26
  */
@@ -17,8 +19,8 @@ public class RedissonLock {
 
     private static final String PREFIX = "lock::";
 
-    private  RedissonManager redissonManager;
-    private Redisson redisson;
+    private RedissonManager redissonManager;
+    private RedissonClient redisson;
 
 
     public RedissonLock(RedissonManager redissonManager) {
@@ -94,6 +96,18 @@ public class RedissonLock {
     }
 
     /**
+     * 解锁 当前线程
+     * @param lockName  锁名称
+     */
+    public void unlockByThread(String lockName) {
+        // 是否是当前线程
+        if(this.isHeldByCurrentThread(lockName)){
+            // 释放锁
+            this.unlock(lockName);
+        }
+    }
+
+    /**
      * 判断该锁是否已经被线程持有
      * @param lockName  锁名称
      */
@@ -111,6 +125,8 @@ public class RedissonLock {
         RLock rLock = redisson.getLock(PREFIX + lockName);
         return rLock.isHeldByCurrentThread();
     }
+
+    // ======================
 
     public RedissonManager getRedissonManager() {
         return redissonManager;

@@ -299,7 +299,7 @@ public class CacheUtil {
             if(isSaveLocal){
                 // 获得缓存Json
                 cacheJson = ehCachePlugin.get(CacheConstants.EHCACHE_SPACE,
-                        cacheKey +":"+ field, JSONObject.class);
+                        cacheKey +"::"+ field, JSONObject.class);
                 if(cacheJson != null){
                     return cacheJson.get(JSON_KEY);
                 }
@@ -312,7 +312,7 @@ public class CacheUtil {
                 if(isSaveLocal){
                     //存入EhCache
                     ehCachePlugin.put(CacheConstants.EHCACHE_SPACE,
-                        cacheKey + ":" + field, cacheJson);
+                        cacheKey + "::" + field, cacheJson);
                 }
             }
 
@@ -474,7 +474,7 @@ public class CacheUtil {
             String cacheKey = CacheUtil.handleKey(CacheType.EDEN_HASH, key);
 
             // 删除 EhCache
-            boolean ehcacheRet = ehCachePlugin.delete(CacheConstants.EHCACHE_SPACE,cacheKey +":"+ field);
+            boolean ehcacheRet = ehCachePlugin.delete(CacheConstants.EHCACHE_SPACE,cacheKey +"::"+ field);
             if(ehcacheRet){
                 count--;
             }
@@ -504,7 +504,7 @@ public class CacheUtil {
     public static boolean putNilFlag(String key) {
         try {
             // 处理缓存 key
-            String cacheKey = CacheUtil.handleKey(NIL_FLAG_PREFIX + ":" + key);
+            String cacheKey = CacheUtil.handleKey(NIL_FLAG_PREFIX + "::" + key);
             // 存入Redis
             return redisPlugin.put(cacheKey, 1, TTL_NIL_DATA_TIME);
         }catch (Exception e){
@@ -523,7 +523,7 @@ public class CacheUtil {
     public static boolean delNilFlag(String key) {
         try {
             // 处理缓存 key
-            String cacheKey = CacheUtil.handleKey(NIL_FLAG_PREFIX + ":" + key);
+            String cacheKey = CacheUtil.handleKey(NIL_FLAG_PREFIX + "::" + key);
             // 删除Redis
             return redisPlugin.del(cacheKey);
         }catch (Exception e){
@@ -543,7 +543,7 @@ public class CacheUtil {
     public static boolean hasNilFlag(String key) {
         try {
             // 处理缓存 key
-            String cacheKey = CacheUtil.handleKey(NIL_FLAG_PREFIX + ":" + key);
+            String cacheKey = CacheUtil.handleKey(NIL_FLAG_PREFIX + "::" + key);
             // 判断Redis 是否 包含当前Nil值
             return redisPlugin.get(cacheKey) != null;
         }catch (Exception e){
@@ -571,7 +571,7 @@ public class CacheUtil {
      * @return String
      */
     public static String handleKey(CacheType cacheType, String key){
-        return PREFIX_NAME + cacheType.getName() + ":" +
+        return PREFIX_NAME + cacheType.getName() + "::" +
                 key;
     }
 

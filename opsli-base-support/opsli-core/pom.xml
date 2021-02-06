@@ -54,6 +54,13 @@
             <version>${plugins.version}</version>
         </dependency>
 
+        <!-- 引入软防火墙插件 -->
+        <dependency>
+            <groupId>org.opsliframework.boot</groupId>
+            <artifactId>opsli-plugins-waf</artifactId>
+            <version>${plugins.version}</version>
+        </dependency>
+
         <!-- ———————————————————— 集成Shiro鉴权安全认证 - 开始 ———————————————————— -->
         <dependency>
             <groupId>org.crazycake</groupId>

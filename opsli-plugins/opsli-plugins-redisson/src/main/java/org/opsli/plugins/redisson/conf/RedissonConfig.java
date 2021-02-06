@@ -13,12 +13,12 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.opsli.core.autoconfigure.conf;
+package org.opsli.plugins.redisson.conf;
 
 import lombok.extern.slf4j.Slf4j;
 import org.opsli.plugins.redisson.RedissonLock;
 import org.opsli.plugins.redisson.RedissonManager;
-import org.opsli.plugins.redisson.entity.RedissonProperties;
+import org.opsli.plugins.redisson.properties.RedissonProperties;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -34,7 +34,7 @@ import org.springframework.core.annotation.Order;
  */
 @Slf4j
 @Configuration
-@ConditionalOnProperty(name = "redisson.lock.server.enable", havingValue = "true")
+@ConditionalOnProperty(prefix = RedissonProperties.PROP_PREFIX, name = "enable", havingValue = "true")
 @EnableConfigurationProperties(RedissonProperties.class)
 public class RedissonConfig {
 

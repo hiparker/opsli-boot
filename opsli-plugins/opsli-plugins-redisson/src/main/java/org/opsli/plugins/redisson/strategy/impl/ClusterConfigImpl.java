@@ -4,13 +4,13 @@ package org.opsli.plugins.redisson.strategy.impl;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.opsli.plugins.redisson.constant.GlobalConstant;
-import org.opsli.plugins.redisson.entity.RedissonProperties;
+import org.opsli.plugins.redisson.properties.RedissonProperties;
 import org.opsli.plugins.redisson.enums.RedissonType;
 import org.opsli.plugins.redisson.strategy.RedissonConfigService;
 import org.redisson.config.Config;
 
 /**
- * @Description: 集群方式Redisson部署
+ * 集群方式Redisson部署
  *      地址格式：
  *          cluster方式至少6个节点(3主3从，3主做sharding，3从用来保证主宕机后可以高可用)
  *          格式为: 127.0.0.1:6379,127.0.0.1:6380,127.0.0.1:6381,127.0.0.1:6382,127.0.0.1:6383,127.0.0.1:6384
@@ -36,7 +36,7 @@ public class ClusterConfigImpl implements RedissonConfigService {
             //设置cluster节点的服务IP和端口
             for (String addrToken : addrTokens) {
                 config.useClusterServers()
-                        .addNodeAddress(GlobalConstant.REDIS_CONNECTION_PREFIX.getConstant_value() + addrToken);
+                        .addNodeAddress(GlobalConstant.REDIS_CONNECTION_PREFIX.getConstantValue() + addrToken);
                 if (StringUtils.isNotBlank(password)) {
                     config.useClusterServers().setPassword(password);
                 }

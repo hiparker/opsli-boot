@@ -80,12 +80,11 @@ public class RedisPluginConfig {
      *
      * 默认开启 全局乐观锁 一劳永逸
      *
-     * @return
+     * @return RedisScriptCache
      */
     @Bean
     public RedisScriptCache loadScripts() {
         RedisScriptCache redisScriptCache = new RedisScriptCache();
-
         RedisScriptsEnum[] scriptEnums = RedisScriptsEnum.values();
         for (RedisScriptsEnum scriptEnum : scriptEnums) {
             String path = scriptEnum.getPath();
@@ -93,47 +92,11 @@ public class RedisPluginConfig {
             try {
                 ClassPathResource resource = new ClassPathResource(path);
                 InputStream inputStream = resource.getInputStream();
-//                List<String> readList = Lists.newArrayList();
-//                IoUtil.readLines(inputStream, StandardCharsets.UTF_8, readList);
-//                StringBuilder stb = new StringBuilder();
-//                for (String readLine : readList) {
-//                    stb.append(readLine);
-//                    stb.append("\n");
-//                }
                 String read = IoUtil.read(inputStream, StandardCharsets.UTF_8);
                 // 保存脚本到缓存中
                 redisScriptCache.putScript(scriptEnum,read);
             }catch (Exception ignored){}
         }
-
-
-        /**
-         * 暂时放弃这种写法 ， 如果把Lua脚本 直接写在Java中，可读性太低了
-         * Lua 就放在 lua 文件夹下 IDEA装一个Lua插件 直接写Lua
-         */
-
-//        // 拿到state包下 实现了 SystemEventState 接口的,所有子类
-//        Set<Class<?>> clazzSet = PackageUtil.listSubClazz(RedisPluginScript.class.getPackage().getName(),
-//                true,
-//                RedisPluginScript.class
-//        );
-//
-//        for (Class<?> aClass : clazzSet) {
-//            // 位运算 去除抽象类
-//            if((aClass.getModifiers() & Modifier.ABSTRACT) != 0){
-//                continue;
-//            }
-//
-//            // 通过反射 加载所有的 脚本
-//            try {
-//                RedisPluginScript redisPluginScript = (RedisPluginScript) aClass.newInstance();
-//                redisScriptCache.putScript(redisPluginScript);
-//            } catch (Exception e) {
-//                log.error(RedisMsg.EXCEPTION_REFLEX.getMessage());
-//            }
-//
-//        }
-
         return redisScriptCache;
     }
 

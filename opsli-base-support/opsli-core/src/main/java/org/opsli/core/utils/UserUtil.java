@@ -17,10 +17,6 @@ package org.opsli.core.utils;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
-import cn.hutool.core.thread.ThreadUtil;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
-import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.crypto.hash.Md5Hash;
@@ -35,17 +31,13 @@ import org.opsli.core.cache.local.CacheUtil;
 import org.opsli.core.cache.pushsub.msgs.UserMsgFactory;
 import org.opsli.core.msg.CoreMsg;
 import org.opsli.core.msg.TokenMsg;
-import org.opsli.plugins.redis.RedisLockPlugins;
 import org.opsli.plugins.redis.RedisPlugin;
-import org.opsli.plugins.redis.lock.RedisLock;
-import org.opsli.plugins.redisson.RedissonLock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import static org.opsli.common.constants.OrderConstants.UTIL_ORDER;
 
@@ -72,9 +64,6 @@ public class UserUtil {
 
     /** Redis插件 */
     private static RedisPlugin redisPlugin;
-
-    /** Redisson 分布式锁 */
-    private static RedissonLock REDISSON_LOCK;
 
     /** 用户Service */
     private static UserApi userApi;
@@ -127,10 +116,8 @@ public class UserUtil {
         }
 
         try {
-            // 分布式上锁
-            boolean isLock = REDISSON_LOCK.tryLock(
-                    cacheKey, 5);
-            if(!isLock){
+            // 分布式加锁
+            if(!DistributedLockUtil.lock(cacheKey)){
                 // 无法申领分布式锁
                 log.error(CoreMsg.REDIS_EXCEPTION_LOCK.getMessage());
                 return null;
@@ -157,11 +144,8 @@ public class UserUtil {
         }catch (Exception e){
             log.error(e.getMessage(), e);
         }finally {
-            // 是否是当前线程
-            if(REDISSON_LOCK.isHeldByCurrentThread(cacheKey)){
-                // 释放锁
-                REDISSON_LOCK.unlock(cacheKey);
-            }
+            // 释放锁
+            DistributedLockUtil.unlock(cacheKey);
         }
 
         if(userModel == null){
@@ -197,10 +181,8 @@ public class UserUtil {
         }
 
         try {
-            // 分布式上锁
-            boolean isLock = REDISSON_LOCK.tryLock(
-                    cacheKey, 5);
-            if(!isLock){
+            // 分布式加锁
+            if(!DistributedLockUtil.lock(cacheKey)){
                 // 无法申领分布式锁
                 log.error(CoreMsg.REDIS_EXCEPTION_LOCK.getMessage());
                 return null;
@@ -222,11 +204,8 @@ public class UserUtil {
         }catch (Exception e){
             log.error(e.getMessage(), e);
         }finally {
-            // 是否是当前线程
-            if(REDISSON_LOCK.isHeldByCurrentThread(cacheKey)){
-                // 释放锁
-                REDISSON_LOCK.unlock(cacheKey);
-            }
+            // 释放锁
+            DistributedLockUtil.unlock(cacheKey);
         }
 
         if(userModel == null){
@@ -264,10 +243,8 @@ public class UserUtil {
         }
 
         try {
-            // 分布式上锁
-            boolean isLock = REDISSON_LOCK.tryLock(
-                    cacheKey, 5);
-            if(!isLock){
+            // 分布式加锁
+            if(!DistributedLockUtil.lock(cacheKey)){
                 // 无法申领分布式锁
                 log.error(CoreMsg.REDIS_EXCEPTION_LOCK.getMessage());
                 return null;
@@ -290,11 +267,8 @@ public class UserUtil {
         }catch (Exception e){
             log.error(e.getMessage(), e);
         }finally {
-            // 是否是当前线程
-            if(REDISSON_LOCK.isHeldByCurrentThread(cacheKey)){
-                // 释放锁
-                REDISSON_LOCK.unlock(cacheKey);
-            }
+            // 释放锁
+            DistributedLockUtil.unlock(cacheKey);
         }
 
         if(CollUtil.isEmpty(roles)){
@@ -334,10 +308,8 @@ public class UserUtil {
         }
 
         try {
-            // 分布式上锁
-            boolean isLock = REDISSON_LOCK.tryLock(
-                    cacheKey, 5);
-            if(!isLock){
+            // 分布式加锁
+            if(!DistributedLockUtil.lock(cacheKey)){
                 // 无法申领分布式锁
                 log.error(CoreMsg.REDIS_EXCEPTION_LOCK.getMessage());
                 return null;
@@ -360,11 +332,8 @@ public class UserUtil {
         }catch (Exception e){
             log.error(e.getMessage(), e);
         }finally {
-            // 是否是当前线程
-            if(REDISSON_LOCK.isHeldByCurrentThread(cacheKey)){
-                // 释放锁
-                REDISSON_LOCK.unlock(cacheKey);
-            }
+            // 释放锁
+            DistributedLockUtil.unlock(cacheKey);
         }
 
         if(CollUtil.isEmpty(permissions)){
@@ -404,10 +373,8 @@ public class UserUtil {
 
 
         try {
-            // 分布式上锁
-            boolean isLock = REDISSON_LOCK.tryLock(
-                    cacheKey, 5);
-            if(!isLock){
+            // 分布式加锁
+            if(!DistributedLockUtil.lock(cacheKey)){
                 // 无法申领分布式锁
                 log.error(CoreMsg.REDIS_EXCEPTION_LOCK.getMessage());
                 return null;
@@ -430,11 +397,8 @@ public class UserUtil {
         }catch (Exception e){
             log.error(e.getMessage(), e);
         }finally {
-            // 是否是当前线程
-            if(REDISSON_LOCK.isHeldByCurrentThread(cacheKey)){
-                // 释放锁
-                REDISSON_LOCK.unlock(cacheKey);
-            }
+            // 释放锁
+            DistributedLockUtil.unlock(cacheKey);
         }
 
         if(CollUtil.isEmpty(menus)){
@@ -675,14 +639,13 @@ public class UserUtil {
      * @param globalProperties 配置类
      */
     @Autowired
-    public void init(GlobalProperties globalProperties, RedissonLock redissonLock){
+    public void init(GlobalProperties globalProperties){
         if(globalProperties != null && globalProperties.getAuth() != null
                 && globalProperties.getAuth().getToken() != null
             ){
             // 获得 超级管理员
             UserUtil.SUPER_ADMIN = globalProperties.getAuth().getSuperAdmin();
         }
-        UserUtil.REDISSON_LOCK = redissonLock;
     }
 
 }

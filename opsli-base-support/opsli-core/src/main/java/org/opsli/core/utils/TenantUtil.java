@@ -22,9 +22,8 @@ import org.opsli.api.web.system.tenant.TenantApi;
 import org.opsli.api.wrapper.system.tenant.TenantModel;
 import org.opsli.core.cache.local.CacheUtil;
 import org.opsli.core.cache.pushsub.msgs.TenantMsgFactory;
-import org.opsli.plugins.redis.RedisLockPlugins;
+import org.opsli.core.msg.CoreMsg;
 import org.opsli.plugins.redis.RedisPlugin;
-import org.opsli.plugins.redis.lock.RedisLock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.core.annotation.Order;
@@ -52,9 +51,6 @@ public class TenantUtil {
     /** Redis插件 */
     private static RedisPlugin redisPlugin;
 
-    /** Redis分布式锁 */
-    private static RedisLockPlugins redisLockPlugins;
-
     /** 租户 Api */
     private static TenantApi tenantApi;
 
@@ -65,35 +61,32 @@ public class TenantUtil {
      * @return
      */
     public static TenantModel getTenant(String tenantId){
+        // 缓存Key
+        String cacheKey = PREFIX_CODE + tenantId;
+
         // 先从缓存里拿
-        TenantModel tenantModel = CacheUtil.getTimed(TenantModel.class, PREFIX_CODE + tenantId);
+        TenantModel tenantModel = CacheUtil.getTimed(TenantModel.class, cacheKey);
         if (tenantModel != null){
             return tenantModel;
         }
 
         // 拿不到 --------
         // 防止缓存穿透判断
-        boolean hasNilFlag = CacheUtil.hasNilFlag(PREFIX_CODE + tenantId);
+        boolean hasNilFlag = CacheUtil.hasNilFlag(cacheKey);
         if(hasNilFlag){
             return null;
         }
 
-        // 锁凭证 redisLock 贯穿全程
-        RedisLock redisLock = new RedisLock();
-        redisLock.setLockName(PREFIX_CODE + tenantId)
-                .setAcquireTimeOut(3000L)
-                .setLockTimeOut(5000L);
-
         try {
-            // 这里增加分布式锁 防止缓存击穿
-            // ============ 尝试加锁
-            redisLock = redisLockPlugins.tryLock(redisLock);
-            if(redisLock == null){
+            // 分布式加锁
+            if(!DistributedLockUtil.lock(cacheKey)){
+                // 无法申领分布式锁
+                log.error(CoreMsg.REDIS_EXCEPTION_LOCK.getMessage());
                 return null;
             }
 
             // 如果获得锁 则 再次检查缓存里有没有， 如果有则直接退出， 没有的话才发起数据库请求
-            tenantModel = CacheUtil.getTimed(TenantModel.class, PREFIX_CODE + tenantId);
+            tenantModel = CacheUtil.getTimed(TenantModel.class, cacheKey);
             if (tenantModel != null){
                 return tenantModel;
             }
@@ -103,18 +96,18 @@ public class TenantUtil {
             if(resultVo.isSuccess()){
                 tenantModel = resultVo.getData();
                 // 存入缓存
-                CacheUtil.put(PREFIX_CODE + tenantId, tenantModel);
+                CacheUtil.put(cacheKey, tenantModel);
             }
         }catch (Exception e){
             log.error(e.getMessage(),e);
         }finally {
-            // ============ 释放锁
-            redisLockPlugins.unLock(redisLock);
+            // 释放锁
+            DistributedLockUtil.unlock(cacheKey);
         }
 
         if(tenantModel == null){
             // 设置空变量 用于防止穿透判断
-            CacheUtil.putNilFlag(PREFIX_CODE + tenantId);
+            CacheUtil.putNilFlag(cacheKey);
             return null;
         }
 
@@ -178,12 +171,8 @@ public class TenantUtil {
     }
 
     @Autowired
-    public  void setRedisLockPlugins(RedisLockPlugins redisLockPlugins) {
-        TenantUtil.redisLockPlugins = redisLockPlugins;
-    }
-
-    @Autowired
     public void setTenantApi(TenantApi tenantApi) {
         TenantUtil.tenantApi = tenantApi;
     }
+
 }

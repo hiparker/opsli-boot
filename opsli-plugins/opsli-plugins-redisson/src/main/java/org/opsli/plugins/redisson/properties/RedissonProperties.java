@@ -1,4 +1,4 @@
-package org.opsli.plugins.redisson.entity;
+package org.opsli.plugins.redisson.properties;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,16 +7,18 @@ import org.opsli.plugins.redisson.enums.RedissonType;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
- * @Description: 读取redis配置信息，封装到当前实体中
+ * 读取redis配置信息，封装到当前实体中
  *
  * @author xub
  * @date 2019/6/19 下午9:35
  */
-@ConfigurationProperties(prefix = "redisson.lock.server")
+@ConfigurationProperties(prefix = RedissonProperties.PROP_PREFIX)
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class RedissonProperties {
+
+    public static final String PROP_PREFIX = "redisson.lock.server";
 
     /**
      * 是否启用

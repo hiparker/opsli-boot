@@ -6,16 +6,15 @@ import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.opsli.plugins.redisson.constant.GlobalConstant;
-import org.opsli.plugins.redisson.entity.RedissonProperties;
+import org.opsli.plugins.redisson.properties.RedissonProperties;
 import org.opsli.plugins.redisson.enums.RedissonType;
 import org.opsli.plugins.redisson.strategy.RedissonConfigService;
 import org.redisson.config.Config;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
- * @Description:  主从部署Redisson配置
+ * 主从部署Redisson配置
  *       连接方式:  主节点,子节点,子节点
  *         格式为:  127.0.0.1:6379,127.0.0.1:6380,127.0.0.1:6381
  * @author xub
@@ -48,7 +47,7 @@ public class MasterslaveConfigImpl implements RedissonConfigService {
             //设置从节点，移除第一个节点，默认第一个为主节点
             List<String> slaveList = Lists.newArrayList();
             for (String addrToken : addrTokens) {
-                slaveList.add(GlobalConstant.REDIS_CONNECTION_PREFIX.getConstant_value() + addrToken);
+                slaveList.add(GlobalConstant.REDIS_CONNECTION_PREFIX.getConstantValue() + addrToken);
             }
             slaveList.remove(0);
 

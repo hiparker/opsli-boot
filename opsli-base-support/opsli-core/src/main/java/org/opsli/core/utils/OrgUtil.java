@@ -22,9 +22,8 @@ import org.opsli.api.web.system.user.UserApi;
 import org.opsli.api.wrapper.system.user.UserOrgRefModel;
 import org.opsli.core.cache.local.CacheUtil;
 import org.opsli.core.cache.pushsub.msgs.OrgMsgFactory;
-import org.opsli.plugins.redis.RedisLockPlugins;
+import org.opsli.core.msg.CoreMsg;
 import org.opsli.plugins.redis.RedisPlugin;
-import org.opsli.plugins.redis.lock.RedisLock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.core.annotation.Order;
@@ -52,9 +51,6 @@ public class OrgUtil {
     /** Redis插件 */
     private static RedisPlugin redisPlugin;
 
-    /** Redis分布式锁 */
-    private static RedisLockPlugins redisLockPlugins;
-
     /** 用户 Api */
     private static UserApi userApi;
 
@@ -65,35 +61,32 @@ public class OrgUtil {
      * @return
      */
     public static UserOrgRefModel getOrgByUserId(String userId){
+        // 缓存Key
+        String cacheKey = PREFIX_CODE + userId;
+
         // 先从缓存里拿
-        UserOrgRefModel orgRefModel = CacheUtil.getTimed(UserOrgRefModel.class, PREFIX_CODE + userId);
+        UserOrgRefModel orgRefModel = CacheUtil.getTimed(UserOrgRefModel.class, cacheKey);
         if (orgRefModel != null){
             return orgRefModel;
         }
 
         // 拿不到 --------
         // 防止缓存穿透判断
-        boolean hasNilFlag = CacheUtil.hasNilFlag(PREFIX_CODE + userId);
+        boolean hasNilFlag = CacheUtil.hasNilFlag(cacheKey);
         if(hasNilFlag){
             return null;
         }
 
-        // 锁凭证 redisLock 贯穿全程
-        RedisLock redisLock = new RedisLock();
-        redisLock.setLockName(PREFIX_CODE + userId)
-                .setAcquireTimeOut(3000L)
-                .setLockTimeOut(5000L);
-
         try {
-            // 这里增加分布式锁 防止缓存击穿
-            // ============ 尝试加锁
-            redisLock = redisLockPlugins.tryLock(redisLock);
-            if(redisLock == null){
+            // 分布式加锁
+            if(!DistributedLockUtil.lock(cacheKey)){
+                // 无法申领分布式锁
+                log.error(CoreMsg.REDIS_EXCEPTION_LOCK.getMessage());
                 return null;
             }
 
             // 如果获得锁 则 再次检查缓存里有没有， 如果有则直接退出， 没有的话才发起数据库请求
-            orgRefModel = CacheUtil.getTimed(UserOrgRefModel.class, PREFIX_CODE + userId);
+            orgRefModel = CacheUtil.getTimed(UserOrgRefModel.class, cacheKey);
             if (orgRefModel != null){
                 return orgRefModel;
             }
@@ -103,18 +96,18 @@ public class OrgUtil {
             if(resultVo.isSuccess()){
                 orgRefModel = resultVo.getData();
                 // 存入缓存
-                CacheUtil.put(PREFIX_CODE + userId, orgRefModel);
+                CacheUtil.put(cacheKey, orgRefModel);
             }
         }catch (Exception e){
             log.error(e.getMessage(),e);
         }finally {
-            // ============ 释放锁
-            redisLockPlugins.unLock(redisLock);
+            // 释放锁
+            DistributedLockUtil.unlock(cacheKey);
         }
 
         if(orgRefModel == null){
             // 设置空变量 用于防止穿透判断
-            CacheUtil.putNilFlag(PREFIX_CODE + userId);
+            CacheUtil.putNilFlag(cacheKey);
             return null;
         }
 
@@ -174,11 +167,6 @@ public class OrgUtil {
     @Autowired
     public  void setRedisPlugin(RedisPlugin redisPlugin) {
         OrgUtil.redisPlugin = redisPlugin;
-    }
-
-    @Autowired
-    public  void setRedisLockPlugins(RedisLockPlugins redisLockPlugins) {
-        OrgUtil.redisLockPlugins = redisLockPlugins;
     }
 
     @Autowired

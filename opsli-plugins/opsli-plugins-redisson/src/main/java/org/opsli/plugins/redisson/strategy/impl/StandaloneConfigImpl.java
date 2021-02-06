@@ -4,13 +4,13 @@ package org.opsli.plugins.redisson.strategy.impl;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.opsli.plugins.redisson.constant.GlobalConstant;
-import org.opsli.plugins.redisson.entity.RedissonProperties;
+import org.opsli.plugins.redisson.properties.RedissonProperties;
 import org.opsli.plugins.redisson.enums.RedissonType;
 import org.opsli.plugins.redisson.strategy.RedissonConfigService;
 import org.redisson.config.Config;
 
 /**
- * @Description: 单机部署Redisson配置
+ * 单机部署Redisson配置
  *
  * @author xub
  * @date 2019/6/19 下午10:04
@@ -31,7 +31,7 @@ public class StandaloneConfigImpl implements RedissonConfigService {
             String address = redissonProperties.getAddress();
             String password = redissonProperties.getPassword();
             int database = redissonProperties.getDatabase();
-            String redisAddr = GlobalConstant.REDIS_CONNECTION_PREFIX.getConstant_value() + address;
+            String redisAddr = GlobalConstant.REDIS_CONNECTION_PREFIX.getConstantValue() + address;
             config.useSingleServer().setAddress(redisAddr);
             config.useSingleServer().setDatabase(database);
             //密码可以为空

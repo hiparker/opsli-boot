@@ -31,9 +31,6 @@ public class GlobalProperties {
     /** 是否开启演示模式 */
     private boolean enableDemo;
 
-    /** 软防火墙 */
-    private Waf waf;
-
     /** 认证类 */
     private Auth auth;
 
@@ -45,33 +42,6 @@ public class GlobalProperties {
 
 
     // ============== 内部类 =============
-
-    /**
-     * 软防火墙
-     */
-    @Data
-    @EqualsAndHashCode(callSuper = false)
-    public static class Waf {
-
-        /** 是否生效 */
-        private boolean enable;
-
-        /** xss 过滤  */
-        private boolean xssFilter;
-
-        /** sql 过滤 */
-        private boolean sqlFilter;
-
-        /** 过滤器需要过滤的路径 */
-        private Set<String> urlPatterns;
-
-        /** 过滤器需要排除过滤的路径 */
-        private Set<String> urlExclusion;
-
-        /** 过滤器的优先级，值越小优先级越高 */
-        private int order;
-
-    }
 
     /**
      * Web

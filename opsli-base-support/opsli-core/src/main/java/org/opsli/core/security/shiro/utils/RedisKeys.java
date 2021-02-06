@@ -25,10 +25,10 @@ package org.opsli.core.security.shiro.utils;
 public class RedisKeys {
 
     public static String getSysConfigKey(String key){
-        return "system:config:" + key;
+        return "system::config::" + key;
     }
 
     public static String getShiroSessionKey(String key){
-        return "sessionid:" + key;
+        return "sessionid::" + key;
     }
 }

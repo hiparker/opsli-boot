@@ -17,6 +17,7 @@ package org.opsli.core.utils;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
+import cn.hutool.core.convert.Convert;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
@@ -28,9 +29,8 @@ import org.opsli.api.wrapper.system.dict.DictWrapper;
 import org.opsli.common.constants.DictConstants;
 import org.opsli.common.enums.CacheType;
 import org.opsli.core.cache.local.CacheUtil;
-import org.opsli.plugins.redis.RedisLockPlugins;
+import org.opsli.core.msg.CoreMsg;
 import org.opsli.plugins.redis.RedisPlugin;
-import org.opsli.plugins.redis.lock.RedisLock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.core.annotation.Order;
@@ -38,7 +38,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import static org.opsli.common.constants.OrderConstants.UTIL_ORDER;
 
@@ -58,9 +57,6 @@ public class DictUtil {
     /** Redis插件 */
     private static RedisPlugin redisPlugin;
 
-    /** Redis分布式锁 */
-    private static RedisLockPlugins redisLockPlugins;
-
     /** 字典Service */
     private static DictDetailApi dictDetailApi;
 
@@ -70,51 +66,46 @@ public class DictUtil {
      * @param typeCode 字典类型Code
      * @param dictValue 字典值
      * @param defaultVal 默认值
-     * @return
+     * @return String
      */
     public static String getDictNameByValue(String typeCode, String dictValue, String defaultVal){
+        // 缓存Key
+        String cacheKey = DictConstants.CACHE_PREFIX_VALUE + typeCode;
+        // 缓存Key + VALUE
+        String cacheKeyVal = cacheKey + "::" + dictValue;
 
-        String dictName = "";
-        DictDetailModel cacheModel = CacheUtil.getHash(DictDetailModel.class, DictConstants.CACHE_PREFIX_VALUE + typeCode,
+        // 字典名称
+        String dictName = null;
+
+        DictDetailModel cacheModel = CacheUtil.getHash(DictDetailModel.class, cacheKey,
                 dictValue);
-        if (cacheModel != null){
-            dictName = cacheModel.getDictName();
+        // 如果缓存有值 直接返回
+        if (cacheModel != null &&
+                StringUtils.isNotEmpty(cacheModel.getDictName())){
+            return cacheModel.getDictName();
         }
-        if (StringUtils.isNotEmpty(dictName)){
-            return dictName;
-        }
-
 
         // 防止缓存穿透判断
-        boolean hasNilFlag = CacheUtil.hasNilFlag(DictConstants.CACHE_PREFIX_VALUE + typeCode + ":" + dictValue);
+        boolean hasNilFlag = CacheUtil.hasNilFlag(cacheKeyVal);
         if(hasNilFlag){
             return defaultVal;
         }
 
-
-
-        // 锁凭证 redisLock 贯穿全程
-        RedisLock redisLock = new RedisLock();
-        redisLock.setLockName(DictConstants.CACHE_PREFIX_VALUE + typeCode + ":" + dictValue)
-                .setAcquireTimeOut(3000L)
-                .setLockTimeOut(5000L);
-
         try {
-            // 这里增加分布式锁 防止缓存击穿
-            // ============ 尝试加锁
-            redisLock = redisLockPlugins.tryLock(redisLock);
-            if(redisLock == null){
-                return defaultVal;
+            // 分布式加锁
+            if(!DistributedLockUtil.lock(cacheKeyVal)){
+                // 无法申领分布式锁
+                log.error(CoreMsg.REDIS_EXCEPTION_LOCK.getMessage());
+                return null;
             }
 
             // 如果获得锁 则 再次检查缓存里有没有， 如果有则直接退出， 没有的话才发起数据库请求
-            cacheModel = CacheUtil.getHash(DictDetailModel.class, DictConstants.CACHE_PREFIX_VALUE + typeCode,
+            cacheModel = CacheUtil.getHash(DictDetailModel.class, cacheKey,
                     dictValue);
-            if (cacheModel != null){
-                dictName = cacheModel.getDictName();
-            }
-            if (StringUtils.isNotEmpty(dictName)){
-                return dictName;
+            // 如果缓存有值 直接返回
+            if (cacheModel != null &&
+                    StringUtils.isNotEmpty(cacheModel.getDictName())){
+                return cacheModel.getDictName();
             }
 
             // 查询数据库 并保存到缓存内
@@ -123,15 +114,10 @@ public class DictUtil {
                 List<DictDetailModel> dictDetailModels = resultVo.getData();
                 for (DictDetailModel model : dictDetailModels) {
                     if(model.getDictValue().equals(dictValue)){
-                        // 名称
-                        dictName = model.getDictName();
-                        DictWrapper dictWrapperModel = new DictWrapper();
-                        dictWrapperModel.setTypeCode(model.getTypeCode());
-                        dictWrapperModel.setDictName(model.getDictName());
-                        dictWrapperModel.setDictValue(model.getDictValue());
-                        dictWrapperModel.setModel(model);
                         // 保存至缓存
-                        DictUtil.put(dictWrapperModel);
+                        DictWrapper dictWrapper = DictUtil.putByModel(model);
+                        // 缓存名
+                        dictName = dictWrapper.getDictName();
                         break;
                     }
                 }
@@ -141,15 +127,15 @@ public class DictUtil {
             log.error(e.getMessage(),e);
             return defaultVal;
         }finally {
-            // ============ 释放锁
-            redisLockPlugins.unLock(redisLock);
+            // 释放锁
+            DistributedLockUtil.unlock(cacheKeyVal);
         }
 
         // 如果名称还是 为空 则赋默认值
         if(StringUtils.isEmpty(dictName)){
             // 加入缓存防穿透
             // 设置空变量 用于防止穿透判断
-            CacheUtil.putNilFlag(DictConstants.CACHE_PREFIX_VALUE + typeCode + ":" + dictValue);
+            CacheUtil.putNilFlag(cacheKeyVal);
             dictName = defaultVal;
         }
         return dictName;
@@ -160,48 +146,45 @@ public class DictUtil {
      * @param typeCode 字典类型Code
      * @param dictName 字典名称
      * @param defaultVal 默认值
-     * @return
+     * @return String
      */
     public static String getDictValueByName(String typeCode, String dictName, String defaultVal){
+        // 缓存Key
+        String cacheKey = DictConstants.CACHE_PREFIX_NAME + typeCode;
+        // 缓存Key + VALUE
+        String cacheKeyVal = cacheKey + "::" + dictName;
 
-        String dictValue = "";
-        DictDetailModel cacheModel = CacheUtil.getHash(DictDetailModel.class, DictConstants.CACHE_PREFIX_NAME + typeCode,
+        // 字典值
+        String dictValue = null;
+
+        DictDetailModel cacheModel = CacheUtil.getHash(DictDetailModel.class, cacheKey,
                 dictName);
-        if (cacheModel != null){
-            dictValue = cacheModel.getDictValue();
-        }
-        if (StringUtils.isNotEmpty(dictValue)){
-            return dictValue;
+        // 如果缓存有值 直接返回
+        if (cacheModel != null &&
+                StringUtils.isNotEmpty(cacheModel.getDictValue())){
+            return cacheModel.getDictValue();
         }
 
         // 防止缓存穿透判断
-        boolean hasNilFlag = CacheUtil.hasNilFlag(DictConstants.CACHE_PREFIX_NAME + typeCode + ":" + dictName);
+        boolean hasNilFlag = CacheUtil.hasNilFlag(cacheKeyVal);
         if(hasNilFlag){
             return defaultVal;
         }
 
-        // 锁凭证 redisLock 贯穿全程
-        RedisLock redisLock = new RedisLock();
-        redisLock.setLockName(DictConstants.CACHE_PREFIX_NAME + typeCode + ":" + dictName)
-                .setAcquireTimeOut(3000L)
-                .setLockTimeOut(10000L);
-
         try {
-            // 这里增加分布式锁 防止缓存击穿
-            // ============ 尝试加锁
-            redisLock = redisLockPlugins.tryLock(redisLock);
-            if(redisLock == null){
-                return defaultVal;
+            // 分布式加锁
+            if(!DistributedLockUtil.lock(cacheKeyVal)){
+                // 无法申领分布式锁
+                log.error(CoreMsg.REDIS_EXCEPTION_LOCK.getMessage());
+                return null;
             }
 
-            // 如果获得锁 则 再次检查缓存里有没有， 如果有则直接退出， 没有的话才发起数据库请求
-            cacheModel = CacheUtil.getHash(DictDetailModel.class, DictConstants.CACHE_PREFIX_NAME + typeCode,
+            cacheModel = CacheUtil.getHash(DictDetailModel.class, cacheKey,
                     dictName);
-            if (cacheModel != null){
-                dictValue = cacheModel.getDictValue();
-            }
-            if (StringUtils.isNotEmpty(dictValue)){
-                return dictValue;
+            // 如果缓存有值 直接返回
+            if (cacheModel != null &&
+                    StringUtils.isNotEmpty(cacheModel.getDictValue())){
+                return cacheModel.getDictValue();
             }
 
             // 查询数据库 并保存到缓存内
@@ -210,15 +193,10 @@ public class DictUtil {
                 List<DictDetailModel> dictDetailModels = resultVo.getData();
                 for (DictDetailModel model : dictDetailModels) {
                     if(model.getDictName().equals(dictName)){
-                        // 值
-                        dictValue = model.getDictValue();
-                        DictWrapper dictWrapperModel = new DictWrapper();
-                        dictWrapperModel.setTypeCode(model.getTypeCode());
-                        dictWrapperModel.setDictName(model.getDictName());
-                        dictWrapperModel.setDictValue(model.getDictValue());
-                        dictWrapperModel.setModel(model);
                         // 保存至缓存
-                        DictUtil.put(dictWrapperModel);
+                        DictWrapper dictWrapper = DictUtil.putByModel(model);
+                        // 值
+                        dictValue = dictWrapper.getDictValue();
                         break;
                     }
                 }
@@ -228,16 +206,15 @@ public class DictUtil {
             log.error(e.getMessage(),e);
             return defaultVal;
         }finally {
-            // ============ 释放锁
-            redisLockPlugins.unLock(redisLock);
+            // 释放锁
+            DistributedLockUtil.unlock(cacheKeyVal);
         }
-
 
         // 如果值还是 为空 则赋默认值
         if(StringUtils.isEmpty(dictValue)){
             // 加入缓存防穿透
             // 设置空变量 用于防止穿透判断
-            CacheUtil.putNilFlag(DictConstants.CACHE_PREFIX_NAME + typeCode + ":" + dictName);
+            CacheUtil.putNilFlag(cacheKeyVal);
             dictValue = defaultVal;
         }
         return dictValue;
@@ -245,82 +222,42 @@ public class DictUtil {
 
     /**
      * 根据字典code 获得字典列表
-     * @param typeCode
-     * @return
+     * @param typeCode 类型编号
+     * @return List
      */
     public static List<DictWrapper> getDictList(String typeCode){
-        List<DictWrapper> dictWrapperModels = Lists.newArrayList();
+        // 缓存Key
+        String cacheKey = DictConstants.CACHE_PREFIX_NAME + typeCode;
+
+        List<DictWrapper> dictWrapperModels;
         try {
-            String key = CacheUtil.handleKey(CacheType.EDEN_HASH, DictConstants.CACHE_PREFIX_VALUE + typeCode);
-            Map<Object, Object> dictMap = redisPlugin.hGetAll(key);
-            Set<Map.Entry<Object, Object>> entries = dictMap.entrySet();
-            for (Map.Entry<Object, Object> entry : entries) {
-                // 赋值
-                JSONObject jsonObject = (JSONObject) entry.getValue();
-                if(jsonObject == null){
-                    continue;
-                }
-                JSONObject dataJson = jsonObject.getJSONObject(CacheUtil.JSON_KEY);
-                if(dataJson == null){
-                    continue;
-                }
-                DictDetailModel model = dataJson.toJavaObject(DictDetailModel.class);
-                DictWrapper dictWrapperModel = new DictWrapper();
-                dictWrapperModel.setTypeCode(typeCode);
-                dictWrapperModel.setDictName(model.getDictName());
-                dictWrapperModel.setDictValue(model.getDictValue());
-                dictWrapperModels.add(dictWrapperModel);
-            }
-            if(!dictWrapperModels.isEmpty()){
-                // 排序
-                return sortDictWrappers(dictWrapperModels);
+            String key = CacheUtil.handleKey(CacheType.EDEN_HASH, cacheKey);
+            // 处理集合数据
+            dictWrapperModels = handleDictList(redisPlugin.hGetAll(key), typeCode);
+            if(CollUtil.isNotEmpty(dictWrapperModels)){
+                return dictWrapperModels;
             }
 
             // 防止缓存穿透判断
-            boolean hasNilFlag = CacheUtil.hasNilFlag(DictConstants.CACHE_PREFIX_LIST + typeCode);
+            boolean hasNilFlag = CacheUtil.hasNilFlag(cacheKey);
             if(hasNilFlag){
                 return dictWrapperModels;
             }
 
-            // 锁凭证 redisLock 贯穿全程
-            RedisLock redisLock = new RedisLock();
-            redisLock.setLockName(DictConstants.CACHE_PREFIX_LIST + typeCode)
-                    .setAcquireTimeOut(3000L)
-                    .setLockTimeOut(10000L);
-
             try {
-                // 这里增加分布式锁 防止缓存击穿
-                // ============ 尝试加锁
-                redisLock = redisLockPlugins.tryLock(redisLock);
-                if(redisLock == null){
+                // 分布式加锁
+                if(!DistributedLockUtil.lock(cacheKey)){
+                    // 无法申领分布式锁
+                    log.error(CoreMsg.REDIS_EXCEPTION_LOCK.getMessage());
                     return dictWrapperModels;
                 }
 
                 // 如果获得锁 则 再次检查缓存里有没有， 如果有则直接退出， 没有的话才发起数据库请求
-                key = CacheUtil.handleKey(CacheType.EDEN_HASH, DictConstants.CACHE_PREFIX_VALUE + typeCode);
-                dictMap = redisPlugin.hGetAll(key);
-                entries = dictMap.entrySet();
-                for (Map.Entry<Object, Object> entry : entries) {
-                    // 赋值
-                    JSONObject jsonObject = (JSONObject) entry.getValue();
-                    if(jsonObject == null){
-                        continue;
-                    }
-                    JSONObject dataJson = jsonObject.getJSONObject(CacheUtil.JSON_KEY);
-                    if(dataJson == null){
-                        continue;
-                    }
-                    DictDetailModel model = dataJson.toJavaObject(DictDetailModel.class);
-                    DictWrapper dictWrapperModel = new DictWrapper();
-                    dictWrapperModel.setTypeCode(typeCode);
-                    dictWrapperModel.setDictName(model.getDictName());
-                    dictWrapperModel.setDictValue(model.getDictValue());
-                    dictWrapperModel.setModel(model);
-                    dictWrapperModels.add(dictWrapperModel);
-                }
-                if(!dictWrapperModels.isEmpty()){
-                    // 排序
-                    return sortDictWrappers(dictWrapperModels);
+                key = CacheUtil.handleKey(CacheType.EDEN_HASH, cacheKey);
+                // 处理集合数据
+                dictWrapperModels = handleDictList(redisPlugin.hGetAll(key), typeCode);
+                if(CollUtil.isNotEmpty(dictWrapperModels)){
+                    return dictWrapperModels;
                 }
 
 
@@ -328,15 +265,14 @@ public class DictUtil {
                 ResultVo<List<DictDetailModel>> resultVo = dictDetailApi.findListByTypeCode(typeCode);
                 if(resultVo.isSuccess()){
                     List<DictDetailModel> dictDetailModels = resultVo.getData();
-                    for (DictDetailModel model : dictDetailModels) {
-                        DictWrapper dictWrapperModel = new DictWrapper();
-                        dictWrapperModel.setTypeCode(model.getTypeCode());
-                        dictWrapperModel.setDictName(model.getDictName());
-                        dictWrapperModel.setDictValue(model.getDictValue());
-                        dictWrapperModel.setModel(model);
-                        dictWrapperModels.add(dictWrapperModel);
-                        // 保存至缓存
-                        DictUtil.put(dictWrapperModel);
+                    // 处理数据库查询数据
+                    if(CollUtil.isNotEmpty(dictDetailModels)){
+                        dictWrapperModels = Lists.newArrayListWithCapacity(dictDetailModels.size());
+                        for (DictDetailModel model : dictDetailModels) {
+                            // 保存至缓存
+                            DictWrapper dictWrapper = DictUtil.putByModel(model);
+                            dictWrapperModels.add(dictWrapper);
+                        }
                     }
                 }
 
@@ -344,16 +280,16 @@ public class DictUtil {
                 log.error(e.getMessage(),e);
                 return dictWrapperModels;
             }finally {
-                // ============ 释放锁
-                redisLockPlugins.unLock(redisLock);
+                // 释放锁
+                DistributedLockUtil.unlock(cacheKey);
             }
 
 
             // 如果值还是 为空 则赋默认值
-            if(dictWrapperModels.isEmpty()){
+            if(CollUtil.isEmpty(dictWrapperModels)){
                 // 加入缓存防穿透
                 // 设置空变量 用于防止穿透判断
-                CacheUtil.putNilFlag(DictConstants.CACHE_PREFIX_LIST + typeCode );
+                CacheUtil.putNilFlag(cacheKey);
             }
 
         }catch (Exception e){
@@ -367,10 +303,14 @@ public class DictUtil {
 
     /**
      * 字典排序
-     * @param dictWrapperModels
-     * @return
+     * @param dictWrapperModels 字典Model
+     * @return List
      */
     private static List<DictWrapper> sortDictWrappers(List<DictWrapper> dictWrapperModels) {
+        // 非法判读
+        if(dictWrapperModels == null){
+            return null;
+        }
         ListUtil.sort(dictWrapperModels, (o1, o2) -> {
             int oInt1 = Integer.MAX_VALUE;
             int oInt2 = Integer.MAX_VALUE;
@@ -392,7 +332,21 @@ public class DictUtil {
     /**
      * 删除 字典
      * @param model 字典模型
-     * @return
+     */
+    private static DictWrapper putByModel(DictDetailModel model){
+        DictWrapper dictWrapperModel = new DictWrapper();
+        dictWrapperModel.setTypeCode(model.getTypeCode());
+        dictWrapperModel.setDictName(model.getDictName());
+        dictWrapperModel.setDictValue(model.getDictValue());
+        dictWrapperModel.setModel(model);
+        // 保存至缓存
+        DictUtil.put(dictWrapperModel);
+        return dictWrapperModel;
+    }
+
+    /**
+     * 删除 字典
+     * @param model 字典模型
      */
     public static void put(DictWrapper model){
         // 清除缓存
@@ -407,7 +361,7 @@ public class DictUtil {
     /**
      * 删除 字典
      * @param model 字典模型
-     * @return
+     * @return boolean
      */
     public static boolean del(DictWrapper model){
         if(model == null){
@@ -415,9 +369,9 @@ public class DictUtil {
         }
 
         boolean hasNilFlagByName = CacheUtil.hasNilFlag(DictConstants.CACHE_PREFIX_NAME +
-                model.getTypeCode() + ":" + model.getDictName());
+                model.getTypeCode() + "::" + model.getDictName());
         boolean hasNilFlagByValue = CacheUtil.hasNilFlag(DictConstants.CACHE_PREFIX_VALUE +
-                model.getTypeCode() + ":" + model.getDictValue());
+                model.getTypeCode() + "::" + model.getDictValue());
 
         DictWrapper dictByName = CacheUtil.getHash(DictWrapper.class,
                 DictConstants.CACHE_PREFIX_NAME + model.getTypeCode(),
@@ -432,7 +386,7 @@ public class DictUtil {
             count++;
             // 清除空拦截
             boolean tmp = CacheUtil.delNilFlag(DictConstants.CACHE_PREFIX_NAME +
-                    model.getTypeCode() + ":" + model.getDictName());
+                    model.getTypeCode() + "::" + model.getDictName());
             if(tmp){
                 count--;
             }
@@ -442,7 +396,7 @@ public class DictUtil {
             count++;
             // 清除空拦截
             boolean tmp = CacheUtil.delNilFlag(DictConstants.CACHE_PREFIX_VALUE +
-                    model.getTypeCode() + ":" + model.getDictValue());
+                    model.getTypeCode() + "::" + model.getDictValue());
             if(tmp){
                 count--;
             }
@@ -474,7 +428,7 @@ public class DictUtil {
     /**
      * 删除 typeCode 下所有字典
      * @param typeCode 字典编号
-     * @return
+     * @return boolean
      */
     public static boolean delAll(String typeCode){
         List<DictWrapper> dictWrapperList = DictUtil.getDictList(typeCode);
@@ -493,6 +447,41 @@ public class DictUtil {
         return count == 0;
     }
 
+    /***
+     * 处理返回字典集合
+     * @param dictMap Map
+     * @param typeCode 类型编号
+     * @return List
+     */
+    public static List<DictWrapper> handleDictList(Map<Object, Object> dictMap, String typeCode){
+        if(CollUtil.isEmpty(dictMap)){
+            return null;
+        }
+
+        List<DictWrapper> dictWrapperModels = Lists.newArrayList();
+        for (Map.Entry<Object, Object> entry : dictMap.entrySet()) {
+            // 赋值
+            JSONObject jsonObject = (JSONObject) entry.getValue();
+            if(jsonObject == null){
+                continue;
+            }
+            Object data = jsonObject.get(CacheUtil.JSON_KEY);
+            if(data == null){
+                continue;
+            }
+
+            DictDetailModel model = Convert.convert(DictDetailModel.class, data);
+            DictWrapper dictWrapperModel = new DictWrapper();
+            dictWrapperModel.setTypeCode(typeCode);
+            dictWrapperModel.setDictName(model.getDictName());
+            dictWrapperModel.setDictValue(model.getDictValue());
+            dictWrapperModels.add(dictWrapperModel);
+        }
+
+        // 返回排序后 list
+        return CollUtil.isNotEmpty(dictWrapperModels)?sortDictWrappers(dictWrapperModels):null;
+    }
+
 
     // ===================================
 
@@ -502,12 +491,8 @@ public class DictUtil {
     }
 
     @Autowired
-    public  void setRedisLockPlugins(RedisLockPlugins redisLockPlugins) {
-        DictUtil.redisLockPlugins = redisLockPlugins;
-    }
-
-    @Autowired
     public  void setDictDetailApi(DictDetailApi dictDetailApi) {
         DictUtil.dictDetailApi = dictDetailApi;
     }
+
 }

@@ -4,14 +4,14 @@ package org.opsli.plugins.redisson.strategy.impl;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.opsli.plugins.redisson.constant.GlobalConstant;
-import org.opsli.plugins.redisson.entity.RedissonProperties;
+import org.opsli.plugins.redisson.properties.RedissonProperties;
 import org.opsli.plugins.redisson.enums.RedissonType;
 import org.opsli.plugins.redisson.strategy.RedissonConfigService;
 import org.redisson.config.Config;
 
 
 /**
- * @Description: 哨兵集群部署Redis连接配置
+ * 哨兵集群部署Redis连接配置
  *
  * @author xub
  * @date 2019/6/19 下午9:17
@@ -41,7 +41,7 @@ public class SentinelConfigImpl implements RedissonConfigService {
             }
             //设置sentinel节点的服务IP和端口
             for (int i = 1; i < addrTokens.length; i++) {
-                config.useSentinelServers().addSentinelAddress(GlobalConstant.REDIS_CONNECTION_PREFIX.getConstant_value() + addrTokens[i]);
+                config.useSentinelServers().addSentinelAddress(GlobalConstant.REDIS_CONNECTION_PREFIX.getConstantValue() + addrTokens[i]);
             }
             log.info("初始化[哨兵部署]方式Config,redisAddress:" + address);
         } catch (Exception e) {

@@ -22,9 +22,8 @@ import org.opsli.api.web.system.menu.MenuApi;
 import org.opsli.api.wrapper.system.menu.MenuModel;
 import org.opsli.core.cache.local.CacheUtil;
 import org.opsli.core.cache.pushsub.msgs.MenuMsgFactory;
-import org.opsli.plugins.redis.RedisLockPlugins;
+import org.opsli.core.msg.CoreMsg;
 import org.opsli.plugins.redis.RedisPlugin;
-import org.opsli.plugins.redis.lock.RedisLock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.core.annotation.Order;
@@ -52,9 +51,6 @@ public class MenuUtil {
     /** Redis插件 */
     private static RedisPlugin redisPlugin;
 
-    /** Redis分布式锁 */
-    private static RedisLockPlugins redisLockPlugins;
-
     /** 菜单 Api */
     private static MenuApi menuApi;
 
@@ -65,35 +61,32 @@ public class MenuUtil {
      * @return
      */
     public static MenuModel getMenuByCode(String menuCode){
+        // 缓存Key
+        String cacheKey = PREFIX_CODE + menuCode;
+
         // 先从缓存里拿
-        MenuModel menuModel = CacheUtil.getTimed(MenuModel.class, PREFIX_CODE + menuCode);
+        MenuModel menuModel = CacheUtil.getTimed(MenuModel.class, cacheKey);
         if (menuModel != null){
             return menuModel;
         }
 
         // 拿不到 --------
         // 防止缓存穿透判断
-        boolean hasNilFlag = CacheUtil.hasNilFlag(PREFIX_CODE + menuCode);
+        boolean hasNilFlag = CacheUtil.hasNilFlag(cacheKey);
         if(hasNilFlag){
             return null;
         }
 
-        // 锁凭证 redisLock 贯穿全程
-        RedisLock redisLock = new RedisLock();
-        redisLock.setLockName(PREFIX_CODE + menuCode)
-                .setAcquireTimeOut(3000L)
-                .setLockTimeOut(5000L);
-
         try {
-            // 这里增加分布式锁 防止缓存击穿
-            // ============ 尝试加锁
-            redisLock = redisLockPlugins.tryLock(redisLock);
-            if(redisLock == null){
+            // 分布式加锁
+            if(!DistributedLockUtil.lock(cacheKey)){
+                // 无法申领分布式锁
+                log.error(CoreMsg.REDIS_EXCEPTION_LOCK.getMessage());
                 return null;
             }
 
             // 如果获得锁 则 再次检查缓存里有没有， 如果有则直接退出， 没有的话才发起数据库请求
-            menuModel = CacheUtil.getTimed(MenuModel.class, PREFIX_CODE + menuCode);
+            menuModel = CacheUtil.getTimed(MenuModel.class, cacheKey);
             if (menuModel != null){
                 return menuModel;
             }
@@ -103,18 +96,18 @@ public class MenuUtil {
             if(resultVo.isSuccess()){
                 menuModel = resultVo.getData();
                 // 存入缓存
-                CacheUtil.put(PREFIX_CODE + menuCode, menuModel);
+                CacheUtil.put(cacheKey, menuModel);
             }
         }catch (Exception e){
             log.error(e.getMessage(),e);
         }finally {
-            // ============ 释放锁
-            redisLockPlugins.unLock(redisLock);
+            // 释放锁
+            DistributedLockUtil.unlock(cacheKey);
         }
 
         if(menuModel == null){
             // 设置空变量 用于防止穿透判断
-            CacheUtil.putNilFlag(PREFIX_CODE + menuCode);
+            CacheUtil.putNilFlag(cacheKey);
             return null;
         }
 
@@ -178,12 +171,8 @@ public class MenuUtil {
     }
 
     @Autowired
-    public  void setRedisLockPlugins(RedisLockPlugins redisLockPlugins) {
-        MenuUtil.redisLockPlugins = redisLockPlugins;
-    }
-
-    @Autowired
     public  void setMenuApi(MenuApi menuApi) {
         MenuUtil.menuApi = menuApi;
     }
+
 }

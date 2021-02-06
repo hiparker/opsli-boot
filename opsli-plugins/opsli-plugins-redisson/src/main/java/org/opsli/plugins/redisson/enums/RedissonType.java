@@ -17,11 +17,10 @@ package org.opsli.plugins.redisson.enums;
 
 
 /**
- * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.common.enums
- * @Author: Parker
- * @CreateTime: 2020-09-17 23:40
- * @Description: Redisson 类型
+ * Redisson 类型
+ *
+ * @author : Parker
+ * @date 2020-09-17 23:40
  */
 public enum RedissonType {
 
@@ -29,7 +28,7 @@ public enum RedissonType {
     STANDALONE("standalone", "单节点部署方式"),
     SENTINEL("sentinel", "哨兵部署方式"),
     CLUSTER("cluster", "集群方式"),
-    MASTER_SLAVE("master_slave", "主从部署方式");
+    MASTER_SLAVE("master_slave", "主从部署方式"),
 
     ;
 

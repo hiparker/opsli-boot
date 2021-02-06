@@ -59,12 +59,6 @@ public enum CoreMsg implements BaseMsg {
     CACHE_DEL_EXCEPTION(10406, "无法清除缓存，请稍后再试"),
 
 
-    /**
-     * 防火墙
-     */
-    WAF_EXCEPTION_XSS(10500, "包含非法字符！"),
-    WAF_EXCEPTION_SQL(10501, "包含非法字符！"),
-
     /** 演示模式 */
     EXCEPTION_ENABLE_DEMO(10600,"演示模式不允许操作"),
 

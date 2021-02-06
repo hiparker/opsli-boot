@@ -74,12 +74,10 @@ public class UserTokenUtil {
     private static RedisPlugin redisPlugin;
 
 
-
-
     /**
      * 根据 user 创建Token
      * @param user 用户
-     * @return
+     * @return UserTokenUtil.TokenRet
      */
     public static ResultVo<UserTokenUtil.TokenRet> createToken(UserModel user) {
         if (user == null) {
@@ -149,7 +147,7 @@ public class UserTokenUtil {
     /**
      * 根据 Token 获得用户ID
      * @param token token
-     * @return
+     * @return String
      */
     public static String getUserIdByToken(String token) {
         if(StringUtils.isEmpty(token)){
@@ -165,7 +163,7 @@ public class UserTokenUtil {
     /**
      * 根据 Token 获得 username
      * @param token token
-     * @return
+     * @return String
      */
     public static String getUserNameByToken(String token) {
         if(StringUtils.isEmpty(token)){
