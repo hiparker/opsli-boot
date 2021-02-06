@@ -45,11 +45,10 @@ import org.opsli.core.cache.local.CacheUtil;
 import org.opsli.core.msg.CoreMsg;
 import org.opsli.core.msg.TokenMsg;
 import org.opsli.core.security.shiro.realm.JwtRealm;
+import org.opsli.core.utils.DistributedLockUtil;
 import org.opsli.core.utils.ExcelUtil;
 import org.opsli.core.utils.UserUtil;
 import org.opsli.plugins.excel.exception.ExcelPluginException;
-import org.opsli.plugins.redis.RedisLockPlugins;
-import org.opsli.plugins.redis.lock.RedisLock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -98,10 +97,6 @@ public abstract class BaseRestController <T extends BaseEntity, E extends ApiWra
     @Autowired(required = false)
     protected S IService;
 
-    /** Redis分布式锁 */
-    @Autowired
-    private RedisLockPlugins redisLockPlugins;
-
     /** Excel工具类 */
     @Autowired
     private ExcelUtil excelUtil;
@@ -115,81 +110,81 @@ public abstract class BaseRestController <T extends BaseEntity, E extends ApiWra
      */
     @ModelAttribute
     public E get(@RequestParam(required=false) String id) {
-        E model = null;
+        E model;
         if (StringUtils.isNotBlank(id)){
             // 如果开启缓存 先从缓存读
             if(hotDataFlag){
+                // 缓存Key
+                String cacheKey = CacheConstants.HOT_DATA_PREFIX +"::"+ id;
+
                 model = WrapperUtil.transformInstance(
-                        CacheUtil.getTimed(entityClazz, CacheConstants.HOT_DATA_PREFIX +"::"+ id)
+                        CacheUtil.getTimed(entityClazz, cacheKey)
                         , modelClazz);
                 if(model != null){
                     return model;
                 }
-            }
-            // 防止缓存穿透判断
-            boolean hasNilFlag = false;
-            // 如果开启缓存 防止缓存穿透判断
-            if(hotDataFlag){
-                hasNilFlag = CacheUtil.hasNilFlag("get::" + id);
-            }
-            if(!hasNilFlag){
-                // 锁凭证 redisLock 贯穿全程
-                RedisLock redisLock = new RedisLock();
-                redisLock.setLockName("getLock::"+id)
-                        .setAcquireTimeOut(3000L)
-                        .setLockTimeOut(10000L);
-                // 这里增加分布式锁 防止缓存击穿
-                if(hotDataFlag){
-                    try {
-                        // 加锁
-                        redisLock = redisLockPlugins.tryLock(redisLock);
-                        if(redisLock == null){
-                            throw new ServiceException(CoreMsg.CACHE_PUNCTURE_EXCEPTION);
-                        }
 
-                        // 如果获得锁 则 再次检查缓存里有没有， 如果有则直接退出， 没有的话才发起数据库请求
-                        model = WrapperUtil.transformInstance(
-                                CacheUtil.getTimed(entityClazz, CacheConstants.HOT_DATA_PREFIX +"::"+ id)
-                                , modelClazz);
-                        if(model != null){
-                            return model;
-                        }
-
-                        // 如果缓存没读到 则去数据库读
-                        model = WrapperUtil.transformInstance(IService.get(id), modelClazz);
-                    }catch (Exception e){
-                        log.error(e.getMessage(), e);
-                    }finally {
-                        // 释放锁
-                        redisLockPlugins.unLock(redisLock);
-                    }
-                }else{
-                    // 如果缓存没读到 则去数据库读
-                    model = WrapperUtil.transformInstance(IService.get(id),modelClazz);
+                // 防止缓存穿透判断
+                boolean hasNilFlag = CacheUtil.hasNilFlag(cacheKey);
+                if(hasNilFlag){
+                    return null;
                 }
 
-                // 获得数据后处理
-                if(model != null){
-                    // 如果开启缓存 将数据库查询对象 存如缓存
-                    if(hotDataFlag){
+                try {
+                    // 分布式加锁
+                    if(!DistributedLockUtil.lock(cacheKey)){
+                        // 无法申领分布式锁
+                        log.error(CoreMsg.REDIS_EXCEPTION_LOCK.getMessage());
+                        throw new ServiceException(CoreMsg.CACHE_PUNCTURE_EXCEPTION);
+                    }
+
+                    // 如果获得锁 则 再次检查缓存里有没有， 如果有则直接退出， 没有的话才发起数据库请求
+                    model = WrapperUtil.transformInstance(
+                            CacheUtil.getTimed(entityClazz, cacheKey)
+                            , modelClazz);
+                    if(model != null){
+                        return model;
+                    }
+
+                    // 如果缓存没读到 则去数据库读
+                    model = WrapperUtil.transformInstance(IService.get(id), modelClazz);
+
+                    // 获得数据后处理
+                    if(model != null){
                         // 这里会 同步更新到本地Ehcache 和 Redis缓存
                         // 如果其他服务器缓存也丢失了 则 回去Redis拉取
-                        CacheUtil.put(id, model);
+                        CacheUtil.put(cacheKey, model);
                     }
-                }else {
+                }catch (Exception e){
+                    log.error(e.getMessage(), e);
+                }finally {
+                    // 释放锁
+                    DistributedLockUtil.unlock(cacheKey);
+                }
+
+                if(model == null){
                     // 设置空变量 用于防止穿透判断
-                    CacheUtil.putNilFlag("get::" + id);
+                    CacheUtil.putNilFlag(cacheKey);
+                    return null;
+                }
+
+                return model;
+            }else {
+                // 如果没开启缓存 则直接查询数据库
+                model = WrapperUtil.transformInstance(IService.get(id), modelClazz);
+                if(model != null){
+                    return model;
                 }
             }
         }
-        if (model == null){
-            try {
-                // 创建泛型对象
-                model = this.createModel();
-            }catch (Exception e){
-                log.error(CommonMsg.EXCEPTION_CONTROLLER_MODEL.toString()+" : {}",e.getMessage());
-                throw new ServiceException(CommonMsg.EXCEPTION_CONTROLLER_MODEL);
-            }
+
+        // 如果参数没传入ID 则创建一个空的对象
+        try {
+            // 创建泛型对象
+            model = this.createModel();
+        }catch (Exception e){
+            log.error(CommonMsg.EXCEPTION_CONTROLLER_MODEL.toString()+" : {}",e.getMessage());
+            throw new ServiceException(CommonMsg.EXCEPTION_CONTROLLER_MODEL);
         }
         return model;
     }
