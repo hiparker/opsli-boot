@@ -17,6 +17,7 @@ package org.opsli.core.base.service.impl;
 
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.TypeUtil;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.github.pagehelper.PageInfo;
@@ -38,6 +39,7 @@ import javax.annotation.PostConstruct;
 import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @BelongsProject: opsli-boot
@@ -62,15 +64,12 @@ import java.util.List;
 public abstract class CrudServiceImpl<M extends BaseMapper<T>, T extends BaseEntity, E extends ApiWrapper>
         extends BaseService<M, T> implements CrudServiceInterface<T,E> {
 
-
+    /** JSON tmp */
+    private static final String JSON_TMP = "{\"id\":\"1\"}";
     /** Entity Clazz 类 */
     protected Class<T> entityClazz;
-    /** Entity 泛型游标 */
-    private static final int ENTITY_INDEX = 1;
     /** Model Clazz 类 */
     protected Class<E> modelClazz;
-    /** Model 泛型游标 */
-    private static final int MODEL_INDEX = 2;
 
     @Override
     public E get(String id) {
@@ -304,36 +303,75 @@ public abstract class CrudServiceImpl<M extends BaseMapper<T>, T extends BaseEnt
     @PostConstruct
     public void init(){
         try {
-            this.modelClazz = this.getModelClazz();
-            this.entityClazz = this.getEntityClazz();
+            this.modelClazz = this.getInnerModelClazz();
+            this.entityClazz = this.getInnerEntityClazz();
         }catch (Exception e){
             log.error(e.getMessage(),e);
         }
     }
 
+    @Override
+    public Class<T> getEntityClazz() {
+        return entityClazz;
+    }
+
+    @Override
+    public Class<E> getModelClazz() {
+        return modelClazz;
+    }
 
     /**
-     * 获得 泛型 Clazz
-     * @return
+     * 内部获得 Model 泛型 Clazz
+     * @return Class<E>
      */
-    private Class<E> getModelClazz(){
+    public Class<E> getInnerModelClazz(){
+        String typeName = "E";
         Class<E> tClass = null;
-        Type typeArgument = TypeUtil.getTypeArgument(getClass().getGenericSuperclass(), MODEL_INDEX);
-        if(typeArgument != null){
-            tClass = (Class<E>) typeArgument;
+        Map<Type, Type> typeMap = TypeUtil.getTypeMap(this.getClass());
+        for (Map.Entry<Type, Type> typeTypeEntry : typeMap.entrySet()) {
+            Type entryKey = typeTypeEntry.getKey();
+            Type entryValue = typeTypeEntry.getValue();
+
+            // 如果等于当前类型名称则进入
+            if(entryKey != null && entryValue != null){
+                if(StringUtils.equals(typeName, entryKey.getTypeName())){
+                    // 小技巧 json 转换 obj 然后 转换成 type对象
+                    Object convert = Convert.convert(entryValue, JSONObject.parse(JSON_TMP));
+                    if(convert instanceof ApiWrapper) {
+                        tClass = (Class<E>) entryValue;
+                        break;
+                    }
+                }
+            }
+
         }
         return tClass;
     }
 
     /**
-     * 获得 泛型 Clazz
-     * @return
+     * 内部获得 Entity 泛型 Clazz
+     * @return Class<T>
      */
-    private Class<T> getEntityClazz(){
+    private Class<T> getInnerEntityClazz(){
+        String typeName = "T";
         Class<T> tClass = null;
-        Type typeArgument = TypeUtil.getTypeArgument(getClass().getGenericSuperclass(), ENTITY_INDEX);
-        if(typeArgument != null){
-            tClass = (Class<T>) typeArgument;
+        Map<Type, Type> typeMap = TypeUtil.getTypeMap(this.getClass());
+        for (Map.Entry<Type, Type> typeTypeEntry : typeMap.entrySet()) {
+            Type entryKey = typeTypeEntry.getKey();
+            Type entryValue = typeTypeEntry.getValue();
+
+            // 如果等于当前类型名称则进入
+            if(entryKey != null && entryValue != null){
+                if(StringUtils.equals(typeName, entryKey.getTypeName())){
+                    // 小技巧 json 转换 obj 然后 转换成 type对象
+                    Object convert = Convert.convert(entryValue, JSONObject.parse(JSON_TMP));
+                    if(convert instanceof ApiWrapper) {
+                        tClass = (Class<T>) entryValue;
+                        break;
+                    }
+                }
+            }
+
         }
         return tClass;
     }

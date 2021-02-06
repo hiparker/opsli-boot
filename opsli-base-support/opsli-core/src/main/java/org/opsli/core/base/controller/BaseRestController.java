@@ -20,7 +20,6 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.date.TimeInterval;
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.core.util.TypeUtil;
 import com.alibaba.excel.support.ExcelTypeEnum;
 import com.alibaba.excel.util.CollectionUtils;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -59,7 +58,6 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Method;
-import java.lang.reflect.Type;
 import java.util.Iterator;
 import java.util.List;
 
@@ -82,12 +80,9 @@ public abstract class BaseRestController <T extends BaseEntity, E extends ApiWra
 
     /** Entity Clazz 类 */
     protected Class<T> entityClazz;
-    /** Entity 泛型游标 */
-    private static final int ENTITY_INDEX = 0;
     /** Model Clazz 类 */
     protected Class<E> modelClazz;
-    /** Model 泛型游标 */
-    private static final int MODEL_INDEX = 1;
+
 
     /** 配置类 */
     @Autowired
@@ -366,8 +361,8 @@ public abstract class BaseRestController <T extends BaseEntity, E extends ApiWra
     @PostConstruct
     public void init(){
         try {
-            this.modelClazz = this.getModelClass();
-            this.entityClazz = this.getEntityClass();
+            this.modelClazz = IService.getModelClazz();
+            this.entityClazz = IService.getEntityClazz();
             Class<?> serviceClazz = IService.getServiceClazz();
             // 判断是否开启热点数据
             if(serviceClazz != null){
@@ -395,33 +390,6 @@ public abstract class BaseRestController <T extends BaseEntity, E extends ApiWra
             log.error(e.getMessage(),e);
         }
         return null;
-    }
-
-
-    /**
-     * 获得 泛型 Clazz
-     * @return Class<E>
-     */
-    private Class<E> getModelClass(){
-        Class<E> tClass = null;
-        Type typeArgument = TypeUtil.getTypeArgument(getClass().getGenericSuperclass(), MODEL_INDEX);
-        if(typeArgument != null){
-            tClass = (Class<E>) typeArgument;
-        }
-        return tClass;
-    }
-
-    /**
-     * 获得 泛型 Clazz
-     * @return Class<T>
-     */
-    private Class<T> getEntityClass(){
-        Class<T> tClass = null;
-        Type typeArgument = TypeUtil.getTypeArgument(getClass().getGenericSuperclass(), ENTITY_INDEX);
-        if(typeArgument != null){
-            tClass = (Class<T>) typeArgument;
-        }
-        return tClass;
     }
 
 }

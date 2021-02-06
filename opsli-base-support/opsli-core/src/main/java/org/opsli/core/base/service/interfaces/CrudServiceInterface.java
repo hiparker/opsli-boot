@@ -38,7 +38,7 @@ import java.util.List;
  * @param <T>
  * @param <E>
  */
-public interface CrudServiceInterface<T extends BaseEntity,E extends ApiWrapper> extends BaseServiceInterface<T> {
+public interface CrudServiceInterface<T extends BaseEntity, E extends ApiWrapper> extends BaseServiceInterface<T> {
 
 
     /**
@@ -199,6 +199,18 @@ public interface CrudServiceInterface<T extends BaseEntity,E extends ApiWrapper>
      */
     Page<T,E> findPageNotCount(Page<T,E> page);
 
+
+    /**
+     * 获得Model Clazz
+     * @return Class
+     */
+    Class<E> getModelClazz();
+
+    /**
+     * 获得Entity Clazz
+     * @return Class
+     */
+    Class<T> getEntityClazz();
 
 }
 
