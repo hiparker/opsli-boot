@@ -13,13 +13,13 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.opsli.core.waf.servlet;
+package org.opsli.plugins.waf.servlet;
 
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 import org.opsli.common.constants.TokenConstants;
-import org.opsli.core.waf.util.SQLFilterKit;
-import org.opsli.core.waf.util.XSSFilterKit;
+import org.opsli.plugins.waf.util.SQLFilterKit;
+import org.opsli.plugins.waf.util.XSSFilterKit;
 import org.springframework.util.StreamUtils;
 import org.springframework.util.StringUtils;
 

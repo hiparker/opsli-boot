@@ -1,0 +1,47 @@
+{
+  "properties": [
+    {
+      "name": "opsli.waf.enable",
+      "sourceType": "org.opsli.plugins.waf.properties.WafProperties",
+      "type": "java.lang.Boolean",
+      "defaultValue": false,
+      "description": "软防火墙是否开启."
+    },
+    {
+      "name": "opsli.waf.xss-filter",
+      "sourceType": "org.opsli.plugins.waf.properties.WafProperties",
+      "type": "java.lang.Boolean",
+      "defaultValue": false,
+      "description": "软防火墙 xss 过滤开启状态."
+    },
+    {
+      "name": "opsli.waf.sql-filter",
+      "sourceType": "org.opsli.plugins.waf.properties.WafProperties",
+      "type": "java.lang.Boolean",
+      "defaultValue": false,
+      "description": "软防火墙 sql 过滤开启状态."
+    },
+    {
+      "name": "opsli.waf.url-patterns",
+      "sourceType": "org.opsli.plugins.waf.properties.WafProperties",
+      "type": "java.util.Set<java.lang.String>",
+      "defaultValue": [
+        "/*"
+      ],
+      "description": "软防火墙 过滤器需要过滤的路径."
+    },
+    {
+      "name": "opsli.waf.url-exclusion",
+      "sourceType": "org.opsli.plugins.waf.properties.WafProperties",
+      "type": "java.util.Set<java.lang.String>",
+      "description": "软防火墙 过滤器需要排除过滤的路径."
+    },
+    {
+      "name": "opsli.waf.order",
+      "sourceType": "org.opsli.plugins.waf.properties.WafProperties",
+      "type": "java.lang.Integer",
+      "defaultValue": 0,
+      "description": "软防火墙 过滤器的优先级，值越小优先级越高."
+    }
+  ]
+}

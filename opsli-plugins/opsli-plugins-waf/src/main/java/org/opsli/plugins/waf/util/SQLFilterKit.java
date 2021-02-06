@@ -13,10 +13,10 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.opsli.core.waf.util;
+package org.opsli.plugins.waf.util;
 
 import org.opsli.common.exception.WafException;
-import org.opsli.core.msg.CoreMsg;
+import org.opsli.plugins.waf.msg.WafMsg;
 import org.springframework.util.StringUtils;
 
 /**
@@ -51,7 +51,7 @@ public final class SQLFilterKit {
 		//判断是否包含非法字符
 		for (String keyword : keywords) {
 			if (str.contains(keyword)) {
-				throw new WafException(CoreMsg.WAF_EXCEPTION_SQL);
+				throw new WafException(WafMsg.WAF_EXCEPTION_SQL);
 			}
 		}
 		return str;

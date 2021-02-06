@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.opsli.core.waf.util;
+package org.opsli.plugins.waf.util;
 
 import org.apache.commons.lang3.StringUtils;
 

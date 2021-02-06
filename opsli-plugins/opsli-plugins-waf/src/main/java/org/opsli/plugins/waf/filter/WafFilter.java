@@ -13,15 +13,15 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.opsli.core.waf.filter;
+package org.opsli.plugins.waf.filter;
 
 
-import org.opsli.core.waf.servlet.WafHttpServletRequestWrapper;
+
+import org.opsli.plugins.waf.servlet.WafHttpServletRequestWrapper;
 
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
-import java.util.List;
 import java.util.Set;
 
 /**
