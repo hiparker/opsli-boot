@@ -55,7 +55,7 @@ public class HotDataHandler implements RedisPushSubHandler{
         }
 
         // 拼装缓存key
-        String cacheName = CacheUtil.handleKey(CacheConstants.HOT_DATA_PREFIX +"::"+ key);
+        String cacheName = CacheUtil.handleKey(CacheConstants.HOT_DATA_PREFIX +":"+ key);
 
         if(CacheHandleType.UPDATE == type){
             ehCachePlugin.put(CacheConstants.EHCACHE_SPACE, cacheName, value);

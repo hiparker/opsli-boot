@@ -61,11 +61,11 @@ public class UserTokenUtil {
     /** token 缓存名 */
     public static final String TOKEN_NAME = TokenConstants.ACCESS_TOKEN;
     /** 缓存前缀 */
-    private static final String TICKET_PREFIX = "ticket::";
+    private static final String TICKET_PREFIX = "ticket:";
     /** 账号失败次数 */
-    public static final String ACCOUNT_SLIP_COUNT_PREFIX = "account::slip::count::";
+    public static final String ACCOUNT_SLIP_COUNT_PREFIX = "account:slip:count:";
     /** 账号失败锁定KEY */
-    public static final String ACCOUNT_SLIP_LOCK_PREFIX = "account::slip::lock::";
+    public static final String ACCOUNT_SLIP_LOCK_PREFIX = "account:slip:lock:";
     /** 限制登录数量 -1 为无限大 */
     public static final int ACCOUNT_LIMIT_INFINITE = -1;
     /** 登录配置信息 */

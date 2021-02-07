@@ -53,7 +53,7 @@ import java.util.List;
 public class RedisLockImpl implements RedisLockPlugins {
 
     /** 锁前缀 */
-    private static final String LOCK_NAME_PREFIX = "lock::";
+    private static final String LOCK_NAME_PREFIX = "lock:";
 
     @Autowired
     private RedisPlugin redisPlugin;

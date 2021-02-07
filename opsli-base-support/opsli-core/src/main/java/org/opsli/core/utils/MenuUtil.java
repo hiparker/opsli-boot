@@ -45,7 +45,7 @@ import static org.opsli.common.constants.OrderConstants.UTIL_ORDER;
 public class MenuUtil {
 
     /** 前缀 */
-    public static final String PREFIX_CODE = "menu::code::";
+    public static final String PREFIX_CODE = "menu:code:";
 
 
     /** Redis插件 */

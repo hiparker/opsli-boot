@@ -72,7 +72,7 @@ public class DictUtil {
         // 缓存Key
         String cacheKey = DictConstants.CACHE_PREFIX_VALUE + typeCode;
         // 缓存Key + VALUE
-        String cacheKeyVal = cacheKey + "::" + dictValue;
+        String cacheKeyVal = cacheKey + ":" + dictValue;
 
         // 字典名称
         String dictName = null;
@@ -152,7 +152,7 @@ public class DictUtil {
         // 缓存Key
         String cacheKey = DictConstants.CACHE_PREFIX_NAME + typeCode;
         // 缓存Key + VALUE
-        String cacheKeyVal = cacheKey + "::" + dictName;
+        String cacheKeyVal = cacheKey + ":" + dictName;
 
         // 字典值
         String dictValue = null;
@@ -369,9 +369,9 @@ public class DictUtil {
         }
 
         boolean hasNilFlagByName = CacheUtil.hasNilFlag(DictConstants.CACHE_PREFIX_NAME +
-                model.getTypeCode() + "::" + model.getDictName());
+                model.getTypeCode() + ":" + model.getDictName());
         boolean hasNilFlagByValue = CacheUtil.hasNilFlag(DictConstants.CACHE_PREFIX_VALUE +
-                model.getTypeCode() + "::" + model.getDictValue());
+                model.getTypeCode() + ":" + model.getDictValue());
 
         DictWrapper dictByName = CacheUtil.getHash(DictWrapper.class,
                 DictConstants.CACHE_PREFIX_NAME + model.getTypeCode(),
@@ -386,7 +386,7 @@ public class DictUtil {
             count++;
             // 清除空拦截
             boolean tmp = CacheUtil.delNilFlag(DictConstants.CACHE_PREFIX_NAME +
-                    model.getTypeCode() + "::" + model.getDictName());
+                    model.getTypeCode() + ":" + model.getDictName());
             if(tmp){
                 count--;
             }
@@ -396,7 +396,7 @@ public class DictUtil {
             count++;
             // 清除空拦截
             boolean tmp = CacheUtil.delNilFlag(DictConstants.CACHE_PREFIX_VALUE +
-                    model.getTypeCode() + "::" + model.getDictValue());
+                    model.getTypeCode() + ":" + model.getDictValue());
             if(tmp){
                 count--;
             }

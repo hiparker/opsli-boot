@@ -45,7 +45,7 @@ import static org.opsli.common.constants.OrderConstants.UTIL_ORDER;
 public class OrgUtil {
 
     /** 前缀 */
-    public static final String PREFIX_CODE = "org::userId::";
+    public static final String PREFIX_CODE = "org:userId:";
 
 
     /** Redis插件 */

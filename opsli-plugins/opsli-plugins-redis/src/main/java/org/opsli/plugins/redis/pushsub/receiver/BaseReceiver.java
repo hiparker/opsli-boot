@@ -11,7 +11,7 @@ package org.opsli.plugins.redis.pushsub.receiver;
  */
 public abstract class BaseReceiver {
 
-    public static final String BASE_CHANNEL = "listener::msg::";
+    public static final String BASE_CHANNEL = "listener:msg:";
     private final String channel;
 
     public BaseReceiver(String channel){

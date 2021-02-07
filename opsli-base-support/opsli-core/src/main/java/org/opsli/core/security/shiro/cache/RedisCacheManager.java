@@ -32,7 +32,7 @@ public class RedisCacheManager implements CacheManager {
 	/**
 	 * The Redis key prefix for caches
 	 */
-	public static final String DEFAULT_CACHE_KEY_PREFIX = "shiro::cache::";
+	public static final String DEFAULT_CACHE_KEY_PREFIX = "shiro:cache:";
 	private String keyPrefix = DEFAULT_CACHE_KEY_PREFIX;
 
 	public static final String DEFAULT_PRINCIPAL_ID_FIELD_NAME = "authCacheKey or id";
@@ -45,7 +45,7 @@ public class RedisCacheManager implements CacheManager {
 		Cache cache = caches.get(name);
 
 		if (cache == null) {
-			cache = new RedisCache<K, V>(redisManager,keyPrefix + name + "::", expire, principalIdFieldName);
+			cache = new RedisCache<K, V>(redisManager,keyPrefix + name + ":", expire, principalIdFieldName);
 			caches.put(name, cache);
 		}
 		return cache;

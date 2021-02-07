@@ -110,7 +110,7 @@ public abstract class BaseRestController <T extends BaseEntity, E extends ApiWra
             // 如果开启缓存 先从缓存读
             if(hotDataFlag){
                 // 缓存Key
-                String cacheKey = CacheConstants.HOT_DATA_PREFIX +"::"+ id;
+                String cacheKey = CacheConstants.HOT_DATA_PREFIX +":"+ id;
 
                 model = WrapperUtil.transformInstance(
                         CacheUtil.getTimed(entityClazz, cacheKey)

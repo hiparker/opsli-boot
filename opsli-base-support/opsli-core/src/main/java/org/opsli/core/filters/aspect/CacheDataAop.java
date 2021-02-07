@@ -93,7 +93,7 @@ public class CacheDataAop {
         for (CacheDataEntity cacheDataEntity : cacheDataEntityList) {
             // 更新缓存数据
             // 热点数据
-            boolean putRet = CacheUtil.put(CacheConstants.HOT_DATA_PREFIX +"::"+ cacheDataEntity.getKey(),
+            boolean putRet = CacheUtil.put(CacheConstants.HOT_DATA_PREFIX +":"+ cacheDataEntity.getKey(),
                     returnValue);
             if(putRet){
                 // 广播缓存数据 - 通知其他服务器同步数据
@@ -143,7 +143,7 @@ public class CacheDataAop {
 
         for (CacheDataEntity cacheDataEntity : cacheDataEntityList) {
             // 更新缓存数据 - 删除缓存
-            boolean delRet = CacheUtil.del(CacheConstants.HOT_DATA_PREFIX +"::"+ cacheDataEntity.getKey());
+            boolean delRet = CacheUtil.del(CacheConstants.HOT_DATA_PREFIX +":"+ cacheDataEntity.getKey());
             if(delRet){
                 // 广播缓存数据 - 通知其他服务器同步数据
                 redisPlugin.sendMessage(

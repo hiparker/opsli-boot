@@ -85,9 +85,9 @@ public class DictHandler implements RedisPushSubHandler{
 
         // 解析 key
         String ehKeyByName = CacheUtil.handleKey(CacheType.EDEN_HASH, DictConstants.CACHE_PREFIX_NAME +
-                        dictWrapperModel.getTypeCode() + "::" + dictWrapperModel.getDictName());
+                        dictWrapperModel.getTypeCode() + ":" + dictWrapperModel.getDictName());
         String ehKeyByValue = CacheUtil.handleKey(CacheType.EDEN_HASH, DictConstants.CACHE_PREFIX_VALUE +
-                dictWrapperModel.getTypeCode() + "::" + dictWrapperModel.getDictValue());
+                dictWrapperModel.getTypeCode() + ":" + dictWrapperModel.getDictValue());
 
         // 缓存更新
         if(CacheHandleType.UPDATE == type){

@@ -55,11 +55,11 @@ import static org.opsli.common.constants.OrderConstants.UTIL_ORDER;
 public class UserUtil {
 
     /** 前缀 */
-    public static final String PREFIX_ID = "userId::";
-    public static final String PREFIX_ID_ROLES = "userId::roles::";
-    public static final String PREFIX_ID_PERMISSIONS = "userId::permissions::";
-    public static final String PREFIX_ID_MENUS = "userId::menus::";
-    public static final String PREFIX_USERNAME = "username::";
+    public static final String PREFIX_ID = "userId:";
+    public static final String PREFIX_ID_ROLES = "userId:roles:";
+    public static final String PREFIX_ID_PERMISSIONS = "userId:permissions:";
+    public static final String PREFIX_ID_MENUS = "userId:menus:";
+    public static final String PREFIX_USERNAME = "username:";
 
 
     /** Redis插件 */

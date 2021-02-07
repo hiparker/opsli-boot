@@ -17,7 +17,7 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class RedissonLock {
 
-    private static final String PREFIX = "lock::";
+    private static final String PREFIX = "lock:";
 
     private RedissonManager redissonManager;
     private RedissonClient redisson;

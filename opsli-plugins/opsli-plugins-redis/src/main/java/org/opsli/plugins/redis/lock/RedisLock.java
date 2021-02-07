@@ -27,7 +27,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class RedisLock {
 
-    private static final String LOCK_PREFIX = "lock::";
+    private static final String LOCK_PREFIX = "lock:";
 
     /** 锁名称 */
     private String lockName;

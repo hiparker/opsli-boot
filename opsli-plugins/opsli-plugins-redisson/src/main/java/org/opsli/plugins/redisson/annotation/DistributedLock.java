@@ -17,7 +17,7 @@ public @interface DistributedLock {
     /**
      * 锁的名称
      */
-    String value() default "opsli::redisson";
+    String value() default "opsli:redisson";
 
     /**
      * 锁的有效时间
