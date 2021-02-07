@@ -16,14 +16,7 @@
 package org.opsli.core.utils;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
-import org.opsli.api.base.result.ResultVo;
-import org.opsli.api.web.system.user.UserApi;
-import org.opsli.api.wrapper.system.user.UserOrgRefModel;
 import org.opsli.core.cache.local.CacheUtil;
-import org.opsli.core.cache.pushsub.msgs.OrgMsgFactory;
-import org.opsli.core.msg.CoreMsg;
-import org.opsli.plugins.redis.RedisPlugin;
 import org.opsli.plugins.redisson.RedissonLock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
