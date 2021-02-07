@@ -29,7 +29,7 @@ import org.opsli.plugins.redis.pushsub.entity.BaseSubMessage;
  * @BelongsPackage: org.opsli.core.cache.pushsub.msgs
  * @Author: Parker
  * @CreateTime: 2020-09-15 16:50
- * @Description: 用户消息
+ * @Description: 菜单消息
  */
 
 @Data
@@ -51,7 +51,7 @@ public final class MenuMsgFactory extends BaseSubMessage{
         jsonObj.put(MsgArgsType.MENU_CODE.toString(), menuModel.getMenuCode());
         jsonObj.put(MsgArgsType.MENU_MODEL_DATA.toString(), menuModel);
 
-        // 用户
+        // 菜单
         baseSubMessage.build(CHANNEL,PushSubType.MENU.toString(),jsonObj);
         return baseSubMessage;
     }

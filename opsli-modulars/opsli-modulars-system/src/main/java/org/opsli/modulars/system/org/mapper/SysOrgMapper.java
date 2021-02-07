@@ -34,11 +34,6 @@ import java.util.List;
 @Mapper
 public interface SysOrgMapper extends BaseMapper<SysOrg> {
 
-    /**
-     * 唯一验证
-     * @return
-     */
-    Integer uniqueVerificationByCode(@Param("ew") Wrapper<SysOrg> wrapper);
 
     /**
      * 是否有下级

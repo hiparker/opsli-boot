@@ -20,6 +20,7 @@ import cn.hutool.core.collection.CollUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.apache.commons.lang3.StringUtils;
 import org.opsli.api.wrapper.system.area.SysAreaModel;
+import org.opsli.api.wrapper.system.role.RoleModel;
 import org.opsli.common.constants.MyBatisConstants;
 import org.opsli.common.exception.ServiceException;
 import org.opsli.common.utils.HumpUtil;
@@ -27,10 +28,12 @@ import org.opsli.core.base.entity.HasChildren;
 import org.opsli.core.base.service.impl.CrudServiceImpl;
 import org.opsli.core.persistence.querybuilder.GenQueryBuilder;
 import org.opsli.core.persistence.querybuilder.QueryBuilder;
+import org.opsli.core.persistence.querybuilder.chain.TenantHandler;
 import org.opsli.modulars.system.SystemMsg;
 import org.opsli.modulars.system.area.entity.SysArea;
 import org.opsli.modulars.system.area.mapper.SysAreaMapper;
 import org.opsli.modulars.system.area.service.ISysAreaService;
+import org.opsli.modulars.system.role.entity.SysRole;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -61,9 +64,8 @@ public class SysAreaServiceImpl extends CrudServiceImpl<SysAreaMapper, SysArea, 
             return null;
         }
 
-        SysArea entity = super.transformM2T(model);
         // 唯一验证
-        Integer count = this.uniqueVerificationByCode(entity);
+        Integer count = this.uniqueVerificationByCode(model);
         if(count != null && count > 0){
             // 重复
             throw new ServiceException(SystemMsg.EXCEPTION_AREA_UNIQUE);
@@ -84,9 +86,8 @@ public class SysAreaServiceImpl extends CrudServiceImpl<SysAreaMapper, SysArea, 
             return null;
         }
 
-        SysArea entity = super.transformM2T(model);
         // 唯一验证
-        Integer count = this.uniqueVerificationByCode(entity);
+        Integer count = this.uniqueVerificationByCode(model);
         if(count != null && count > 0){
             // 重复
             throw new ServiceException(SystemMsg.EXCEPTION_AREA_UNIQUE);
@@ -138,26 +139,31 @@ public class SysAreaServiceImpl extends CrudServiceImpl<SysAreaMapper, SysArea, 
         return ret;
     }
 
+
     /**
      * 唯一验证
-     * @param entity
-     * @return
+     * @param model model
+     * @return Integer
      */
     @Transactional(readOnly = true)
-    public Integer uniqueVerificationByCode(SysArea entity){
+    public Integer uniqueVerificationByCode(SysAreaModel model){
+        if(model == null){
+            return null;
+        }
         QueryWrapper<SysArea> wrapper = new QueryWrapper<>();
 
         // code 唯一
-        wrapper.eq("area_code", entity.getAreaCode())
-               .eq(MyBatisConstants.FIELD_DELETE_LOGIC, "0");
+        wrapper.eq(MyBatisConstants.FIELD_DELETE_LOGIC, "0")
+                .eq("area_code", model.getAreaCode());
 
-        // 如果为修改 则跳过当前数据
-        if(StringUtils.isNotBlank(entity.getId())){
-            wrapper.notIn(MyBatisConstants.FIELD_ID, entity.getId());
+        // 重复校验排除自身
+        if(StringUtils.isNotEmpty(model.getId())){
+            wrapper.notIn(MyBatisConstants.FIELD_ID, model.getId());
         }
 
-        return mapper.uniqueVerificationByCode(wrapper);
+        return super.count(wrapper);
     }
+
 
 
     /**

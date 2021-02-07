@@ -19,6 +19,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.apache.commons.lang3.StringUtils;
+import org.opsli.api.wrapper.system.area.SysAreaModel;
 import org.opsli.api.wrapper.system.menu.MenuModel;
 import org.opsli.common.constants.MyBatisConstants;
 import org.opsli.common.exception.ServiceException;
@@ -30,6 +31,7 @@ import org.opsli.core.persistence.querybuilder.QueryBuilder;
 import org.opsli.core.utils.MenuUtil;
 import org.opsli.core.utils.UserUtil;
 import org.opsli.modulars.system.SystemMsg;
+import org.opsli.modulars.system.area.entity.SysArea;
 import org.opsli.modulars.system.menu.entity.SysMenu;
 import org.opsli.modulars.system.menu.mapper.MenuMapper;
 import org.opsli.modulars.system.menu.service.IMenuService;
@@ -75,9 +77,8 @@ public class MenuServiceImpl extends CrudServiceImpl<MenuMapper, SysMenu, MenuMo
             return null;
         }
 
-        SysMenu entity = super.transformM2T(model);
         // 唯一验证
-        Integer count = mapper.uniqueVerificationByCode(entity);
+        Integer count = this.uniqueVerificationByCode(model);
         if(count != null && count > 0){
             // 重复
             throw new ServiceException(SystemMsg.EXCEPTION_ROLE_UNIQUE);
@@ -98,9 +99,8 @@ public class MenuServiceImpl extends CrudServiceImpl<MenuMapper, SysMenu, MenuMo
             return null;
         }
 
-        SysMenu entity = super.transformM2T(model);
         // 唯一验证
-        Integer count = mapper.uniqueVerificationByCode(entity);
+        Integer count = this.uniqueVerificationByCode(model);
         if(count != null && count > 0){
             // 重复
             throw new ServiceException(SystemMsg.EXCEPTION_ROLE_UNIQUE);
@@ -123,7 +123,6 @@ public class MenuServiceImpl extends CrudServiceImpl<MenuMapper, SysMenu, MenuMo
         // 删除子数据
         this.deleteByParentId(id);
 
-
         if(ret){
             // 清除缓存
             this.clearCache(menuModel);
@@ -141,7 +140,6 @@ public class MenuServiceImpl extends CrudServiceImpl<MenuMapper, SysMenu, MenuMo
                 super.findList(queryWrapper)
         );
 
-
         // 清除缓存
         for (MenuModel menuModel : menuList) {
             this.clearCache(menuModel);
@@ -154,6 +152,30 @@ public class MenuServiceImpl extends CrudServiceImpl<MenuMapper, SysMenu, MenuMo
         }
 
         return ret;
+    }
+
+    /**
+     * 唯一验证
+     * @param model model
+     * @return Integer
+     */
+    @Transactional(readOnly = true)
+    public Integer uniqueVerificationByCode(MenuModel model){
+        if(model == null){
+            return null;
+        }
+        QueryWrapper<SysMenu> wrapper = new QueryWrapper<>();
+
+        // code 唯一
+        wrapper.eq(MyBatisConstants.FIELD_DELETE_LOGIC, "0")
+                .eq("menu_code", model.getMenuCode());
+
+        // 重复校验排除自身
+        if(StringUtils.isNotEmpty(model.getId())){
+            wrapper.notIn(MyBatisConstants.FIELD_ID, model.getId());
+        }
+
+        return super.count(wrapper);
     }
 
 

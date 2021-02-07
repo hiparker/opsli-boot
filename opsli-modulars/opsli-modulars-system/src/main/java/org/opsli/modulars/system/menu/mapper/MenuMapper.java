@@ -29,11 +29,4 @@ import org.opsli.modulars.system.menu.entity.SysMenu;
 @Mapper
 public interface MenuMapper extends BaseMapper<SysMenu> {
 
-    /**
-     * 唯一验证
-     * @param entity
-     * @return
-     */
-    Integer uniqueVerificationByCode(SysMenu entity);
-
 }

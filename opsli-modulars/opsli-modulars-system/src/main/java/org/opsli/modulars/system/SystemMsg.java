@@ -46,6 +46,7 @@ public enum SystemMsg implements BaseMsg {
     EXCEPTION_ROLE_PERMS_ERROR(20202,"角色权限设置失败"),
 
 
+
     /**
      * 用户
      */
@@ -79,6 +80,11 @@ public enum SystemMsg implements BaseMsg {
      * 地域
      */
     EXCEPTION_AREA_UNIQUE(20600,"地域编号重复，已存在"),
+
+    /**
+     * 系统参数
+     */
+    EXCEPTION_OPTIONS_UNIQUE(20700,"参数编号重复，该角色已存在"),
 
     ;
 

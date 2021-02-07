@@ -67,9 +67,8 @@ public class SysOrgServiceImpl extends CrudServiceImpl<SysOrgMapper, SysOrg, Sys
             return null;
         }
 
-        SysOrg entity = super.transformM2T(model);
         // 唯一验证
-        Integer count = this.uniqueVerificationByCode(entity);
+        Integer count = this.uniqueVerificationByCode(model);
         if(count != null && count > 0){
             // 重复
             throw new ServiceException(SystemMsg.EXCEPTION_ORG_UNIQUE);
@@ -99,9 +98,8 @@ public class SysOrgServiceImpl extends CrudServiceImpl<SysOrgMapper, SysOrg, Sys
             return null;
         }
 
-        SysOrg entity = super.transformM2T(model);
         // 唯一验证
-        Integer count = this.uniqueVerificationByCode(entity);
+        Integer count = this.uniqueVerificationByCode(model);
         if(count != null && count > 0){
             // 重复
             throw new ServiceException(SystemMsg.EXCEPTION_ORG_UNIQUE);
@@ -223,26 +221,27 @@ public class SysOrgServiceImpl extends CrudServiceImpl<SysOrgMapper, SysOrg, Sys
 
     /**
      * 唯一验证
-     * @param entity
+     * @param model
      * @return
      */
     @Transactional(readOnly = true)
-    public Integer uniqueVerificationByCode(SysOrg entity){
+    public Integer uniqueVerificationByCode(SysOrgModel model){
+        if(model == null){
+            return null;
+        }
         QueryWrapper<SysOrg> wrapper = new QueryWrapper<>();
+        wrapper.eq(MyBatisConstants.FIELD_DELETE_LOGIC, "0")
+                .eq("org_code", model.getOrgCode());
 
-        // code 唯一
-        wrapper.eq("org_code", entity.getOrgCode())
-               .eq(MyBatisConstants.FIELD_DELETE_LOGIC, "0");
-
-        // 如果为修改 则跳过当前数据
-        if(StringUtils.isNotBlank(entity.getId())){
-            wrapper.notIn(MyBatisConstants.FIELD_ID, entity.getId());
+        // 重复校验排除自身
+        if(StringUtils.isNotEmpty(model.getId())){
+            wrapper.notIn(MyBatisConstants.FIELD_ID, model.getId());
         }
 
         // 租户检测
         wrapper = new TenantHandler().handler(super.entityClazz, wrapper);
 
-        return mapper.uniqueVerificationByCode(wrapper);
+        return super.count(wrapper);
     }
 
 

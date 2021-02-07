@@ -31,11 +31,5 @@ import org.opsli.modulars.system.tenant.entity.SysTenant;
 @Mapper
 public interface TenantMapper extends BaseMapper<SysTenant> {
 
-    /**
-     * 唯一验证
-     * @param entity
-     * @return
-     */
-    Integer uniqueVerificationByName(SysTenant entity);
 
 }

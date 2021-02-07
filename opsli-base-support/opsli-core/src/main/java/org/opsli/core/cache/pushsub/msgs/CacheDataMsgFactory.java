@@ -30,7 +30,7 @@ import org.opsli.plugins.redis.pushsub.entity.BaseSubMessage;
  * @BelongsPackage: org.opsli.core.cache.pushsub.msgs
  * @Author: Parker
  * @CreateTime: 2020-09-15 16:50
- * @Description: 字典消息
+ * @Description: 热数据消息
  */
 
 @Data

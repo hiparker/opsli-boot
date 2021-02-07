@@ -57,6 +57,11 @@ public enum MsgArgsType {
     /** 租户数据 */
     TENANT_DATA,
 
+    /** 参数编号 */
+    OPTION_CODE,
+    /** 参数数据*/
+    OPTION_MODEL_DATA,
+
     /** 缓存数据Key */
     CACHE_DATA_KEY,
     /** 缓存数据Value */

@@ -2,16 +2,6 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.opsli.modulars.system.org.mapper.SysOrgMapper">
 
-    <select id="uniqueVerificationByCode" parameterType="SysOrg" resultType="Integer">
-        select
-            count(0)
-        from
-            sys_org
-        <where>
-            ${ew.sqlSegment}
-        </where>
-    </select>
-
     <select id="hasChildren" parameterType="SysOrg" resultType="org.opsli.core.base.entity.HasChildren">
         select
             parent_id as parentId,

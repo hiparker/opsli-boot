@@ -2,34 +2,6 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.opsli.modulars.system.role.mapper.RoleMapper">
 
-    <!-- 数据库字段 -->
-    <sql id="SysRoleColumns">
-		a.id as id,
 
-		a.role_code as roleCode,
-        a.role_name as roleName,
-        a.iz_lock as izLock,
-        a.remark as remark,
-
-        a.create_by as createBy,
-        a.create_time as createTime,
-        a.update_by as updateBy,
-        a.update_time as updateTime,
-        a.version as version,
-        a.deleted as deleted
-	</sql>
-
-    <sql id="SysRoleJoins">
-	</sql>
-
-    <select id="uniqueVerificationByCode" resultType="Integer">
-        select
-            count(0)
-        from
-            sys_role
-        <where>
-            ${ew.sqlSegment}
-        </where>
-    </select>
 
 </mapper>

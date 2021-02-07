@@ -51,9 +51,8 @@ public class RoleServiceImpl extends CrudServiceImpl<RoleMapper, SysRole, RoleMo
             return null;
         }
 
-        SysRole entity = super.transformM2T(model);
         // 唯一验证
-        Integer count = this.uniqueVerificationByCode(entity);
+        Integer count = this.uniqueVerificationByCode(model);
         if(count != null && count > 0){
             // 重复
             throw new ServiceException(SystemMsg.EXCEPTION_ROLE_UNIQUE);
@@ -69,9 +68,8 @@ public class RoleServiceImpl extends CrudServiceImpl<RoleMapper, SysRole, RoleMo
             return null;
         }
 
-        SysRole entity = super.transformM2T(model);
         // 唯一验证
-        Integer count = this.uniqueVerificationByCode(entity);
+        Integer count = this.uniqueVerificationByCode(model);
         if(count != null && count > 0){
             // 重复
             throw new ServiceException(SystemMsg.EXCEPTION_ROLE_UNIQUE);
@@ -80,30 +78,33 @@ public class RoleServiceImpl extends CrudServiceImpl<RoleMapper, SysRole, RoleMo
         return super.update(model);
     }
 
-
     /**
      * 唯一验证
-     * @param entity
-     * @return
+     * @param model model
+     * @return Integer
      */
     @Transactional(readOnly = true)
-    public Integer uniqueVerificationByCode(SysRole entity){
+    public Integer uniqueVerificationByCode(RoleModel model){
+        if(model == null){
+            return null;
+        }
         QueryWrapper<SysRole> wrapper = new QueryWrapper<>();
 
         // code 唯一
-        wrapper.eq("role_code", entity.getRoleCode())
-                .eq(MyBatisConstants.FIELD_DELETE_LOGIC, "0");
+        wrapper.eq(MyBatisConstants.FIELD_DELETE_LOGIC, "0")
+                .eq("role_code", model.getRoleCode());
 
-        // 如果为修改 则跳过当前数据
-        if(StringUtils.isNotBlank(entity.getId())){
-            wrapper.notIn(MyBatisConstants.FIELD_ID, entity.getId());
+        // 重复校验排除自身
+        if(StringUtils.isNotEmpty(model.getId())){
+            wrapper.notIn(MyBatisConstants.FIELD_ID, model.getId());
         }
 
         // 租户检测
         wrapper = new TenantHandler().handler(super.entityClazz, wrapper);
 
-        return mapper.uniqueVerificationByCode(wrapper);
+        return super.count(wrapper);
     }
+
 
 }
 

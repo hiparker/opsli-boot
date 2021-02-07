@@ -58,7 +58,6 @@ public class #(data.model.tableName)Model extends ApiWrapper {
     #else
     @ExcelInfo
     #end
-    // 验证器
     #if(column.validateType != null && column.validateType != "")
     @ValidationArgs({#(column.validateType)})
     #end

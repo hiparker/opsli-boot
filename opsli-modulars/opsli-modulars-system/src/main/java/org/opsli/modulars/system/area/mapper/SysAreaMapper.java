@@ -34,15 +34,10 @@ import java.util.List;
 @Mapper
 public interface SysAreaMapper extends BaseMapper<SysArea> {
 
-    /**
-     * 唯一验证
-     * @return
-     */
-    Integer uniqueVerificationByCode(@Param("ew") Wrapper<SysArea> wrapper);
 
     /**
      * 是否有下级
-     * @return
+     * @return List
      */
     List<HasChildren> hasChildren(@Param("ew") Wrapper<SysArea> wrapper);
 

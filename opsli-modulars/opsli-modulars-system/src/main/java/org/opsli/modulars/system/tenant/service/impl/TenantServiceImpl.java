@@ -17,13 +17,18 @@ package org.opsli.modulars.system.tenant.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.google.common.collect.Lists;
+import org.apache.commons.lang3.StringUtils;
+import org.opsli.api.wrapper.system.menu.MenuModel;
 import org.opsli.api.wrapper.system.tenant.TenantModel;
+import org.opsli.common.constants.MyBatisConstants;
 import org.opsli.common.exception.ServiceException;
 import org.opsli.core.base.service.impl.CrudServiceImpl;
 import org.opsli.core.msg.CoreMsg;
 import org.opsli.core.utils.TenantUtil;
 import org.opsli.modulars.system.SystemMsg;
+import org.opsli.modulars.system.menu.entity.SysMenu;
 import org.opsli.modulars.system.tenant.entity.SysTenant;
 import org.opsli.modulars.system.tenant.mapper.TenantMapper;
 import org.opsli.modulars.system.tenant.service.ITenantService;
@@ -56,9 +61,8 @@ public class TenantServiceImpl extends CrudServiceImpl<TenantMapper, SysTenant, 
             return null;
         }
 
-        SysTenant entity = super.transformM2T(model);
         // 唯一验证
-        Integer count = mapper.uniqueVerificationByName(entity);
+        Integer count = this.uniqueVerificationByName(model);
         if(count != null && count > 0){
             // 重复
             throw new ServiceException(SystemMsg.EXCEPTION_TENANT_UNIQUE);
@@ -74,9 +78,8 @@ public class TenantServiceImpl extends CrudServiceImpl<TenantMapper, SysTenant, 
             return null;
         }
 
-        SysTenant entity = super.transformM2T(model);
         // 唯一验证
-        Integer count = mapper.uniqueVerificationByName(entity);
+        Integer count = this.uniqueVerificationByName(model);
         if(count != null && count > 0){
             // 重复
             throw new ServiceException(SystemMsg.EXCEPTION_TENANT_UNIQUE);
@@ -177,7 +180,33 @@ public class TenantServiceImpl extends CrudServiceImpl<TenantMapper, SysTenant, 
         return ret;
     }
 
+
+    /**
+     * 唯一验证
+     * @param model model
+     * @return Integer
+     */
+    @Transactional(readOnly = true)
+    public Integer uniqueVerificationByName(TenantModel model){
+        if(model == null){
+            return null;
+        }
+        QueryWrapper<SysTenant> wrapper = new QueryWrapper<>();
+
+        // name 唯一
+        wrapper.eq(MyBatisConstants.FIELD_DELETE_LOGIC, "0")
+                .eq("tenant_name", model.getTenantName());
+
+        // 重复校验排除自身
+        if(StringUtils.isNotEmpty(model.getId())){
+            wrapper.notIn(MyBatisConstants.FIELD_ID, model.getId());
+        }
+
+        return super.count(wrapper);
+    }
+
     // ============
+
 
     /**
      * 清除缓存

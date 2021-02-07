@@ -32,11 +32,5 @@ import org.opsli.modulars.system.role.entity.SysRole;
 @Mapper
 public interface RoleMapper extends BaseMapper<SysRole> {
 
-    /**
-     * 唯一验证
-     * @param wrapper
-     * @return
-     */
-    Integer uniqueVerificationByCode(@Param("ew") Wrapper<SysRole> wrapper);
 
 }

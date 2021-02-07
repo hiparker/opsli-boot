@@ -52,7 +52,7 @@ public final class OrgMsgFactory extends BaseSubMessage{
         jsonObj.put(MsgArgsType.ORG_USER_ID.toString(), orgRefModel.getUserId());
         jsonObj.put(MsgArgsType.ORG_USER_DATA.toString(), orgRefModel);
 
-        // 用户
+        // 组织
         baseSubMessage.build(CHANNEL,PushSubType.ORG.toString(),jsonObj);
         return baseSubMessage;
     }

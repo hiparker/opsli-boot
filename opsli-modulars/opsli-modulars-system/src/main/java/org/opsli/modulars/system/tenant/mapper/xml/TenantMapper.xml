@@ -3,18 +3,4 @@
 <mapper namespace="org.opsli.modulars.system.tenant.mapper.TenantMapper">
 
 
-    <select id="uniqueVerificationByName" resultType="Integer">
-        select
-            count(0)
-        from
-        sys_tenant a
-        <where>
-            a.tenant_name = #{tenantName}
-            and a.deleted = 0
-            <if test="id != null and id != ''">
-                and a.id != #{id}
-            </if>
-        </where>
-    </select>
-
 </mapper>

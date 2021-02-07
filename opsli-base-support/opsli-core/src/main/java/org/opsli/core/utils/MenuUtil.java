@@ -56,7 +56,7 @@ public class MenuUtil {
 
 
     /**
-     * 根据 userName 获得用户
+     * 根据 menuCode 获得菜单
      * @param menuCode
      * @return
      */
@@ -118,7 +118,7 @@ public class MenuUtil {
     // ============== 刷新缓存 ==============
 
     /**
-     * 刷新用户 - 删就完了
+     * 刷新菜单 - 删就完了
      * @param menu
      * @return
      */
@@ -130,7 +130,7 @@ public class MenuUtil {
         // 计数器
         int count = 0;
 
-        MenuModel menuModel = CacheUtil.getTimed(MenuModel.class, PREFIX_CODE + menu.getMenuCode());
+        MenuModel model = CacheUtil.getTimed(MenuModel.class, PREFIX_CODE + menu.getMenuCode());
         boolean hasNilFlag = CacheUtil.hasNilFlag(PREFIX_CODE + menu.getMenuCode());
 
         // 只要不为空 则执行刷新
@@ -143,7 +143,7 @@ public class MenuUtil {
             }
         }
 
-        if(menuModel != null){
+        if(model != null){
             count++;
             // 先删除
             boolean tmp = CacheUtil.del(PREFIX_CODE + menu.getMenuCode());
