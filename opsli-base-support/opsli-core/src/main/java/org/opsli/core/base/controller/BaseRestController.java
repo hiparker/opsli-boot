@@ -16,6 +16,7 @@
 package org.opsli.core.base.controller;
 
 
+import cn.hutool.core.annotation.AnnotationUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.date.TimeInterval;
@@ -197,7 +198,7 @@ public abstract class BaseRestController <T extends BaseEntity, E extends ApiWra
                     CoreMsg.EXCEL_FILE_NULL.getMessage());
         }
         ResultVo<?> resultVo;
-        String msgInfo = "";
+        String msgInfo;
         try {
             List<E> modelList = excelUtil.readExcel(files.get(0), modelClazz);
             if(CollUtil.isNotEmpty(modelList)){
@@ -263,7 +264,7 @@ public abstract class BaseRestController <T extends BaseEntity, E extends ApiWra
      *
      * @param fileName 文件名称
      * @param queryWrapper 查询构建器
-     * @param response
+     * @param response response
      */
     protected void excelExport(String fileName, QueryWrapper<T> queryWrapper, HttpServletResponse response,
                                       Method method){
@@ -291,7 +292,7 @@ public abstract class BaseRestController <T extends BaseEntity, E extends ApiWra
 
         // 计时器
         TimeInterval timer = DateUtil.timer();
-        String msgInfo = "";
+        String msgInfo;
         ResultVo<?> resultVo;
         List<E> modelList = Lists.newArrayList();
         try {
@@ -359,15 +360,11 @@ public abstract class BaseRestController <T extends BaseEntity, E extends ApiWra
         try {
             this.modelClazz = IService.getModelClazz();
             this.entityClazz = IService.getEntityClazz();
-            Class<?> serviceClazz = IService.getServiceClazz();
-            // 判断是否开启热点数据
-            if(serviceClazz != null){
-                EnableHotData annotation = serviceClazz.getAnnotation(EnableHotData.class);
-                if(annotation != null){
-                    this.hotDataFlag = true;
-                }
+            if(IService != null){
+                // 判断Service 是否包含 热数据注解
+                this.hotDataFlag = AnnotationUtil.hasAnnotation(IService.getServiceClazz(),
+                        EnableHotData.class);
             }
-
         }catch (Exception e){
             log.error(e.getMessage(),e);
         }

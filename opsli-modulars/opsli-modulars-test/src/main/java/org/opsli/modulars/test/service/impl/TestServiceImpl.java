@@ -29,7 +29,6 @@ import java.util.Collection;
  *
  */
 @Service
-// 开启热数据标示 不加不生效
 @EnableHotData
 public class TestServiceImpl extends CrudServiceImpl<TestMapper, TestEntity,TestModel > implements ITestService {
 

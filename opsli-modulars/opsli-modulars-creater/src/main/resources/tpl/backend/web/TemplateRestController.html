@@ -207,7 +207,6 @@ public class #(data.model.tableName)RestController extends BaseRestController<#(
     *
     * @param request request
     * @param response response
-    * @return ResultVo
     */
     @ApiOperation(value = "导出Excel", notes = "导出Excel")
     #if(data.subModuleName != null && data.subModuleName != "")
@@ -246,7 +245,6 @@ public class #(data.model.tableName)RestController extends BaseRestController<#(
     * #(data.codeTitleBrief) Excel 下载导入模版
     * 注：这里 RequiresPermissionsCus 引入的是 自定义鉴权注解
     * @param response response
-    * @return ResultVo
     */
     @ApiOperation(value = "导出Excel模版", notes = "导出Excel模版")
     #if(data.subModuleName != null && data.subModuleName != "")

@@ -142,7 +142,7 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
 
     /**
      * 用户组织机构
-     * @param userId
+     * @param userId 用户ID
      * @return ResultVo
      */
     @ApiOperation(value = "用户组织机构", notes = "用户组织机构")
@@ -195,8 +195,8 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
         List<MultipartFile> files = request.getFiles(uploadedFile);
         if (CollectionUtils.isEmpty(files)) {
             // 请选择文件
-            return ResultVo.error(CoreMsg.EXCEL_FILE_NULL.getCode(),
-                    CoreMsg.EXCEL_FILE_NULL.getMessage());
+            return ResultVo.error(SystemMsg.EXCEPTION_USER_FILE_NULL.getCode(),
+                    SystemMsg.EXCEPTION_USER_FILE_NULL.getMessage());
         }
 
         try {
@@ -411,7 +411,6 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
      * 用户信息 Excel 导出
      * @param request request
      * @param response response
-     * @return ResultVo
      */
     @ApiOperation(value = "导出Excel", notes = "导出Excel")
     @RequiresPermissionsCus("system_user_export")
@@ -440,7 +439,6 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
     /**
      * 用户信息 Excel 下载导入模版
      * @param response response
-     * @return ResultVo
      */
     @ApiOperation(value = "导出Excel模版", notes = "导出Excel模版")
     @RequiresPermissionsCus("system_user_import")
@@ -504,7 +502,7 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
 
     /**
      * 用户组织机构
-     * @param userId
+     * @param userId 用户ID
      * @return ResultVo
      */
     @ApiOperation(value = "用户组织机构", notes = "用户组织机构")
