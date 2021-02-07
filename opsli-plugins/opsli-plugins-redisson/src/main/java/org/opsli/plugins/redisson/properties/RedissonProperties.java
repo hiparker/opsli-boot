@@ -2,6 +2,7 @@ package org.opsli.plugins.redisson.properties;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.opsli.plugins.redisson.enums.RedissonType;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -16,6 +17,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(callSuper = false)
 public class RedissonProperties {
 
     public static final String PROP_PREFIX = "redisson.lock.server";

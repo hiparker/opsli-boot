@@ -34,8 +34,8 @@ import org.springframework.core.annotation.Order;
  */
 @Slf4j
 @Configuration
-@ConditionalOnProperty(prefix = RedissonProperties.PROP_PREFIX, name = "enable", havingValue = "true")
 @EnableConfigurationProperties(RedissonProperties.class)
+@ConditionalOnProperty(prefix = RedissonProperties.PROP_PREFIX, name = "enable", havingValue = "true")
 public class RedissonConfig {
 
     @Bean
