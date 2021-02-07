@@ -121,49 +121,45 @@ public abstract class BaseRestController <T extends BaseEntity, E extends ApiWra
 
                 // 防止缓存穿透判断
                 boolean hasNilFlag = CacheUtil.hasNilFlag(cacheKey);
-                if(hasNilFlag){
-                    return null;
-                }
+                if(!hasNilFlag) {
+                    try {
+                        // 分布式加锁
+                        if(!DistributedLockUtil.lock(cacheKey)){
+                            // 无法申领分布式锁
+                            log.error(CoreMsg.REDIS_EXCEPTION_LOCK.getMessage());
+                            throw new ServiceException(CoreMsg.CACHE_PUNCTURE_EXCEPTION);
+                        }
 
-                try {
-                    // 分布式加锁
-                    if(!DistributedLockUtil.lock(cacheKey)){
-                        // 无法申领分布式锁
-                        log.error(CoreMsg.REDIS_EXCEPTION_LOCK.getMessage());
-                        throw new ServiceException(CoreMsg.CACHE_PUNCTURE_EXCEPTION);
+                        // 如果获得锁 则 再次检查缓存里有没有， 如果有则直接退出， 没有的话才发起数据库请求
+                        model = WrapperUtil.transformInstance(
+                                CacheUtil.getTimed(entityClazz, cacheKey)
+                                , modelClazz);
+                        if(model != null){
+                            return model;
+                        }
+
+                        // 如果缓存没读到 则去数据库读
+                        model = WrapperUtil.transformInstance(IService.get(id), modelClazz);
+
+                        // 获得数据后处理
+                        if(model != null){
+                            // 这里会 同步更新到本地Ehcache 和 Redis缓存
+                            // 如果其他服务器缓存也丢失了 则 回去Redis拉取
+                            CacheUtil.put(cacheKey, model);
+                            return model;
+                        }
+                    }catch (Exception e){
+                        log.error(e.getMessage(), e);
+                    }finally {
+                        // 释放锁
+                        DistributedLockUtil.unlock(cacheKey);
                     }
 
-                    // 如果获得锁 则 再次检查缓存里有没有， 如果有则直接退出， 没有的话才发起数据库请求
-                    model = WrapperUtil.transformInstance(
-                            CacheUtil.getTimed(entityClazz, cacheKey)
-                            , modelClazz);
-                    if(model != null){
-                        return model;
+                    if(model == null){
+                        // 设置空变量 用于防止穿透判断
+                        CacheUtil.putNilFlag(cacheKey);
                     }
-
-                    // 如果缓存没读到 则去数据库读
-                    model = WrapperUtil.transformInstance(IService.get(id), modelClazz);
-
-                    // 获得数据后处理
-                    if(model != null){
-                        // 这里会 同步更新到本地Ehcache 和 Redis缓存
-                        // 如果其他服务器缓存也丢失了 则 回去Redis拉取
-                        CacheUtil.put(cacheKey, model);
-                    }
-                }catch (Exception e){
-                    log.error(e.getMessage(), e);
-                }finally {
-                    // 释放锁
-                    DistributedLockUtil.unlock(cacheKey);
                 }
-
-                if(model == null){
-                    // 设置空变量 用于防止穿透判断
-                    CacheUtil.putNilFlag(cacheKey);
-                    return null;
-                }
-
-                return model;
             }else {
                 // 如果没开启缓存 则直接查询数据库
                 model = WrapperUtil.transformInstance(IService.get(id), modelClazz);
