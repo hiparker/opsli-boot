@@ -62,19 +62,20 @@
         </dependency>
 
         <!-- ———————————————————— 集成Shiro鉴权安全认证 - 开始 ———————————————————— -->
+
+        <!-- ShiroRedis包 -->
         <dependency>
             <groupId>org.crazycake</groupId>
             <artifactId>shiro-redis-spring-boot-starter</artifactId>
-            <version>3.3.1</version>
         </dependency>
 
-        <!-- captcha -->
+        <!-- captcha 验证码 -->
         <dependency>
             <groupId>com.github.whvcse</groupId>
             <artifactId>easy-captcha</artifactId>
         </dependency>
 
-        <!-- JWT -->
+        <!-- JWT 认证 -->
         <dependency>
             <groupId>com.auth0</groupId>
             <artifactId>java-jwt</artifactId>
@@ -82,6 +83,71 @@
 
         <!-- ———————————————————— 集成Shiro鉴权安全认证 - 结束 ———————————————————— -->
 
+        <!-- ———————————————————— 集成数据库相关配置 - 开始 ———————————————————— -->
+        <!-- mybatis-plus -->
+        <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus-boot-starter</artifactId>
+        </dependency>
+
+        <!-- page-helper 分页 -->
+        <dependency>
+            <groupId>com.github.pagehelper</groupId>
+            <artifactId>pagehelper-spring-boot-starter</artifactId>
+        </dependency>
+
+        <!-- druid -->
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>druid-spring-boot-starter</artifactId>
+        </dependency>
+
+        <!-- 动态数据源 -->
+        <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>dynamic-datasource-spring-boot-starter</artifactId>
+        </dependency>
+
+        <!--mysql-->
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
+        <!--  sqlserver-->
+        <dependency>
+            <groupId>com.microsoft.sqlserver</groupId>
+            <artifactId>sqljdbc4</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
+        <!-- oracle驱动 -->
+        <dependency>
+            <groupId>com.oracle</groupId>
+            <artifactId>ojdbc6</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
+        <!-- postgresql驱动 -->
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
+        <!-- ———————————————————— 集成数据库相关配置 - 结束 ———————————————————— -->
+
+        <!-- ———————————————————— OSHI 系统监控 - 开始 ———————————————————— -->
+        <dependency>
+            <groupId>com.github.oshi</groupId>
+            <artifactId>oshi-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>net.java.dev.jna</groupId>
+            <artifactId>jna-platform</artifactId>
+        </dependency>
+        <!-- ———————————————————— OSHI 系统监控 - 结束 ———————————————————— -->
     </dependencies>
 
 </project>

@@ -27,6 +27,12 @@
             <version>${plugins.version}</version>
         </dependency>
 
+        <!-- mybatis-plus -->
+        <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus-boot-starter</artifactId>
+        </dependency>
+
         <!-- ———————————————————— 集成SwaggerApi - 开始 ———————————————————— -->
         <dependency>
             <groupId>com.github.xiaoymin</groupId>

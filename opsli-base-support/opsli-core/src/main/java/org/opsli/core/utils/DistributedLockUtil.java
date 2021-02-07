@@ -82,7 +82,7 @@ public class DistributedLockUtil {
      * 初始化
      * @param redissonLock 分布式锁
      */
-    @Autowired
+    @Autowired(required = false)
     public void init(RedissonLock redissonLock){
         DistributedLockUtil.REDISSON_LOCK = redissonLock;
     }
