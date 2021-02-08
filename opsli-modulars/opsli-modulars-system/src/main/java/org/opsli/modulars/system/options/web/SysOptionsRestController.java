@@ -46,7 +46,7 @@ import java.lang.reflect.Method;
 
 /**
 * @BelongsProject: opsli-boot
-* @BelongsPackage: org.opsli.modulars.sys.options.web
+* @BelongsPackage: org.opsli.modulars.system.options.web
 * @CreateTime: 2021-02-07 18:24:38
 * @Description: 系统参数 Controller
 *

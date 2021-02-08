@@ -34,7 +34,7 @@ import org.opsli.api.wrapper.system.options.OptionsModel;
 /**
  * @BelongsProject: opsli-boot
 
- * @BelongsPackage: org.opsli.api.web.sys.options
+ * @BelongsPackage: org.opsli.api.web.system.options
 
  * @Author: Parker
  * @CreateTime: 2021-02-07 18:24:38

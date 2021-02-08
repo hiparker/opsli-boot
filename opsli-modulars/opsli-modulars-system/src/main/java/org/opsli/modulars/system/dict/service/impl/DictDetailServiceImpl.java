@@ -24,6 +24,7 @@ import org.opsli.api.wrapper.system.dict.DictDetailModel;
 import org.opsli.api.wrapper.system.dict.DictModel;
 import org.opsli.api.wrapper.system.dict.DictWrapper;
 import org.opsli.common.constants.MyBatisConstants;
+import org.opsli.common.enums.DictType;
 import org.opsli.common.exception.ServiceException;
 import org.opsli.common.utils.HumpUtil;
 import org.opsli.core.base.service.impl.CrudServiceImpl;
@@ -72,9 +73,8 @@ public class DictDetailServiceImpl extends CrudServiceImpl<DictDetailMapper, Sys
     @Override
     public DictDetailModel insert(DictDetailModel model) {
 
-        SysDictDetail entity = super.transformM2T(model);
         // 唯一验证
-        Integer count = mapper.uniqueVerificationByNameOrValue(entity);
+        Integer count = this.uniqueVerificationByNameOrValue(model);
         if(count != null && count > 0){
             // 重复
             throw new ServiceException(SystemMsg.EXCEPTION_DICT_DETAIL_UNIQUE);
@@ -116,9 +116,8 @@ public class DictDetailServiceImpl extends CrudServiceImpl<DictDetailMapper, Sys
     @Override
     public DictDetailModel update(DictDetailModel model) {
 
-        SysDictDetail entity = super.transformM2T(model);
         // 唯一验证
-        Integer count = mapper.uniqueVerificationByNameOrValue(entity);
+        Integer count = this.uniqueVerificationByNameOrValue(model);
         if(count != null && count > 0){
             // 重复
             throw new ServiceException(SystemMsg.EXCEPTION_DICT_DETAIL_UNIQUE);
@@ -396,6 +395,35 @@ public class DictDetailServiceImpl extends CrudServiceImpl<DictDetailMapper, Sys
         return super.transformTs2Ms(list);
     }
 
+
+    /**
+     * 唯一验证 名称
+     * @param model model
+     * @return Integer
+     */
+    @Transactional(readOnly = true)
+    public Integer uniqueVerificationByNameOrValue(DictDetailModel model){
+        if(model == null){
+            return null;
+        }
+        QueryWrapper<SysDictDetail> wrapper = new QueryWrapper<>();
+
+        // name 唯一
+        wrapper.eq(MyBatisConstants.FIELD_DELETE_LOGIC,  DictType.NO_YES_NO.getCode())
+                .eq("type_code", model.getTypeCode());
+
+        // 名称 或者 Val 重复
+        wrapper.and(wra ->
+                wra.eq("dict_name",
+                        model.getDictName()).or().eq("dict_value", model.getDictValue()));
+
+        // 重复校验排除自身
+        if(StringUtils.isNotEmpty(model.getId())){
+            wrapper.notIn(MyBatisConstants.FIELD_ID, model.getId());
+        }
+
+        return super.count(wrapper);
+    }
 
     // ================
 

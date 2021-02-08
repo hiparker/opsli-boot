@@ -15,9 +15,12 @@
  */
 package org.opsli.modulars.system.dict.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.apache.commons.lang3.StringUtils;
 import org.opsli.api.wrapper.system.dict.DictDetailModel;
 import org.opsli.api.wrapper.system.dict.DictModel;
+import org.opsli.common.constants.MyBatisConstants;
+import org.opsli.common.enums.DictType;
 import org.opsli.common.exception.ServiceException;
 import org.opsli.core.base.service.impl.CrudServiceImpl;
 import org.opsli.modulars.system.SystemMsg;
@@ -54,9 +57,8 @@ public class DictServiceImpl extends CrudServiceImpl<DictMapper, SysDict, DictMo
             return null;
         }
 
-        SysDict entity = super.transformM2T(model);
         // 唯一验证
-        Integer count = mapper.uniqueVerificationByCode(entity);
+        Integer count = this.uniqueVerificationByCode(model);
         if(count != null && count > 0){
             // 重复
             throw new ServiceException(SystemMsg.EXCEPTION_DICT_UNIQUE);
@@ -72,9 +74,8 @@ public class DictServiceImpl extends CrudServiceImpl<DictMapper, SysDict, DictMo
             return null;
         }
 
-        SysDict entity = super.transformM2T(model);
         // 唯一验证
-        Integer count = mapper.uniqueVerificationByCode(entity);
+        Integer count = this.uniqueVerificationByCode(model);
         if(count != null && count > 0){
             // 重复
             throw new ServiceException(SystemMsg.EXCEPTION_DICT_UNIQUE);
@@ -156,6 +157,33 @@ public class DictServiceImpl extends CrudServiceImpl<DictMapper, SysDict, DictMo
         // 删除自身数据
         return super.deleteAll(models);
     }
+
+    // ==============================
+
+    /**
+     * 唯一验证
+     * @param model model
+     * @return Integer
+     */
+    @Transactional(readOnly = true)
+    public Integer uniqueVerificationByCode(DictModel model){
+        if(model == null){
+            return null;
+        }
+        QueryWrapper<SysDict> wrapper = new QueryWrapper<>();
+
+        // code 唯一
+        wrapper.eq(MyBatisConstants.FIELD_DELETE_LOGIC, DictType.NO_YES_NO.getCode())
+                .eq("type_code", model.getTypeCode());
+
+        // 重复校验排除自身
+        if(StringUtils.isNotEmpty(model.getId())){
+            wrapper.notIn(MyBatisConstants.FIELD_ID, model.getId());
+        }
+
+        return super.count(wrapper);
+    }
+
 }
 
 

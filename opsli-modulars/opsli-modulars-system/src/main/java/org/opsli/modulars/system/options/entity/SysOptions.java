@@ -27,7 +27,7 @@ import org.opsli.core.base.entity.BaseEntity;
 
 /**
  * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.modulars.sys.options.entity
+ * @BelongsPackage: org.opsli.modulars.system.options.entity
  * @Author: Parker
  * @CreateTime: 2021-02-07 18:24:38
  * @Description: 系统参数

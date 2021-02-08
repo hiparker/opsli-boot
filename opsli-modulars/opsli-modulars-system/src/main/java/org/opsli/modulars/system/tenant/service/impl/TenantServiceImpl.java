@@ -20,15 +20,14 @@ import cn.hutool.core.convert.Convert;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
-import org.opsli.api.wrapper.system.menu.MenuModel;
 import org.opsli.api.wrapper.system.tenant.TenantModel;
 import org.opsli.common.constants.MyBatisConstants;
+import org.opsli.common.enums.DictType;
 import org.opsli.common.exception.ServiceException;
 import org.opsli.core.base.service.impl.CrudServiceImpl;
 import org.opsli.core.msg.CoreMsg;
 import org.opsli.core.utils.TenantUtil;
 import org.opsli.modulars.system.SystemMsg;
-import org.opsli.modulars.system.menu.entity.SysMenu;
 import org.opsli.modulars.system.tenant.entity.SysTenant;
 import org.opsli.modulars.system.tenant.mapper.TenantMapper;
 import org.opsli.modulars.system.tenant.service.ITenantService;
@@ -194,7 +193,7 @@ public class TenantServiceImpl extends CrudServiceImpl<TenantMapper, SysTenant, 
         QueryWrapper<SysTenant> wrapper = new QueryWrapper<>();
 
         // name 唯一
-        wrapper.eq(MyBatisConstants.FIELD_DELETE_LOGIC, "0")
+        wrapper.eq(MyBatisConstants.FIELD_DELETE_LOGIC, DictType.NO_YES_NO.getCode())
                 .eq("tenant_name", model.getTenantName());
 
         // 重复校验排除自身

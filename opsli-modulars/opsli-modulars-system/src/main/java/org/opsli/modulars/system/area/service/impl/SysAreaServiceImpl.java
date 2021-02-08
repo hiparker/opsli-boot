@@ -20,20 +20,18 @@ import cn.hutool.core.collection.CollUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.apache.commons.lang3.StringUtils;
 import org.opsli.api.wrapper.system.area.SysAreaModel;
-import org.opsli.api.wrapper.system.role.RoleModel;
 import org.opsli.common.constants.MyBatisConstants;
+import org.opsli.common.enums.DictType;
 import org.opsli.common.exception.ServiceException;
 import org.opsli.common.utils.HumpUtil;
 import org.opsli.core.base.entity.HasChildren;
 import org.opsli.core.base.service.impl.CrudServiceImpl;
 import org.opsli.core.persistence.querybuilder.GenQueryBuilder;
 import org.opsli.core.persistence.querybuilder.QueryBuilder;
-import org.opsli.core.persistence.querybuilder.chain.TenantHandler;
 import org.opsli.modulars.system.SystemMsg;
 import org.opsli.modulars.system.area.entity.SysArea;
 import org.opsli.modulars.system.area.mapper.SysAreaMapper;
 import org.opsli.modulars.system.area.service.ISysAreaService;
-import org.opsli.modulars.system.role.entity.SysRole;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -153,7 +151,7 @@ public class SysAreaServiceImpl extends CrudServiceImpl<SysAreaMapper, SysArea, 
         QueryWrapper<SysArea> wrapper = new QueryWrapper<>();
 
         // code 唯一
-        wrapper.eq(MyBatisConstants.FIELD_DELETE_LOGIC, "0")
+        wrapper.eq(MyBatisConstants.FIELD_DELETE_LOGIC,  DictType.NO_YES_NO.getCode())
                 .eq("area_code", model.getAreaCode());
 
         // 重复校验排除自身
@@ -180,7 +178,7 @@ public class SysAreaServiceImpl extends CrudServiceImpl<SysAreaMapper, SysArea, 
         QueryWrapper<SysArea> wrapper = new QueryWrapper<>();
 
         wrapper.in(HumpUtil.humpToUnderline(MyBatisConstants.FIELD_PARENT_ID), parentIds)
-                .eq(MyBatisConstants.FIELD_DELETE_LOGIC, "0")
+                .eq(MyBatisConstants.FIELD_DELETE_LOGIC,  DictType.NO_YES_NO.getCode())
                 .groupBy(HumpUtil.humpToUnderline(MyBatisConstants.FIELD_PARENT_ID));
 
         return mapper.hasChildren(wrapper);

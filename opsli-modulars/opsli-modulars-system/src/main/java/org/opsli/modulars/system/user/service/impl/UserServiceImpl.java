@@ -19,15 +19,16 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.RandomUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.github.pagehelper.PageInfo;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.poi.ss.formula.functions.T;
 import org.opsli.api.wrapper.system.menu.MenuModel;
 import org.opsli.api.wrapper.system.user.UserAndOrgModel;
 import org.opsli.api.wrapper.system.user.UserModel;
 import org.opsli.api.wrapper.system.user.UserPassword;
 import org.opsli.common.constants.MyBatisConstants;
+import org.opsli.common.enums.DictType;
 import org.opsli.common.exception.ServiceException;
 import org.opsli.common.utils.HumpUtil;
 import org.opsli.common.utils.WrapperUtil;
@@ -71,15 +72,14 @@ public class UserServiceImpl extends CrudServiceImpl<UserMapper, SysUser, UserMo
             return null;
         }
 
-        SysUser entity = super.transformM2T(model);
         // 唯一验证
-        Integer count = mapper.uniqueVerificationByUsername(entity);
+        Integer count = this.uniqueVerificationByName(model);
         if(count != null && count > 0){
             // 重复
             throw new ServiceException(SystemMsg.EXCEPTION_USER_UNIQUE);
         }
         // 唯一验证 - 工号
-        count = mapper.uniqueVerificationByNo(entity);
+        count = this.uniqueVerificationByNo(model);
         if(count != null && count > 0){
             // 重复
             throw new ServiceException(SystemMsg.EXCEPTION_USER_NO_UNIQUE);
@@ -102,6 +102,14 @@ public class UserServiceImpl extends CrudServiceImpl<UserMapper, SysUser, UserMo
             );
         }
 
+        // 如果手机号有变化 则强制覆盖手机号
+        if(StringUtils.isNotEmpty(model.getMobile())){
+            UpdateWrapper<SysUser> updateWrapper = new UpdateWrapper<>();
+            updateWrapper.set("mobile", null);
+            updateWrapper.eq("mobile", model.getMobile());
+            this.update(updateWrapper);
+        }
+
         return super.insert(model);
     }
 
@@ -112,19 +120,20 @@ public class UserServiceImpl extends CrudServiceImpl<UserMapper, SysUser, UserMo
             return null;
         }
 
-        SysUser entity = super.transformM2T(model);
         // 唯一验证 - 用户名
-        Integer count = mapper.uniqueVerificationByUsername(entity);
+        Integer count = this.uniqueVerificationByName(model);
         if(count != null && count > 0){
             // 重复
             throw new ServiceException(SystemMsg.EXCEPTION_USER_UNIQUE);
         }
         // 唯一验证 - 工号
-        count = mapper.uniqueVerificationByNo(entity);
+        count = this.uniqueVerificationByNo(model);
         if(count != null && count > 0){
             // 重复
             throw new ServiceException(SystemMsg.EXCEPTION_USER_NO_UNIQUE);
         }
+
+        UserModel userModel = super.get(model);
 
         // 防止非法操作 - 不允许直接操控到 关键数据
         // 需要注意的是 不要轻易改修改策略
@@ -133,9 +142,16 @@ public class UserServiceImpl extends CrudServiceImpl<UserMapper, SysUser, UserMo
         model.setSecretkey(null);
         model.setLoginIp(null);
 
-        UserModel userModel = super.get(model);
         UserModel update = super.update(model);
         if(update != null){
+            // 如果手机号有变化 则强制覆盖手机号
+            if(!StringUtils.equals(userModel.getMobile(), update.getMobile())){
+                UpdateWrapper<SysUser> updateWrapper = new UpdateWrapper<>();
+                updateWrapper.set("mobile", null);
+                updateWrapper.eq("mobile", update.getMobile());
+                this.update(updateWrapper);
+            }
+
             // 刷新用户缓存
             this.clearCache(Collections.singletonList(userModel));
         }
@@ -443,6 +459,54 @@ public class UserServiceImpl extends CrudServiceImpl<UserMapper, SysUser, UserMo
     }
 
 
+
+    /**
+     * 唯一验证 工号
+     * @param model model
+     * @return Integer
+     */
+    @Transactional(readOnly = true)
+    public Integer uniqueVerificationByNo(UserModel model){
+        if(model == null){
+            return null;
+        }
+        QueryWrapper<SysUser> wrapper = new QueryWrapper<>();
+
+        // no 唯一
+        wrapper.eq(MyBatisConstants.FIELD_DELETE_LOGIC,  DictType.NO_YES_NO.getCode())
+                .eq("no", model.getNo());
+
+        // 重复校验排除自身
+        if(StringUtils.isNotEmpty(model.getId())){
+            wrapper.notIn(MyBatisConstants.FIELD_ID, model.getId());
+        }
+
+        return super.count(wrapper);
+    }
+
+    /**
+     * 唯一验证 名称
+     * @param model model
+     * @return Integer
+     */
+    @Transactional(readOnly = true)
+    public Integer uniqueVerificationByName(UserModel model){
+        if(model == null){
+            return null;
+        }
+        QueryWrapper<SysUser> wrapper = new QueryWrapper<>();
+
+        // name 唯一
+        wrapper.eq(MyBatisConstants.FIELD_DELETE_LOGIC,  DictType.NO_YES_NO.getCode())
+                .eq("username", model.getUsername());
+
+        // 重复校验排除自身
+        if(StringUtils.isNotEmpty(model.getId())){
+            wrapper.notIn(MyBatisConstants.FIELD_ID, model.getId());
+        }
+
+        return super.count(wrapper);
+    }
 
     // ==================
 

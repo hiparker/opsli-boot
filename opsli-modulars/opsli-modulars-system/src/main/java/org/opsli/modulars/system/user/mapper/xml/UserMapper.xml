@@ -51,33 +51,6 @@
         </where>
     </select>
 
-    <select id="uniqueVerificationByUsername" parameterType="SysUser" resultType="Integer">
-        select
-            count(0)
-        from
-        sys_user a
-        where
-            a.username = #{username}
-            and a.deleted = 0
-            <if test="id != null and id != ''">
-                AND a.id != #{id}
-            </if>
-    </select>
-
-
-    <select id="uniqueVerificationByNo" parameterType="SysUser" resultType="Integer">
-        select
-            count(0)
-        from
-        sys_user a
-        where
-            a.no = #{no}
-            and a.deleted = 0
-            <if test="id != null and id != ''">
-                AND a.id != #{id}
-            </if>
-    </select>
-
     <select id="queryAllPerms" resultType="String">
         select
             a.menu_code

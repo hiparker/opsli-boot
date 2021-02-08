@@ -17,6 +17,9 @@ package org.opsli.modulars.creater.table.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import org.apache.commons.lang3.StringUtils;
+import org.opsli.common.constants.MyBatisConstants;
 import org.opsli.common.enums.DictType;
 import org.opsli.common.utils.WrapperUtil;
 import org.opsli.core.base.service.impl.CrudServiceImpl;
@@ -67,9 +70,8 @@ public class TableServiceImpl extends CrudServiceImpl<TableMapper, CreaterTable,
             return null;
         }
 
-        CreaterTable entity = super.transformM2T(model);
         // 唯一验证
-        Integer count = mapper.uniqueVerificationByTableName(entity);
+        Integer count = this.uniqueVerificationByTableName(model);
         if(count != null && count > 0){
             // 重复
             throw new CreaterException(CreaterMsg.EXCEPTION_TABLE_NAME_REPEAT);
@@ -94,9 +96,8 @@ public class TableServiceImpl extends CrudServiceImpl<TableMapper, CreaterTable,
             return null;
         }
 
-        CreaterTable entity = super.transformM2T(model);
         // 唯一验证
-        Integer count = mapper.uniqueVerificationByTableName(entity);
+        Integer count = this.uniqueVerificationByTableName(model);
         if(count != null && count > 0){
             // 重复
             throw new CreaterException(CreaterMsg.EXCEPTION_TABLE_NAME_REPEAT);
@@ -249,6 +250,32 @@ public class TableServiceImpl extends CrudServiceImpl<TableMapper, CreaterTable,
             createrTableModel.setIzApi(true);
             this.insertAny(createrTableModel);
         }
+    }
+
+
+    // =======================
+
+    /**
+     * 唯一验证
+     * @param model model
+     * @return Integer
+     */
+    @Transactional(readOnly = true)
+    public Integer uniqueVerificationByTableName(CreaterTableModel model){
+        if(model == null){
+            return null;
+        }
+        QueryWrapper<CreaterTable> wrapper = new QueryWrapper<>();
+
+        // code 唯一
+        wrapper.eq("table_name", model.getTableName());
+
+        // 重复校验排除自身
+        if(StringUtils.isNotEmpty(model.getId())){
+            wrapper.notIn(MyBatisConstants.FIELD_ID, model.getId());
+        }
+
+        return super.count(wrapper);
     }
 }
 

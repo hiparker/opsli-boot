@@ -17,13 +17,13 @@ package org.opsli.modulars.creater.column.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.apache.commons.lang3.StringUtils;
-import org.opsli.core.utils.ValidationUtil;
-import org.opsli.common.exception.ServiceException;
+import org.opsli.common.constants.MyBatisConstants;
 import org.opsli.core.base.service.impl.CrudServiceImpl;
 import org.opsli.core.creater.exception.CreaterException;
 import org.opsli.core.creater.msg.CreaterMsg;
 import org.opsli.core.persistence.querybuilder.GenQueryBuilder;
 import org.opsli.core.persistence.querybuilder.QueryBuilder;
+import org.opsli.core.utils.ValidationUtil;
 import org.opsli.modulars.creater.column.entity.CreaterTableColumn;
 import org.opsli.modulars.creater.column.mapper.TableColumnMapper;
 import org.opsli.modulars.creater.column.service.ITableColumnService;
@@ -58,9 +58,8 @@ public class TableColumnServiceImpl extends CrudServiceImpl<TableColumnMapper, C
             return null;
         }
 
-        CreaterTableColumn entity = super.transformM2T(model);
         // 唯一验证
-        Integer count = mapper.uniqueVerificationByFieldName(entity);
+        Integer count = this.uniqueVerificationByFieldName(model);
         if(count != null && count > 0){
             // 重复
          throw new CreaterException(CreaterMsg.EXCEPTION_TABLE_COLUMN_FIELD_NAME_REPEAT);
@@ -88,8 +87,7 @@ public class TableColumnServiceImpl extends CrudServiceImpl<TableColumnMapper, C
             ValidationUtil.verify(model);
 
             // 唯一验证
-            CreaterTableColumn entity = super.transformM2T(model);
-            Integer count = mapper.uniqueVerificationByFieldName(entity);
+            Integer count = this.uniqueVerificationByFieldName(model);
             if(count != null && count > 0){
                 // 重复
                 throw new CreaterException(CreaterMsg.EXCEPTION_TABLE_COLUMN_FIELD_NAME_REPEAT);
@@ -121,9 +119,8 @@ public class TableColumnServiceImpl extends CrudServiceImpl<TableColumnMapper, C
             return null;
         }
 
-        CreaterTableColumn entity = super.transformM2T(model);
         // 唯一验证
-        Integer count = mapper.uniqueVerificationByFieldName(entity);
+        Integer count = this.uniqueVerificationByFieldName(model);
         if(count != null && count > 0){
             // 重复
             throw new CreaterException(CreaterMsg.EXCEPTION_TABLE_COLUMN_FIELD_NAME_REPEAT);
@@ -171,6 +168,33 @@ public class TableColumnServiceImpl extends CrudServiceImpl<TableColumnMapper, C
                 super.remove(wrapper);
             }
         }
+    }
+
+
+    // ========================
+
+    /**
+     * 唯一验证
+     * @param model model
+     * @return Integer
+     */
+    @Transactional(readOnly = true)
+    public Integer uniqueVerificationByFieldName(CreaterTableColumnModel model){
+        if(model == null){
+            return null;
+        }
+        QueryWrapper<CreaterTableColumn> wrapper = new QueryWrapper<>();
+
+        // code 唯一
+        wrapper.eq("table_id", model.getTableId())
+                .eq("field_name", model.getFieldName());
+
+        // 重复校验排除自身
+        if(StringUtils.isNotEmpty(model.getId())){
+            wrapper.notIn(MyBatisConstants.FIELD_ID, model.getId());
+        }
+
+        return super.count(wrapper);
     }
 }
 

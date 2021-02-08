@@ -18,7 +18,6 @@ package org.opsli.modulars.creater.column.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 import org.opsli.modulars.creater.column.entity.CreaterTableColumn;
-import org.opsli.modulars.creater.table.entity.CreaterTable;
 
 
 /**
@@ -30,11 +29,6 @@ import org.opsli.modulars.creater.table.entity.CreaterTable;
 @Mapper
 public interface TableColumnMapper extends BaseMapper<CreaterTableColumn> {
 
-    /**
-     * 唯一验证
-     * @param entity
-     * @return
-     */
-    Integer uniqueVerificationByFieldName(CreaterTableColumn entity);
+
 
 }

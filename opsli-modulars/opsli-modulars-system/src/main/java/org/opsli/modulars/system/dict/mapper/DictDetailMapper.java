@@ -29,11 +29,5 @@ import org.opsli.modulars.system.dict.entity.SysDictDetail;
 @Mapper
 public interface DictDetailMapper extends BaseMapper<SysDictDetail> {
 
-    /**
-     * 唯一验证
-     * @param entity
-     * @return
-     */
-    Integer uniqueVerificationByNameOrValue(SysDictDetail entity);
 
 }

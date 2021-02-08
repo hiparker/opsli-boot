@@ -37,20 +37,6 @@ import java.util.List;
 @Mapper
 public interface UserMapper extends BaseMapper<SysUser> {
 
-    /**
-     * 唯一验证 - 用户名
-     * @param entity
-     * @return
-     */
-    Integer uniqueVerificationByUsername(SysUser entity);
-
-    /**
-     * 唯一验证 - 工号
-     * @param entity
-     * @return
-     */
-    Integer uniqueVerificationByNo(SysUser entity);
-
 
     /**
      * 根据用户ID 获得当前角色编码集合

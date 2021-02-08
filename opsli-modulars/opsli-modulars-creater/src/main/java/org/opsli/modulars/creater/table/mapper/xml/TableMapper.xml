@@ -3,19 +3,6 @@
 <mapper namespace="org.opsli.modulars.creater.table.mapper.TableMapper">
 
 
-    <select id="uniqueVerificationByTableName" resultType="Integer">
-        select
-            count(0)
-        from
-        creater_table a
-        <where>
-            a.table_name = #{tableName}
-            <if test="id != null and id != ''">
-                and a.id != #{id}
-            </if>
-        </where>
-    </select>
-
     <select id="findAllByTableName" resultType="String">
         select
          table_name AS tableName

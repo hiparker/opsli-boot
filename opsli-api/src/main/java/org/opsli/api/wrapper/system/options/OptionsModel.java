@@ -33,7 +33,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 /**
  * @BelongsProject: opsli-boot
 
- * @BelongsPackage: org.opsli.api.wrapper.sys.options
+ * @BelongsPackage: org.opsli.api.wrapper.system.options
 
  * @Author: Parker
  * @CreateTime: 2021-02-07 18:24:38

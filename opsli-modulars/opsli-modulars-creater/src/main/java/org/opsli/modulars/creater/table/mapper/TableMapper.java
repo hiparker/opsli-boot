@@ -31,12 +31,6 @@ import java.util.List;
 @Mapper
 public interface TableMapper extends BaseMapper<CreaterTable> {
 
-    /**
-     * 唯一验证
-     * @param entity
-     * @return
-     */
-    Integer uniqueVerificationByTableName(CreaterTable entity);
 
     /**
      * 更新同步状态 为 已同步

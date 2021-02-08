@@ -2,44 +2,4 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.opsli.modulars.system.dict.mapper.DictDetailMapper">
 
-    <!-- 数据库字段 -->
-    <sql id="SysDictDetailColumns">
-		a.id as id,
-
-        a.type_id as typeId,
-        a.type_code as typeCode,
-        a.dict_name as dictName,
-        a.dict_value as dictValue,
-        a.iz_lock as izLock,
-        a.sort_no as sortNo,
-        a.remark as remark,
-
-        a.create_by as createBy,
-        a.create_time as createTime,
-        a.update_by as updateBy,
-        a.update_time as updateTime,
-        a.version as version,
-        a.deleted as deleted
-	</sql>
-
-    <sql id="SysDictDetailJoins">
-	</sql>
-
-
-    <select id="uniqueVerificationByNameOrValue" parameterType="SysDictDetail" resultType="Integer">
-        select count(0)
-        from sys_dict_detail a
-        where
-        (
-        a.dict_name = #{dictName}
-        or
-        a.dict_value = #{dictValue}
-        )
-        and a.type_code = #{typeCode}
-        and a.deleted = 0
-        <if test="id != null and id != ''">
-            and a.id != #{id}
-        </if>
-    </select>
-
 </mapper>

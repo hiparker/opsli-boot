@@ -23,6 +23,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.opsli.api.wrapper.system.org.SysOrgModel;
 import org.opsli.common.constants.MyBatisConstants;
+import org.opsli.common.enums.DictType;
 import org.opsli.common.exception.ServiceException;
 import org.opsli.common.utils.HumpUtil;
 import org.opsli.core.base.entity.HasChildren;
@@ -230,7 +231,7 @@ public class SysOrgServiceImpl extends CrudServiceImpl<SysOrgMapper, SysOrg, Sys
             return null;
         }
         QueryWrapper<SysOrg> wrapper = new QueryWrapper<>();
-        wrapper.eq(MyBatisConstants.FIELD_DELETE_LOGIC, "0")
+        wrapper.eq(MyBatisConstants.FIELD_DELETE_LOGIC,  DictType.NO_YES_NO.getCode())
                 .eq("org_code", model.getOrgCode());
 
         // 重复校验排除自身
@@ -259,7 +260,7 @@ public class SysOrgServiceImpl extends CrudServiceImpl<SysOrgMapper, SysOrg, Sys
         QueryWrapper<SysOrg> wrapper = new QueryWrapper<>();
 
         wrapper.in(HumpUtil.humpToUnderline(MyBatisConstants.FIELD_PARENT_ID), parentIds)
-                .eq(MyBatisConstants.FIELD_DELETE_LOGIC, "0")
+                .eq(MyBatisConstants.FIELD_DELETE_LOGIC,  DictType.NO_YES_NO.getCode())
                 .groupBy(HumpUtil.humpToUnderline(MyBatisConstants.FIELD_PARENT_ID));
 
         return mapper.hasChildren(wrapper);

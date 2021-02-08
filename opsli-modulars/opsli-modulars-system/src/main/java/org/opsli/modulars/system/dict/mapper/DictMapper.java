@@ -29,11 +29,5 @@ import org.opsli.modulars.system.dict.entity.SysDict;
 @Mapper
 public interface DictMapper extends BaseMapper<SysDict> {
 
-    /**
-     * 唯一验证
-     * @param entity
-     * @return
-     */
-    Integer uniqueVerificationByCode(SysDict entity);
 
 }
