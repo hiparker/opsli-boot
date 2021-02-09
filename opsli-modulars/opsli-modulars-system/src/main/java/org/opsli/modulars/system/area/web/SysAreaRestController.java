@@ -105,7 +105,7 @@ public class SysAreaRestController extends BaseRestController<SysArea, SysAreaMo
         QueryWrapper<SysArea> wrapper = queryBuilder.build();
         wrapper.eq(HumpUtil.humpToUnderline(MyBatisConstants.FIELD_PARENT_ID), parentId);
 
-        // 获得用户 对应菜单
+        // 获得用户 对应地域
         List<SysArea> dataList = IService.findList(wrapper);
 
         //配置
@@ -117,6 +117,77 @@ public class SysAreaRestController extends BaseRestController<SysArea, SysAreaMo
         treeNodeConfig.setDeep(1);
 
         List<Tree<String>> treeNodes = TreeUtil.build(dataList, parentId, treeNodeConfig,
+                (treeNode, tree) -> {
+
+                    String areaCode = treeNode.getAreaCode();
+                    int sort = 0;
+                    if(StringUtils.isNotEmpty(areaCode)){
+                        try {
+                            sort = Integer.parseInt(areaCode);
+                        }catch (Exception ignored){}
+                    }
+
+                    tree.setId(treeNode.getId());
+                    tree.setParentId(treeNode.getParentId());
+                    tree.setWeight(sort);
+                    tree.setName(treeNode.getAreaName());
+                    // 扩展属性 ...
+                    // 不是外链 则处理组件
+                    tree.putExtra("areaCode", areaCode);
+                    tree.putExtra("version", treeNode.getVersion());
+                });
+
+        Set<String> parentIds = Sets.newHashSet();
+        for (Tree<String> treeNode : treeNodes) {
+            parentIds.add(treeNode.getId());
+        }
+
+        // 数据排查是否存在下级
+        List<HasChildren> hasChildrenList = IService.hasChildren(parentIds);
+        if(CollUtil.isNotEmpty(hasChildrenList)){
+            Map<String, Boolean> tmp = Maps.newHashMap();
+            for (HasChildren hasChildren : hasChildrenList) {
+                if(hasChildren.getCount() != null && hasChildren.getCount() > 0){
+                    tmp.put(hasChildren.getParentId(), true);
+                }
+            }
+
+            for (Tree<String> treeNode : treeNodes) {
+                Boolean tmpFlag = tmp.get(treeNode.getId());
+                if(tmpFlag != null && tmpFlag){
+                    treeNode.putExtra("hasChildren", true);
+                }
+            }
+        }
+
+        return ResultVo.success(treeNodes);
+    }
+
+    /**
+     * 获取全量地域列表
+     *
+     * @param deep 层级
+     *
+     *
+     * @return ResultVo
+     */
+    @ApiOperation(value = "获取全量地域列表", notes = "获取全量地域列表")
+    @RequiresPermissions("system_area_select")
+    @Override
+    public ResultVo<?> findTreeAll(Integer deep) {
+
+        List<SysArea> dataList =  IService.findList(new QueryWrapper<>());
+
+
+        //配置
+        TreeNodeConfig treeNodeConfig = new TreeNodeConfig();
+        // 自定义属性名 都要默认值的
+        treeNodeConfig.setWeightKey("sortNo");
+        treeNodeConfig.setNameKey("areaName");
+        // 最大递归深度
+        treeNodeConfig.setDeep(deep);
+
+        List<Tree<String>> treeNodes = TreeUtil.build(dataList, "0", treeNodeConfig,
                 (treeNode, tree) -> {
 
                     String areaCode = treeNode.getAreaCode();

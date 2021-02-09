@@ -20,6 +20,7 @@ import org.opsli.api.wrapper.system.area.SysAreaModel;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import javax.servlet.http.HttpServletRequest;
@@ -60,6 +61,14 @@ public interface SysAreaRestApi {
     */
     @GetMapping("/findTree")
     ResultVo<?> findTree( String parentId );
+
+    /**
+     * 组织树
+     * @param deep 层级
+     * @return ResultVo
+     */
+    @GetMapping("/findTreeAll")
+    ResultVo<?> findTreeAll(@RequestParam(name = "deep", defaultValue = "3", required = false) Integer deep);
 
     /**
     * 组织机构表 新增
