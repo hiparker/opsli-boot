@@ -69,12 +69,14 @@ public class #(data.model.tableName)Model extends ApiWrapper {
     #end
     #end
     ### 日期处理
-    #if(column.javaType == "Date" && column.showType == "4")
+    #if(column.javaType == "Date"
+    #if(column.showType == "4")
     @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     #else
     @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    #end
     #end
     private #(column.javaType) #(column.fieldName);
 
