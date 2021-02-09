@@ -33,7 +33,7 @@ public final class RateLimiterUtil {
     /** 默认等待时长 */
     private static final int DEFAULT_WAIT = 5000;
     /** 限流器单机缓存 */
-    private static final Cache<String, Map<String, RateLimiterInner> > LFU_CACHE;
+    private static final Cache<String, Map<String, RateLimiterUtil.RateLimiterInner> > LFU_CACHE;
 
     static{
         LFU_CACHE = CacheBuilder
@@ -95,13 +95,13 @@ public final class RateLimiterUtil {
         // 计时器
         long t1 = System.currentTimeMillis();
 
-        Map<String, RateLimiterInner> rateLimiterInnerMap;
+        Map<String, RateLimiterUtil.RateLimiterInner> rateLimiterInnerMap;
         try {
             rateLimiterInnerMap = LFU_CACHE.get(clientIpAddress, ()->{
                 // 当缓存取不到时 重新加载缓存
-                Map<String, RateLimiterInner> tmpMap = Maps.newConcurrentMap();
+                Map<String, RateLimiterUtil.RateLimiterInner> tmpMap = Maps.newConcurrentMap();
                 // 设置限流器
-                RateLimiterInner rateLimiterInner = new RateLimiterInner();
+                RateLimiterUtil.RateLimiterInner rateLimiterInner = new RateLimiterUtil.RateLimiterInner();
                 rateLimiterInner.setQps(dfQps);
                 rateLimiterInner.setRateLimiter(RateLimiter.create(dfQps));
                 tmpMap.put(resource, rateLimiterInner);
@@ -112,14 +112,14 @@ public final class RateLimiterUtil {
             return false;
         }
 
-        RateLimiterInner rateLimiterObj;
+        RateLimiterUtil.RateLimiterInner rateLimiterObj;
 
         Double qps = dfQps;
         // 初始化过程
-        RateLimiterInner rateLimiterInner = rateLimiterInnerMap.get(resource);
+        RateLimiterUtil.RateLimiterInner rateLimiterInner = rateLimiterInnerMap.get(resource);
         // 如果为空 则创建一个新的限流器
         if(rateLimiterInner == null){
-            rateLimiterInner = new RateLimiterInner();
+            rateLimiterInner = new RateLimiterUtil.RateLimiterInner();
             rateLimiterInner.setQps(dfQps);
             rateLimiterInner.setRateLimiter(RateLimiter.create(dfQps));
             rateLimiterInnerMap.put(resource, rateLimiterInner);
@@ -147,6 +147,19 @@ public final class RateLimiterUtil {
     }
 
 
+    /**
+     * 限流器
+     */
+    @Data
+    public static class RateLimiterInner {
+
+        /** qps */
+        private Double qps;
+
+        /** 限流器 */
+        private RateLimiter rateLimiter;
+
+    }
 
     // ==============
 
@@ -165,19 +178,7 @@ public final class RateLimiterUtil {
 
 }
 
-/**
- * 限流器
- */
-@Data
-class RateLimiterInner {
 
-    /** qps */
-    private Double qps;
-
-    /** 限流器 */
-    private RateLimiter rateLimiter;
-
-}
 
 
 
