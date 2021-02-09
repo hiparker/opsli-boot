@@ -36,10 +36,8 @@ public enum DataBaseType {
     private final String desc;
 
     public static DataBaseType getDbType(String dbType) {
-        DataBaseType[] var1 = values();
-        int var2 = var1.length;
-
-        for (DataBaseType type : var1) {
+        DataBaseType[] var = values();
+        for (DataBaseType type : var) {
             if (type.db.equalsIgnoreCase(dbType)) {
                 return type;
             }
