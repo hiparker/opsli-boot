@@ -86,6 +86,12 @@ public enum SystemMsg implements BaseMsg {
      */
     EXCEPTION_OPTIONS_UNIQUE(20700,"参数编号重复，该角色已存在"),
 
+
+    /**
+     * 其他 - 非对称加密
+     */
+    EXCEPTION_OTHER_CRYPTO_UNIQUE(20800,"算法类型重复，该角色已存在"),
+
     ;
 
     private final int code;

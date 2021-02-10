@@ -22,14 +22,11 @@ import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
 import org.opsli.api.wrapper.system.dict.DictDetailModel;
 import org.opsli.api.wrapper.system.dict.DictModel;
-import org.opsli.api.wrapper.system.dict.DictWrapper;
 import org.opsli.common.constants.MyBatisConstants;
 import org.opsli.common.enums.DictType;
 import org.opsli.common.exception.ServiceException;
 import org.opsli.common.utils.HumpUtil;
 import org.opsli.core.base.service.impl.CrudServiceImpl;
-import org.opsli.core.cache.pushsub.enums.CacheHandleType;
-import org.opsli.core.cache.pushsub.msgs.DictMsgFactory;
 import org.opsli.core.msg.CoreMsg;
 import org.opsli.core.persistence.querybuilder.GenQueryBuilder;
 import org.opsli.core.persistence.querybuilder.QueryBuilder;
@@ -39,7 +36,6 @@ import org.opsli.modulars.system.dict.entity.SysDictDetail;
 import org.opsli.modulars.system.dict.mapper.DictDetailMapper;
 import org.opsli.modulars.system.dict.service.IDictDetailService;
 import org.opsli.modulars.system.dict.service.IDictService;
-import org.opsli.plugins.redis.RedisPlugin;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -61,8 +57,6 @@ public class DictDetailServiceImpl extends CrudServiceImpl<DictDetailMapper, Sys
     private DictDetailMapper mapper;
     @Autowired
     private IDictService iDictService;
-    @Autowired
-    private RedisPlugin redisPlugin;
 
     /**
      * 新增
@@ -83,24 +77,11 @@ public class DictDetailServiceImpl extends CrudServiceImpl<DictDetailMapper, Sys
         DictDetailModel ret = super.insert(model);
         if(ret != null){
             List<DictDetailModel> listByTypeCode = this.findListByTypeCode(ret.getTypeCode());
-            if(listByTypeCode != null && listByTypeCode.size() > 0){
-                List<DictWrapper> dictWrapperList = Lists.newArrayListWithCapacity(listByTypeCode.size());
-                for (DictDetailModel dictDetailModel : listByTypeCode) {
-                    DictWrapper dictWrapperModel = new DictWrapper();
-                    dictWrapperModel.setTypeCode(dictDetailModel.getTypeCode());
-                    dictWrapperModel.setDictName(dictDetailModel.getDictName());
-                    dictWrapperModel.setDictValue(dictDetailModel.getDictValue());
-                    dictWrapperList.add(dictWrapperModel);
-                }
+            if(CollUtil.isNotEmpty(listByTypeCode)){
                 // 删除缓存
                 this.clearCache(Collections.singletonList(
                         ret.getTypeCode()
                 ));
-
-                // 广播缓存数据 - 通知其他服务器同步数据
-                redisPlugin.sendMessage(
-                        DictMsgFactory.createMsg(dictWrapperList, CacheHandleType.DELETE)
-                );
             }
         }
 
@@ -129,24 +110,11 @@ public class DictDetailServiceImpl extends CrudServiceImpl<DictDetailMapper, Sys
         DictDetailModel ret = super.update(model);
         if(ret != null){
             List<DictDetailModel> listByTypeCode = this.findListByTypeCode(oldModel.getTypeCode());
-            if(listByTypeCode != null && listByTypeCode.size() > 0){
-                List<DictWrapper> dictWrapperList = Lists.newArrayListWithCapacity(listByTypeCode.size());
-                for (DictDetailModel dictDetailModel : listByTypeCode) {
-                    DictWrapper dictWrapperModel = new DictWrapper();
-                    dictWrapperModel.setTypeCode(dictDetailModel.getTypeCode());
-                    dictWrapperModel.setDictName(dictDetailModel.getDictName());
-                    dictWrapperModel.setDictValue(dictDetailModel.getDictValue());
-                    dictWrapperList.add(dictWrapperModel);
-                }
+            if(CollUtil.isNotEmpty(listByTypeCode)){
                 // 删除缓存
                 this.clearCache(Collections.singletonList(
                         oldModel.getTypeCode()
                 ));
-
-                // 广播缓存数据 - 通知其他服务器同步数据
-                redisPlugin.sendMessage(
-                        DictMsgFactory.createMsg(dictWrapperList, CacheHandleType.DELETE)
-                );
             }
         }
 
@@ -165,25 +133,10 @@ public class DictDetailServiceImpl extends CrudServiceImpl<DictDetailMapper, Sys
         DictDetailModel dictModel = this.get(id);
         boolean ret = super.delete(id);
         if(ret){
-            List<DictDetailModel> listByTypeCode = this.findListByTypeCode(dictModel.getTypeCode());
-            if(listByTypeCode != null && listByTypeCode.size() > 0){
-                List<DictWrapper> dictWrapperList = Lists.newArrayListWithCapacity(listByTypeCode.size());
-                for (DictDetailModel dictDetailModel : listByTypeCode) {
-                    DictWrapper dictWrapperModel = new DictWrapper();
-                    dictWrapperModel.setTypeCode(dictDetailModel.getTypeCode());
-                    dictWrapperModel.setDictName(dictDetailModel.getDictName());
-                    dictWrapperModel.setDictValue(dictDetailModel.getDictValue());
-                    dictWrapperList.add(dictWrapperModel);
-                }
-                // 删除缓存
-                this.clearCache(Collections.singletonList(
-                        dictModel.getTypeCode()
-                ));
-                // 广播缓存数据 - 通知其他服务器同步数据
-                redisPlugin.sendMessage(
-                        DictMsgFactory.createMsg(dictWrapperList, CacheHandleType.DELETE)
-                );
-            }
+            // 删除缓存
+            this.clearCache(Collections.singletonList(
+                    dictModel.getTypeCode()
+            ));
         }
         return ret;
     }
@@ -203,26 +156,6 @@ public class DictDetailServiceImpl extends CrudServiceImpl<DictDetailMapper, Sys
             this.clearCache(Collections.singletonList(
                     dictModel.getTypeCode()
             ));
-
-            List<DictDetailModel> listByTypeCode = this.findListByTypeCode(dictModel.getTypeCode());
-            if(listByTypeCode != null && listByTypeCode.size() > 0){
-                List<DictWrapper> dictWrapperList = Lists.newArrayListWithCapacity(listByTypeCode.size());
-                for (DictDetailModel dictDetailModel : listByTypeCode) {
-                    DictWrapper dictWrapperModel = new DictWrapper();
-                    dictWrapperModel.setTypeCode(dictDetailModel.getTypeCode());
-                    dictWrapperModel.setDictName(dictDetailModel.getDictName());
-                    dictWrapperModel.setDictValue(dictDetailModel.getDictValue());
-                    dictWrapperList.add(dictWrapperModel);
-                }
-                // 删除缓存
-                this.clearCache(Collections.singletonList(
-                        dictModel.getTypeCode()
-                ));
-                // 广播缓存数据 - 通知其他服务器同步数据
-                redisPlugin.sendMessage(
-                        DictMsgFactory.createMsg(dictWrapperList, CacheHandleType.DELETE)
-                );
-            }
         }
         return ret;
     }
@@ -243,31 +176,17 @@ public class DictDetailServiceImpl extends CrudServiceImpl<DictDetailMapper, Sys
         boolean ret = super.deleteAll(ids);
 
         if(ret){
-            if(list != null && list.size() > 0){
-                List<DictWrapper> dictWrapperModels = Lists.newArrayListWithCapacity(list.size());
+            if(CollUtil.isNotEmpty(list)){
                 Set<String> typeCodes = new HashSet<>();
                 // 封装数据
                 for (SysDictDetail sysDictDetail : list) {
-                    DictWrapper dictWrapperModel = new DictWrapper();
-                    dictWrapperModel.setTypeCode(sysDictDetail.getTypeCode());
-                    dictWrapperModel.setDictName(sysDictDetail.getDictName());
-                    dictWrapperModel.setDictValue(sysDictDetail.getDictValue());
-
-                    dictWrapperModels.add(dictWrapperModel);
-
-                    typeCodes.add(dictWrapperModel.getTypeCode());
+                    typeCodes.add(sysDictDetail.getTypeCode());
                 }
 
                 List<String> typeCodeList = Lists.newArrayListWithCapacity(typeCodes.size());
-                typeCodeList.addAll(typeCodes);
 
                 // 删除缓存
                 this.clearCache(typeCodeList);
-
-                // 广播缓存数据 - 通知其他服务器同步数据
-                redisPlugin.sendMessage(
-                        DictMsgFactory.createMsg(dictWrapperModels, CacheHandleType.DELETE)
-                );
             }
 
         }
@@ -298,30 +217,16 @@ public class DictDetailServiceImpl extends CrudServiceImpl<DictDetailMapper, Sys
 
         if(ret){
             if(list != null && list.size() > 0){
-                List<DictWrapper> dictWrapperModels = Lists.newArrayListWithCapacity(list.size());
                 Set<String> typeCodes = new HashSet<>();
                 // 封装数据
                 for (SysDictDetail sysDictDetail : list) {
-                    DictWrapper dictWrapperModel = new DictWrapper();
-                    dictWrapperModel.setTypeCode(sysDictDetail.getTypeCode());
-                    dictWrapperModel.setDictName(sysDictDetail.getDictName());
-                    dictWrapperModel.setDictValue(sysDictDetail.getDictValue());
-
-                    dictWrapperModels.add(dictWrapperModel);
-
-                    typeCodes.add(dictWrapperModel.getTypeCode());
+                    typeCodes.add(sysDictDetail.getTypeCode());
                 }
 
                 List<String> typeCodeList = Lists.newArrayListWithCapacity(typeCodes.size());
-                typeCodeList.addAll(typeCodes);
 
                 // 删除缓存
                 this.clearCache(typeCodeList);
-
-                // 广播缓存数据 - 通知其他服务器同步数据
-                redisPlugin.sendMessage(
-                        DictMsgFactory.createMsg(dictWrapperModels, CacheHandleType.DELETE)
-                );
             }
         }
 
@@ -347,24 +252,11 @@ public class DictDetailServiceImpl extends CrudServiceImpl<DictDetailMapper, Sys
         boolean removeFlag = super.remove(queryWrapper);
         if(removeFlag){
             DictModel dictModel = iDictService.get(parentId);
-            List<DictDetailModel> listByTypeCode = this.findListByTypeCode(dictModel.getTypeCode());
-            if(listByTypeCode != null && listByTypeCode.size() > 0){
-                List<DictWrapper> dictWrapperList = Lists.newArrayListWithCapacity(listByTypeCode.size());
-                for (DictDetailModel dictDetailModel : listByTypeCode) {
-                    DictWrapper dictWrapperModel = new DictWrapper();
-                    dictWrapperModel.setTypeCode(dictDetailModel.getTypeCode());
-                    dictWrapperModel.setDictName(dictDetailModel.getDictName());
-                    dictWrapperModel.setDictValue(dictDetailModel.getDictValue());
-                    dictWrapperList.add(dictWrapperModel);
-                }
+            if(dictModel != null){
                 // 删除缓存
                 this.clearCache(Collections.singletonList(
                         dictModel.getTypeCode()
                 ));
-                // 广播缓存数据 - 通知其他服务器同步数据
-                redisPlugin.sendMessage(
-                        DictMsgFactory.createMsg(dictWrapperList, CacheHandleType.DELETE)
-                );
             }
         }
         return removeFlag;

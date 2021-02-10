@@ -29,7 +29,7 @@ import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.opsli.api.base.encrypt.BaseEncrypt;
 import org.opsli.api.base.result.ResultVo;
-import org.opsli.common.annotation.InterfaceEncryptAndDecrypt;
+import org.opsli.common.annotation.InterfaceCrypto;
 import org.opsli.common.exception.ServiceException;
 import org.opsli.common.utils.Props;
 import org.opsli.core.msg.CoreMsg;
@@ -96,7 +96,7 @@ public class InterfaceEncryptAndDecryptAop {
         return RSA_PRIVATE_KEY;
     }
 
-    @Pointcut("@annotation(org.opsli.common.annotation.InterfaceEncryptAndDecrypt)")
+    @Pointcut("@annotation(org.opsli.common.annotation.InterfaceCrypto)")
     public void encryptAndDecrypt() {
     }
 
@@ -115,8 +115,8 @@ public class InterfaceEncryptAndDecryptAop {
         // 获得 方法
         Method  method = signature.getMethod();
         // 获得方法注解
-        InterfaceEncryptAndDecrypt annotation =
-                method.getAnnotation(InterfaceEncryptAndDecrypt.class);
+        InterfaceCrypto annotation =
+                method.getAnnotation(InterfaceCrypto.class);
         if(annotation != null){
 
             // 1. 拆解请求数据

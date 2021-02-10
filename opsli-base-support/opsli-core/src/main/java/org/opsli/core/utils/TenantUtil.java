@@ -21,9 +21,7 @@ import org.opsli.api.base.result.ResultVo;
 import org.opsli.api.web.system.tenant.TenantApi;
 import org.opsli.api.wrapper.system.tenant.TenantModel;
 import org.opsli.core.cache.local.CacheUtil;
-import org.opsli.core.cache.pushsub.msgs.TenantMsgFactory;
 import org.opsli.core.msg.CoreMsg;
-import org.opsli.plugins.redis.RedisPlugin;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.core.annotation.Order;
@@ -46,10 +44,6 @@ public class TenantUtil {
 
     /** 前缀 */
     public static final String PREFIX_CODE = "tenant:id:";
-
-
-    /** Redis插件 */
-    private static RedisPlugin redisPlugin;
 
     /** 租户 Api */
     private static TenantApi tenantApi;
@@ -150,11 +144,6 @@ public class TenantUtil {
             if(tmp){
                 count--;
             }
-
-            // 发送通知消息
-            redisPlugin.sendMessage(
-                    TenantMsgFactory.createTenantMsg(tenantModel)
-            );
         }
 
         return count == 0;
@@ -164,11 +153,6 @@ public class TenantUtil {
 
 
     // =====================================
-
-    @Autowired
-    public  void setRedisPlugin(RedisPlugin redisPlugin) {
-        TenantUtil.redisPlugin = redisPlugin;
-    }
 
     @Autowired
     public void setTenantApi(TenantApi tenantApi) {

@@ -17,6 +17,8 @@ opsli:
     - sys_user_org_ref
     - sys_area
     - sys_org
+    - sys_options
+    - other_crypto_asymmetric
 
 
   # 排除字段

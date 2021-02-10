@@ -21,9 +21,7 @@ import org.opsli.api.base.result.ResultVo;
 import org.opsli.api.web.system.menu.MenuApi;
 import org.opsli.api.wrapper.system.menu.MenuModel;
 import org.opsli.core.cache.local.CacheUtil;
-import org.opsli.core.cache.pushsub.msgs.MenuMsgFactory;
 import org.opsli.core.msg.CoreMsg;
-import org.opsli.plugins.redis.RedisPlugin;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.core.annotation.Order;
@@ -46,10 +44,6 @@ public class MenuUtil {
 
     /** 前缀 */
     public static final String PREFIX_CODE = "menu:code:";
-
-
-    /** Redis插件 */
-    private static RedisPlugin redisPlugin;
 
     /** 菜单 Api */
     private static MenuApi menuApi;
@@ -150,11 +144,6 @@ public class MenuUtil {
             if(tmp){
                 count--;
             }
-
-            // 发送通知消息
-            redisPlugin.sendMessage(
-                    MenuMsgFactory.createMenuMsg(menu)
-            );
         }
 
         return count == 0;
@@ -164,11 +153,6 @@ public class MenuUtil {
 
 
     // =====================================
-
-    @Autowired
-    public  void setRedisPlugin(RedisPlugin redisPlugin) {
-        MenuUtil.redisPlugin = redisPlugin;
-    }
 
     @Autowired
     public  void setMenuApi(MenuApi menuApi) {

@@ -20,27 +20,23 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.opsli.api.base.result.ResultVo;
-import org.opsli.core.autoconfigure.properties.GlobalProperties;
 import org.opsli.core.utils.ValidationUtil;
 import org.opsli.api.wrapper.system.tenant.TenantModel;
 import org.opsli.api.wrapper.system.user.UserModel;
-import org.opsli.common.annotation.InterfaceEncryptAndDecrypt;
+import org.opsli.common.annotation.InterfaceCrypto;
 import org.opsli.common.annotation.Limiter;
 import org.opsli.common.api.TokenThreadLocal;
 import org.opsli.common.enums.AlertType;
 import org.opsli.common.exception.TokenException;
 import org.opsli.common.thread.refuse.AsyncProcessQueueReFuse;
 import org.opsli.common.utils.IPUtil;
-import org.opsli.common.utils.OutputStreamUtil;
 import org.opsli.core.filters.aspect.InterfaceEncryptAndDecryptAop;
 import org.opsli.core.msg.TokenMsg;
 import org.opsli.core.security.shiro.realm.JwtRealm;
 import org.opsli.core.utils.*;
 import org.opsli.modulars.system.login.entity.LoginForm;
 import org.opsli.modulars.system.user.service.IUserService;
-import org.opsli.plugins.redis.RedisPlugin;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -74,7 +70,7 @@ public class LoginRestController {
      * 登录 登录数据加密
      */
     @Limiter
-    @InterfaceEncryptAndDecrypt(responseEncrypt = false)
+    @InterfaceCrypto(responseEncrypt = false)
     @ApiOperation(value = "登录", notes = "登录")
     @PostMapping("/sys/login")
     public ResultVo<UserTokenUtil.TokenRet> login(@RequestBody LoginForm form, HttpServletRequest request){

@@ -28,10 +28,8 @@ import org.opsli.common.api.TokenThreadLocal;
 import org.opsli.common.exception.TokenException;
 import org.opsli.core.autoconfigure.properties.GlobalProperties;
 import org.opsli.core.cache.local.CacheUtil;
-import org.opsli.core.cache.pushsub.msgs.UserMsgFactory;
 import org.opsli.core.msg.CoreMsg;
 import org.opsli.core.msg.TokenMsg;
-import org.opsli.plugins.redis.RedisPlugin;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.core.annotation.Order;
@@ -60,10 +58,6 @@ public class UserUtil {
     public static final String PREFIX_ID_PERMISSIONS = "userId:permissions:";
     public static final String PREFIX_ID_MENUS = "userId:menus:";
     public static final String PREFIX_USERNAME = "username:";
-
-
-    /** Redis插件 */
-    private static RedisPlugin redisPlugin;
 
     /** 用户Service */
     private static UserApi userApi;
@@ -468,11 +462,6 @@ public class UserUtil {
             }
         }
 
-        // 发送通知消息
-        redisPlugin.sendMessage(
-                UserMsgFactory.createUserMsg(user)
-        );
-
         return count == 0;
     }
 
@@ -508,11 +497,6 @@ public class UserUtil {
             }
         }
 
-        // 发送通知消息
-        redisPlugin.sendMessage(
-                UserMsgFactory.createUserRolesMsg(userId, null)
-        );
-
         return count == 0;
     }
 
@@ -547,10 +531,6 @@ public class UserUtil {
             }
         }
 
-        // 发送通知消息
-        redisPlugin.sendMessage(
-                UserMsgFactory.createUserPermsMsg(userId, null)
-        );
 
         return count == 0;
     }
@@ -586,11 +566,6 @@ public class UserUtil {
             }
         }
 
-        // 发送通知消息
-        redisPlugin.sendMessage(
-                UserMsgFactory.createUserMenusMsg(userId, null)
-        );
-
         return count == 0;
     }
 
@@ -622,11 +597,6 @@ public class UserUtil {
     }
 
     // =====================================
-
-    @Autowired
-    public void setRedisPlugin(RedisPlugin redisPlugin) {
-        UserUtil.redisPlugin = redisPlugin;
-    }
 
     @Autowired
     public void setUserApi(UserApi userApi) {

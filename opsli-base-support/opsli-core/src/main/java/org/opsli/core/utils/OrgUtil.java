@@ -21,9 +21,7 @@ import org.opsli.api.base.result.ResultVo;
 import org.opsli.api.web.system.user.UserApi;
 import org.opsli.api.wrapper.system.user.UserOrgRefModel;
 import org.opsli.core.cache.local.CacheUtil;
-import org.opsli.core.cache.pushsub.msgs.OrgMsgFactory;
 import org.opsli.core.msg.CoreMsg;
-import org.opsli.plugins.redis.RedisPlugin;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.core.annotation.Order;
@@ -46,10 +44,6 @@ public class OrgUtil {
 
     /** 前缀 */
     public static final String PREFIX_CODE = "org:userId:";
-
-
-    /** Redis插件 */
-    private static RedisPlugin redisPlugin;
 
     /** 用户 Api */
     private static UserApi userApi;
@@ -150,11 +144,6 @@ public class OrgUtil {
             if(tmp){
                 count--;
             }
-
-            // 发送通知消息
-            redisPlugin.sendMessage(
-                    OrgMsgFactory.createOrgMsg(orgRefModel)
-            );
         }
         return count == 0;
     }
@@ -163,11 +152,6 @@ public class OrgUtil {
 
 
     // =====================================
-
-    @Autowired
-    public  void setRedisPlugin(RedisPlugin redisPlugin) {
-        OrgUtil.redisPlugin = redisPlugin;
-    }
 
     @Autowired
     public void setUserApi(UserApi userApi) {

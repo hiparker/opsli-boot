@@ -14,9 +14,10 @@
  * the License.
  */
 
-package org.opsli.api.wrapper.system.options;
+package org.opsli.api.wrapper.system.other.crypto;
 
 
+import java.util.Date;
 import com.alibaba.excel.annotation.ExcelProperty;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -26,49 +27,46 @@ import org.opsli.common.annotation.validation.ValidationArgs;
 import org.opsli.common.annotation.validation.ValidationArgsLenMax;
 import org.opsli.common.enums.ValiArgsType;
 import org.opsli.plugins.excel.annotation.ExcelInfo;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import org.springframework.format.annotation.DateTimeFormat;
 
 /**
  * @BelongsProject: opsli-boot
 
- * @BelongsPackage: org.opsli.api.wrapper.system.options
+ * @BelongsPackage: org.opsli.api.wrapper.other.crypto
 
  * @Author: Parker
- * @CreateTime: 2021-02-07 18:24:38
- * @Description: 系统参数
+ * @CreateTime: 2021-02-10 17:09:34
+ * @Description: 非对称加密
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class OptionsModel extends ApiWrapper {
+public class OtherCryptoAsymmetricModel extends ApiWrapper {
 
-    
-    
-    /** 参数编号 */
-    @ApiModelProperty(value = "参数编号")
-    @ExcelProperty(value = "参数编号", order = 1)
+
+    /** 加解密类别 */
+    @ApiModelProperty(value = "加解密类别")
+    @ExcelProperty(value = "加解密类别", order = 1)
     @ExcelInfo
     @ValidationArgs({ValiArgsType.IS_NOT_NULL, ValiArgsType.IS_GENERAL})
     @ValidationArgsLenMax(100)
-    private String optionCode;
+    private String cryptoType;
 
-    
-    
-    /** 参数名称 */
-    @ApiModelProperty(value = "参数名称")
-    @ExcelProperty(value = "参数名称", order = 2)
+    /** 公钥 */
+    @ApiModelProperty(value = "公钥")
+    @ExcelProperty(value = "公钥", order = 2)
     @ExcelInfo
-    @ValidationArgs({ValiArgsType.IS_NOT_NULL, ValiArgsType.IS_GENERAL_WITH_CHINESE})
-    @ValidationArgsLenMax(200)
-    private String optionName;
+    @ValidationArgs({ValiArgsType.IS_NOT_NULL})
+    @ValidationArgsLenMax(2000)
+    private String publicKey;
 
-    
-    
-    /** 参数值 */
-    @ApiModelProperty(value = "参数值")
-    @ExcelProperty(value = "参数值", order = 3)
+    /** 私钥 */
+    @ApiModelProperty(value = "私钥")
+    @ExcelProperty(value = "私钥", order = 3)
     @ExcelInfo
-    @ValidationArgsLenMax(500)
-    private String optionValue;
-
+    @ValidationArgs({ValiArgsType.IS_NOT_NULL})
+    @ValidationArgsLenMax(2000)
+    private String privateKey;
 
 
 }

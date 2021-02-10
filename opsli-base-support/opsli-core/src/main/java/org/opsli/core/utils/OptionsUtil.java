@@ -18,15 +18,11 @@ package org.opsli.core.utils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.opsli.api.base.result.ResultVo;
-import org.opsli.api.web.system.menu.MenuApi;
 import org.opsli.api.web.system.options.OptionsApi;
-import org.opsli.api.wrapper.system.menu.MenuModel;
 import org.opsli.api.wrapper.system.options.OptionsModel;
+import org.opsli.common.enums.OptionsType;
 import org.opsli.core.cache.local.CacheUtil;
-import org.opsli.core.cache.pushsub.msgs.MenuMsgFactory;
-import org.opsli.core.cache.pushsub.msgs.OptionMsgFactory;
 import org.opsli.core.msg.CoreMsg;
-import org.opsli.plugins.redis.RedisPlugin;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.core.annotation.Order;
@@ -50,12 +46,21 @@ public class OptionsUtil {
     /** 前缀 */
     public static final String PREFIX_CODE = "options:code:";
 
-
-    /** Redis插件 */
-    private static RedisPlugin redisPlugin;
-
     /** 参数 Api */
     private static OptionsApi optionsApi;
+
+
+    /**
+     * 根据 optionsType 枚举 获得参数
+     * @param optionsType
+     * @return
+     */
+    public static OptionsModel getOptionByCode(OptionsType optionsType){
+        if(optionsType == null){
+            return null;
+        }
+        return OptionsUtil.getOptionByCode(optionsType.getCode());
+    }
 
 
     /**
@@ -153,11 +158,6 @@ public class OptionsUtil {
             if(tmp){
                 count--;
             }
-
-            // 发送通知消息
-            redisPlugin.sendMessage(
-                    OptionMsgFactory.createOptionMsg(option)
-            );
         }
 
         return count == 0;
@@ -168,10 +168,6 @@ public class OptionsUtil {
 
     // =====================================
 
-    @Autowired
-    public  void setRedisPlugin(RedisPlugin redisPlugin) {
-        OptionsUtil.redisPlugin = redisPlugin;
-    }
 
     @Autowired
     public void setOptionsApi(OptionsApi optionsApi) {

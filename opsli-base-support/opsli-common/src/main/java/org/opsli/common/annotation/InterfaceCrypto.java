@@ -10,7 +10,7 @@ import java.lang.annotation.*;
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-public @interface InterfaceEncryptAndDecrypt {
+public @interface InterfaceCrypto {
 
     /** 加密启用状态 */
     boolean enable() default true;
