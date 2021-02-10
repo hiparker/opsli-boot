@@ -28,8 +28,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.opsli.api.base.result.ResultVo;
 import org.opsli.api.web.system.other.crypto.OtherCryptoAsymmetricRestApi;
+import org.opsli.api.wrapper.system.options.OptionsModel;
 import org.opsli.api.wrapper.system.other.crypto.OtherCryptoAsymmetricModel;
 import org.opsli.common.enums.CryptoAsymmetricType;
+import org.opsli.common.enums.OptionsType;
 import org.opsli.common.exception.ServiceException;
 import org.opsli.core.cache.local.CacheUtil;
 import org.opsli.core.msg.CoreMsg;
@@ -66,8 +68,8 @@ public class CryptoAsymmetricUtil {
 
     /**
      * 根据 cryptoAsymmetricType 枚举 获得参数
-     * @param cryptoAsymmetricType
-     * @return
+     * @param cryptoAsymmetricType type
+     * @return model
      */
     public static OtherCryptoAsymmetricModel getCryptoAsymmetric(final CryptoAsymmetricType cryptoAsymmetricType){
         if(cryptoAsymmetricType == null){
@@ -106,12 +108,36 @@ public class CryptoAsymmetricUtil {
                 return model;
             }
 
+            boolean noData = true;
             // 查询数据库
             ResultVo<OtherCryptoAsymmetricModel> resultVo = otherCryptoAsymmetricRestApi.getByCryptoType(typeCode);
             if(resultVo.isSuccess()){
                 model = resultVo.getData();
-                // 存入缓存
-                CacheUtil.put(cacheKey, model);
+                if(model != null){
+                    noData = false;
+                    // 存入缓存
+                    CacheUtil.put(cacheKey, model);
+                }
+            }
+
+            // 如果没取到数值 则自动创建
+            if(noData){
+                // 获得系统配置参数 非对称加密枚举
+                CryptoAsymmetricType asymmetricType = null;
+                OptionsModel optionsModel = OptionsUtil.getOptionByCode(OptionsType.CRYPTO_ASYMMETRIC);
+                if(optionsModel != null){
+                    // 获得加密类型
+                    asymmetricType = CryptoAsymmetricType.getCryptoType(
+                            optionsModel.getOptionValue());
+                }
+
+                // 默认 RSA 算法
+                model = create(asymmetricType!=null?asymmetricType:CryptoAsymmetricType.RSA);
+                ResultVo<?> insertModel = otherCryptoAsymmetricRestApi.insertInner(model);
+                if(insertModel.isSuccess()){
+                    // 存入缓存
+                    CacheUtil.put(cacheKey, model);
+                }
             }
         }catch (Exception e){
             log.error(e.getMessage(),e);
@@ -134,8 +160,8 @@ public class CryptoAsymmetricUtil {
 
     /**
      * 刷新参数 - 删就完了
-     * @param model
-     * @return
+     * @param model m
+     * @return boolean
      */
     public static boolean refresh(final OtherCryptoAsymmetricModel model){
         if(model == null || StringUtils.isEmpty(model.getCryptoType())){
@@ -174,10 +200,11 @@ public class CryptoAsymmetricUtil {
     /**
      * 创建公私钥
      * @param cryptoAsymmetricType 枚举
-     * @return
+     * @return Model
      */
     public static OtherCryptoAsymmetricModel create(final CryptoAsymmetricType cryptoAsymmetricType){
         OtherCryptoAsymmetricModel model = new OtherCryptoAsymmetricModel();
+        model.setCryptoType(cryptoAsymmetricType.getCode());
         switch (cryptoAsymmetricType){
             case RSA:
                 RSA rsa = SecureUtil.rsa();
@@ -204,7 +231,8 @@ public class CryptoAsymmetricUtil {
     /**
      * 加密数据
      * @param cryptoAsymmetricType 枚举
-     * @return
+     * @param data 数据
+     * @return String
      */
     public static String encrypt(final CryptoAsymmetricType cryptoAsymmetricType, final Object data){
 
@@ -214,14 +242,15 @@ public class CryptoAsymmetricUtil {
         // 原始/加密 数据
         String encryptedStr = jsonObject.toString();
 
-        OtherCryptoAsymmetricModel cryptoAsymmetric = getCryptoAsymmetric(cryptoAsymmetricType);
-
-        // 如果找不到 公私钥 直接返回原始数据
-        if(cryptoAsymmetric == null){
-            return encryptedStr;
-        }
 
         try {
+            OtherCryptoAsymmetricModel cryptoAsymmetric = getCryptoAsymmetric(cryptoAsymmetricType);
+
+            // 如果找不到 公私钥 直接返回原始数据
+            if(cryptoAsymmetric == null){
+                throw new RuntimeException();
+            }
+
             switch (cryptoAsymmetricType){
                 case RSA:
                     RSA rsa = SecureUtil.rsa(cryptoAsymmetric.getPrivateKey(), cryptoAsymmetric.getPublicKey());
@@ -239,120 +268,93 @@ public class CryptoAsymmetricUtil {
                             StrUtil.bytes(encryptedStr, CharsetUtil.CHARSET_UTF_8), KeyType.PublicKey);
                     break;
                 default:
-                    break;
+                    throw new RuntimeException();
             }
         }catch (Exception e){
             // 加密失败
-            throw new ServiceException(CoreMsg.OTHER_EXCEPTION_RSA_EN);
+            throw new ServiceException(CoreMsg.OTHER_EXCEPTION_CRYPTO_EN);
         }
         return encryptedStr;
+    }
+
+
+    /**
+     * RSA 解密数据
+     * @param cryptoAsymmetricType 枚举
+     * @param data 数据
+     * @return Object
+     */
+    public static Object decryptToObj(final CryptoAsymmetricType cryptoAsymmetricType, final String data){
+        Object obj;
+        String decryptedData = decrypt(cryptoAsymmetricType, data);
+        try{
+            obj = JSONObject.parse(decryptedData);
+        }catch (Exception e){
+            // 非对称解密反射失败
+            throw new ServiceException(CoreMsg.OTHER_EXCEPTION_CRYPTO_REFLEX);
+        }
+        return obj;
     }
 
     /**
-     * 加密数据
+     * 解密数据
      * @param cryptoAsymmetricType 枚举
-     * @return
+     * @param data 数据
+     * @return String
      */
     public static String decrypt(final CryptoAsymmetricType cryptoAsymmetricType, final String data){
-        if(StringUtils.isEmpty(data)){
-            return null;
-        }
-
-        OtherCryptoAsymmetricModel cryptoAsymmetric = getCryptoAsymmetric(cryptoAsymmetricType);
-        // 如果找不到 公私钥 直接返回原始数据
-        if(cryptoAsymmetric == null){
-            return data;
-        }
-
         String decryptStr;
         try {
+            if(StringUtils.isEmpty(data)){
+                throw new RuntimeException();
+            }
+
+            OtherCryptoAsymmetricModel cryptoAsymmetric = getCryptoAsymmetric(cryptoAsymmetricType);
+            // 如果找不到 公私钥 直接返回原始数据
+            if(cryptoAsymmetric == null){
+                throw new RuntimeException();
+            }
+
+            String tmp;
+            String currData = data.replaceAll(" ", "+");
             switch (cryptoAsymmetricType){
                 case RSA:
                     RSA rsa = SecureUtil.rsa(cryptoAsymmetric.getPrivateKey(), cryptoAsymmetric.getPublicKey());
-                    decryptStr = rsa.decryptStr(data, KeyType.PrivateKey);
+                    tmp = rsa.decryptStr(currData, KeyType.PrivateKey);
                     break;
                 case SM2:
                     SM2 sm2 = SmUtil.sm2(cryptoAsymmetric.getPrivateKey(), cryptoAsymmetric.getPublicKey());
-                    decryptStr = sm2.decryptStr(data, KeyType.PrivateKey);
+                    tmp = sm2.decryptStr(currData, KeyType.PrivateKey);
                     break;
                 case ECIES:
                     ECIES ecies = new ECIES(cryptoAsymmetric.getPrivateKey(), cryptoAsymmetric.getPublicKey());
-                    decryptStr = ecies.decryptStr(data, KeyType.PrivateKey);
+                    tmp = ecies.decryptStr(currData, KeyType.PrivateKey);
                     break;
                 default:
-                    break;
+                    throw new RuntimeException();
             }
-        }catch (Exception e){
-            // 加密失败
-            throw new ServiceException(CoreMsg.OTHER_EXCEPTION_RSA_EN);
-        }
 
-
-
-        //解密,因为编码传值时有空格出现
-        String decryptStr;
-        try{
-            String tmp = rsa.decryptStr(data, KeyType.PrivateKey);
+            // 转换对象
             JSONObject jsonObject = JSONObject.parseObject(tmp);
-            Object obj = jsonObject.get(rsaKey);
+            Object obj = jsonObject.get(CRYPTO_KEY);
             if(obj instanceof Collection){
-                decryptStr = jsonObject.getJSONArray(rsaKey).toJSONString();
+                decryptStr = jsonObject.getJSONArray(CRYPTO_KEY).toJSONString();
             }else{
-                decryptStr = jsonObject.getJSONObject(rsaKey).toJSONString();
+                decryptStr = jsonObject.getJSONObject(CRYPTO_KEY).toJSONString();
             }
         }catch (Exception e){
             // 解密失败
-            throw new ServiceException(CoreMsg.OTHER_EXCEPTION_RSA_DE);
+            throw new ServiceException(CoreMsg.OTHER_EXCEPTION_CRYPTO_DE);
         }
 
-
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put(CRYPTO_KEY, data);
-
-        // 原始/加密 数据
-        String encryptedStr = jsonObject.toString();
-
-        OtherCryptoAsymmetricModel cryptoAsymmetric = getCryptoAsymmetric(cryptoAsymmetricType);
-
-        // 如果找不到 公私钥 直接返回原始数据
-        if(cryptoAsymmetric == null){
-            return encryptedStr;
-        }
-
-        try {
-            switch (cryptoAsymmetricType){
-                case RSA:
-                    RSA rsa = SecureUtil.rsa(cryptoAsymmetric.getPrivateKey(), cryptoAsymmetric.getPublicKey());
-                    encryptedStr = rsa.encryptBase64(
-                            StrUtil.bytes(encryptedStr, CharsetUtil.CHARSET_UTF_8), KeyType.PublicKey);
-                    break;
-                case SM2:
-                    SM2 sm2 = SmUtil.sm2(cryptoAsymmetric.getPrivateKey(), cryptoAsymmetric.getPublicKey());
-                    encryptedStr = sm2.encryptBase64(
-                            StrUtil.bytes(encryptedStr, CharsetUtil.CHARSET_UTF_8), KeyType.PublicKey);
-                    break;
-                case ECIES:
-                    ECIES ecies = new ECIES(cryptoAsymmetric.getPrivateKey(), cryptoAsymmetric.getPublicKey());
-                    encryptedStr = ecies.encryptBase64(
-                            StrUtil.bytes(encryptedStr, CharsetUtil.CHARSET_UTF_8), KeyType.PublicKey);
-                    break;
-                default:
-                    break;
-            }
-        }catch (Exception e){
-            // 加密失败
-            throw new ServiceException(CoreMsg.OTHER_EXCEPTION_RSA_EN);
-        }
-        return encryptedStr;
+        return decryptStr;
     }
-
-
 
 
     // =====================================
 
     @Autowired
-    public static void setOtherCryptoAsymmetricRestApi(OtherCryptoAsymmetricRestApi otherCryptoAsymmetricRestApi) {
+    public void setOtherCryptoAsymmetricRestApi(OtherCryptoAsymmetricRestApi otherCryptoAsymmetricRestApi) {
         CryptoAsymmetricUtil.otherCryptoAsymmetricRestApi = otherCryptoAsymmetricRestApi;
     }
 

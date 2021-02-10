@@ -64,6 +64,10 @@ public enum CoreMsg implements BaseMsg {
 
     /** 其他 */
     OTHER_EXCEPTION_LIMITER(10700,"当前系统繁忙，请稍后再试"),
+    OTHER_EXCEPTION_CRYPTO_EN(10702,"加密失败"),
+    OTHER_EXCEPTION_CRYPTO_DE(10703,"解密失败"),
+    OTHER_EXCEPTION_CRYPTO_REFLEX(10703,"解密反射失败"),
+
     OTHER_EXCEPTION_RSA_CREATE(10701,"指定RSA算法器创建失败，系统已自动创建随机RSA算法\n公钥：{}\n私钥：{}"),
     OTHER_EXCEPTION_RSA_EN(10702,"RSA非对称加密失败"),
     OTHER_EXCEPTION_RSA_DE(10703,"RSA非对称解密失败"),

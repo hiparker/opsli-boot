@@ -149,4 +149,14 @@ public interface OtherCryptoAsymmetricRestApi {
     @GetMapping("/getByCryptoType")
     ResultVo<OtherCryptoAsymmetricModel> getByCryptoType(String optionCode);
 
+
+    // ===================
+
+    /**
+     * 非对称加密 新增
+     * @param model 模型
+     * @return ResultVo
+     */
+    ResultVo<?> insertInner(@RequestBody OtherCryptoAsymmetricModel model);
+
 }

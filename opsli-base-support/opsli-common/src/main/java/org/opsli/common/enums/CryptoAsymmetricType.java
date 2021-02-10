@@ -18,10 +18,10 @@ public enum CryptoAsymmetricType {
     private final String code;
     private final String desc;
 
-    public static CryptoAsymmetricType getCacheType(String cacheType) {
+    public static CryptoAsymmetricType getCryptoType(String code) {
         CryptoAsymmetricType[] var1 = values();
         for (CryptoAsymmetricType type : var1) {
-            if (type.code.equalsIgnoreCase(cacheType)) {
+            if (type.code.equalsIgnoreCase(code)) {
                 return type;
             }
         }

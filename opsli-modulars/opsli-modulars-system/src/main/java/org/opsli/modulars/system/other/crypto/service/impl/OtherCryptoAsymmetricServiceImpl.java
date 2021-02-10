@@ -72,44 +72,21 @@ public class OtherCryptoAsymmetricServiceImpl extends CrudServiceImpl<OtherCrypt
         return super.insert(model);
     }
 
-    /***
-     * 重置数据
-     * @param cryptoAsymmetricType 枚举
-     * @return
-     */
-    @Transactional(rollbackFor = Exception.class)
     @Override
-    public OtherCryptoAsymmetricModel reset(CryptoAsymmetricType cryptoAsymmetricType) {
-        if(cryptoAsymmetricType == null){
+    @Transactional(rollbackFor = Exception.class)
+    public OtherCryptoAsymmetricModel update(OtherCryptoAsymmetricModel model) {
+        if(model == null){
             return null;
         }
 
         // 唯一验证
-        OtherCryptoAsymmetricModel model = new OtherCryptoAsymmetricModel();
-        model.setCryptoType(cryptoAsymmetricType.getCode());
         Integer count = this.uniqueVerificationByCode(model);
-
-        // 修改
-        if(count > 0){
-
-        }
-
-        // 新增
-
-
-
         if(count != null && count > 0){
             // 重复
             throw new ServiceException(SystemMsg.EXCEPTION_OTHER_CRYPTO_UNIQUE);
         }
 
-        model = super.update(model);
-        if(model != null){
-            // 清除缓存
-            this.clearCache(Collections.singletonList(model));
-        }
-
-        return model;
+        return super.update(model);
     }
 
     @Override
@@ -139,6 +116,31 @@ public class OtherCryptoAsymmetricServiceImpl extends CrudServiceImpl<OtherCrypt
 
         return super.deleteAll(ids);
     }
+
+    /***
+     * 重置数据
+     * @param type 枚举
+     * @return OtherCryptoAsymmetricModel
+     */
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public OtherCryptoAsymmetricModel reset(CryptoAsymmetricType type) {
+        if(type == null){
+            return null;
+        }
+
+        QueryWrapper<OtherCryptoAsymmetric> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("crypto_type", type.getCode());
+        OtherCryptoAsymmetricModel model = super.transformT2M(
+                this.getOne(queryWrapper)
+        );
+
+        // 删除当前数据 并清空缓存
+        this.delete(model);
+        // 重新获得缓存 如果当前库中没有该缓存 则自动创建
+        return CryptoAsymmetricUtil.getCryptoAsymmetric(type);
+    }
+
 
     // =======================
 

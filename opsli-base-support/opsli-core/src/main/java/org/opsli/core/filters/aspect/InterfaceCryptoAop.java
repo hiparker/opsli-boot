@@ -18,9 +18,7 @@ package org.opsli.core.filters.aspect;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.ReflectUtil;
-import cn.hutool.core.util.StrUtil;
 import cn.hutool.core.util.TypeUtil;
-import cn.hutool.crypto.asymmetric.RSA;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -29,11 +27,14 @@ import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.opsli.api.base.encrypt.BaseEncrypt;
 import org.opsli.api.base.result.ResultVo;
+import org.opsli.api.wrapper.system.options.OptionsModel;
 import org.opsli.common.annotation.InterfaceCrypto;
+import org.opsli.common.enums.CryptoAsymmetricType;
+import org.opsli.common.enums.OptionsType;
 import org.opsli.common.exception.ServiceException;
-import org.opsli.common.utils.Props;
 import org.opsli.core.msg.CoreMsg;
-import org.opsli.core.utils.EncryptAndDecryptByRsaUtil;
+import org.opsli.core.utils.CryptoAsymmetricUtil;
+import org.opsli.core.utils.OptionsUtil;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
@@ -54,47 +55,7 @@ import static org.opsli.common.constants.OrderConstants.ENCRYPT_ADN_DECRYPT_AOP_
 @Order(ENCRYPT_ADN_DECRYPT_AOP_SORT)
 @Aspect
 @Component
-public class InterfaceEncryptAndDecryptAop {
-
-    /** RSA 公钥 */
-    private static String RSA_PUBLIC_KEY;
-    /** RSA 私钥 */
-    private static String RSA_PRIVATE_KEY;
-    /** RSA */
-    private static RSA ASSIGN_RSA;
-    static {
-        // 缓存前缀
-        Props props = new Props("application.yaml");
-        RSA_PUBLIC_KEY = props.getStr("opsli.encrypt-decrypt.rsa.public-key");
-        RSA_PRIVATE_KEY = props.getStr("opsli.encrypt-decrypt.rsa.private-key");
-        try {
-            ASSIGN_RSA = EncryptAndDecryptByRsaUtil.INSTANCE.createRsa(RSA_PUBLIC_KEY, RSA_PRIVATE_KEY);
-        }catch (Exception e){
-            ASSIGN_RSA = EncryptAndDecryptByRsaUtil.INSTANCE.createRsa();
-            RSA_PUBLIC_KEY = ASSIGN_RSA.getPublicKeyBase64();
-            RSA_PRIVATE_KEY = ASSIGN_RSA.getPrivateKeyBase64();
-            String errorMsg = StrUtil.format(CoreMsg.OTHER_EXCEPTION_RSA_CREATE.getMessage(),
-                    RSA_PUBLIC_KEY, RSA_PRIVATE_KEY
-                    );
-            log.error(errorMsg);
-        }
-    }
-
-    /**
-     * 获得公钥
-     * @return
-     */
-    public static String getRsaPublicKey() {
-        return RSA_PUBLIC_KEY;
-    }
-
-    /**
-     * 获得私钥
-     * @return
-     */
-    public static String getRsaPrivateKey() {
-        return RSA_PRIVATE_KEY;
-    }
+public class InterfaceCryptoAop {
 
     @Pointcut("@annotation(org.opsli.common.annotation.InterfaceCrypto)")
     public void encryptAndDecrypt() {
@@ -109,7 +70,16 @@ public class InterfaceEncryptAndDecryptAop {
         // 获得请求参数
         Object[] args = point.getArgs();
         // 返回结果
-        Object returnValue = null;
+        Object returnValue;
+
+        // 获得系统配置参数 非对称加密枚举
+        CryptoAsymmetricType asymmetricType = null;
+        OptionsModel optionsModel = OptionsUtil.getOptionByCode(OptionsType.CRYPTO_ASYMMETRIC);
+        if(optionsModel != null){
+            // 获得加密类型
+            asymmetricType = CryptoAsymmetricType.getCryptoType(
+                    optionsModel.getOptionValue());
+        }
 
         MethodSignature signature = (MethodSignature) point.getSignature();
         // 获得 方法
@@ -117,7 +87,7 @@ public class InterfaceEncryptAndDecryptAop {
         // 获得方法注解
         InterfaceCrypto annotation =
                 method.getAnnotation(InterfaceCrypto.class);
-        if(annotation != null){
+        if(asymmetricType != null && annotation != null){
 
             // 1. 拆解请求数据
             // request 解密
@@ -130,7 +100,7 @@ public class InterfaceEncryptAndDecryptAop {
                         BaseEncrypt baseEncrypt = (BaseEncrypt) arg;
                         String encryptData = baseEncrypt.getEncryptData();
                         // 解密对象
-                        Object dataToObj = EncryptAndDecryptByRsaUtil.INSTANCE.decryptedDataToObj(ASSIGN_RSA, encryptData);
+                        Object dataToObj = CryptoAsymmetricUtil.decryptToObj(asymmetricType, encryptData);
 
                         // 根据方法类型转化对象
                         Type type = TypeUtil.getParamType(method, i);
@@ -160,28 +130,33 @@ public class InterfaceEncryptAndDecryptAop {
             // 3. 返回响应数据
             // response 加密
             if (annotation.enable() && annotation.responseEncrypt()){
-                try {
-                    // 执行加密过程
-                    if(returnValue instanceof ResultVo){
-                        ResultVo<Object> ret = (ResultVo<Object>) returnValue;
-                        ret.setData(
-                                EncryptAndDecryptByRsaUtil.INSTANCE.encryptedData(
-                                        ASSIGN_RSA, ret.getData()
-                                )
-                        );
-                        returnValue = ret;
-                    }else {
-                        returnValue = EncryptAndDecryptByRsaUtil.INSTANCE.encryptedData(
-                                ASSIGN_RSA, returnValue
-                        );
+                if(returnValue != null){
+                    try {
+                        // 执行加密过程
+                        if(returnValue instanceof ResultVo){
+                            ResultVo<Object> ret = (ResultVo<Object>) returnValue;
+                            ret.setData(
+                                    CryptoAsymmetricUtil.encrypt(asymmetricType, ret.getData())
+                            );
+                            returnValue = ret;
+                        }else {
+                            returnValue = CryptoAsymmetricUtil.encrypt(asymmetricType, returnValue);
+                        }
+                    }catch (Exception e){
+                        // RSA非对称加密失败
+                        throw new ServiceException(CoreMsg.OTHER_EXCEPTION_RSA_EN);
                     }
-                }catch (Exception e){
-                    // RSA非对称加密失败
-                    throw new ServiceException(CoreMsg.OTHER_EXCEPTION_RSA_EN);
                 }
             }
+            return returnValue;
+
+
+        }else{
+            returnValue = point.proceed(args);
         }
         return returnValue;
     }
+
+    // ===============================
 
 }

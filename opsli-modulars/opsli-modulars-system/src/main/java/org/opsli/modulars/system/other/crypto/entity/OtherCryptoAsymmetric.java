@@ -21,8 +21,11 @@ import java.util.Date;
 import com.baomidou.mybatisplus.annotation.FieldStrategy;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableLogic;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.AccessLevel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Setter;
 import org.opsli.core.base.entity.BaseEntity;
 
 /**
@@ -47,6 +50,37 @@ public class OtherCryptoAsymmetric extends BaseEntity {
 
 
     // ========================================
+
+
+    /** 创建人 */
+    @JsonIgnore
+    @Setter(AccessLevel.NONE)
+    @TableField(exist = false)
+    private String createBy;
+
+    /** 创建时间 */
+    @JsonIgnore
+    @Setter(AccessLevel.NONE)
+    @TableField(exist = false)
+    private Date createTime;
+
+    /** 更新人 */
+    @JsonIgnore
+    @Setter(AccessLevel.NONE)
+    @TableField(exist = false)
+    private String updateBy;
+
+    /** 更新时间 */
+    @JsonIgnore
+    @Setter(AccessLevel.NONE)
+    @TableField(exist = false)
+    private Date updateTime;
+
+    /** 乐观锁 版本 */
+    @JsonIgnore
+    @Setter(AccessLevel.NONE)
+    @TableField(exist = false)
+    private Integer version;
 
 
 }

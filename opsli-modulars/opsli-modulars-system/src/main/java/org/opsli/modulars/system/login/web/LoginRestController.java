@@ -21,6 +21,10 @@ import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.opsli.api.base.result.ResultVo;
+import org.opsli.api.wrapper.system.options.OptionsModel;
+import org.opsli.api.wrapper.system.other.crypto.OtherCryptoAsymmetricModel;
+import org.opsli.common.enums.CryptoAsymmetricType;
+import org.opsli.common.enums.OptionsType;
 import org.opsli.core.utils.ValidationUtil;
 import org.opsli.api.wrapper.system.tenant.TenantModel;
 import org.opsli.api.wrapper.system.user.UserModel;
@@ -31,7 +35,7 @@ import org.opsli.common.enums.AlertType;
 import org.opsli.common.exception.TokenException;
 import org.opsli.common.thread.refuse.AsyncProcessQueueReFuse;
 import org.opsli.common.utils.IPUtil;
-import org.opsli.core.filters.aspect.InterfaceEncryptAndDecryptAop;
+import org.opsli.core.filters.aspect.InterfaceCryptoAop;
 import org.opsli.core.msg.TokenMsg;
 import org.opsli.core.security.shiro.realm.JwtRealm;
 import org.opsli.core.utils.*;
@@ -196,10 +200,24 @@ public class LoginRestController {
     @ApiOperation(value = "获得公钥", notes = "获得公钥")
     @GetMapping("/sys/publicKey")
     public ResultVo<?> getPublicKey(){
-        return ResultVo.success(
-                "操作成功!",
-                InterfaceEncryptAndDecryptAop.getRsaPublicKey()
-        );
+
+        // 获得系统配置参数
+        OptionsModel optionsModel = OptionsUtil.getOptionByCode(OptionsType.CRYPTO_ASYMMETRIC);
+        if(optionsModel != null){
+            // 获得加密类型
+            CryptoAsymmetricType cryptoType = CryptoAsymmetricType.getCryptoType(
+                    optionsModel.getOptionValue());
+            OtherCryptoAsymmetricModel cryptoAsymmetric = CryptoAsymmetricUtil.getCryptoAsymmetric(cryptoType);
+            if(cryptoAsymmetric != null){
+                return ResultVo.success(
+                        "操作成功!",
+                        cryptoAsymmetric.getPublicKey()
+                );
+            }
+        }
+
+        // 失败
+        return ResultVo.error();
     }
 
     // =================

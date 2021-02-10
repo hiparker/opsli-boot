@@ -229,4 +229,11 @@ public class OtherCryptoAsymmetricRestController extends BaseRestController<Othe
                 WrapperUtil.transformInstance(entity, OtherCryptoAsymmetricModel.class)
         );
     }
+
+    @Override
+    public ResultVo<?> insertInner(OtherCryptoAsymmetricModel model) {
+        // 调用新增方法
+        IService.insert(model);
+        return ResultVo.success("新增非对称加密成功");
+    }
 }

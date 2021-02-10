@@ -18,6 +18,7 @@ package org.opsli.modulars.system.other.crypto.service;
 
 
 import org.opsli.api.wrapper.system.other.crypto.OtherCryptoAsymmetricModel;
+import org.opsli.common.enums.CryptoAsymmetricType;
 import org.opsli.core.base.service.interfaces.CrudServiceInterface;
 
 
@@ -33,5 +34,12 @@ import org.opsli.modulars.system.other.crypto.entity.OtherCryptoAsymmetric;
 * @Description: 非对称加密 Service
 */
 public interface IOtherCryptoAsymmetricService extends CrudServiceInterface<OtherCryptoAsymmetric, OtherCryptoAsymmetricModel> {
+
+    /***
+     * 重置数据
+     * @param type 枚举
+     * @return OtherCryptoAsymmetricModel
+     */
+    OtherCryptoAsymmetricModel reset(CryptoAsymmetricType type);
 
 }
