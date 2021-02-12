@@ -157,4 +157,11 @@ public interface OptionsApi {
     @GetMapping("/findAll")
     ResultVo<List<OptionsModel>> findAll();
 
+    /**
+     * 系统参数 创建加密公私钥
+     * @return ResultVo
+     */
+    @PostMapping("/createCrypto")
+    ResultVo<?> createCrypto(String type);
+
 }

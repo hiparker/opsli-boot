@@ -27,14 +27,17 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.opsli.api.base.result.ResultVo;
 import org.opsli.api.web.system.options.OptionsApi;
 import org.opsli.api.wrapper.system.options.OptionsModel;
+import org.opsli.api.wrapper.system.other.crypto.OtherCryptoAsymmetricModel;
 import org.opsli.common.annotation.ApiRestController;
 import org.opsli.common.annotation.EnableLog;
 import org.opsli.common.annotation.RequiresPermissionsCus;
+import org.opsli.common.enums.CryptoAsymmetricType;
 import org.opsli.common.utils.WrapperUtil;
 import org.opsli.core.base.controller.BaseRestController;
 import org.opsli.core.persistence.Page;
 import org.opsli.core.persistence.querybuilder.QueryBuilder;
 import org.opsli.core.persistence.querybuilder.WebQueryBuilder;
+import org.opsli.core.utils.CryptoAsymmetricUtil;
 import org.opsli.modulars.system.options.entity.SysOptions;
 import org.opsli.modulars.system.options.service.ISysOptionsService;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
@@ -237,6 +240,23 @@ public class SysOptionsRestController extends BaseRestController<SysOptions, Opt
     public ResultVo<List<OptionsModel>> findAll() {
         return ResultVo.success(
                 WrapperUtil.transformInstance(IService.findAllList(), OptionsModel.class)
+        );
+    }
+
+
+    /**
+     * 创建加密 公私钥
+     * @return ResultVo
+     */
+    @Override
+    public ResultVo<?> createCrypto(String type) {
+        CryptoAsymmetricType cryptoType = CryptoAsymmetricType.getCryptoType(type);
+        if(cryptoType == null){
+            return ResultVo.error();
+        }
+
+        return ResultVo.success(
+                CryptoAsymmetricUtil.create(cryptoType)
         );
     }
 }
