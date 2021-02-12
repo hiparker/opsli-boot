@@ -9,15 +9,19 @@ public enum OptionsType {
 
     /** 参数类型 */
 
-    /** 目前支持 RSA SM2 ECIES 3种模式 */
+    /** 非对称加密 目前支持 RSA SM2 ECIES 3种模式 */
     CRYPTO_ASYMMETRIC("crypto_asymmetric", "加解密-非对称"),
+    /** 非对称加密 公钥 */
+    CRYPTO_ASYMMETRIC_PUBLIC_KEY("crypto_asymmetric_public_key", "加解密-非对称-公钥"),
+    /** 非对称加密 私钥 */
+    CRYPTO_ASYMMETRIC_PRIVATE_KEY("crypto_asymmetric_private_key", "加解密-非对称-私钥"),
 
     ;
 
     private final String code;
     private final String desc;
 
-    public static OptionsType getCacheType(String cacheType) {
+    public static OptionsType getType(String cacheType) {
         OptionsType[] var1 = values();
         for (OptionsType type : var1) {
             if (type.code.equalsIgnoreCase(cacheType)) {

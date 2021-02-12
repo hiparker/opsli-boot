@@ -27,14 +27,10 @@ import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.opsli.api.base.encrypt.BaseEncrypt;
 import org.opsli.api.base.result.ResultVo;
-import org.opsli.api.wrapper.system.options.OptionsModel;
 import org.opsli.common.annotation.InterfaceCrypto;
-import org.opsli.common.enums.CryptoAsymmetricType;
-import org.opsli.common.enums.OptionsType;
 import org.opsli.common.exception.ServiceException;
 import org.opsli.core.msg.CoreMsg;
 import org.opsli.core.utils.CryptoAsymmetricUtil;
-import org.opsli.core.utils.OptionsUtil;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
@@ -72,22 +68,13 @@ public class InterfaceCryptoAop {
         // 返回结果
         Object returnValue;
 
-        // 获得系统配置参数 非对称加密枚举
-        CryptoAsymmetricType asymmetricType = null;
-        OptionsModel optionsModel = OptionsUtil.getOptionByCode(OptionsType.CRYPTO_ASYMMETRIC);
-        if(optionsModel != null){
-            // 获得加密类型
-            asymmetricType = CryptoAsymmetricType.getCryptoType(
-                    optionsModel.getOptionValue());
-        }
-
         MethodSignature signature = (MethodSignature) point.getSignature();
         // 获得 方法
         Method  method = signature.getMethod();
         // 获得方法注解
         InterfaceCrypto annotation =
                 method.getAnnotation(InterfaceCrypto.class);
-        if(asymmetricType != null && annotation != null){
+        if(annotation != null){
 
             // 1. 拆解请求数据
             // request 解密
@@ -100,7 +87,7 @@ public class InterfaceCryptoAop {
                         BaseEncrypt baseEncrypt = (BaseEncrypt) arg;
                         String encryptData = baseEncrypt.getEncryptData();
                         // 解密对象
-                        Object dataToObj = CryptoAsymmetricUtil.decryptToObj(asymmetricType, encryptData);
+                        Object dataToObj = CryptoAsymmetricUtil.decryptToObj(encryptData);
 
                         // 根据方法类型转化对象
                         Type type = TypeUtil.getParamType(method, i);
@@ -136,11 +123,11 @@ public class InterfaceCryptoAop {
                         if(returnValue instanceof ResultVo){
                             ResultVo<Object> ret = (ResultVo<Object>) returnValue;
                             ret.setData(
-                                    CryptoAsymmetricUtil.encrypt(asymmetricType, ret.getData())
+                                    CryptoAsymmetricUtil.encrypt(ret.getData())
                             );
                             returnValue = ret;
                         }else {
-                            returnValue = CryptoAsymmetricUtil.encrypt(asymmetricType, returnValue);
+                            returnValue = CryptoAsymmetricUtil.encrypt(returnValue);
                         }
                     }catch (Exception e){
                         // RSA非对称加密失败

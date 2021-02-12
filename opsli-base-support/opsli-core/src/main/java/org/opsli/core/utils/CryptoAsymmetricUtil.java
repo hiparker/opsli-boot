@@ -230,11 +230,10 @@ public class CryptoAsymmetricUtil {
 
     /**
      * 加密数据
-     * @param cryptoAsymmetricType 枚举
      * @param data 数据
      * @return String
      */
-    public static String encrypt(final CryptoAsymmetricType cryptoAsymmetricType, final Object data){
+    public static String encrypt(final Object data){
 
         JSONObject jsonObject = new JSONObject();
         jsonObject.put(CRYPTO_KEY, data);
@@ -244,26 +243,47 @@ public class CryptoAsymmetricUtil {
 
 
         try {
-            OtherCryptoAsymmetricModel cryptoAsymmetric = getCryptoAsymmetric(cryptoAsymmetricType);
+            // 加解密方式
+            OptionsModel cryptoAsymmetric = OptionsUtil.getOptionByCode(OptionsType.CRYPTO_ASYMMETRIC);
+            // 公钥
+            OptionsModel cryptoAsymmetricPublicKey =
+                    OptionsUtil.getOptionByCode(OptionsType.CRYPTO_ASYMMETRIC_PUBLIC_KEY);
+            // 私钥
+            OptionsModel cryptoAsymmetricPrivateKey =
+                    OptionsUtil.getOptionByCode(OptionsType.CRYPTO_ASYMMETRIC_PRIVATE_KEY);
 
-            // 如果找不到 公私钥 直接返回原始数据
-            if(cryptoAsymmetric == null){
+            // 非法验证
+            if(cryptoAsymmetric == null || cryptoAsymmetricPublicKey == null ||
+                    cryptoAsymmetricPrivateKey == null
+                ){
                 throw new RuntimeException();
             }
 
-            switch (cryptoAsymmetricType){
+            // 加解密方式枚举
+            CryptoAsymmetricType cryptoType = CryptoAsymmetricType.getCryptoType(
+                    cryptoAsymmetric.getOptionValue());
+            // 非法验证
+            if(cryptoType == null){
+                throw new RuntimeException();
+            }
+
+
+            switch (cryptoType){
                 case RSA:
-                    RSA rsa = SecureUtil.rsa(cryptoAsymmetric.getPrivateKey(), cryptoAsymmetric.getPublicKey());
+                    RSA rsa = SecureUtil.rsa(cryptoAsymmetricPrivateKey.getOptionValue(),
+                            cryptoAsymmetricPublicKey.getOptionValue());
                     encryptedStr = rsa.encryptBase64(
                             StrUtil.bytes(encryptedStr, CharsetUtil.CHARSET_UTF_8), KeyType.PublicKey);
                     break;
                 case SM2:
-                    SM2 sm2 = SmUtil.sm2(cryptoAsymmetric.getPrivateKey(), cryptoAsymmetric.getPublicKey());
+                    SM2 sm2 = SmUtil.sm2(cryptoAsymmetricPrivateKey.getOptionValue(),
+                            cryptoAsymmetricPublicKey.getOptionValue());
                     encryptedStr = sm2.encryptBase64(
                             StrUtil.bytes(encryptedStr, CharsetUtil.CHARSET_UTF_8), KeyType.PublicKey);
                     break;
                 case ECIES:
-                    ECIES ecies = new ECIES(cryptoAsymmetric.getPrivateKey(), cryptoAsymmetric.getPublicKey());
+                    ECIES ecies = new ECIES(cryptoAsymmetricPrivateKey.getOptionValue(),
+                            cryptoAsymmetricPublicKey.getOptionValue());
                     encryptedStr = ecies.encryptBase64(
                             StrUtil.bytes(encryptedStr, CharsetUtil.CHARSET_UTF_8), KeyType.PublicKey);
                     break;
@@ -280,13 +300,12 @@ public class CryptoAsymmetricUtil {
 
     /**
      * RSA 解密数据
-     * @param cryptoAsymmetricType 枚举
      * @param data 数据
      * @return Object
      */
-    public static Object decryptToObj(final CryptoAsymmetricType cryptoAsymmetricType, final String data){
+    public static Object decryptToObj(final String data){
         Object obj;
-        String decryptedData = decrypt(cryptoAsymmetricType, data);
+        String decryptedData = decrypt(data);
         try{
             obj = JSONObject.parse(decryptedData);
         }catch (Exception e){
@@ -298,36 +317,53 @@ public class CryptoAsymmetricUtil {
 
     /**
      * 解密数据
-     * @param cryptoAsymmetricType 枚举
      * @param data 数据
      * @return String
      */
-    public static String decrypt(final CryptoAsymmetricType cryptoAsymmetricType, final String data){
+    public static String decrypt(final String data){
         String decryptStr;
         try {
             if(StringUtils.isEmpty(data)){
                 throw new RuntimeException();
             }
 
-            OtherCryptoAsymmetricModel cryptoAsymmetric = getCryptoAsymmetric(cryptoAsymmetricType);
-            // 如果找不到 公私钥 直接返回原始数据
-            if(cryptoAsymmetric == null){
+            // 加解密方式
+            OptionsModel cryptoAsymmetric = OptionsUtil.getOptionByCode(OptionsType.CRYPTO_ASYMMETRIC);
+            // 公钥
+            OptionsModel cryptoAsymmetricPublicKey =
+                    OptionsUtil.getOptionByCode(OptionsType.CRYPTO_ASYMMETRIC_PUBLIC_KEY);
+            // 私钥
+            OptionsModel cryptoAsymmetricPrivateKey =
+                    OptionsUtil.getOptionByCode(OptionsType.CRYPTO_ASYMMETRIC_PRIVATE_KEY);
+
+            // 非法验证
+            if(cryptoAsymmetric == null || cryptoAsymmetricPublicKey == null ||
+                    cryptoAsymmetricPrivateKey == null
+            ){
+                throw new RuntimeException();
+            }
+
+            // 加解密方式枚举
+            CryptoAsymmetricType cryptoType = CryptoAsymmetricType.getCryptoType(
+                    cryptoAsymmetric.getOptionValue());
+            // 非法验证
+            if(cryptoType == null){
                 throw new RuntimeException();
             }
 
             String tmp;
             String currData = data.replaceAll(" ", "+");
-            switch (cryptoAsymmetricType){
+            switch (cryptoType){
                 case RSA:
-                    RSA rsa = SecureUtil.rsa(cryptoAsymmetric.getPrivateKey(), cryptoAsymmetric.getPublicKey());
+                    RSA rsa = SecureUtil.rsa(cryptoAsymmetricPrivateKey.getOptionValue(), cryptoAsymmetricPublicKey.getOptionValue());
                     tmp = rsa.decryptStr(currData, KeyType.PrivateKey);
                     break;
                 case SM2:
-                    SM2 sm2 = SmUtil.sm2(cryptoAsymmetric.getPrivateKey(), cryptoAsymmetric.getPublicKey());
+                    SM2 sm2 = SmUtil.sm2(cryptoAsymmetricPrivateKey.getOptionValue(), cryptoAsymmetricPublicKey.getOptionValue());
                     tmp = sm2.decryptStr(currData, KeyType.PrivateKey);
                     break;
                 case ECIES:
-                    ECIES ecies = new ECIES(cryptoAsymmetric.getPrivateKey(), cryptoAsymmetric.getPublicKey());
+                    ECIES ecies = new ECIES(cryptoAsymmetricPrivateKey.getOptionValue(), cryptoAsymmetricPublicKey.getOptionValue());
                     tmp = ecies.decryptStr(currData, KeyType.PrivateKey);
                     break;
                 default:

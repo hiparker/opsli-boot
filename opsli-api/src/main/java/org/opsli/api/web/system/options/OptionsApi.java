@@ -29,6 +29,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.opsli.api.wrapper.system.options.OptionsModel;
 
+import java.util.List;
 
 
 /**
@@ -148,5 +149,12 @@ public interface OptionsApi {
      */
     @GetMapping("/getByCode")
     ResultVo<OptionsModel> getByCode(String optionCode);
+
+    /**
+     * 系统参数 查询全部
+     * @return ResultVo
+     */
+    @GetMapping("/findAll")
+    ResultVo<List<OptionsModel>> findAll();
 
 }

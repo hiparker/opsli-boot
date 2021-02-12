@@ -15,11 +15,14 @@
  */
 package org.opsli.core.utils;
 
+import cn.hutool.core.collection.CollUtil;
+import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.opsli.api.base.result.ResultVo;
 import org.opsli.api.web.system.options.OptionsApi;
 import org.opsli.api.wrapper.system.options.OptionsModel;
+import org.opsli.api.wrapper.system.other.crypto.OtherCryptoAsymmetricModel;
 import org.opsli.common.enums.OptionsType;
 import org.opsli.core.cache.local.CacheUtil;
 import org.opsli.core.msg.CoreMsg;
@@ -27,6 +30,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
+import java.util.Map;
 
 import static org.opsli.common.constants.OrderConstants.UTIL_ORDER;
 
@@ -120,6 +126,29 @@ public class OptionsUtil {
         }
 
         return model;
+    }
+
+    /**
+     * 获得全部配置参数 （慢）仅用于管理解密
+     * @return Map
+     */
+    public static Map<String, OptionsModel> findAllOptions(){
+        ResultVo<List<OptionsModel>> optionsApiAll = optionsApi.findAll();
+        if(optionsApiAll == null || !optionsApiAll.isSuccess()){
+            return null;
+        }
+
+        List<OptionsModel> optionsModels = optionsApiAll.getData();
+        if(CollUtil.isEmpty(optionsModels)){
+            return null;
+        }
+
+        Map<String, OptionsModel> optionsModelMap = Maps.newHashMap();
+        for (OptionsModel optionsModel : optionsModels) {
+            optionsModelMap.put(optionsModel.getOptionCode(), optionsModel);
+        }
+
+        return optionsModelMap;
     }
 
 

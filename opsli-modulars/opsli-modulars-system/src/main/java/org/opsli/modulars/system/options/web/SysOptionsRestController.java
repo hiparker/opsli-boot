@@ -42,6 +42,7 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Method;
+import java.util.List;
 
 
 /**
@@ -225,6 +226,17 @@ public class SysOptionsRestController extends BaseRestController<SysOptions, Opt
 
         return ResultVo.success(
                 WrapperUtil.transformInstance(option, OptionsModel.class)
+        );
+    }
+
+    /**
+     * 系统参数 查询全部
+     * @return ResultVo
+     */
+    @Override
+    public ResultVo<List<OptionsModel>> findAll() {
+        return ResultVo.success(
+                WrapperUtil.transformInstance(IService.findAllList(), OptionsModel.class)
         );
     }
 }
