@@ -30,6 +30,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.opsli.api.wrapper.system.options.OptionsModel;
 
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -92,6 +93,15 @@ public interface OptionsApi {
     ResultVo<?> update(@RequestBody OptionsModel model);
 
     /**
+     * 系统参数 修改
+     * @param params Map
+     * @return ResultVo
+     */
+    @PostMapping("/updateOptions")
+    ResultVo<?> updateOptions(@RequestBody Map<String, String> params);
+
+
+    /**
     * 系统参数 删除
     * @param id ID
     * @return ResultVo
@@ -149,6 +159,13 @@ public interface OptionsApi {
      */
     @GetMapping("/getByCode")
     ResultVo<OptionsModel> getByCode(String optionCode);
+
+    /**
+     * 系统参数 查询全部
+     * @return ResultVo
+     */
+    @GetMapping("/findAllOptions")
+    ResultVo<Map<String, OptionsModel>> findAllOptions();
 
     /**
      * 系统参数 查询全部

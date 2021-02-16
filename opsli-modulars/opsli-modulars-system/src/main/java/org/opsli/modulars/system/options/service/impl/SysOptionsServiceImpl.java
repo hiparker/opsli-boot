@@ -20,6 +20,8 @@ package org.opsli.modulars.system.options.service.impl;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import org.apache.commons.lang3.StringUtils;
 import org.opsli.api.wrapper.system.options.OptionsModel;
 import org.opsli.common.constants.MyBatisConstants;
@@ -37,6 +39,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -93,6 +96,55 @@ public class SysOptionsServiceImpl extends CrudServiceImpl<SysOptionsMapper, Sys
         }
 
         return model;
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public void updateOptions(Map<String, String> params) {
+        if(CollUtil.isEmpty(params)){
+            // 更新异常
+            throw new ServiceException(SystemMsg.EXCEPTION_OPTIONS_UPDATE);
+        }
+
+        List<String> optionsCode = Lists.newArrayList();
+        optionsCode.addAll(params.keySet());
+
+        // 获得所有的原始内容
+        QueryWrapper<SysOptions> queryWrapper = new QueryWrapper<>();
+        queryWrapper.in("option_code", optionsCode);
+        List<SysOptions> optionsList = this.findList(queryWrapper);
+        Map<String, OptionsModel> resourceDataDict = Maps.newHashMap();
+        for (SysOptions option : optionsList) {
+            resourceDataDict.put(option.getOptionCode(),
+                    transformT2M(option)
+                    );
+        }
+
+        // 循环修改
+        for (Map.Entry<String, String> entry : params.entrySet()) {
+            String key = entry.getKey();
+            String value = entry.getValue();
+
+            OptionsModel optionsModel = resourceDataDict.get(key);
+            if(optionsModel == null){
+                // 更新异常
+                throw new ServiceException(SystemMsg.EXCEPTION_OPTIONS_UPDATE);
+            }
+
+            // 唯一验证
+            Integer count = this.uniqueVerificationByCode(optionsModel);
+            if(count != null && count > 0){
+                // 重复
+                throw new ServiceException(SystemMsg.EXCEPTION_OPTIONS_UNIQUE);
+            }
+
+            // 设置值
+            optionsModel.setOptionValue(value);
+            optionsModel.setVersion(null);
+
+            // 更新
+            this.update(optionsModel);
+        }
     }
 
     @Override

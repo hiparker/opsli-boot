@@ -22,20 +22,16 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.opsli.api.base.result.ResultVo;
 import org.opsli.api.wrapper.system.options.OptionsModel;
-import org.opsli.api.wrapper.system.other.crypto.OtherCryptoAsymmetricModel;
-import org.opsli.common.enums.CryptoAsymmetricType;
-import org.opsli.common.enums.OptionsType;
-import org.opsli.core.utils.ValidationUtil;
 import org.opsli.api.wrapper.system.tenant.TenantModel;
 import org.opsli.api.wrapper.system.user.UserModel;
 import org.opsli.common.annotation.InterfaceCrypto;
 import org.opsli.common.annotation.Limiter;
 import org.opsli.common.api.TokenThreadLocal;
 import org.opsli.common.enums.AlertType;
+import org.opsli.common.enums.OptionsType;
 import org.opsli.common.exception.TokenException;
 import org.opsli.common.thread.refuse.AsyncProcessQueueReFuse;
 import org.opsli.common.utils.IPUtil;
-import org.opsli.core.filters.aspect.InterfaceCryptoAop;
 import org.opsli.core.msg.TokenMsg;
 import org.opsli.core.security.shiro.realm.JwtRealm;
 import org.opsli.core.utils.*;
@@ -201,19 +197,13 @@ public class LoginRestController {
     @GetMapping("/sys/publicKey")
     public ResultVo<?> getPublicKey(){
 
-        // 获得系统配置参数
-        OptionsModel optionsModel = OptionsUtil.getOptionByCode(OptionsType.CRYPTO_ASYMMETRIC);
-        if(optionsModel != null){
-            // 获得加密类型
-            CryptoAsymmetricType cryptoType = CryptoAsymmetricType.getCryptoType(
-                    optionsModel.getOptionValue());
-            OtherCryptoAsymmetricModel cryptoAsymmetric = CryptoAsymmetricUtil.getCryptoAsymmetric(cryptoType);
-            if(cryptoAsymmetric != null){
-                return ResultVo.success(
-                        "操作成功!",
-                        cryptoAsymmetric.getPublicKey()
-                );
-            }
+        // 获得公钥
+        OptionsModel option = OptionsUtil.getOptionByCode(OptionsType.CRYPTO_ASYMMETRIC_PUBLIC_KEY);
+        if(option != null){
+            return ResultVo.success(
+                    "操作成功!",
+                    option.getOptionValue()
+            );
         }
 
         // 失败

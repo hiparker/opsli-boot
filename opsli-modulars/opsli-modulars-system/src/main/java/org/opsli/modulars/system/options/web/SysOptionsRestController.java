@@ -27,7 +27,6 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.opsli.api.base.result.ResultVo;
 import org.opsli.api.web.system.options.OptionsApi;
 import org.opsli.api.wrapper.system.options.OptionsModel;
-import org.opsli.api.wrapper.system.other.crypto.OtherCryptoAsymmetricModel;
 import org.opsli.common.annotation.ApiRestController;
 import org.opsli.common.annotation.EnableLog;
 import org.opsli.common.annotation.RequiresPermissionsCus;
@@ -38,6 +37,7 @@ import org.opsli.core.persistence.Page;
 import org.opsli.core.persistence.querybuilder.QueryBuilder;
 import org.opsli.core.persistence.querybuilder.WebQueryBuilder;
 import org.opsli.core.utils.CryptoAsymmetricUtil;
+import org.opsli.core.utils.OptionsUtil;
 import org.opsli.modulars.system.options.entity.SysOptions;
 import org.opsli.modulars.system.options.service.ISysOptionsService;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
@@ -46,6 +46,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Method;
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -69,7 +70,7 @@ public class SysOptionsRestController extends BaseRestController<SysOptions, Opt
     * @return ResultVo
     */
     @ApiOperation(value = "获得单条系统参数", notes = "获得单条系统参数 - ID")
-    @RequiresPermissions("sys_options_select")
+    @RequiresPermissions("system_options_select")
     @Override
     public ResultVo<OptionsModel> get(OptionsModel model) {
         // 如果系统内部调用 则直接查数据库
@@ -87,7 +88,7 @@ public class SysOptionsRestController extends BaseRestController<SysOptions, Opt
     * @return ResultVo
     */
     @ApiOperation(value = "获得分页数据", notes = "获得分页数据 - 查询构造器")
-    @RequiresPermissions("sys_options_select")
+    @RequiresPermissions("system_options_select")
     @Override
     public ResultVo<?> findPage(Integer pageNo, Integer pageSize, HttpServletRequest request) {
 
@@ -105,7 +106,7 @@ public class SysOptionsRestController extends BaseRestController<SysOptions, Opt
     * @return ResultVo
     */
     @ApiOperation(value = "新增系统参数数据", notes = "新增系统参数数据")
-    @RequiresPermissions("sys_options_insert")
+    @RequiresPermissions("system_options_insert")
     @EnableLog
     @Override
     public ResultVo<?> insert(OptionsModel model) {
@@ -120,13 +121,28 @@ public class SysOptionsRestController extends BaseRestController<SysOptions, Opt
     * @return ResultVo
     */
     @ApiOperation(value = "修改系统参数数据", notes = "修改系统参数数据")
-    @RequiresPermissions("sys_options_update")
+    @RequiresPermissions("system_options_update")
     @EnableLog
     @Override
     public ResultVo<?> update(OptionsModel model) {
         // 调用修改方法
         IService.update(model);
         return ResultVo.success("修改系统参数成功");
+    }
+
+    /**
+     * 系统参数 修改
+     * @param params Map
+     * @return ResultVo
+     */
+    @ApiOperation(value = "修改系统参数数据", notes = "修改系统参数数据")
+    @RequiresPermissions("system_options_update")
+    @EnableLog
+    @Override
+    public ResultVo<?> updateOptions(Map<String, String> params) {
+        // 调用修改方法
+        IService.updateOptions(params);
+        return ResultVo.success("保存参数成功");
     }
 
 
@@ -136,7 +152,7 @@ public class SysOptionsRestController extends BaseRestController<SysOptions, Opt
     * @return ResultVo
     */
     @ApiOperation(value = "删除系统参数数据", notes = "删除系统参数数据")
-    @RequiresPermissions("sys_options_update")
+    @RequiresPermissions("system_options_update")
     @EnableLog
     @Override
     public ResultVo<?> del(String id){
@@ -150,7 +166,7 @@ public class SysOptionsRestController extends BaseRestController<SysOptions, Opt
     * @return ResultVo
     */
     @ApiOperation(value = "批量删除系统参数数据", notes = "批量删除系统参数数据")
-    @RequiresPermissions("sys_options_update")
+    @RequiresPermissions("system_options_update")
     @EnableLog
     @Override
     public ResultVo<?> delAll(String ids){
@@ -175,7 +191,7 @@ public class SysOptionsRestController extends BaseRestController<SysOptions, Opt
     * @param response response
     */
     @ApiOperation(value = "导出Excel", notes = "导出Excel")
-    @RequiresPermissionsCus("sys_options_export")
+    @RequiresPermissionsCus("system_options_export")
     @EnableLog
     @Override
     public void exportExcel(HttpServletRequest request, HttpServletResponse response) {
@@ -192,7 +208,7 @@ public class SysOptionsRestController extends BaseRestController<SysOptions, Opt
     * @return ResultVo
     */
     @ApiOperation(value = "导入Excel", notes = "导入Excel")
-    @RequiresPermissions("sys_options_import")
+    @RequiresPermissions("system_options_import")
     @EnableLog
     @Override
     public ResultVo<?> importExcel(MultipartHttpServletRequest request) {
@@ -205,7 +221,7 @@ public class SysOptionsRestController extends BaseRestController<SysOptions, Opt
     * @param response response
     */
     @ApiOperation(value = "导出Excel模版", notes = "导出Excel模版")
-    @RequiresPermissionsCus("sys_options_import")
+    @RequiresPermissionsCus("system_options_import")
     @Override
     public void importTemplate(HttpServletResponse response) {
         // 当前方法
@@ -237,6 +253,17 @@ public class SysOptionsRestController extends BaseRestController<SysOptions, Opt
      * @return ResultVo
      */
     @Override
+    public ResultVo<Map<String, OptionsModel>> findAllOptions() {
+        return ResultVo.success(
+                OptionsUtil.findAllOptions()
+        );
+    }
+
+    /**
+     * 系统参数 查询全部 List
+     * @return ResultVo
+     */
+    @Override
     public ResultVo<List<OptionsModel>> findAll() {
         return ResultVo.success(
                 WrapperUtil.transformInstance(IService.findAllList(), OptionsModel.class)
@@ -249,6 +276,8 @@ public class SysOptionsRestController extends BaseRestController<SysOptions, Opt
      * @return ResultVo
      */
     @Override
+    @ApiOperation(value = "创建加密 公私钥", notes = "创建加密 公私钥")
+    @RequiresPermissions("system_options_update")
     public ResultVo<?> createCrypto(String type) {
         CryptoAsymmetricType cryptoType = CryptoAsymmetricType.getCryptoType(type);
         if(cryptoType == null){

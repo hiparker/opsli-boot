@@ -15,11 +15,13 @@
  */
 package org.opsli.core.cache.local;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.XmlUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
 import org.opsli.common.constants.CacheConstants;
 import org.opsli.common.enums.CacheType;
@@ -37,6 +39,7 @@ import org.w3c.dom.NodeList;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 import static org.opsli.common.constants.OrderConstants.UTIL_ORDER;
 
@@ -317,6 +320,46 @@ public class CacheUtil {
             }
 
             return cacheJson != null ? cacheJson.get(JSON_KEY) : null;
+        }catch (Exception e){
+            log.error(e.getMessage(),e);
+        }
+        return null;
+    }
+
+
+    /**
+     * 获得 Hash 缓存
+     * @param key 键
+     * @return Object
+     */
+    public static Map<String, Object> getHashAll(final String key){
+        try {
+            // 缓存 Key
+            String cacheKey  = CacheUtil.handleKey(CacheType.EDEN_HASH, key);
+
+            Map<String, Object> retMap = Maps.newHashMap();
+
+            // 如果本地缓存找不到该缓存 则去远端缓存拉去缓存
+            Map<Object, Object> allCache = redisPlugin.hGetAll(cacheKey);
+            if(CollUtil.isEmpty(allCache)){
+                return retMap;
+            }
+
+            for (Map.Entry<Object, Object> entry : allCache.entrySet()) {
+                // 赋值
+                JSONObject jsonObject = (JSONObject) entry.getValue();
+                if (jsonObject == null) {
+                    continue;
+                }
+                Object data = jsonObject.get(CacheUtil.JSON_KEY);
+                if (data == null) {
+                    continue;
+                }
+
+                retMap.put(Convert.toStr(entry.getKey()), data);
+            }
+
+            return retMap;
         }catch (Exception e){
             log.error(e.getMessage(),e);
         }

@@ -229,72 +229,65 @@ public class DictUtil {
         // 缓存Key
         String cacheKey = DictConstants.CACHE_PREFIX_NAME + typeCode;
 
-        List<DictWrapper> dictWrapperModels;
+        // 处理集合数据
+        List<DictWrapper> dictWrapperModels = handleDictList(
+                    CacheUtil.getHashAll(cacheKey), typeCode);
+        if(CollUtil.isNotEmpty(dictWrapperModels)){
+            return sortDictWrappers(dictWrapperModels);
+        }
+
+        // 防止缓存穿透判断
+        boolean hasNilFlag = CacheUtil.hasNilFlag(cacheKey);
+        if(hasNilFlag){
+            return sortDictWrappers(dictWrapperModels);
+        }
+
         try {
-            String key = CacheUtil.handleKey(CacheType.EDEN_HASH, cacheKey);
+            // 分布式加锁
+            if(!DistributedLockUtil.lock(cacheKey)){
+                // 无法申领分布式锁
+                log.error(CoreMsg.REDIS_EXCEPTION_LOCK.getMessage());
+                return sortDictWrappers(dictWrapperModels);
+            }
+
+            // 如果获得锁 则 再次检查缓存里有没有， 如果有则直接退出， 没有的话才发起数据库请求
             // 处理集合数据
-            dictWrapperModels = handleDictList(redisPlugin.hGetAll(key), typeCode);
+            dictWrapperModels = handleDictList(
+                    CacheUtil.getHashAll(cacheKey), typeCode);
             if(CollUtil.isNotEmpty(dictWrapperModels)){
-                return dictWrapperModels;
+                return sortDictWrappers(dictWrapperModels);
             }
 
-            // 防止缓存穿透判断
-            boolean hasNilFlag = CacheUtil.hasNilFlag(cacheKey);
-            if(hasNilFlag){
-                return dictWrapperModels;
-            }
 
-            try {
-                // 分布式加锁
-                if(!DistributedLockUtil.lock(cacheKey)){
-                    // 无法申领分布式锁
-                    log.error(CoreMsg.REDIS_EXCEPTION_LOCK.getMessage());
-                    return dictWrapperModels;
-                }
-
-                // 如果获得锁 则 再次检查缓存里有没有， 如果有则直接退出， 没有的话才发起数据库请求
-                key = CacheUtil.handleKey(CacheType.EDEN_HASH, cacheKey);
-                // 处理集合数据
-                dictWrapperModels = handleDictList(redisPlugin.hGetAll(key), typeCode);
-                if(CollUtil.isNotEmpty(dictWrapperModels)){
-                    return dictWrapperModels;
-                }
-
-
-                // 查询数据库 并保存到缓存内
-                ResultVo<List<DictDetailModel>> resultVo = dictDetailApi.findListByTypeCode(typeCode);
-                if(resultVo.isSuccess()){
-                    List<DictDetailModel> dictDetailModels = resultVo.getData();
-                    // 处理数据库查询数据
-                    if(CollUtil.isNotEmpty(dictDetailModels)){
-                        dictWrapperModels = Lists.newArrayListWithCapacity(dictDetailModels.size());
-                        for (DictDetailModel model : dictDetailModels) {
-                            // 保存至缓存
-                            DictWrapper dictWrapper = DictUtil.putByModel(model);
-                            dictWrapperModels.add(dictWrapper);
-                        }
+            // 查询数据库 并保存到缓存内
+            ResultVo<List<DictDetailModel>> resultVo = dictDetailApi.findListByTypeCode(typeCode);
+            if(resultVo.isSuccess()){
+                List<DictDetailModel> dictDetailModels = resultVo.getData();
+                // 处理数据库查询数据
+                if(CollUtil.isNotEmpty(dictDetailModels)){
+                    dictWrapperModels = Lists.newArrayListWithCapacity(dictDetailModels.size());
+                    for (DictDetailModel model : dictDetailModels) {
+                        // 保存至缓存
+                        DictWrapper dictWrapper = DictUtil.putByModel(model);
+                        dictWrapperModels.add(dictWrapper);
                     }
+
+                    return sortDictWrappers(dictWrapperModels);
                 }
-
-            }catch (Exception e){
-                log.error(e.getMessage(),e);
-                return dictWrapperModels;
-            }finally {
-                // 释放锁
-                DistributedLockUtil.unlock(cacheKey);
-            }
-
-
-            // 如果值还是 为空 则赋默认值
-            if(CollUtil.isEmpty(dictWrapperModels)){
-                // 加入缓存防穿透
-                // 设置空变量 用于防止穿透判断
-                CacheUtil.putNilFlag(cacheKey);
             }
 
         }catch (Exception e){
             log.error(e.getMessage(),e);
-            dictWrapperModels = Lists.newArrayList();
+        }finally {
+            // 释放锁
+            DistributedLockUtil.unlock(cacheKey);
+        }
+
+        // 如果值还是 为空 则赋默认值
+        if(CollUtil.isEmpty(dictWrapperModels)){
+            // 加入缓存防穿透
+            // 设置空变量 用于防止穿透判断
+            CacheUtil.putNilFlag(cacheKey);
         }
 
         // 排序
@@ -311,6 +304,7 @@ public class DictUtil {
         if(dictWrapperModels == null){
             return null;
         }
+
         ListUtil.sort(dictWrapperModels, (o1, o2) -> {
             int oInt1 = Integer.MAX_VALUE;
             int oInt2 = Integer.MAX_VALUE;
@@ -453,33 +447,24 @@ public class DictUtil {
      * @param typeCode 类型编号
      * @return List
      */
-    public static List<DictWrapper> handleDictList(Map<Object, Object> dictMap, String typeCode){
-        if(CollUtil.isEmpty(dictMap)){
-            return null;
-        }
-
+    public static List<DictWrapper> handleDictList(Map<String, Object> dictMap, String typeCode){
         List<DictWrapper> dictWrapperModels = Lists.newArrayList();
-        for (Map.Entry<Object, Object> entry : dictMap.entrySet()) {
-            // 赋值
-            JSONObject jsonObject = (JSONObject) entry.getValue();
-            if(jsonObject == null){
-                continue;
-            }
-            Object data = jsonObject.get(CacheUtil.JSON_KEY);
-            if(data == null){
-                continue;
-            }
+        if(CollUtil.isNotEmpty(dictMap)){
+            for (Map.Entry<String, Object> entry : dictMap.entrySet()) {
+                // 赋值
+                Object data = entry.getValue();
 
-            DictDetailModel model = Convert.convert(DictDetailModel.class, data);
-            DictWrapper dictWrapperModel = new DictWrapper();
-            dictWrapperModel.setTypeCode(typeCode);
-            dictWrapperModel.setDictName(model.getDictName());
-            dictWrapperModel.setDictValue(model.getDictValue());
-            dictWrapperModels.add(dictWrapperModel);
-        }
+                DictDetailModel model = Convert.convert(DictDetailModel.class, data);
+                DictWrapper dictWrapperModel = new DictWrapper();
+                dictWrapperModel.setTypeCode(typeCode);
+                dictWrapperModel.setDictName(model.getDictName());
+                dictWrapperModel.setDictValue(model.getDictValue());
+                dictWrapperModels.add(dictWrapperModel);
+            }
+         }
 
         // 返回排序后 list
-        return CollUtil.isNotEmpty(dictWrapperModels)?sortDictWrappers(dictWrapperModels):null;
+        return CollUtil.isNotEmpty(dictWrapperModels)?sortDictWrappers(dictWrapperModels):dictWrapperModels;
     }
 
 

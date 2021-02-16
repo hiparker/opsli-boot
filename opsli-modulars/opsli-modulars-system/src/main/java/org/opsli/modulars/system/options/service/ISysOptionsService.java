@@ -24,6 +24,8 @@ import org.opsli.core.base.service.interfaces.CrudServiceInterface;
 import org.opsli.modulars.system.options.entity.SysOptions;
 import org.opsli.api.wrapper.system.options.OptionsModel;
 
+import java.util.Map;
+
 
 /**
 * @BelongsProject: opsli-boot
@@ -35,5 +37,11 @@ import org.opsli.api.wrapper.system.options.OptionsModel;
 * @Description: 系统参数 Service
 */
 public interface ISysOptionsService extends CrudServiceInterface<SysOptions, OptionsModel> {
+
+    /**
+     * 更新参数
+     * @param params
+     */
+    void updateOptions(Map<String, String> params);
 
 }
