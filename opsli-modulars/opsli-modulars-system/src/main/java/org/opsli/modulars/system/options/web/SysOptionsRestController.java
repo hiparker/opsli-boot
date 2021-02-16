@@ -110,6 +110,9 @@ public class SysOptionsRestController extends BaseRestController<SysOptions, Opt
     @EnableLog
     @Override
     public ResultVo<?> insert(OptionsModel model) {
+        // 演示模式 不允许操作
+        super.demoError();
+
         // 调用新增方法
         IService.insert(model);
         return ResultVo.success("新增系统参数成功");
@@ -125,6 +128,9 @@ public class SysOptionsRestController extends BaseRestController<SysOptions, Opt
     @EnableLog
     @Override
     public ResultVo<?> update(OptionsModel model) {
+        // 演示模式 不允许操作
+        super.demoError();
+
         // 调用修改方法
         IService.update(model);
         return ResultVo.success("修改系统参数成功");
@@ -140,6 +146,9 @@ public class SysOptionsRestController extends BaseRestController<SysOptions, Opt
     @EnableLog
     @Override
     public ResultVo<?> updateOptions(Map<String, String> params) {
+        // 演示模式 不允许操作
+        super.demoError();
+
         // 调用修改方法
         IService.updateOptions(params);
         return ResultVo.success("保存参数成功");
@@ -156,6 +165,9 @@ public class SysOptionsRestController extends BaseRestController<SysOptions, Opt
     @EnableLog
     @Override
     public ResultVo<?> del(String id){
+        // 演示模式 不允许操作
+        super.demoError();
+
         IService.delete(id);
         return ResultVo.success("删除系统参数成功");
     }
@@ -170,6 +182,9 @@ public class SysOptionsRestController extends BaseRestController<SysOptions, Opt
     @EnableLog
     @Override
     public ResultVo<?> delAll(String ids){
+        // 演示模式 不允许操作
+        super.demoError();
+
         String[] idArray = Convert.toStrArray(ids);
         IService.deleteAll(idArray);
         return ResultVo.success("批量删除系统参数成功");
