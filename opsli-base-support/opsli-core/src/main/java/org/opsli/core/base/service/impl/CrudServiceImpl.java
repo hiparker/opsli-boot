@@ -257,8 +257,8 @@ public abstract class CrudServiceImpl<M extends BaseMapper<T>, T extends BaseEnt
 
     /**
      * 转化 entity 为 model
-     * @param entity
-     * @return
+     * @param entity entity
+     * @return E
      */
     protected E transformT2M(T entity){
         return WrapperUtil.transformInstance(entity, modelClazz);
@@ -267,8 +267,8 @@ public abstract class CrudServiceImpl<M extends BaseMapper<T>, T extends BaseEnt
     /**
      * 集合对象
      * 转化 entitys 为 models
-     * @param entitys
-     * @return
+     * @param entitys entitys
+     * @return List<E>
      */
     protected List<E> transformTs2Ms(List<T> entitys){
         return WrapperUtil.transformInstance(entitys, modelClazz);
@@ -277,8 +277,8 @@ public abstract class CrudServiceImpl<M extends BaseMapper<T>, T extends BaseEnt
 
     /**
      * 转化 model 为 entity
-     * @param model
-     * @return
+     * @param model model
+     * @return T
      */
     protected T transformM2T(E model){
         return WrapperUtil.transformInstance(model, entityClazz);
@@ -287,8 +287,8 @@ public abstract class CrudServiceImpl<M extends BaseMapper<T>, T extends BaseEnt
     /**
      * 集合对象
      * 转化 models 为 entitys
-     * @param models
-     * @return
+     * @param models models
+     * @return List<T>
      */
     protected List<T> transformMs2Ts(List<E> models){
         return WrapperUtil.transformInstance(models, entityClazz);
@@ -324,6 +324,7 @@ public abstract class CrudServiceImpl<M extends BaseMapper<T>, T extends BaseEnt
      * 内部获得 Model 泛型 Clazz
      * @return Class<E>
      */
+    @SuppressWarnings("unchecked")
     public Class<E> getInnerModelClazz(){
         String typeName = "E";
         Class<E> tClass = null;
@@ -352,6 +353,7 @@ public abstract class CrudServiceImpl<M extends BaseMapper<T>, T extends BaseEnt
      * 内部获得 Entity 泛型 Clazz
      * @return Class<T>
      */
+    @SuppressWarnings("unchecked")
     private Class<T> getInnerEntityClazz(){
         String typeName = "T";
         Class<T> tClass = null;

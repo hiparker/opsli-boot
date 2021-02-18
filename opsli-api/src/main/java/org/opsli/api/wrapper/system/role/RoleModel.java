@@ -43,7 +43,6 @@ public class RoleModel extends ApiWrapper {
     @ApiModelProperty(value = "角色编码")
     @ExcelProperty(value = "角色编码", order = 1)
     @ExcelInfo
-    // 验证器
     @ValidationArgs({ValiArgsType.IS_NOT_NULL,ValiArgsType.IS_GENERAL})
     @ValidationArgsLenMax(50)
     private String roleCode;
@@ -52,7 +51,6 @@ public class RoleModel extends ApiWrapper {
     @ApiModelProperty(value = "角色编码")
     @ExcelProperty(value = "角色编码", order = 2)
     @ExcelInfo
-    // 验证器
     @ValidationArgs({ValiArgsType.IS_NOT_NULL,ValiArgsType.IS_GENERAL_WITH_CHINESE})
     @ValidationArgsLenMax(50)
     private String roleName;
@@ -61,7 +59,6 @@ public class RoleModel extends ApiWrapper {
     @ApiModelProperty(value = "是否内置数据 0是  1否")
     @ExcelProperty(value = "是否内置数据", order = 3)
     @ExcelInfo(dictType = "no_yes")
-    // 验证器
     @ValidationArgs({ValiArgsType.IS_NOT_NULL})
     @ValidationArgsLenMax(1)
     private String izLock;
@@ -70,7 +67,6 @@ public class RoleModel extends ApiWrapper {
     @ApiModelProperty(value = "备注")
     @ExcelProperty(value = "备注", order = 4)
     @ExcelInfo
-    // 验证器
     @ValidationArgsLenMax(255)
     private String remark;
 
@@ -78,7 +74,6 @@ public class RoleModel extends ApiWrapper {
     /** 多租户字段 */
     @ApiModelProperty(value = "多租户ID")
     @ExcelIgnore
-    // 验证器
     @ValidationArgsLenMax(20)
     private String tenantId;
 

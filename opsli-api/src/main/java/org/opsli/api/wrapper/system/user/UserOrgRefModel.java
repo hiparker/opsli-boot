@@ -39,37 +39,30 @@ public class UserOrgRefModel implements Serializable {
 
     /** 用户ID */
     @ApiModelProperty(value = "用户ID")
-    // 验证器
     @ValidationArgs({ValiArgsType.IS_NOT_NULL})
     @ValidationArgsLenMax(50)
     private String userId;
 
     @ApiModelProperty(value = "公司")
-    // 验证器
     @ValidationArgs({ValiArgsType.IS_NOT_NULL})
     @ValidationArgsLenMax(19)
     private String companyId;
 
     @ApiModelProperty(value = "公司名称")
-    // 验证器
     private String companyName;
 
     @ApiModelProperty(value = "部门ID")
-    // 验证器
     @ValidationArgsLenMax(19)
     private String departmentId;
 
     @ApiModelProperty(value = "部门名称")
-    // 验证器
     private String departmentName;
 
     @ApiModelProperty(value = "岗位ID")
-    // 验证器
     @ValidationArgsLenMax(19)
     private String postId;
 
     @ApiModelProperty(value = "岗位名称")
-    // 验证器
     private String postName;
 
 }

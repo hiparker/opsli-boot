@@ -108,5 +108,6 @@ public final class XSSFilterKit {
 	}
 
 	// ====================
+
 	private XSSFilterKit(){}
 }

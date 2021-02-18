@@ -42,7 +42,6 @@ public class DictModel extends ApiWrapper {
     @ApiModelProperty(value = "字典类型编号")
     @ExcelProperty(value = "字典类型编号", order = 1)
     @ExcelInfo
-    // 验证器
     @ValidationArgs({ValiArgsType.IS_NOT_NULL, ValiArgsType.IS_GENERAL})
     @ValidationArgsLenMax(120)
     private String typeCode;
@@ -51,7 +50,6 @@ public class DictModel extends ApiWrapper {
     @ApiModelProperty(value = "字典类型名称")
     @ExcelProperty(value = "字典类型名称", order = 2)
     @ExcelInfo
-    // 验证器
     @ValidationArgs({ValiArgsType.IS_NOT_NULL, ValiArgsType.IS_GENERAL_WITH_CHINESE})
     @ValidationArgsLenMax(120)
     private String typeName;
@@ -60,7 +58,6 @@ public class DictModel extends ApiWrapper {
     @ApiModelProperty(value = "是否内置数据 0是  1否")
     @ExcelProperty(value = "是否内置数据", order = 3)
     @ExcelInfo(dictType = "no_yes")
-    // 验证器
     @ValidationArgs(ValiArgsType.IS_NOT_NULL)
     @ValidationArgsLenMax(1)
     private String izLock;
@@ -69,7 +66,6 @@ public class DictModel extends ApiWrapper {
     @ApiModelProperty(value = "备注")
     @ExcelProperty(value = "备注", order = 4)
     @ExcelInfo
-    // 验证器
     @ValidationArgsLenMax(255)
     private String remark;
 

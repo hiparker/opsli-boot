@@ -41,7 +41,6 @@ public class SysAreaModel extends ApiWrapper {
     @ApiModelProperty(value = "父级主键")
     @ExcelProperty(value = "父级主键", order = 1)
     @ExcelInfo
-    // 验证器
     @ValidationArgsLenMax(19)
     private String parentId;
 
@@ -49,7 +48,6 @@ public class SysAreaModel extends ApiWrapper {
     @ApiModelProperty(value = "地域编号")
     @ExcelProperty(value = "地域编号", order = 2)
     @ExcelInfo
-    // 验证器
     @ValidationArgs({ValiArgsType.IS_NOT_NULL, ValiArgsType.IS_NUMBER})
     @ValidationArgsLenMax(40)
     private String areaCode;
@@ -58,7 +56,6 @@ public class SysAreaModel extends ApiWrapper {
     @ApiModelProperty(value = "地域名称")
     @ExcelProperty(value = "地域名称", order = 3)
     @ExcelInfo
-    // 验证器
     @ValidationArgs({ValiArgsType.IS_NOT_NULL, ValiArgsType.IS_GENERAL_WITH_CHINESE})
     @ValidationArgsLenMax(40)
     private String areaName;

@@ -40,7 +40,6 @@ public class MenuModel extends ApiWrapper {
     @ApiModelProperty(value = "父级主键")
     @ExcelProperty(value = "父级主键", order = 1)
     @ExcelInfo
-    // 验证器
     @ValidationArgsLenMax(20)
     private String parentId;
 
@@ -48,7 +47,6 @@ public class MenuModel extends ApiWrapper {
     @ApiModelProperty(value = "编号")
     @ExcelProperty(value = "编号", order = 2)
     @ExcelInfo
-    // 验证器
     @ValidationArgs({ValiArgsType.IS_NOT_NULL,ValiArgsType.IS_GENERAL})
     @ValidationArgsLenMax(50)
     private String menuCode;
@@ -57,7 +55,6 @@ public class MenuModel extends ApiWrapper {
     @ApiModelProperty(value = "名称")
     @ExcelProperty(value = "名称", order = 3)
     @ExcelInfo
-    // 验证器
     @ValidationArgs({ValiArgsType.IS_NOT_NULL,ValiArgsType.IS_GENERAL_WITH_CHINESE})
     @ValidationArgsLenMax(50)
     private String menuName;
@@ -66,7 +63,6 @@ public class MenuModel extends ApiWrapper {
     @ApiModelProperty(value = "图标")
     @ExcelProperty(value = "图标", order = 4)
     @ExcelInfo
-    // 验证器
     @ValidationArgsLenMax(50)
     private String icon;
 
@@ -74,7 +70,6 @@ public class MenuModel extends ApiWrapper {
     @ApiModelProperty(value = "项目类型")
     @ExcelProperty(value = "项目类型", order = 5)
     @ExcelInfo(dictType = "menu_type")
-    // 验证器
     @ValidationArgs({ValiArgsType.IS_NOT_NULL})
     @ValidationArgsLenMax(20)
     private String type;
@@ -83,7 +78,6 @@ public class MenuModel extends ApiWrapper {
     @ApiModelProperty(value = "url地址")
     @ExcelProperty(value = "url地址", order = 6)
     @ExcelInfo
-    // 验证器
     @ValidationArgsLenMax(200)
     private String url;
 
@@ -91,7 +85,6 @@ public class MenuModel extends ApiWrapper {
     @ApiModelProperty(value = "组件")
     @ExcelProperty(value = "组件", order = 7)
     @ExcelInfo
-    // 验证器
     @ValidationArgsLenMax(200)
     private String component;
 
@@ -99,7 +92,6 @@ public class MenuModel extends ApiWrapper {
     @ApiModelProperty(value = "重定向")
     @ExcelProperty(value = "重定向", order = 8)
     @ExcelInfo
-    // 验证器
     @ValidationArgsLenMax(200)
     private String redirect;
 
@@ -107,7 +99,6 @@ public class MenuModel extends ApiWrapper {
     @ApiModelProperty(value = "排序")
     @ExcelProperty(value = "排序", order = 8)
     @ExcelInfo
-    // 验证器
     @ValidationArgs({ValiArgsType.IS_NOT_NULL})
     private Integer sortNo;
 
@@ -115,7 +106,6 @@ public class MenuModel extends ApiWrapper {
     @ApiModelProperty(value = "是否隐藏")
     @ExcelProperty(value = "是否隐藏", order = 8)
     @ExcelInfo(dictType = "no_yes")
-    // 验证器
     @ValidationArgs({ValiArgsType.IS_NOT_NULL})
     private String hidden;
 

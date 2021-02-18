@@ -74,8 +74,7 @@ public class CaptchaUtil {
     /**
      * 获得验证码
      *
-     * @param uuid
-     * @return
+     * @param uuid UUID
      */
     public static void createCaptcha(String uuid, OutputStream out) {
         if (StringUtils.isBlank(uuid)) {
@@ -102,9 +101,8 @@ public class CaptchaUtil {
     /**
      * 校验验证码
      *
-     * @param uuid
-     * @param code
-     * @return
+     * @param uuid UUID
+     * @param code 验证码
      */
     public static void validate(String uuid, String code) {
         // 判断UUID 是否为空
@@ -134,8 +132,8 @@ public class CaptchaUtil {
     /**
      * 删除验证码
      *
-     * @param uuid
-     * @return
+     * @param uuid UUID
+     * @return boolean
      */
     public static boolean delCaptcha(String uuid) {
         if (StringUtils.isEmpty(uuid)) {

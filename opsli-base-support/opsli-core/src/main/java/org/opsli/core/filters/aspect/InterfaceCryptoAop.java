@@ -59,8 +59,9 @@ public class InterfaceCryptoAop {
 
     /**
      * 切如 post 请求
-     * @param point
+     * @param point point
      */
+    @SuppressWarnings("unchecked")
     @Around("encryptAndDecrypt()")
     public Object encryptAndDecryptHandle(ProceedingJoinPoint point) throws Throwable {
         // 获得请求参数

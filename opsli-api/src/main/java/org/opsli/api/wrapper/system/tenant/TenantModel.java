@@ -41,7 +41,6 @@ public class TenantModel extends ApiWrapper {
     @ApiModelProperty(value = "租户名称")
     @ExcelProperty(value = "租户名称", order = 1)
     @ExcelInfo
-    // 验证器
     @ValidationArgs({ValiArgsType.IS_NOT_NULL,ValiArgsType.IS_GENERAL_WITH_CHINESE})
     @ValidationArgsLenMax(50)
     private String tenantName;
@@ -50,7 +49,6 @@ public class TenantModel extends ApiWrapper {
     @ApiModelProperty(value = "是否启用")
     @ExcelProperty(value = "是否启用", order = 2)
     @ExcelInfo(dictType = "no_yes")
-    // 验证器
     @ValidationArgs({ValiArgsType.IS_NOT_NULL})
     @ValidationArgsLenMax(1)
     private String izUsable;
@@ -59,7 +57,6 @@ public class TenantModel extends ApiWrapper {
     @ApiModelProperty(value = "备注")
     @ExcelProperty(value = "备注", order = 3)
     @ExcelInfo
-    // 验证器
     @ValidationArgsLenMax(255)
     private String remark;
 

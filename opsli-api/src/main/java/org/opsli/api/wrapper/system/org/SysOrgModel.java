@@ -45,7 +45,6 @@ public class SysOrgModel extends ApiWrapper {
     @ApiModelProperty(value = "父级主键")
     @ExcelProperty(value = "父级主键", order = 1)
     @ExcelInfo
-    // 验证器
     @ValidationArgsLenMax(19)
     private String parentId;
 
@@ -53,7 +52,6 @@ public class SysOrgModel extends ApiWrapper {
     @ApiModelProperty(value = "组织机构编号")
     @ExcelProperty(value = "组织机构编号", order = 2)
     @ExcelInfo
-    // 验证器
     @ValidationArgs({ValiArgsType.IS_NOT_NULL, ValiArgsType.IS_GENERAL})
     @ValidationArgsLenMax(120)
     private String orgCode;
@@ -62,7 +60,6 @@ public class SysOrgModel extends ApiWrapper {
     @ApiModelProperty(value = "组织机构名称")
     @ExcelProperty(value = "组织机构名称", order = 3)
     @ExcelInfo
-    // 验证器
     @ValidationArgs({ValiArgsType.IS_NOT_NULL, ValiArgsType.IS_GENERAL_WITH_CHINESE})
     @ValidationArgsLenMax(120)
     private String orgName;
@@ -71,7 +68,6 @@ public class SysOrgModel extends ApiWrapper {
     @ApiModelProperty(value = "组织机构类型")
     @ExcelProperty(value = "组织机构类型", order = 4)
     @ExcelInfo( dictType = "org_type")
-    // 验证器
     @ValidationArgs({ValiArgsType.IS_NOT_NULL})
     @ValidationArgsLenMax(3)
     private String orgType;
@@ -80,14 +76,12 @@ public class SysOrgModel extends ApiWrapper {
     @ApiModelProperty(value = "排序")
     @ExcelProperty(value = "排序", order = 5)
     @ExcelInfo
-    // 验证器
     @ValidationArgsLenMax(10)
     private Integer sortNo;
 
     /** 多租户字段 */
     @ApiModelProperty(value = "多租户ID")
     @ExcelIgnore
-    // 验证器
     @ValidationArgsLenMax(20)
     private String tenantId;
 

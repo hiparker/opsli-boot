@@ -46,7 +46,6 @@ public class CreaterTableColumnModel extends ApiWrapper {
     @ApiModelProperty(value = "字段名称")
     @ExcelProperty(value = "字段名称", order = 2)
     @ExcelInfo
-    // 验证器
     @ValidationArgs({ValiArgsType.IS_NOT_NULL, ValiArgsType.IS_GENERAL})
     @ValidationArgsLenMax(100)
     private String fieldName;
@@ -55,7 +54,6 @@ public class CreaterTableColumnModel extends ApiWrapper {
     @ApiModelProperty(value = "字段类型")
     @ExcelProperty(value = "字段类型", order = 3)
     @ExcelInfo
-    // 验证器
     @ValidationArgs({ValiArgsType.IS_NOT_NULL, ValiArgsType.IS_GENERAL})
     @ValidationArgsLenMax(100)
     private String fieldType;
@@ -76,7 +74,6 @@ public class CreaterTableColumnModel extends ApiWrapper {
     @ApiModelProperty(value = "字段描述")
     @ExcelProperty(value = "字段描述", order = 6)
     @ExcelInfo
-    // 验证器
     @ValidationArgs({ValiArgsType.IS_NOT_NULL})
     @ValidationArgsLenMax(200)
     private String fieldComments;
@@ -85,7 +82,6 @@ public class CreaterTableColumnModel extends ApiWrapper {
     @ApiModelProperty(value = "是否主键")
     @ExcelProperty(value = "是否主键", order = 7)
     @ExcelInfo(dictType = "no_yes")
-    // 验证器
     @ValidationArgsLenMax(1)
     private String izPk;
 
@@ -93,7 +89,6 @@ public class CreaterTableColumnModel extends ApiWrapper {
     @ApiModelProperty(value = "是否可为空")
     @ExcelProperty(value = "是否可为空", order = 8)
     @ExcelInfo(dictType = "no_yes")
-    // 验证器
     @ValidationArgsLenMax(1)
     private String izNotNull;
 
@@ -101,7 +96,6 @@ public class CreaterTableColumnModel extends ApiWrapper {
     @ApiModelProperty(value = "是否列表显示")
     @ExcelProperty(value = "是否列表显示", order = 9)
     @ExcelInfo(dictType = "no_yes")
-    // 验证器
     @ValidationArgsLenMax(1)
     private String izShowList;
 
@@ -109,7 +103,6 @@ public class CreaterTableColumnModel extends ApiWrapper {
     @ApiModelProperty(value = "是否表单显示")
     @ExcelProperty(value = "是否表单显示", order = 10)
     @ExcelInfo(dictType = "no_yes")
-    // 验证器
     @ValidationArgsLenMax(1)
     private String izShowForm;
 
@@ -117,7 +110,6 @@ public class CreaterTableColumnModel extends ApiWrapper {
     @ApiModelProperty(value = "Java字段类型")
     @ExcelProperty(value = "Java字段类型", order = 11)
     @ExcelInfo(dictType = "java_type")
-    // 验证器
     @ValidationArgs({ValiArgsType.IS_NOT_NULL, ValiArgsType.IS_GENERAL})
     @ValidationArgsLenMax(50)
     private String javaType;
@@ -126,7 +118,6 @@ public class CreaterTableColumnModel extends ApiWrapper {
     @ApiModelProperty(value = "字段生成方案")
     @ExcelProperty(value = "字段生成方案", order = 12)
     @ExcelInfo(dictType = "show_type")
-    // 验证器
     @ValidationArgsLenMax(1)
     private String showType;
 
@@ -134,7 +125,6 @@ public class CreaterTableColumnModel extends ApiWrapper {
     @ApiModelProperty(value = "字典类型编号")
     @ExcelProperty(value = "字典类型编号", order = 13)
     @ExcelInfo
-    // 验证器
     @ValidationArgs({ValiArgsType.IS_GENERAL})
     @ValidationArgsLenMax(100)
     private String dictTypeCode;
@@ -143,7 +133,6 @@ public class CreaterTableColumnModel extends ApiWrapper {
     @ApiModelProperty(value = "排序")
     @ExcelProperty(value = "排序", order = 14)
     @ExcelInfo
-    // 验证器
     @ValidationArgs({ValiArgsType.IS_NOT_NULL})
     @ValidationArgsLenMax(6)
     private Integer sort;
@@ -152,7 +141,6 @@ public class CreaterTableColumnModel extends ApiWrapper {
     @ApiModelProperty(value = "验证类别")
     @ExcelProperty(value = "验证类别", order = 15)
     @ExcelInfo
-    // 验证器
     @ValidationArgsLenMax(500)
     private String validateType;
 
@@ -160,7 +148,6 @@ public class CreaterTableColumnModel extends ApiWrapper {
     @ApiModelProperty(value = "检索类别")
     @ExcelProperty(value = "检索类别", order = 16)
     @ExcelInfo
-    // 验证器
     @ValidationArgs({ValiArgsType.IS_GENERAL})
     @ValidationArgsLenMax(100)
     private String queryType;

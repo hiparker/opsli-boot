@@ -39,7 +39,6 @@ public class CreaterLogsModel extends ApiWrapper {
     /** 归属表ID */
     @ApiModelProperty(value = "归属表ID")
     @ExcelIgnore
-    // 验证器
     @ValidationArgs({ValiArgsType.IS_NOT_NULL})
     @ValidationArgsLenMax(19)
     private String tableId;
@@ -48,7 +47,6 @@ public class CreaterLogsModel extends ApiWrapper {
     /** 包名 */
     @ApiModelProperty(value = "包名")
     @ExcelIgnore
-    // 验证器
     @ValidationArgs({ValiArgsType.IS_NOT_NULL})
     @ValidationArgsLenMax(255)
     private String packageName;
@@ -56,7 +54,6 @@ public class CreaterLogsModel extends ApiWrapper {
     /** 模块名 */
     @ApiModelProperty(value = "模块名")
     @ExcelIgnore
-    // 验证器
     @ValidationArgs({ValiArgsType.IS_NOT_NULL})
     @ValidationArgsLenMax(40)
     private String moduleName;
@@ -64,7 +61,6 @@ public class CreaterLogsModel extends ApiWrapper {
     /** 子模块名 */
     @ApiModelProperty(value = "子模块名")
     @ExcelIgnore
-    // 验证器
     @ValidationArgsLenMax(40)
     private String subModuleName;
 
@@ -72,7 +68,6 @@ public class CreaterLogsModel extends ApiWrapper {
     /** 代码标题 */
     @ApiModelProperty(value = "代码标题")
     @ExcelIgnore
-    // 验证器
     @ValidationArgs({ValiArgsType.IS_NOT_NULL})
     @ValidationArgsLenMax(100)
     private String codeTitle;
@@ -80,7 +75,6 @@ public class CreaterLogsModel extends ApiWrapper {
     /** 代码标题简介 */
     @ApiModelProperty(value = "代码标题简介")
     @ExcelIgnore
-    // 验证器
     @ValidationArgs({ValiArgsType.IS_NOT_NULL})
     @ValidationArgsLenMax(100)
     private String codeTitleBrief;
@@ -88,7 +82,6 @@ public class CreaterLogsModel extends ApiWrapper {
     /** 作者名 */
     @ApiModelProperty(value = "作者名")
     @ExcelIgnore
-    // 验证器
     @ValidationArgs({ValiArgsType.IS_NOT_NULL})
     @ValidationArgsLenMax(64)
     private String authorName;

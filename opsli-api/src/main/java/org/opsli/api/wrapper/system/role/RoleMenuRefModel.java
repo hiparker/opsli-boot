@@ -39,14 +39,12 @@ public class RoleMenuRefModel implements Serializable {
 
     /** 角色ID */
     @ApiModelProperty(value = "角色ID")
-    // 验证器
     @ValidationArgs({ValiArgsType.IS_NOT_NULL})
     @ValidationArgsLenMax(50)
     private String roleId;
 
     /** 权限数组 */
     @ApiModelProperty(value = "权限数组")
-    // 验证器
     private String[] permsIds;
 
 }

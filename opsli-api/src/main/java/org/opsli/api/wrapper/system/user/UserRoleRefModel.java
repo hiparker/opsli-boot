@@ -39,14 +39,12 @@ public class UserRoleRefModel implements Serializable {
 
     /** 用户ID */
     @ApiModelProperty(value = "用户ID")
-    // 验证器
     @ValidationArgs({ValiArgsType.IS_NOT_NULL})
     @ValidationArgsLenMax(50)
     private String userId;
 
     /** 角色数组 */
     @ApiModelProperty(value = "权限数组")
-    // 验证器
     private String[] roleIds;
 
 }

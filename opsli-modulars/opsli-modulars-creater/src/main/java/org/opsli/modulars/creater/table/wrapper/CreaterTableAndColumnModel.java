@@ -58,7 +58,6 @@ public class CreaterTableAndColumnModel extends ApiWrapper {
     @ApiModelProperty(value = "表类型")
     @ExcelProperty(value = "表类型", order = 2)
     @ExcelInfo(dictType = "table_type")
-    // 验证器
     @ValidationArgs({ValiArgsType.IS_NOT_NULL})
     @ValidationArgsLenMax(1)
     private String tableType;
@@ -67,7 +66,6 @@ public class CreaterTableAndColumnModel extends ApiWrapper {
     @ApiModelProperty(value = "数据库类型")
     @ExcelProperty(value = "数据库类型", order = 3)
     @ExcelInfo(dictType = "jdbc_type")
-    // 验证器
     @ValidationArgs({ValiArgsType.IS_NOT_NULL})
     @ValidationArgsLenMax(30)
     private String jdbcType;
@@ -76,7 +74,6 @@ public class CreaterTableAndColumnModel extends ApiWrapper {
     @ApiModelProperty(value = "描述")
     @ExcelProperty(value = "描述", order = 4)
     @ExcelInfo
-    // 验证器
     @ValidationArgsLenMax(200)
     private String comments;
 
@@ -84,7 +81,6 @@ public class CreaterTableAndColumnModel extends ApiWrapper {
     @ApiModelProperty(value = "同步")
     @ExcelProperty(value = "是否同步", order = 5)
     @ExcelInfo(dictType = "no_yes")
-    // 验证器
     @ValidationArgsLenMax(1)
     private String izSync;
 
@@ -92,7 +88,6 @@ public class CreaterTableAndColumnModel extends ApiWrapper {
     @ApiModelProperty(value = "备注")
     @ExcelProperty(value = "备注", order = 6)
     @ExcelInfo
-    // 验证器
     @ValidationArgsLenMax(255)
     private String remark;
 
@@ -101,7 +96,6 @@ public class CreaterTableAndColumnModel extends ApiWrapper {
     @ApiModelProperty(value = "表结构")
     @ExcelProperty(value = "表结构", order = 7)
     @ExcelInfo
-    // 验证器
     @ValidationArgs({ValiArgsType.IS_NOT_NULL})
     private List<CreaterTableColumnModel> columnList;
 

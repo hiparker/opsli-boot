@@ -43,7 +43,6 @@ public class TestCarModel extends ApiWrapper {
     @ApiModelProperty(value = "汽车名称")
     @ExcelProperty(value = "汽车名称", order = 1)
     @ExcelInfo
-    // 验证器
     @ValidationArgs({ValiArgsType.IS_NOT_NULL, ValiArgsType.IS_GENERAL_WITH_CHINESE})
     @ValidationArgsLenMax(20)
     private String carName;
@@ -52,7 +51,6 @@ public class TestCarModel extends ApiWrapper {
     @ApiModelProperty(value = "汽车类型")
     @ExcelProperty(value = "汽车类型", order = 2)
     @ExcelInfo
-    // 验证器
     @ValidationArgs({ValiArgsType.IS_NOT_NULL, ValiArgsType.IS_GENERAL_WITH_CHINESE})
     @ValidationArgsLenMax(20)
     private String carType;
@@ -61,7 +59,6 @@ public class TestCarModel extends ApiWrapper {
     @ApiModelProperty(value = "汽车品牌")
     @ExcelProperty(value = "汽车品牌", order = 3)
     @ExcelInfo
-    // 验证器
     @ValidationArgs({ValiArgsType.IS_GENERAL_WITH_CHINESE})
     @ValidationArgsLenMax(50)
     private String carBrand;
@@ -70,7 +67,6 @@ public class TestCarModel extends ApiWrapper {
     @ApiModelProperty(value = "生产日期")
     @ExcelProperty(value = "生产日期", order = 4)
     @ExcelInfo
-    // 验证器
     @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date produceData;
@@ -79,7 +75,6 @@ public class TestCarModel extends ApiWrapper {
     @ApiModelProperty(value = "是否启用")
     @ExcelProperty(value = "是否启用", order = 5)
     @ExcelInfo( dictType = "no_yes" )
-    // 验证器
     @ValidationArgsLenMax(1)
     private String izUsable;
 

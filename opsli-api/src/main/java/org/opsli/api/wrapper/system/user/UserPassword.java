@@ -47,7 +47,6 @@ public class UserPassword implements Serializable {
 
     /** 旧密码 */
     @ApiModelProperty(value = "旧密码")
-    // 验证器
     @ValidationArgs({ValiArgsType.IS_NOT_NULL})
     @ValidationArgsLenMin(6)
     @ValidationArgsLenMax(50)
@@ -55,7 +54,6 @@ public class UserPassword implements Serializable {
 
     /** 新密码 */
     @ApiModelProperty(value = "新密码")
-    // 验证器
     @ValidationArgs({ValiArgsType.IS_NOT_NULL})
     @ValidationArgsLenMin(6)
     @ValidationArgsLenMax(50)
@@ -64,7 +62,6 @@ public class UserPassword implements Serializable {
     /** 盐值，密码秘钥 */
     @ApiModelProperty(value = "盐值，密码秘钥")
     @ExcelIgnore
-    // 验证器
     @ValidationArgsLenMax(50)
     private String salt;
 

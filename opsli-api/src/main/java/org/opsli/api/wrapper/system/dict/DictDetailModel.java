@@ -47,7 +47,6 @@ public class DictDetailModel extends ApiWrapper {
     /** 类型编号 - 冗余 */
     @ApiModelProperty(value = "字典类型Code")
     @ExcelIgnore
-    // 验证器
     @ValidationArgs({ValiArgsType.IS_NOT_NULL, ValiArgsType.IS_GENERAL})
     @ValidationArgsLenMax(120)
     private String typeCode;
@@ -56,7 +55,6 @@ public class DictDetailModel extends ApiWrapper {
     @ApiModelProperty(value = "字典名称")
     @ExcelProperty(value = "字典名称", order = 1)
     @ExcelInfo
-    // 验证器
     @ValidationArgs({ValiArgsType.IS_NOT_NULL, ValiArgsType.IS_GENERAL_WITH_CHINESE})
     @ValidationArgsLenMax(120)
     private String dictName;
@@ -65,7 +63,6 @@ public class DictDetailModel extends ApiWrapper {
     @ApiModelProperty(value = "字典值")
     @ExcelProperty(value = "字典值", order = 2)
     @ExcelInfo
-    // 验证器
     @ValidationArgs({ValiArgsType.IS_NOT_NULL})
     @ValidationArgsLenMax(120)
     private String dictValue;
@@ -74,7 +71,6 @@ public class DictDetailModel extends ApiWrapper {
     @ApiModelProperty(value = "是否内置数据 0是  1否")
     @ExcelProperty(value = "是否内置数据", order = 2)
     @ExcelInfo(dictType = "no_yes")
-    // 验证器
     @ValidationArgs({ValiArgsType.IS_NOT_NULL})
     @ValidationArgsLenMax(1)
     private String izLock;
@@ -83,7 +79,6 @@ public class DictDetailModel extends ApiWrapper {
     @ApiModelProperty(value = "排序")
     @ExcelProperty(value = "排序", order = 2)
     @ExcelInfo
-    // 验证器
     @ValidationArgs({ValiArgsType.IS_NOT_NULL, ValiArgsType.IS_NUMBER})
     @ValidationArgsLenMax(10)
     private Integer sortNo;
@@ -92,7 +87,6 @@ public class DictDetailModel extends ApiWrapper {
     @ApiModelProperty(value = "备注")
     @ExcelProperty(value = "备注", order = 2)
     @ExcelInfo
-    // 验证器
     @ValidationArgsLenMax(255)
     private String remark;
 

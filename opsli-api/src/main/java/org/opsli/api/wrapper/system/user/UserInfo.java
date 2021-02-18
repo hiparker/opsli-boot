@@ -42,54 +42,46 @@ public class UserInfo extends ApiWrapper {
 
     /** 登录账户 */
     @ApiModelProperty(value = "登录账户")
-    // 验证器
     @ValidationArgs({ValiArgsType.IS_NOT_NULL,ValiArgsType.IS_GENERAL})
     @ValidationArgsLenMax(32)
     private String username;
 
     /** 真实姓名 */
     @ApiModelProperty(value = "真实姓名")
-    // 验证器
     @ValidationArgs({ValiArgsType.IS_NOT_NULL,ValiArgsType.IS_GENERAL_WITH_CHINESE})
     @ValidationArgsLenMax(50)
     private String realName;
 
     /** 手机 */
     @ApiModelProperty(value = "手机")
-    // 验证器
     @ValidationArgs({ValiArgsType.IS_MOBILE})
     private String mobile;
 
     /** 邮箱 */
     @ApiModelProperty(value = "邮箱")
     @ExcelProperty(value = "邮箱", order = 3)
-    // 验证器
     @ValidationArgs({ValiArgsType.IS_EMAIL})
     private String email;
 
     /** 工号 */
     @ApiModelProperty(value = "工号")
     @ExcelProperty(value = "工号", order = 4)
-    // 验证器
     @ValidationArgs({ValiArgsType.IS_GENERAL})
     @ValidationArgsLenMax(32)
     private String no;
 
     /** 头像 */
     @ApiModelProperty(value = "头像")
-    // 验证器
     @ValidationArgsLenMax(255)
     private String avatar;
 
     /** 备注 */
     @ApiModelProperty(value = "备注")
-    // 验证器
     @ValidationArgsLenMax(255)
     private String remark;
 
     /** 签名 */
     @ApiModelProperty(value = "签名")
-    // 验证器
     @ValidationArgsLenMax(255)
     private String sign;
 

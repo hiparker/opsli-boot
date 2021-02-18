@@ -44,7 +44,6 @@ public class TestUserModel extends ApiWrapper {
     @ApiModelProperty(value = "名称")
     @ExcelProperty(value = "名称", order = 1)
     @ExcelInfo
-    // 验证器
     @ValidationArgs({ValiArgsType.IS_GENERAL_WITH_CHINESE})
     @ValidationArgsLenMax(50)
     private String name;
@@ -53,7 +52,6 @@ public class TestUserModel extends ApiWrapper {
     @ApiModelProperty(value = "金钱")
     @ExcelProperty(value = "金钱", order = 2)
     @ExcelInfo
-    // 验证器
     @ValidationArgs({ValiArgsType.IS_NOT_NULL, ValiArgsType.IS_MONEY})
     @ValidationArgsLenMax(8)
     private Double money;
@@ -62,7 +60,6 @@ public class TestUserModel extends ApiWrapper {
     @ApiModelProperty(value = "年龄")
     @ExcelProperty(value = "年龄", order = 3)
     @ExcelInfo
-    // 验证器
     @ValidationArgs({ValiArgsType.IS_NOT_NULL, ValiArgsType.IS_NUMBER})
     @ValidationArgsLenMax(5)
     private Integer age;
@@ -71,7 +68,6 @@ public class TestUserModel extends ApiWrapper {
     @ApiModelProperty(value = "生日")
     @ExcelProperty(value = "生日", order = 4)
     @ExcelInfo
-    // 验证器
     @ValidationArgs({ValiArgsType.IS_NOT_NULL, })
     @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
@@ -81,7 +77,6 @@ public class TestUserModel extends ApiWrapper {
     @ApiModelProperty(value = "是否启用")
     @ExcelProperty(value = "是否启用", order = 5)
     @ExcelInfo( dictType = "no_yes" )
-    // 验证器
     @ValidationArgs({ValiArgsType.IS_NOT_NULL, })
     @ValidationArgsLenMax(1)
     private String izUsable;
