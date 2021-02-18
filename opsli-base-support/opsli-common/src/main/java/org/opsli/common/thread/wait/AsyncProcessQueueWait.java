@@ -38,12 +38,12 @@ public class AsyncProcessQueueWait {
           if (gift != null) {
              try {
                  gift.run();
+                 // 标示已执行
+                 count.decrementAndGet();
              } catch (Exception e) {
                  String errMsg = StrUtil.format("线程池-包装的目标执行异常: {}", e.getMessage());
                  log.error(errMsg, e);
              } finally {
-                 // 标示已执行
-                 count.decrementAndGet();
                  latch.countDown();
              }
           }
