@@ -131,8 +131,8 @@ public class InterfaceCryptoAop {
                             returnValue = CryptoAsymmetricUtil.encrypt(returnValue);
                         }
                     }catch (Exception e){
-                        // RSA非对称加密失败
-                        throw new ServiceException(CoreMsg.OTHER_EXCEPTION_RSA_EN);
+                        // 非对称加密失败
+                        throw new ServiceException(CoreMsg.OTHER_EXCEPTION_CRYPTO_EN);
                     }
                 }
             }
