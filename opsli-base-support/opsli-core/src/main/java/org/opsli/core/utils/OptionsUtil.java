@@ -126,7 +126,7 @@ public class OptionsUtil {
 
         if(model == null){
             // 设置空变量 用于防止穿透判断
-            CacheUtil.putNilFlag(cacheKey);
+            CacheUtil.putNilFlag(cacheKeyVal);
             return null;
         }
 
