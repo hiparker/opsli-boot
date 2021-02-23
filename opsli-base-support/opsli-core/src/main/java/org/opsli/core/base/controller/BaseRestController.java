@@ -93,10 +93,6 @@ public abstract class BaseRestController <T extends BaseEntity, E extends ApiWra
     @Autowired(required = false)
     protected S IService;
 
-    /** Excel工具类 */
-    @Autowired
-    private ExcelUtil excelUtil;
-
     /**
      * 默认 直接设置 传入数据的
      * 根据id 从缓存 直接查询 数据对象
@@ -200,7 +196,7 @@ public abstract class BaseRestController <T extends BaseEntity, E extends ApiWra
         ResultVo<?> resultVo;
         String msgInfo;
         try {
-            List<E> modelList = excelUtil.readExcel(files.get(0), modelClazz);
+            List<E> modelList = ExcelUtil.INSTANCE.readExcel(files.get(0), modelClazz);
             if(CollUtil.isNotEmpty(modelList)){
                 if(modelList.size() > globalProperties.getExcel().getImportMaxCount()){
                     String maxError = StrUtil.format(CoreMsg.EXCEL_HANDLE_MAX.getMessage(), modelList.size(),
@@ -311,7 +307,7 @@ public abstract class BaseRestController <T extends BaseEntity, E extends ApiWra
                 modelList = WrapperUtil.transformInstance(entityList, modelClazz);
             }
             // 导出Excel
-            excelUtil.writeExcel(response, modelList ,fileName,"sheet", modelClazz ,ExcelTypeEnum.XLSX);
+            ExcelUtil.INSTANCE.writeExcel(response, modelList ,fileName,"sheet", modelClazz ,ExcelTypeEnum.XLSX);
             // 花费毫秒数
             long timerCount = timer.interval();
             // 提示信息

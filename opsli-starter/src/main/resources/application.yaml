@@ -212,6 +212,6 @@ opsli:
   # Excel
   excel:
     # Excel 最大导入操作数量 防止OOM
-    import-max-count: 20000
+    import-max-count: 5000
     # Excel 最大导出操作数量 防止OOM
-    export-max-count: 20000
+    export-max-count: 50000
