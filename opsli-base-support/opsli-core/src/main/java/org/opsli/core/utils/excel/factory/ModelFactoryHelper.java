@@ -80,8 +80,6 @@ public final class ModelFactoryHelper {
         clazzPool.importPackage(ApiWrapper.class.getName());
         clazzPool.importPackage(modelClazz.getName());
 
-
-
         // 抽象助手类
         CtClass abstractEntityHelper = clazzPool.getCtClass(AbstractModelHelper.class.getName());
         // 助手类名称
@@ -147,9 +145,9 @@ public final class ModelFactoryHelper {
             createByImportSb.append("String dictValue").append(i).append(" = \"\";").append("\n")
                     .append("if(dictJson.getJSONObject(fieldNameAndTypeCodeDict.getStr(\"").append(field.getName()).append("\")").append(") != null &&")
                     .append("dictJson.getJSONObject(fieldNameAndTypeCodeDict.getStr(\"").append(field.getName()).append("\")")
-                    .append(").getJSONObject(ExcelUtil.INSTANCE.DICT_NAME_KEY) != null ){").append("\n")
+                    .append(").getJSONObject(ExcelUtil.DICT_NAME_KEY) != null ){").append("\n")
                     .append("dictValue").append(i).append(" = dictJson.getJSONObject(fieldNameAndTypeCodeDict.getStr(\"").append(field.getName()).append("\")")
-                    .append(").getJSONObject(ExcelUtil.INSTANCE.DICT_NAME_KEY).getStr(")
+                    .append(").getJSONObject(ExcelUtil.DICT_NAME_KEY).getStr(")
                     .append("model.").append(readMethod.getName()).append("());").append("\n")
                     .append("}").append("\n");
 
@@ -191,9 +189,9 @@ public final class ModelFactoryHelper {
             createByExportSb.append("String dictValue").append(i).append(" = \"\";").append("\n")
                     .append("if(dictJson.getJSONObject(fieldNameAndTypeCodeDict.getStr(\"").append(field.getName()).append("\")").append(") != null &&")
                     .append("dictJson.getJSONObject(fieldNameAndTypeCodeDict.getStr(\"").append(field.getName()).append("\")")
-                    .append(").getJSONObject(ExcelUtil.INSTANCE.DICT_VALUE_KEY) != null ){").append("\n")
+                    .append(").getJSONObject(ExcelUtil.DICT_VALUE_KEY) != null ){").append("\n")
                     .append("dictValue").append(i).append(" = dictJson.getJSONObject(fieldNameAndTypeCodeDict.getStr(\"").append(field.getName()).append("\")")
-                    .append(").getJSONObject(ExcelUtil.INSTANCE.DICT_VALUE_KEY).getStr(")
+                    .append(").getJSONObject(ExcelUtil.DICT_VALUE_KEY).getStr(")
                     .append("model.").append(readMethod.getName()).append("());").append("\n")
                     .append("}").append("\n");
 
@@ -205,7 +203,7 @@ public final class ModelFactoryHelper {
         helperClazz.addMethod(createByExportMethod);
 
         // 生成文件 测试查看使用
-        helperClazz.writeFile("C:/Users/zhoupengcheng/Desktop/test");
+        //helperClazz.writeFile("C:/Users/zhoupengcheng/Desktop/test");
 
         // 获取 JAVA 类
         Class<?> javaClazz = helperClazz.toClass();

@@ -196,7 +196,7 @@ public abstract class BaseRestController <T extends BaseEntity, E extends ApiWra
         ResultVo<?> resultVo;
         String msgInfo;
         try {
-            List<E> modelList = ExcelUtil.INSTANCE.readExcel(files.get(0), modelClazz);
+            List<E> modelList = ExcelUtil.getInstance().readExcel(files.get(0), modelClazz);
             if(CollUtil.isNotEmpty(modelList)){
                 if(modelList.size() > globalProperties.getExcel().getImportMaxCount()){
                     String maxError = StrUtil.format(CoreMsg.EXCEL_HANDLE_MAX.getMessage(), modelList.size(),
@@ -307,7 +307,7 @@ public abstract class BaseRestController <T extends BaseEntity, E extends ApiWra
                 modelList = WrapperUtil.transformInstance(entityList, modelClazz);
             }
             // 导出Excel
-            ExcelUtil.INSTANCE.writeExcel(response, modelList ,fileName,"sheet", modelClazz ,ExcelTypeEnum.XLSX);
+            ExcelUtil.getInstance().writeExcel(response, modelList ,fileName,"sheet", modelClazz ,ExcelTypeEnum.XLSX);
             // 花费毫秒数
             long timerCount = timer.interval();
             // 提示信息

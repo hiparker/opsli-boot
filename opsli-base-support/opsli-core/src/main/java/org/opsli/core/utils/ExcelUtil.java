@@ -23,6 +23,8 @@ import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.alibaba.excel.support.ExcelTypeEnum;
+import com.google.common.collect.Maps;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.opsli.api.base.warpper.ApiWrapper;
 import org.opsli.api.wrapper.system.dict.DictWrapper;
@@ -37,6 +39,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Field;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @BelongsProject: opsli-boot
@@ -45,31 +48,47 @@ import java.util.List;
  * @CreateTime: 2020-09-23 21:53
  * @Description: ExcelUtil
  */
-public enum ExcelUtil {
-
-    /** 实例 */
-    INSTANCE;
+@Slf4j
+public final class ExcelUtil {
 
     /** 字典KEY */
-    public final String DICT_NAME_KEY = "dictName";
-    public final String DICT_VALUE_KEY = "dictValue";
-    private final ExcelPlugin EXCEL_PLUGIN = new ExcelPlugin();
+    public static final String DICT_NAME_KEY = "dictName";
+    public static final String DICT_VALUE_KEY = "dictValue";
+    /** 字段字典Map */
+    private static final Map<Class<?>, JSONObject> FIELD_DICT_MAP = Maps.newHashMap();
 
+    private ExcelUtil(){}
+
+    /** 静态内部类，里面实例化外部类 */
+    private static class ExcelUtilSingletonHolder {
+        private static final ExcelPlugin EXCEL_PLUGIN = new ExcelPlugin();
+        private static final ExcelUtil INSTANCE = new ExcelUtil();
+    }
+
+    /**
+     * 获得实例对象
+     * @return ExcelUtil
+     */
+    public static ExcelUtil getInstance(){
+        return ExcelUtilSingletonHolder.INSTANCE;
+    }
+
+    // ================================================
 
     public <T> List<T> readExcel(MultipartFile excel, Class<T> rowModel) throws ExcelPluginException {
-        List<T> ts = EXCEL_PLUGIN.readExcel(excel, rowModel);
+        List<T> ts = ExcelUtilSingletonHolder.EXCEL_PLUGIN.readExcel(excel, rowModel);
         // 处理数据
         return this.handleDatas(ts, rowModel, ExcelOperate.READ);
     }
 
     public <T> List<T> radExcel(MultipartFile excel, Class<T> rowModel, String sheetName) throws ExcelPluginException {
-        List<T> ts = EXCEL_PLUGIN.readExcel(excel, rowModel, sheetName);
+        List<T> ts = ExcelUtilSingletonHolder.EXCEL_PLUGIN.readExcel(excel, rowModel, sheetName);
         // 处理数据
         return this.handleDatas(ts, rowModel, ExcelOperate.READ);
     }
 
     public <T> List<T> readExcel(MultipartFile excel, Class<T> rowModel, String sheetName, int headLineNum) throws ExcelPluginException {
-        List<T> ts = EXCEL_PLUGIN.readExcel(excel, rowModel, sheetName, headLineNum);
+        List<T> ts = ExcelUtilSingletonHolder.EXCEL_PLUGIN.readExcel(excel, rowModel, sheetName, headLineNum);
         // 处理数据
         return this.handleDatas(ts, rowModel, ExcelOperate.READ);
     }
@@ -77,16 +96,16 @@ public enum ExcelUtil {
     public <T> void writeExcel(HttpServletResponse response, List<T> list, String fileName, String sheetName, Class<T> classType, ExcelTypeEnum excelTypeEnum) throws ExcelPluginException {
         // 处理数据
         List<T> ts = this.handleDatas(list, classType, ExcelOperate.WRITE);
-        EXCEL_PLUGIN.writeExcel(response, ts, fileName, sheetName, classType, excelTypeEnum);
+        ExcelUtilSingletonHolder.EXCEL_PLUGIN.writeExcel(response, ts, fileName, sheetName, classType, excelTypeEnum);
     }
 
     /**
      * 处理字典
-     * @param datas
-     * @param typeClazz
-     * @param operate
-     * @param <T>
-     * @return
+     * @param datas 数据
+     * @param typeClazz 数据CLazz
+     * @param operate 操作方式
+     * @param <T> 泛型
+     * @return List<T>
      */
     private <T> List<T> handleDatas(List<T> datas, Class<T> typeClazz, ExcelOperate operate){
         // 计时器
@@ -117,11 +136,12 @@ public enum ExcelUtil {
             }
 
         }catch (Exception e){
+            log.error(e.getMessage(), e);
             return datas;
         }finally {
             // 花费毫秒数
             long timerCount = timer.interval();
-            System.out.println("Excel 处理数据耗时："+ DateUtil.formatBetween(timerCount));
+            log.info("Excel 处理数据耗时："+ DateUtil.formatBetween(timerCount));
         }
 
         return datas;
@@ -134,7 +154,13 @@ public enum ExcelUtil {
      * @return JSONObject
      */
     public JSONObject getFields(Class<?> clazz){
-        JSONObject fieldNameAndTypeCodeDict = JSONUtil.createObj();
+        // 加入内部缓存 防止每次导出都重复反射对象
+        JSONObject fieldNameAndTypeCodeDict = FIELD_DICT_MAP.get(clazz);
+        if(!JSONUtil.isNull(fieldNameAndTypeCodeDict)){
+            return fieldNameAndTypeCodeDict;
+        }
+
+        fieldNameAndTypeCodeDict = JSONUtil.createObj();
         Field[] fields = ReflectUtil.getFields(clazz);
         for (Field field : fields) {
             ExcelInfo excelInfo = field.getAnnotation(ExcelInfo.class);
@@ -146,6 +172,7 @@ public enum ExcelUtil {
                 }
             }
         }
+        FIELD_DICT_MAP.put(clazz, fieldNameAndTypeCodeDict);
         return fieldNameAndTypeCodeDict;
     }
 
@@ -196,7 +223,7 @@ public enum ExcelUtil {
     }
 
 
-    private <T extends ApiWrapper> T cast(Object msg){
+    private static <T extends ApiWrapper> T cast(Object msg){
         if(null == msg){
             return null;
         }
