@@ -103,7 +103,7 @@ public class TenantServiceImpl extends CrudServiceImpl<TenantMapper, SysTenant, 
     /**
      * 删除
      * @param id ID
-     * @return
+     * @return boolean
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -129,7 +129,7 @@ public class TenantServiceImpl extends CrudServiceImpl<TenantMapper, SysTenant, 
     /**
      * 删除
      * @param model 数据模型
-     * @return
+     * @return boolean
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -155,7 +155,7 @@ public class TenantServiceImpl extends CrudServiceImpl<TenantMapper, SysTenant, 
     /**
      * 删除 - 多个
      * @param ids id数组
-     * @return
+     * @return boolean
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -177,7 +177,7 @@ public class TenantServiceImpl extends CrudServiceImpl<TenantMapper, SysTenant, 
     /**
      * 删除 - 多个
      * @param models 封装模型
-     * @return
+     * @return boolean
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -249,7 +249,7 @@ public class TenantServiceImpl extends CrudServiceImpl<TenantMapper, SysTenant, 
 
     /**
      * 清除缓存
-     * @param tenantIds
+     * @param tenantIds 租户ID集合
      */
     private void clearCache(List<String> tenantIds){
         // 清空缓存
