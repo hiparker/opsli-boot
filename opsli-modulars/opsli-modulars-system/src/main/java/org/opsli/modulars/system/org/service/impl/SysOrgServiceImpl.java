@@ -270,8 +270,8 @@ public class SysOrgServiceImpl extends CrudServiceImpl<SysOrgMapper, SysOrg, Sys
         );
         Integer count = mapper.hasUse(queryWrapper);
         if(count !=null && count > 0){
-            // 该租户正在被其他用户绑定，无法操作
-            throw new ServiceException(SystemMsg.EXCEPTION_TENANT_USED_DEL);
+            // 该组织正在被其他用户绑定，无法操作
+            throw new ServiceException(SystemMsg.EXCEPTION_ORG_USE);
         }
     }
 }
