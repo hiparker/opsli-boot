@@ -84,6 +84,11 @@ public final class LogUtil {
                 return;
             }
 
+            String argsStr = null;
+            try {
+                argsStr = JSONUtil.toJsonStr(args);
+            }catch (Exception ignored){}
+
             LogsModel logsModel = new LogsModel();
             // 操作方法
             String methodName = request.getMethod();
@@ -101,7 +106,7 @@ public final class LogUtil {
             // 设置IP
             logsModel.setRemoteAddr(clientIpAddress);
             // 设置参数
-            logsModel.setParams(JSONUtil.parse(args).toString());
+            logsModel.setParams(argsStr);
             // 设置方法
             logsModel.setMethod(methodName);
             // 设置执行时长
