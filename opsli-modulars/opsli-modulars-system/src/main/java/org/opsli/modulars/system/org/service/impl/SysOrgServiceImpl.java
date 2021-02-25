@@ -35,10 +35,13 @@ import org.opsli.modulars.system.SystemMsg;
 import org.opsli.modulars.system.org.entity.SysOrg;
 import org.opsli.modulars.system.org.mapper.SysOrgMapper;
 import org.opsli.modulars.system.org.service.ISysOrgService;
+import org.opsli.modulars.system.user.entity.SysUser;
+import org.opsli.modulars.system.user.service.IUserOrgRefService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -59,7 +62,6 @@ public class SysOrgServiceImpl extends CrudServiceImpl<SysOrgMapper, SysOrg, Sys
 
     @Autowired(required = false)
     private SysOrgMapper mapper;
-
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -119,13 +121,8 @@ public class SysOrgServiceImpl extends CrudServiceImpl<SysOrgMapper, SysOrg, Sys
         // 如果 TenantId 发生变化 则需要更改 下级数据 租户ID
         if(sysOrgModel != null && !sysOrgModel.getTenantId().equals(
                 model.getTenantId())){
-            QueryWrapper<SysOrg> queryWrapper = new QueryWrapper<>();
-            queryWrapper.eq("org_id", sysOrgModel.getId());
-            Integer countTmp = mapper.hasUse(queryWrapper);
-            if(countTmp > 0){
-                // 组织机构已被引用，不能删除
-                throw new ServiceException(SystemMsg.EXCEPTION_ORG_USE_TENANT);
-            }
+            // 如果有组织还在被引用 则不允许操作该组织
+            this.validationUsedByDel(Collections.singletonList(sysOrgModel.getId()));
 
             // 如果没有被引用 则逐级修改
             this.updateTenantByParentId(sysOrgModel.getId(), model.getTenantId());
@@ -144,13 +141,8 @@ public class SysOrgServiceImpl extends CrudServiceImpl<SysOrgMapper, SysOrg, Sys
             return false;
         }
 
-        QueryWrapper<SysOrg> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("org_id", id);
-        Integer count = mapper.hasUse(queryWrapper);
-        if(count > 0){
-            // 组织机构已被引用，不能删除
-            throw new ServiceException(SystemMsg.EXCEPTION_ORG_USE);
-        }
+        // 如果有组织还在被引用 则不允许操作该组织
+        this.validationUsedByDel(Collections.singletonList(id));
 
         ret = super.delete(id);
         // 删除子数据
@@ -166,13 +158,8 @@ public class SysOrgServiceImpl extends CrudServiceImpl<SysOrgMapper, SysOrg, Sys
             return false;
         }
 
-        QueryWrapper<SysOrg> queryWrapper = new QueryWrapper<>();
-        queryWrapper.in("org_id", Convert.toList(String.class, ids));
-        Integer count = mapper.hasUse(queryWrapper);
-        if(count > 0){
-            // 组织机构已被引用，不能删除
-            throw new ServiceException(SystemMsg.EXCEPTION_ORG_USE);
-        }
+        // 如果有组织还在被引用 则不允许操作该组织
+        this.validationUsedByDel(Convert.toList(String.class, ids));
 
         ret = super.deleteAll(ids);
         // 删除子数据
@@ -264,5 +251,27 @@ public class SysOrgServiceImpl extends CrudServiceImpl<SysOrgMapper, SysOrg, Sys
                 .groupBy(HumpUtil.humpToUnderline(MyBatisConstants.FIELD_PARENT_ID));
 
         return mapper.hasChildren(wrapper);
+    }
+
+
+    /**
+     * 删除验证该组织是否被引用
+     * @param orgIdList 组织ID
+     */
+    public void validationUsedByDel(List<String> orgIdList){
+        if(CollUtil.isEmpty(orgIdList)){
+            return;
+        }
+
+        // 如果有租户还在被引用 则不允许删除该租户
+        QueryWrapper<SysOrg> queryWrapper = new QueryWrapper<>();
+        queryWrapper.in("org_id",
+                orgIdList
+        );
+        Integer count = mapper.hasUse(queryWrapper);
+        if(count !=null && count > 0){
+            // 该租户正在被其他用户绑定，无法操作
+            throw new ServiceException(SystemMsg.EXCEPTION_TENANT_USED_DEL);
+        }
     }
 }
