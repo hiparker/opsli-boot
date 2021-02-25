@@ -77,6 +77,17 @@ public final class ModelFactoryHelper {
         // 使用 Javassist 动态生成 Java 字节码
         ///////////////////////////////////////////////////////////////////////
         ClassPool clazzPool = ClassPool.getDefault();
+        clazzPool.insertClassPath(new ClassClassPath(StringUtils.class));
+        clazzPool.insertClassPath(new ClassClassPath(ReflectUtil.class));
+        clazzPool.insertClassPath(new ClassClassPath(Field.class));
+        clazzPool.insertClassPath(new ClassClassPath(Iterator.class));
+        clazzPool.insertClassPath(new ClassClassPath(Convert.class));
+        clazzPool.insertClassPath(new ClassClassPath(JSONObject.class));
+        clazzPool.insertClassPath(new ClassClassPath(JSONUtil.class));
+        clazzPool.insertClassPath(new ClassClassPath(ExcelUtil.class));
+        clazzPool.insertClassPath(new ClassClassPath(ExcelInfo.class));
+        clazzPool.insertClassPath(new ClassClassPath(ApiWrapper.class));
+        clazzPool.insertClassPath(new ClassClassPath(modelClazz));
 
         // 添加class 系统路径
         clazzPool.appendSystemPath();
