@@ -19,6 +19,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.google.common.collect.Lists;
+
 import org.apache.commons.lang3.StringUtils;
 import org.opsli.api.wrapper.system.tenant.TenantModel;
 import org.opsli.common.constants.MyBatisConstants;
@@ -113,15 +114,7 @@ public class TenantServiceImpl extends CrudServiceImpl<TenantMapper, SysTenant, 
         }
 
         // 如果有租户还在被引用 则不允许删除该租户
-        QueryWrapper<SysUser> queryWrapper = new QueryWrapper<>();
-        queryWrapper.in(HumpUtil.humpToUnderline(MyBatisConstants.FIELD_TENANT),
-                id
-                );
-        int count = iUserService.count(queryWrapper);
-        if(count >= 0){
-            // 该租户正在被其他用户绑定，无法删除
-            throw new ServiceException(SystemMsg.EXCEPTION_TENANT_USED_DEL);
-        }
+        this.validationUsedByDel(Collections.singletonList(id));
 
         boolean ret = super.delete(id);
 
@@ -147,15 +140,7 @@ public class TenantServiceImpl extends CrudServiceImpl<TenantMapper, SysTenant, 
         }
 
         // 如果有租户还在被引用 则不允许删除该租户
-        QueryWrapper<SysUser> queryWrapper = new QueryWrapper<>();
-        queryWrapper.in(HumpUtil.humpToUnderline(MyBatisConstants.FIELD_TENANT),
-                model.getId()
-        );
-        int count = iUserService.count(queryWrapper);
-        if(count >= 0){
-            // 该租户正在被其他用户绑定，无法删除
-            throw new ServiceException(SystemMsg.EXCEPTION_TENANT_USED_DEL);
-        }
+        this.validationUsedByDel(Collections.singletonList(model.getId()));
 
         boolean ret = super.delete(model);
 
@@ -178,15 +163,7 @@ public class TenantServiceImpl extends CrudServiceImpl<TenantMapper, SysTenant, 
         List<String> idList = Convert.toList(String.class, ids);
 
         // 如果有租户还在被引用 则不允许删除该租户
-        QueryWrapper<SysUser> queryWrapper = new QueryWrapper<>();
-        queryWrapper.in(HumpUtil.humpToUnderline(MyBatisConstants.FIELD_TENANT),
-                idList
-        );
-        int count = iUserService.count(queryWrapper);
-        if(count >= 0){
-            // 该租户正在被其他用户绑定，无法删除
-            throw new ServiceException(SystemMsg.EXCEPTION_TENANT_USED_DEL);
-        }
+        this.validationUsedByDel(idList);
 
         boolean ret = super.deleteAll(ids);
         if(ret){
@@ -211,15 +188,7 @@ public class TenantServiceImpl extends CrudServiceImpl<TenantMapper, SysTenant, 
         }
 
         // 如果有租户还在被引用 则不允许删除该租户
-        QueryWrapper<SysUser> queryWrapper = new QueryWrapper<>();
-        queryWrapper.in(HumpUtil.humpToUnderline(MyBatisConstants.FIELD_TENANT),
-                idList
-        );
-        int count = iUserService.count(queryWrapper);
-        if(count >= 0){
-            // 该租户正在被其他用户绑定，无法删除
-            throw new ServiceException(SystemMsg.EXCEPTION_TENANT_USED_DEL);
-        }
+        this.validationUsedByDel(idList);
 
         boolean ret = super.deleteAll(models);
         if(ret){
@@ -252,6 +221,27 @@ public class TenantServiceImpl extends CrudServiceImpl<TenantMapper, SysTenant, 
         }
 
         return super.count(wrapper);
+    }
+
+    /**
+     * 删除验证该租户是否被引用
+     * @param tenantIdList 租户ID
+     */
+    public void validationUsedByDel(List<String> tenantIdList){
+        if(CollUtil.isEmpty(tenantIdList)){
+            return;
+        }
+
+        // 如果有租户还在被引用 则不允许删除该租户
+        QueryWrapper<SysUser> queryWrapper = new QueryWrapper<>();
+        queryWrapper.in(HumpUtil.humpToUnderline(MyBatisConstants.FIELD_TENANT),
+                tenantIdList
+        );
+        int count = iUserService.count(queryWrapper);
+        if(count > 0){
+            // 该租户正在被其他用户绑定，无法删除
+            throw new ServiceException(SystemMsg.EXCEPTION_TENANT_USED_DEL);
+        }
     }
 
     // ============
