@@ -52,12 +52,8 @@ import static org.opsli.common.constants.OrderConstants.UTIL_ORDER;
 @Lazy(false)
 public class DictUtil {
 
-    /** Redis插件 */
-    private static RedisPlugin redisPlugin;
-
     /** 字典Service */
     private static DictDetailApi dictDetailApi;
-
 
     /**
      * 根据 字典值 取 字典名称
@@ -467,11 +463,6 @@ public class DictUtil {
 
 
     // ===================================
-
-    @Autowired
-    public  void setRedisPlugin(RedisPlugin redisPlugin) {
-        DictUtil.redisPlugin = redisPlugin;
-    }
 
     @Autowired
     public  void setDictDetailApi(DictDetailApi dictDetailApi) {
