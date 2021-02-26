@@ -15,7 +15,9 @@
  */
 package org.opsli.modulars.system.role.service.impl;
 
+import cn.hutool.core.convert.Convert;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
 import org.opsli.api.wrapper.system.role.RoleModel;
 import org.opsli.common.constants.MyBatisConstants;
@@ -26,10 +28,14 @@ import org.opsli.core.persistence.querybuilder.chain.TenantHandler;
 import org.opsli.modulars.system.SystemMsg;
 import org.opsli.modulars.system.role.entity.SysRole;
 import org.opsli.modulars.system.role.mapper.RoleMapper;
+import org.opsli.modulars.system.role.service.IRoleMenuRefService;
 import org.opsli.modulars.system.role.service.IRoleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Collection;
+import java.util.List;
 
 
 /**
@@ -44,6 +50,8 @@ public class RoleServiceImpl extends CrudServiceImpl<RoleMapper, SysRole, RoleMo
 
     @Autowired(required = false)
     private RoleMapper mapper;
+    @Autowired
+    private IRoleMenuRefService iRoleMenuRefService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -77,6 +85,41 @@ public class RoleServiceImpl extends CrudServiceImpl<RoleMapper, SysRole, RoleMo
         }
 
         return super.update(model);
+    }
+
+    @Override
+    public boolean delete(String id) {
+        // 删除角色下 权限
+        iRoleMenuRefService.delPermsByRoleIds(Convert.toList(String.class, id));
+        return super.delete(id);
+    }
+
+    @Override
+    public boolean deleteAll(String[] ids) {
+        // 删除角色下 权限
+        iRoleMenuRefService.delPermsByRoleIds(Convert.toList(String.class, ids));
+        return super.deleteAll(ids);
+    }
+
+    @Override
+    public boolean delete(RoleModel model) {
+        if(model == null){
+            return false;
+        }
+        // 删除角色下 权限
+        iRoleMenuRefService.delPermsByRoleIds(Convert.toList(String.class, model.getId()));
+        return super.delete(model);
+    }
+
+    @Override
+    public boolean deleteAll(Collection<RoleModel> models) {
+        List<String> roleIds = Lists.newArrayList();
+        for (RoleModel model : models) {
+            roleIds.add(model.getId());
+        }
+        // 删除角色下 权限
+        iRoleMenuRefService.delPermsByRoleIds(roleIds);
+        return super.deleteAll(models);
     }
 
     /**

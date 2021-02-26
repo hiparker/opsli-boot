@@ -44,6 +44,13 @@ public interface IRoleMenuRefService {
     boolean setPerms(String roleId,String[] permsIds);
 
     /**
+     * 根据角色ID 移除对应 权限数据
+     * @param roleIds 角色ID
+     * @return boolean
+     */
+    boolean delPermsByRoleIds(List<String> roleIds);
+
+    /**
      * 根据菜单ID 移除对应 权限数据
      * @param menuIds 菜单ID
      * @return boolean

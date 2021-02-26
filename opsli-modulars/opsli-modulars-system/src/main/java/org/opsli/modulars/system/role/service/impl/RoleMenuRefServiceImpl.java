@@ -96,6 +96,14 @@ public class RoleMenuRefServiceImpl extends ServiceImpl<RoleMenuRefMapper,SysRol
         return this.remove(queryWrapper);
     }
 
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public boolean delPermsByRoleIds(List<String> menuIds){
+        QueryWrapper<SysRoleMenuRef> queryWrapper = new QueryWrapper<>();
+        queryWrapper.in("role_id", menuIds);
+        return this.remove(queryWrapper);
+    }
+
     // =========================
 
     /**

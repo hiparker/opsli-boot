@@ -57,7 +57,7 @@ public class UserModel extends ApiWrapper {
     @ApiModelProperty(value = "盐值，密码秘钥")
     @ExcelIgnore
     @ValidationArgsLenMax(50)
-    private String secretkey;
+    private String secretKey;
 
     /** 是否锁定 */
     @ApiModelProperty(value = "是否锁定")

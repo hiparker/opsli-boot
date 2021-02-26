@@ -589,11 +589,11 @@ public class UserUtil {
     /**
      * 处理密码
      * @param password 密码
-     * @param secretkey 盐值
+     * @param secretKey 盐值
      * @return String
      */
-    public static String handlePassword(String password, String secretkey){
-        return new Md5Hash(password, secretkey).toHex();
+    public static String handlePassword(String password, String secretKey){
+        return new Md5Hash(password, secretKey).toHex();
     }
 
     // =====================================

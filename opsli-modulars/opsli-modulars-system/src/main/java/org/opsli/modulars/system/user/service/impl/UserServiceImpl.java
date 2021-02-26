@@ -95,13 +95,13 @@ public class UserServiceImpl extends CrudServiceImpl<UserMapper, SysUser, UserMo
         // 新增可以直接设置密码
         if(StringUtils.isNotEmpty(model.getPassword())){
             // 设置随机新盐值
-            model.setSecretkey(
+            model.setSecretKey(
                     RandomUtil.randomString(20)
             );
             // 处理密码
             model.setPassword(
                     UserUtil.handlePassword(model.getPassword(),
-                            model.getSecretkey())
+                            model.getSecretKey())
             );
         }
 
@@ -142,7 +142,7 @@ public class UserServiceImpl extends CrudServiceImpl<UserMapper, SysUser, UserMo
         // 需要注意的是 不要轻易改修改策略
         model.setUsername(null);
         model.setPassword(null);
-        model.setSecretkey(null);
+        model.setSecretKey(null);
         model.setLoginIp(null);
 
         UserModel update = super.update(model);
@@ -381,7 +381,7 @@ public class UserServiceImpl extends CrudServiceImpl<UserMapper, SysUser, UserMo
 
         // 获得 处理后 老密码
         String orlPassword = UserUtil.handlePassword(userPassword.getOldPassword(),
-                userModel.getSecretkey());
+                userModel.getSecretKey());
 
         // 判断老密码是否正确
         if(!userModel.getPassword().equals(orlPassword)){

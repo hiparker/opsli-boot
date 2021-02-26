@@ -99,7 +99,7 @@ public class LoginRestController {
 
         // 账号不存在、密码错误
         if(user == null ||
-                !user.getPassword().equals(UserUtil.handlePassword(form.getPassword(), user.getSecretkey()))) {
+                !user.getPassword().equals(UserUtil.handlePassword(form.getPassword(), user.getSecretKey()))) {
             // 判断是否需要锁定账号 这里没有直接抛异常 而是返回错误信息， 其中包含 是否开启验证码状态
             TokenMsg lockAccountMsg = UserTokenUtil.lockAccount(form.getUsername());
             throw new TokenException(lockAccountMsg);
@@ -213,8 +213,8 @@ public class LoginRestController {
     // =================
 
     public static void main(String[] args) {
-        String passwordStr = "Aa123456";
-        String password = UserUtil.handlePassword(passwordStr, "system");
+        String passwordStr = "Bb123456";
+        String password = UserUtil.handlePassword(passwordStr, "z25fk1otoj45ref83shq");
         System.out.println(password);
     }
 }

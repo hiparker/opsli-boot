@@ -328,7 +328,7 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
         page = IService.findPageByCus(page);
         // 密码防止分页泄露处理
         for (UserAndOrgModel userModel : page.getList()) {
-            userModel.setSecretkey(null);
+            userModel.setSecretKey(null);
             userModel.setPassword(null);
         }
         return ResultVo.success(page.getBootstrapData());
