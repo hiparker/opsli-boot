@@ -199,7 +199,7 @@ public abstract class BaseRestController <T extends BaseEntity, E extends ApiWra
                     CoreMsg.EXCEL_FILE_NULL.getMessage());
         }
         ResultVo<?> resultVo ;
-        String msgInfo = "";
+        String msgInfo;
         try {
             UserModel user = UserUtil.getUser();
             Date currDate = DateUtil.date();
