@@ -57,7 +57,7 @@ public enum VueCodeBuilder {
      */
     public Map<String,String> createIndex(CreaterBuilderModel builderModelTmp, String dataStr){
         CreaterBuilderModel builderModel =
-                WrapperUtil.cloneTransformInstance(builderModelTmp, CreaterBuilderModel.class);
+                WrapperUtil.transformInstance(builderModelTmp, CreaterBuilderModel.class, true);
         List<CreaterTableColumnModel> columnList = builderModel.getModel().getColumnList();
         // 处理数据
         for (CreaterTableColumnModel columnModel : columnList) {
@@ -125,7 +125,7 @@ public enum VueCodeBuilder {
      */
     public Map<String,String> createEdit(CreaterBuilderModel builderModelTmp, String dataStr){
         CreaterBuilderModel builderModel =
-                WrapperUtil.cloneTransformInstance(builderModelTmp, CreaterBuilderModel.class);
+                WrapperUtil.transformInstance(builderModelTmp, CreaterBuilderModel.class, true);
         List<CreaterTableColumnModel> columnList = builderModel.getModel().getColumnList();
         List<List<CreaterTableColumnModel>> formList = new ArrayList<>();
         Map<String,List<String>> valiDict = new HashMap<>();
@@ -230,7 +230,7 @@ public enum VueCodeBuilder {
      */
     public Map<String,String> createImport(CreaterBuilderModel builderModelTmp, String dataStr){
         CreaterBuilderModel builderModel =
-                WrapperUtil.cloneTransformInstance(builderModelTmp, CreaterBuilderModel.class);
+                WrapperUtil.transformInstance(builderModelTmp, CreaterBuilderModel.class, true);
         List<CreaterTableColumnModel> columnList = builderModel.getModel().getColumnList();
         // 处理数据
         for (CreaterTableColumnModel columnModel : columnList) {
@@ -275,7 +275,7 @@ public enum VueCodeBuilder {
      */
     public Map<String,String> createApi(CreaterBuilderModel builderModelTmp, String dataStr){
         CreaterBuilderModel builderModel =
-                WrapperUtil.cloneTransformInstance(builderModelTmp, CreaterBuilderModel.class);
+                WrapperUtil.transformInstance(builderModelTmp, CreaterBuilderModel.class, true);
         List<CreaterTableColumnModel> columnList = builderModel.getModel().getColumnList();
         // 处理数据
         for (CreaterTableColumnModel columnModel : columnList) {

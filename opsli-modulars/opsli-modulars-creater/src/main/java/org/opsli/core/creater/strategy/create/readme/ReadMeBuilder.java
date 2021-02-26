@@ -49,7 +49,7 @@ public enum ReadMeBuilder {
      */
     public Map<String,String> createReadMe(CreaterBuilderModel builderModelTmp, String dataStr){
         CreaterBuilderModel builderModel =
-                WrapperUtil.cloneTransformInstance(builderModelTmp, CreaterBuilderModel.class);
+                WrapperUtil.transformInstance(builderModelTmp, CreaterBuilderModel.class, true);
 
         String codeStr = EnjoyUtil.render("/readme/TemplateReadMe.html",
                 this.createKv(builderModel)

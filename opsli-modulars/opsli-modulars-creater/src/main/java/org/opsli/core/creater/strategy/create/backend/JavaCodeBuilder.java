@@ -51,7 +51,7 @@ public enum JavaCodeBuilder {
      */
     public Map<String,String> createEntity(CreaterBuilderModel builderModelTmp, String dataStr){
         CreaterBuilderModel builderModel =
-                WrapperUtil.cloneTransformInstance(builderModelTmp, CreaterBuilderModel.class);
+                WrapperUtil.transformInstance(builderModelTmp, CreaterBuilderModel.class, true);
         List<CreaterTableColumnModel> columnList = builderModel.getModel().getColumnList();
         // 处理数据
         for (CreaterTableColumnModel columnModel : columnList) {
@@ -95,7 +95,7 @@ public enum JavaCodeBuilder {
      */
     public Map<String,String> createMapper(CreaterBuilderModel builderModelTmp, String dataStr){
         CreaterBuilderModel builderModel =
-                WrapperUtil.cloneTransformInstance(builderModelTmp, CreaterBuilderModel.class);
+                WrapperUtil.transformInstance(builderModelTmp, CreaterBuilderModel.class, true);
         String codeStr = EnjoyUtil.render("/backend/mapper/TemplateMapper.html",
                 this.createKv(builderModel)
         );
@@ -128,7 +128,7 @@ public enum JavaCodeBuilder {
      */
     public Map<String,String> createMapperXML(CreaterBuilderModel builderModelTmp, String dataStr){
         CreaterBuilderModel builderModel =
-                WrapperUtil.cloneTransformInstance(builderModelTmp, CreaterBuilderModel.class);
+                WrapperUtil.transformInstance(builderModelTmp, CreaterBuilderModel.class, true);
         String codeStr = EnjoyUtil.render("/backend/mapper/xml/TemplateMapperXML.html",
                 this.createKv(builderModel)
         );
@@ -163,7 +163,7 @@ public enum JavaCodeBuilder {
      */
     public Map<String,String> createService(CreaterBuilderModel builderModelTmp, String dataStr){
         CreaterBuilderModel builderModel =
-                WrapperUtil.cloneTransformInstance(builderModelTmp, CreaterBuilderModel.class);
+                WrapperUtil.transformInstance(builderModelTmp, CreaterBuilderModel.class, true);
         String codeStr = EnjoyUtil.render("/backend/service/TemplateService.html",
                 this.createKv(builderModel)
         );
@@ -197,7 +197,7 @@ public enum JavaCodeBuilder {
      */
     public Map<String,String> createServiceImpl(CreaterBuilderModel builderModelTmp, String dataStr){
         CreaterBuilderModel builderModel =
-                WrapperUtil.cloneTransformInstance(builderModelTmp, CreaterBuilderModel.class);
+                WrapperUtil.transformInstance(builderModelTmp, CreaterBuilderModel.class, true);
         String codeStr = EnjoyUtil.render("/backend/service/impl/TemplateServiceImpl.html",
                 this.createKv(builderModel)
         );
@@ -232,7 +232,7 @@ public enum JavaCodeBuilder {
      */
     public Map<String,String> createWeb(CreaterBuilderModel builderModelTmp, String dataStr){
         CreaterBuilderModel builderModel =
-                WrapperUtil.cloneTransformInstance(builderModelTmp, CreaterBuilderModel.class);
+                WrapperUtil.transformInstance(builderModelTmp, CreaterBuilderModel.class, true);
         String codeStr = EnjoyUtil.render("/backend/web/TemplateRestController.html",
                 this.createKv(builderModel)
         );
@@ -266,7 +266,7 @@ public enum JavaCodeBuilder {
      */
     public Map<String,String> createModel(CreaterBuilderModel builderModelTmp, String dataStr){
         CreaterBuilderModel builderModel =
-                WrapperUtil.cloneTransformInstance(builderModelTmp, CreaterBuilderModel.class);
+                WrapperUtil.transformInstance(builderModelTmp, CreaterBuilderModel.class, true);
         // 处理数据
         List<CreaterTableColumnModel> columnList = builderModel.getModel().getColumnList();
         for (CreaterTableColumnModel columnModel : columnList) {
@@ -339,7 +339,7 @@ public enum JavaCodeBuilder {
      */
     public Map<String,String> createRestApi(CreaterBuilderModel builderModelTmp, String dataStr){
         CreaterBuilderModel builderModel =
-                WrapperUtil.cloneTransformInstance(builderModelTmp, CreaterBuilderModel.class);
+                WrapperUtil.transformInstance(builderModelTmp, CreaterBuilderModel.class, true);
         String codeStr = EnjoyUtil.render("/backend/api/TemplateRestApi.html",
                 this.createKv(builderModel)
         );

@@ -22,9 +22,11 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * @BelongsProject: opsli-boot
@@ -44,22 +46,43 @@ public final class WrapperUtil {
 
     /**
      * 转化对象
-     * @param from
-     * @param toClass
-     * @param <M>
-     * @return
+     * @param source 源数据
+     * @param target 目标
+     * @param <M> 泛型
+     * @return M
      */
-    public static <T,M> M transformInstance(T from, Class<M> toClass){
+    public static <M> M transformInstance(Object source, Class<M> target){
+        return transformInstance(source, target, false);
+    }
+
+
+    /**
+     * 转化集合对象
+     * @param source 源数据
+     * @param target 目标
+     * @param <M> 泛型
+     * @return List<M>
+     */
+    public static <T,M> List<M> transformInstance(Collection<T> source, Class<M> target){
+        return transformInstance(source, target, false);
+    }
+
+
+    /**
+     * 克隆并且转化对象
+     * @param source 源数据
+     * @param target 目标
+     * @param isClone 是否克隆
+     * @return M
+     */
+    public static <T,M> M transformInstance(Object source, Class<M> target, boolean isClone){
+        if(isClone){
+            source = ObjectUtil.cloneByStream(source);
+        }
+
         M m = null;
         try {
-            Object toObj = ReflectUtil.newInstance(toClass);
-            Map<String, Object> stringBeanMap = BeanUtil.beanToMap(from);
-            if(stringBeanMap != null){
-                Object toInstance = BeanUtil.fillBeanWithMapIgnoreCase(stringBeanMap, toObj, true);
-                if(toInstance != null){
-                    m = (M) toInstance;
-                }
-            }
+            m = BeanUtil.copyProperties(source, target);
         }catch (Exception e){
             log.error(e.getMessage(),e);
         }
@@ -68,94 +91,25 @@ public final class WrapperUtil {
 
 
     /**
-     * 转化集合对象
-     * @param froms
-     * @param toClass
+     * 克隆并且转化集合对象
+     * @param source 源数据
+     * @param target 目标
+     * @param isClone 是否克隆
      * @param <M>
-     * @return
+     * @return List<M>
      */
-    public static <T,M> List<M> transformInstance(List<T> froms, Class<M> toClass){
-        List<M> toInstanceList = Lists.newArrayListWithCapacity(froms.size());
-        try {
-            for (Object from : froms) {
-                Object toObj = ReflectUtil.newInstance(toClass);
-                Map<String, Object> stringBeanMap = BeanUtil.beanToMap(from);
-                if(stringBeanMap != null){
-                    Object toInstance = BeanUtil.fillBeanWithMapIgnoreCase(stringBeanMap, toObj, true);
-                    if(toInstance != null){
-                        toInstanceList.add((M) toInstance);
-                    }
-                }
-            }
+    public static <T,M> List<M> transformInstance(Collection<T> source, Class<M> target, boolean isClone){
+        if(isClone){
+            source = ObjectUtil.cloneByStream(source);
+        }
 
+        List<M> toInstanceList = Lists.newArrayList();
+        try {
+            toInstanceList = source.stream().map((s) -> transformInstance(s, target, true)).collect(Collectors.toList());
         }catch (Exception e){
             log.error(e.getMessage(),e);
         }
         return toInstanceList;
-    }
-
-    /**
-     * 转化集合对象
-     * @param froms
-     * @param toClass
-     * @param <M>
-     * @return
-     */
-    public static <T,M> Set<M> transformInstance(Set<T> froms, Class<M> toClass){
-        Set<M> toInstanceList = Sets.newHashSetWithExpectedSize(froms.size());
-        try {
-            for (Object from : froms) {
-                Object toObj = ReflectUtil.newInstance(toClass);
-                Map<String, Object> stringBeanMap = BeanUtil.beanToMap(from);
-                if(stringBeanMap != null){
-                    Object toInstance = BeanUtil.fillBeanWithMapIgnoreCase(stringBeanMap, toObj, true);
-                    if(toInstance != null){
-                        toInstanceList.add((M) toInstance);
-                    }
-                }
-            }
-
-        }catch (Exception e){
-            log.error(e.getMessage(),e);
-        }
-        return toInstanceList;
-    }
-
-    /**
-     * 克隆并且转化对象
-     * @param from
-     * @param toClass
-     * @param <M>
-     * @return
-     */
-    public static <T,M> M cloneTransformInstance(T from, Class<M> toClass){
-        T fromByClone = ObjectUtil.cloneByStream(from);
-        return transformInstance(fromByClone,toClass);
-    }
-
-
-    /**
-     * 克隆并且转化集合对象
-     * @param froms
-     * @param toClass
-     * @param <M>
-     * @return
-     */
-    public static <T,M> List<M> cloneTransformInstance(List<T> froms, Class<M> toClass){
-        List<T> ts = ObjectUtil.cloneByStream(froms);
-        return transformInstance(ts,toClass);
-    }
-
-    /**
-     * 克隆并且转化集合对象
-     * @param froms
-     * @param toClass
-     * @param <M>
-     * @return
-     */
-    public static <T,M> Set<M> cloneTransformInstance(Set<T> froms, Class<M> toClass){
-        Set<T> ts = ObjectUtil.cloneByStream(froms);
-        return transformInstance(ts,toClass);
     }
 
 }
