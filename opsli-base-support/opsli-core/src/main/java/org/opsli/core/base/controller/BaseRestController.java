@@ -198,14 +198,19 @@ public abstract class BaseRestController <T extends BaseEntity, E extends ApiWra
         try {
             List<E> modelList = ExcelUtil.getInstance().readExcel(files.get(0), modelClazz);
             if(CollUtil.isNotEmpty(modelList)){
-                if(modelList.size() > globalProperties.getExcel().getImportMaxCount()){
-                    String maxError = StrUtil.format(CoreMsg.EXCEL_HANDLE_MAX.getMessage(), modelList.size(),
-                            globalProperties.getExcel().getImportMaxCount());
-                    // 清空 list
-                    modelList.clear();
-                    // 超出最大导出数量
-                    throw new ExcelPluginException(CoreMsg.EXCEL_HANDLE_MAX.getCode(), maxError);
+                // 导入数量限制 -1 为无限制
+                Integer importMaxCount = globalProperties.getExcel().getImportMaxCount();
+                if(importMaxCount != null && importMaxCount > -1){
+                    if(modelList.size() > importMaxCount){
+                        String maxError = StrUtil.format(CoreMsg.EXCEL_HANDLE_MAX.getMessage(), modelList.size(),
+                                importMaxCount);
+                        // 清空 list
+                        modelList.clear();
+                        // 超出最大导出数量
+                        throw new ExcelPluginException(CoreMsg.EXCEL_HANDLE_MAX.getCode(), maxError);
+                    }
                 }
+
 
                 boolean ret = IService.insertBatch(modelList);
                 if(!ret){
@@ -293,14 +298,19 @@ public abstract class BaseRestController <T extends BaseEntity, E extends ApiWra
         List<E> modelList = Lists.newArrayList();
         try {
             if(queryWrapper != null){
-                // 获得数量 大于 阈值 禁止导出， 防止OOM
-                int count = IService.count(queryWrapper);
-                if(count > globalProperties.getExcel().getExportMaxCount()){
-                    String maxError = StrUtil.format(CoreMsg.EXCEL_HANDLE_MAX.getMessage(), count,
-                            globalProperties.getExcel().getExportMaxCount());
-                    // 超出最大导出数量
-                    throw new ExcelPluginException(CoreMsg.EXCEL_HANDLE_MAX.getCode(), maxError);
+                // 导出数量限制 -1 为无限制
+                Integer exportMaxCount = globalProperties.getExcel().getExportMaxCount();
+                if(exportMaxCount != null && exportMaxCount > -1){
+                    // 获得数量 大于 阈值 禁止导出， 防止OOM
+                    int count = IService.count(queryWrapper);
+                    if(count > exportMaxCount){
+                        String maxError = StrUtil.format(CoreMsg.EXCEL_HANDLE_MAX.getMessage(), count,
+                                exportMaxCount);
+                        // 超出最大导出数量
+                        throw new ExcelPluginException(CoreMsg.EXCEL_HANDLE_MAX.getCode(), maxError);
+                    }
                 }
+
 
                 List<T> entityList = IService.findList(queryWrapper);
                 // 转化类型
