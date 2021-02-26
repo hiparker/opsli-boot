@@ -54,6 +54,12 @@ redisson:
       password: 123456
       database: 0
 
+#mybatis-plus 插件
+mybatis-plus:
+  configuration:
+    # 打印SQL 开发测试使用 生产关闭 ***
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
 # knife4j 文档 配置
 knife4j:
   basic:

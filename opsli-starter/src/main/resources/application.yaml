@@ -151,8 +151,6 @@ mybatis-plus:
     map-underscore-to-camel-case: true
     cache-enabled: false
     call-setters-on-nulls: true
-    # 打印SQL 开发测试使用 生产关闭 ***
-    #log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 
 
 
