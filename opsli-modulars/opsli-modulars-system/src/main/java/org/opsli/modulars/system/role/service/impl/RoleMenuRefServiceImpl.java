@@ -16,6 +16,7 @@
 package org.opsli.modulars.system.role.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.convert.Convert;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.common.collect.Lists;
@@ -63,13 +64,10 @@ public class RoleMenuRefServiceImpl extends ServiceImpl<RoleMenuRefMapper,SysRol
             throw new ServiceException(SystemMsg.EXCEPTION_ROLE_ID_NOT_NULL);
         }
 
-        // 删除已有权限
-        String roleIdField = "role_id";
-        QueryWrapper<SysRoleMenuRef> wrapper = new QueryWrapper<>();
-        wrapper.eq(roleIdField, roleId);
-        super.remove(wrapper);
-
         if(permsIds != null && permsIds.length > 0){
+            // 删除已有权限
+            this.delPermsByRoleIds(Convert.toList(String.class, roleId));
+
             List<SysRoleMenuRef> list = Lists.newArrayListWithCapacity(permsIds.length);
             for (String permsId : permsIds) {
                 SysRoleMenuRef entity = new SysRoleMenuRef();
