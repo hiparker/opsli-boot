@@ -106,8 +106,8 @@ export function doImportExcel(data) {
     url: "#(apiPath)/#(data.moduleName)/importExcel",
     #end
     method: "post",
-    // 最长超时时间 50秒
-    timeout: 50000,
+    // 最长超时时间 3 分钟
+    timeout: 180000,
     headers: {
     'Content-Type': 'multipart/form-data'
     },
