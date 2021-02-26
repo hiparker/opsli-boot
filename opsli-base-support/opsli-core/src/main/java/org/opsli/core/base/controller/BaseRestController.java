@@ -21,6 +21,8 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.date.TimeInterval;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.json.JSONUtil;
+import com.alibaba.excel.context.AnalysisContext;
 import com.alibaba.excel.support.ExcelTypeEnum;
 import com.alibaba.excel.util.CollectionUtils;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -33,6 +35,7 @@ import org.opsli.api.wrapper.system.user.UserModel;
 import org.opsli.common.annotation.RequiresPermissionsCus;
 import org.opsli.common.annotation.hotdata.EnableHotData;
 import org.opsli.common.constants.CacheConstants;
+import org.opsli.common.enums.ExcelOperate;
 import org.opsli.common.exception.ServiceException;
 import org.opsli.common.exception.TokenException;
 import org.opsli.common.msg.CommonMsg;
@@ -49,6 +52,7 @@ import org.opsli.core.utils.DistributedLockUtil;
 import org.opsli.core.utils.ExcelUtil;
 import org.opsli.core.utils.UserUtil;
 import org.opsli.plugins.excel.exception.ExcelPluginException;
+import org.opsli.plugins.excel.listener.BatchExcelListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -59,6 +63,7 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Method;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
@@ -193,43 +198,39 @@ public abstract class BaseRestController <T extends BaseEntity, E extends ApiWra
             return ResultVo.error(CoreMsg.EXCEL_FILE_NULL.getCode(),
                     CoreMsg.EXCEL_FILE_NULL.getMessage());
         }
-        ResultVo<?> resultVo;
-        String msgInfo;
+        ResultVo<?> resultVo ;
+        String msgInfo = "";
         try {
-            List<E> modelList = ExcelUtil.getInstance().readExcel(files.get(0), modelClazz);
-            if(CollUtil.isNotEmpty(modelList)){
-                // 导入数量限制 -1 为无限制
-                Integer importMaxCount = globalProperties.getExcel().getImportMaxCount();
-                if(importMaxCount != null && importMaxCount > -1){
-                    if(modelList.size() > importMaxCount){
-                        String maxError = StrUtil.format(CoreMsg.EXCEL_HANDLE_MAX.getMessage(), modelList.size(),
-                                importMaxCount);
-                        // 清空 list
-                        modelList.clear();
-                        // 超出最大导出数量
-                        throw new ExcelPluginException(CoreMsg.EXCEL_HANDLE_MAX.getCode(), maxError);
+            UserModel user = UserUtil.getUser();
+            Date currDate = DateUtil.date();
+
+            // 导入优化为 监听器 模式 超过一定阈值直接释放资源 防止导入数据导致系统 OOM
+            ExcelUtil.getInstance().readExcelByListener(files.get(0), modelClazz, new BatchExcelListener<E>() {
+                @Override
+                public void saveData(List<E> dataList) {
+                    // 处理字典数据
+                    List<E> disposeData = ExcelUtil.getInstance().handleDatas(dataList, modelClazz, ExcelOperate.READ);
+                    // 手动赋值 必要数据 防止频繁开启Redis网络IO
+                    for (E model : disposeData) {
+                        model.setIzManual(true);
+                        model.setCreateBy(user.getId());
+                        model.setUpdateBy(user.getId());
+                        model.setCreateTime(currDate);
+                        model.setUpdateTime(currDate);
                     }
+                    // 数据库插入数据
+                    IService.insertBatch(disposeData);
                 }
+            });
 
+            // 花费毫秒数
+            long timerCount = timer.interval();
+            // 提示信息
+            msgInfo = StrUtil.format(CoreMsg.EXCEL_IMPORT_SUCCESS.getMessage(), DateUtil.formatBetween(timerCount));
+            // 导出成功
+            resultVo = ResultVo.success(msgInfo);
+            resultVo.setCode(CoreMsg.EXCEL_IMPORT_SUCCESS.getCode());
 
-                boolean ret = IService.insertBatch(modelList);
-                if(!ret){
-                    // 清空 list
-                    modelList.clear();
-                    throw new ExcelPluginException(CoreMsg.EXCEL_IMPORT_NO);
-                }
-                // 清空 list
-                modelList.clear();
-                // 花费毫秒数
-                long timerCount = timer.interval();
-                // 提示信息
-                msgInfo = StrUtil.format(CoreMsg.EXCEL_IMPORT_SUCCESS.getMessage(), DateUtil.formatBetween(timerCount));
-                // 导出成功
-                resultVo = ResultVo.success(msgInfo);
-                resultVo.setCode(CoreMsg.EXCEL_IMPORT_SUCCESS.getCode());
-            }else {
-                throw new ExcelPluginException(CoreMsg.EXCEL_FILE_NULL);
-            }
         } catch (ExcelPluginException e) {
             // 花费毫秒数
             long timerCount = timer.interval();

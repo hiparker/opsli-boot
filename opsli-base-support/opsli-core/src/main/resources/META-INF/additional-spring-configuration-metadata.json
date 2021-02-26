@@ -157,14 +157,6 @@
     },
 
 
-
-    {
-      "name": "opsli.excel.import-max-count",
-      "sourceType": "org.opsli.core.autoconfigure.properties.GlobalProperties$Excel",
-      "type": "java.lang.Integer",
-      "defaultValue": 20000,
-      "description": "Excel 导入最大操作数."
-    },
     {
       "name": "opsli.excel.export-max-count",
       "sourceType": "org.opsli.core.autoconfigure.properties.GlobalProperties$Excel",

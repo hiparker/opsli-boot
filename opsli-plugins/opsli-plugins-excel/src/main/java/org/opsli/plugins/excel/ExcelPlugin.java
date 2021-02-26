@@ -27,6 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.opsli.common.utils.WrapperUtil;
 import org.opsli.plugins.excel.exception.ExcelPluginException;
+import org.opsli.plugins.excel.listener.BatchExcelListener;
 import org.opsli.plugins.excel.listener.ExcelListener;
 import org.opsli.plugins.excel.msg.ExcelMsg;
 import org.springframework.web.multipart.MultipartFile;
@@ -84,7 +85,7 @@ public class ExcelPlugin {
      */
     public <T> List<T> readExcel(MultipartFile excel, Class<T>  rowModel, String sheetName,
                                                              int headLineNum) throws ExcelPluginException {
-        ExcelListener excelListener = new ExcelListener();
+        ExcelListener<T> excelListener = new ExcelListener<>();
         InputStream inputStream = null;
         try{
             if(null != excel){
@@ -113,6 +114,79 @@ public class ExcelPlugin {
         excelReader.finish();
 
         return getExtendsBeanList(excelListener.getDataList(), rowModel);
+    }
+
+
+    // ==================================================================================
+
+
+    /**
+     * 读取 Excel(多个 sheet)
+     * 将多sheet合并成一个list数据集，通过自定义ExcelReader继承AnalysisEventListener
+     * 重写invoke doAfterAllAnalysed方法
+     * getExtendsBeanList 主要是做Bean的属性拷贝 ，可以通过ExcelReader中添加的数据集直接获取
+     * @param excel    文件
+     * @param rowModel 实体类映射，继承 BaseRowModel 类
+     * @param batchExcelListener 监听器
+     */
+    public <T> void readExcelByListener(MultipartFile excel,Class<T>  rowModel,
+                                           BatchExcelListener<T> batchExcelListener)
+            throws ExcelPluginException {
+        readExcelByListener(excel, rowModel, null, 1, batchExcelListener);
+    }
+
+    /**
+     * 读取某个 sheet 的 Excel
+     * @param excel    文件
+     * @param rowModel 实体类映射，继承 BaseRowModel 类
+     * @param sheetName  sheet 的序号 从1开始
+     * @param batchExcelListener 监听器
+     */
+    public <T> void readExcelByListener(MultipartFile excel, Class<T>  rowModel, String sheetName,
+                                           BatchExcelListener<T> batchExcelListener)
+            throws ExcelPluginException{
+        readExcelByListener(excel, rowModel, sheetName, 1, batchExcelListener);
+    }
+
+    /**
+     * 读取某个 sheet 的 Excel
+     * @param excel       文件
+     * @param rowModel    实体类映射，继承 BaseRowModel 类
+     * @param sheetName     sheet 的序号 从1开始
+     * @param headLineNum 表头行数，默认为1
+     * @param batchExcelListener 监听器
+     */
+    public <T> void readExcelByListener(MultipartFile excel, Class<T>  rowModel, String sheetName,
+                                 int headLineNum, BatchExcelListener<T> batchExcelListener) throws ExcelPluginException {
+        if(null == batchExcelListener){
+            return;
+        }
+        InputStream inputStream = null;
+        try{
+            if(null != excel){
+                inputStream = excel.getInputStream();
+            }
+        }catch (IOException e){
+            log.error(e.getMessage(),e);
+        }
+        if(null == inputStream){
+            return;
+        }
+
+        ExcelReader excelReader = EasyExcel.read(inputStream, rowModel, batchExcelListener).build();
+        if (excelReader == null) {
+            return;
+        }
+        ReadSheet readSheet;
+        if(StringUtils.isEmpty(sheetName)){
+            readSheet = EasyExcel.readSheet().build();
+        }else{
+            readSheet = EasyExcel.readSheet(sheetName).build();
+        }
+        readSheet.setHeadRowNumber(headLineNum);
+        excelReader.read(readSheet);
+        // 这里千万别忘记关闭，读的时候会创建临时文件，到时磁盘会崩的
+        excelReader.finish();
     }
 
     /**

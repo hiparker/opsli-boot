@@ -34,6 +34,7 @@ import org.opsli.core.utils.excel.factory.ModelFactoryHelper;
 import org.opsli.plugins.excel.ExcelPlugin;
 import org.opsli.plugins.excel.annotation.ExcelInfo;
 import org.opsli.plugins.excel.exception.ExcelPluginException;
+import org.opsli.plugins.excel.listener.BatchExcelListener;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
@@ -93,6 +94,25 @@ public final class ExcelUtil {
         return this.handleDatas(ts, rowModel, ExcelOperate.READ);
     }
 
+    ///////////////////////
+
+    public <T> void readExcelByListener(MultipartFile excel, Class<T> rowModel,
+                                        BatchExcelListener<T> batchExcelListener) throws ExcelPluginException {
+        ExcelUtilSingletonHolder.EXCEL_PLUGIN.readExcelByListener(excel, rowModel, batchExcelListener);
+    }
+
+    public <T> void readExcelByListener(MultipartFile excel, Class<T> rowModel, String sheetName,
+                                        BatchExcelListener<T> batchExcelListener) throws ExcelPluginException {
+        ExcelUtilSingletonHolder.EXCEL_PLUGIN.readExcelByListener(excel, rowModel, sheetName, batchExcelListener);
+    }
+
+    public <T> void readExcelByListener(MultipartFile excel, Class<T> rowModel, String sheetName, int headLineNum,
+                                        BatchExcelListener<T> batchExcelListener) throws ExcelPluginException {
+        ExcelUtilSingletonHolder.EXCEL_PLUGIN.readExcelByListener(excel, rowModel, sheetName, headLineNum, batchExcelListener);
+    }
+
+    ///////////////////////
+
     public <T> void writeExcel(HttpServletResponse response, List<T> list, String fileName, String sheetName, Class<T> classType, ExcelTypeEnum excelTypeEnum) throws ExcelPluginException {
         // 处理数据
         List<T> ts = this.handleDatas(list, classType, ExcelOperate.WRITE);
@@ -107,7 +127,7 @@ public final class ExcelUtil {
      * @param <T> 泛型
      * @return List<T>
      */
-    private <T> List<T> handleDatas(List<T> datas, Class<T> typeClazz, ExcelOperate operate){
+    public <T> List<T> handleDatas(List<T> datas, Class<T> typeClazz, ExcelOperate operate){
         // 计时器
         TimeInterval timer = DateUtil.timer();
         // 空处理

@@ -127,9 +127,6 @@ public class GlobalProperties {
     @EqualsAndHashCode(callSuper = false)
     public static class Excel {
 
-        /** 最大导入操作数 */
-        private Integer importMaxCount;
-
         /** 最大导出操作数 */
         private Integer exportMaxCount;
 

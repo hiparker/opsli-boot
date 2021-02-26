@@ -30,6 +30,7 @@ import org.apache.ibatis.mapping.SqlCommandType;
 import org.apache.ibatis.plugin.*;
 import org.opsli.common.constants.MyBatisConstants;
 import org.opsli.core.utils.UserUtil;
+import org.opsli.core.utils.excel.factory.AbstractModelHelper;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Field;
@@ -57,6 +58,9 @@ import java.util.*;
 public class MybatisAutoFillInterceptor implements Interceptor {
 
     private static final String ET = "et";
+
+    /** 实体类字段 */
+    static private final Map<Class<?>, Field[]> ENTITY_FIELD_MAP = new HashMap<>();
 
     @Override
     public Object intercept(Invocation invocation) throws IllegalAccessException, InvocationTargetException {
@@ -110,7 +114,14 @@ public class MybatisAutoFillInterceptor implements Interceptor {
 
         // 当前时间
         Date currDate = DateUtil.date();
-        Field[] fields = ReflectUtil.getFields(arg.getClass());
+
+        // 字段缓存 减少每次更新 反射
+        Field[] fields = ENTITY_FIELD_MAP.get(arg.getClass());
+        if(fields == null){
+            fields = ReflectUtil.getFields(arg.getClass());
+            ENTITY_FIELD_MAP.put(arg.getClass(), fields);
+        }
+
         for (Field f : fields) {
             // 判断是否是排除字段
             if(existField.contains(f.getName())){
@@ -189,7 +200,6 @@ public class MybatisAutoFillInterceptor implements Interceptor {
 
         // 2020-09-19
         // 修改这儿 有可能会拿到一个 MapperMethod，需要特殊处理
-        Field[] fields;
         if (arg instanceof MapperMethod.ParamMap) {
             MapperMethod.ParamMap<?> paramMap = (MapperMethod.ParamMap<?>) arg;
             if (paramMap.containsKey(ET)) {
@@ -201,7 +211,14 @@ public class MybatisAutoFillInterceptor implements Interceptor {
                 return;
             }
         }
-        fields = ReflectUtil.getFields(arg.getClass());
+
+        // 字段缓存 减少每次更新 反射
+        Field[] fields = ENTITY_FIELD_MAP.get(arg.getClass());
+        if(fields == null){
+            fields = ReflectUtil.getFields(arg.getClass());
+            ENTITY_FIELD_MAP.put(arg.getClass(), fields);
+        }
+
         for (Field f : fields) {
             // 判断是否是排除字段
             if(existField.contains(f.getName())){
