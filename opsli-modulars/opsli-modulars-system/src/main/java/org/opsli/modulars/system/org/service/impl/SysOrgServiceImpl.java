@@ -136,7 +136,6 @@ public class SysOrgServiceImpl extends CrudServiceImpl<SysOrgMapper, SysOrg, Sys
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean delete(String id) {
-        boolean ret;
         if(StringUtils.isEmpty(id)){
             return false;
         }
@@ -144,10 +143,10 @@ public class SysOrgServiceImpl extends CrudServiceImpl<SysOrgMapper, SysOrg, Sys
         // 如果有组织还在被引用 则不允许操作该组织
         this.validationUsedByDel(Collections.singletonList(id));
 
-        ret = super.delete(id);
-        // 删除子数据
+        // 先删除子数据
         this.deleteByParentId(id);
-        return ret;
+
+        return super.delete(id);
     }
 
     @Override
@@ -161,13 +160,12 @@ public class SysOrgServiceImpl extends CrudServiceImpl<SysOrgMapper, SysOrg, Sys
         // 如果有组织还在被引用 则不允许操作该组织
         this.validationUsedByDel(Convert.toList(String.class, ids));
 
-        ret = super.deleteAll(ids);
-        // 删除子数据
+        // 先删除子数据
         for (String id : ids) {
             this.deleteByParentId(id);
         }
 
-        return ret;
+        return super.deleteAll(ids);
     }
 
     /**

@@ -45,18 +45,22 @@ public class JwtRealm extends AuthorizingRealm implements FlagRealm {
      */
     @Override
     protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
+        SimpleAuthorizationInfo info = new SimpleAuthorizationInfo();
+
         UserModel user = (UserModel) principals.getPrimaryPrincipal();
         String userId = user.getId();
 
         //用户权限列表
         List<String> permsSet = UserUtil.getUserAllPermsByUserId(userId);
+        if(CollUtil.isNotEmpty(permsSet)){
+            info.addStringPermissions(permsSet);
+        }
 
         //用户角色列表
         List<String> rolesSet = UserUtil.getUserRolesByUserId(userId);
-
-        SimpleAuthorizationInfo info = new SimpleAuthorizationInfo();
-        info.addStringPermissions(permsSet);
-        info.addRoles(rolesSet);
+        if(CollUtil.isNotEmpty(rolesSet)){
+            info.addRoles(rolesSet);
+        }
 
         return info;
     }

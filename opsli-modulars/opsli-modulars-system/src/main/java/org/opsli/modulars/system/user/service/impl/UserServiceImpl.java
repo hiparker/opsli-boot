@@ -41,6 +41,7 @@ import org.opsli.core.persistence.querybuilder.chain.TenantHandler;
 import org.opsli.core.utils.UserUtil;
 import org.opsli.modulars.system.SystemMsg;
 import org.opsli.modulars.system.menu.entity.SysMenu;
+import org.opsli.modulars.system.menu.service.IMenuService;
 import org.opsli.modulars.system.user.entity.SysUser;
 import org.opsli.modulars.system.user.entity.SysUserAndOrg;
 import org.opsli.modulars.system.user.mapper.UserMapper;
@@ -64,6 +65,8 @@ public class UserServiceImpl extends CrudServiceImpl<UserMapper, SysUser, UserMo
 
     @Autowired(required = false)
     private UserMapper mapper;
+    @Autowired
+    private IMenuService iMenuService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -297,14 +300,56 @@ public class UserServiceImpl extends CrudServiceImpl<UserMapper, SysUser, UserMo
 
     @Override
     public List<String> getAllPerms(String userId) {
-        List<String> perms = mapper.queryAllPerms(userId);
+
+        UserModel userModel = this.get(userId);
+        if(userModel == null){
+            return new ArrayList<>();
+        }
+
+        List<String> perms;
+
+        // 判断是否是超级管理员 如果是超级管理员 则默认享有全部权限
+        if(StringUtils.equals(UserUtil.SUPER_ADMIN, userModel.getUsername())){
+            perms = Lists.newArrayList();
+            QueryBuilder<SysMenu> queryBuilder = new GenQueryBuilder<>();
+            QueryWrapper<SysMenu> queryWrapper = queryBuilder.build();
+            queryWrapper.notIn("parent_id", -1);
+            queryWrapper.eq("type", '2');
+            queryWrapper.eq("hidden", '0');
+            List<SysMenu> menuList = iMenuService.findList(queryWrapper);
+            for (SysMenu sysMenu : menuList) {
+                perms.add(sysMenu.getMenuCode());
+            }
+        }else{
+            perms = mapper.queryAllPerms(userId);
+        }
+
         // 去重
         return new ArrayList<>(new LinkedHashSet<>(perms));
     }
 
     @Override
     public List<MenuModel> getMenuListByUserId(String userId) {
-        List<SysMenu> menuList = mapper.findMenuListByUserId(userId);
+
+        UserModel userModel = this.get(userId);
+        if(userModel == null){
+            return new ArrayList<>();
+        }
+
+        List<SysMenu> menuList;
+
+        // 判断是否是超级管理员 如果是超级管理员 则默认享有全部权限
+        if(StringUtils.equals(UserUtil.SUPER_ADMIN, userModel.getUsername())){
+            QueryBuilder<SysMenu> queryBuilder = new GenQueryBuilder<>();
+            QueryWrapper<SysMenu> queryWrapper = queryBuilder.build();
+            queryWrapper.notIn("parent_id", -1);
+            queryWrapper.in("type", '1', '3');
+            queryWrapper.eq("hidden", '0');
+            menuList = iMenuService.findList(queryWrapper);
+        }else{
+            menuList = mapper.findMenuListByUserId(userId);
+        }
+
         return WrapperUtil.transformInstance(menuList, MenuModel.class);
     }
 

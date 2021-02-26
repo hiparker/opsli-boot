@@ -20,6 +20,7 @@ import cn.hutool.core.convert.Convert;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.apache.commons.lang3.StringUtils;
 import org.opsli.api.wrapper.system.menu.MenuModel;
+import org.opsli.api.wrapper.system.user.UserModel;
 import org.opsli.common.constants.MyBatisConstants;
 import org.opsli.common.enums.DictType;
 import org.opsli.common.exception.ServiceException;
@@ -34,6 +35,7 @@ import org.opsli.modulars.system.SystemMsg;
 import org.opsli.modulars.system.menu.entity.SysMenu;
 import org.opsli.modulars.system.menu.mapper.MenuMapper;
 import org.opsli.modulars.system.menu.service.IMenuService;
+import org.opsli.modulars.system.role.service.IRoleMenuRefService;
 import org.opsli.modulars.system.user.service.IUserRoleRefService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -56,6 +58,8 @@ public class MenuServiceImpl extends CrudServiceImpl<MenuMapper, SysMenu, MenuMo
     private MenuMapper mapper;
     @Autowired
     private IUserRoleRefService iUserRoleRefService;
+    @Autowired
+    private IRoleMenuRefService iRoleMenuRefService;
 
     @Override
     public MenuModel getByCode(String menuCode) {
@@ -88,6 +92,28 @@ public class MenuServiceImpl extends CrudServiceImpl<MenuMapper, SysMenu, MenuMo
             model.setParentId("0");
         }
 
+        // 菜单有变动 直接刷新超级管理员 菜单缓存
+        UserModel adminUser = UserUtil.getUserByUserName(UserUtil.SUPER_ADMIN);
+        if(adminUser != null){
+            // 计数器
+            int cacheCount = 2;
+            boolean cacheRet;
+            cacheRet = UserUtil.refreshUserAllPerms(adminUser.getId());
+            if(cacheRet){
+                cacheCount--;
+            }
+            cacheRet = UserUtil.refreshUserMenus(adminUser.getId());
+            if(cacheRet){
+                cacheCount--;
+            }
+
+            // 判断删除状态
+            if(cacheCount != 0){
+                // 删除缓存失败
+                throw new ServiceException(CoreMsg.CACHE_DEL_EXCEPTION);
+            }
+        }
+
         return super.insert(model);
     }
 
@@ -118,15 +144,20 @@ public class MenuServiceImpl extends CrudServiceImpl<MenuMapper, SysMenu, MenuMo
     @Transactional(rollbackFor = Exception.class)
     public boolean delete(String id) {
         MenuModel menuModel = super.get(id);
-        boolean ret = super.delete(id);
+        if(menuModel == null){
+            return false;
+        }
+
+        // 清除缓存
+        this.clearCache(menuModel);
+
         // 删除子数据
         this.deleteByParentId(id);
 
-        if(ret){
-            // 清除缓存
-            this.clearCache(menuModel);
-        }
-        return ret;
+        // 移除权限数据
+        iRoleMenuRefService.delPermsByMenuIds(Convert.toList(String.class, id));
+
+        return super.delete(id);
     }
 
     @Override
@@ -144,13 +175,15 @@ public class MenuServiceImpl extends CrudServiceImpl<MenuMapper, SysMenu, MenuMo
             this.clearCache(menuModel);
         }
 
-        boolean ret = super.deleteAll(ids);
-        // 删除子数据
+        // 先删除子数据
         for (String id : ids) {
             this.deleteByParentId(id);
         }
 
-        return ret;
+        // 移除权限数据
+        iRoleMenuRefService.delPermsByMenuIds(Convert.toList(String.class, ids));
+
+        return super.deleteAll(ids);
     }
 
     /**
@@ -184,16 +217,21 @@ public class MenuServiceImpl extends CrudServiceImpl<MenuMapper, SysMenu, MenuMo
      * @return
      */
     @Transactional(rollbackFor = Exception.class)
-    public void deleteByParentId(String parentId) {
+    public boolean deleteByParentId(String parentId) {
+        boolean ret = false;
         QueryBuilder<SysMenu> queryBuilder = new GenQueryBuilder<>();
         QueryWrapper<SysMenu> queryWrapper = queryBuilder.build();
         queryWrapper.eq(HumpUtil.humpToUnderline(MyBatisConstants.FIELD_PARENT_ID), parentId);
         List<SysMenu> menuList = super.findList(queryWrapper);
-        for (SysMenu sysMenu : menuList) {
-            super.delete(sysMenu.getId());
+        for (SysMenu child : menuList) {
+            // 删除菜单数据
+            super.delete(child.getId());
+            // 移除权限数据
+            iRoleMenuRefService.delPermsByMenuIds(Convert.toList(String.class, child.getId()));
             // 逐级删除子数据
-            this.deleteByParentId(sysMenu.getId());
+            ret = this.deleteByParentId(child.getId());
         }
+        return ret;
     }
 
     // ============
@@ -232,6 +270,21 @@ public class MenuServiceImpl extends CrudServiceImpl<MenuMapper, SysMenu, MenuMo
                 }
             }
         }
+
+        // 菜单有变动 直接刷新超级管理员 菜单缓存
+        UserModel adminUser = UserUtil.getUserByUserName(UserUtil.SUPER_ADMIN);
+        if(adminUser != null){
+            cacheCount += 2;
+            cacheRet = UserUtil.refreshUserAllPerms(adminUser.getId());
+            if(cacheRet){
+                cacheCount--;
+            }
+            cacheRet = UserUtil.refreshUserMenus(adminUser.getId());
+            if(cacheRet){
+                cacheCount--;
+            }
+        }
+
         // 判断删除状态
         if(cacheCount != 0){
             // 删除缓存失败

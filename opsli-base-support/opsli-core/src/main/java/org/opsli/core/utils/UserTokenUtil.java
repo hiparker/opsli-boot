@@ -187,7 +187,7 @@ public class UserTokenUtil {
             return;
         }
         try {
-            // 获得要推出用户
+            // 获得要退出用户
             String userId = getUserIdByToken(token);
             UserModel user = UserUtil.getUser(userId);
             if(user != null){

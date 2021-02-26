@@ -15,6 +15,7 @@
  */
 package org.opsli.modulars.system.menu.web;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.lang.tree.Tree;
 import cn.hutool.core.lang.tree.TreeNodeConfig;
@@ -34,6 +35,7 @@ import org.opsli.api.wrapper.system.user.UserModel;
 import org.opsli.common.annotation.ApiRestController;
 import org.opsli.common.annotation.EnableLog;
 import org.opsli.common.annotation.RequiresPermissionsCus;
+import org.opsli.common.exception.ServiceException;
 import org.opsli.common.utils.WrapperUtil;
 import org.opsli.core.base.controller.BaseRestController;
 import org.opsli.core.general.StartPrint;
@@ -72,42 +74,31 @@ public class MenuRestController extends BaseRestController<SysMenu, MenuModel, I
 
     /**
      * 根据 获得用户 菜单 - 权限
+     * 判断是否是超级管理员，如果是 则显示全部菜单 否则显示有权限菜单
+     *
      * @return ResultVo
      */
     @ApiOperation(value = "根据 获得用户 菜单 - 权限", notes = "根据 获得用户 菜单 - 权限")
     @Override
     public ResultVo<?> getMenuAndPermsTree() {
-        // 菜单集合
-        List<MenuModel> menuModelList = null;
-        QueryBuilder<SysMenu> queryBuilder = new GenQueryBuilder<>();
-        // 判断是否是超级管理员，如果是 则显示全部菜单 否则显示有权限菜单
         UserModel user = UserUtil.getUser();
 
-        // 获得全量数据
-        if(StringUtils.equals(UserUtil.SUPER_ADMIN, user.getUsername())){
-            List<SysMenu> menuList = IService.findList(queryBuilder.build());
-            menuModelList = WrapperUtil.transformInstance(menuList, modelClazz);
-        }else {
-            List<MenuModel> menuListByUserId = UserUtil.getMenuListByUserId(user.getId());
-            if(menuListByUserId != null){
-                // 这里有 ehcache的坑 需要深克隆再操作
-                menuModelList = WrapperUtil.cloneTransformInstance(menuListByUserId
-                        ,modelClazz);
-            }
-
-            List<String> perms = UserUtil.getUserAllPermsByUserId(user.getId());
-            if(perms != null){
-                QueryWrapper<SysMenu> wrapper = queryBuilder.build();
-                wrapper.in("menu_code", perms);
-                List<SysMenu> sysMenus = IService.findList(wrapper);
-                List<MenuModel> menuModels = WrapperUtil.transformInstance(sysMenus, modelClazz);
-                if(menuModelList != null){
-                    menuModelList.addAll(menuModels);
-                }
-            }
+        // 获得当前用户菜单
+        List<MenuModel> menuModelList = UserUtil.getMenuListByUserId(user.getId());
+        if(CollUtil.isEmpty(menuModelList)){
+            // 用户暂无角色菜单，请设置后登录
+            throw new ServiceException(SystemMsg.EXCEPTION_USER_MENU_NOT_NULL);
         }
-        if(menuModelList == null){
-            return ResultVo.error("菜单为空");
+
+        // 获得当前用户权限
+        List<String> perms = UserUtil.getUserAllPermsByUserId(user.getId());
+        if(CollUtil.isNotEmpty(perms)){
+            QueryBuilder<SysMenu> queryBuilder = new GenQueryBuilder<>();
+            QueryWrapper<SysMenu> wrapper = queryBuilder.build();
+            wrapper.in("menu_code", perms);
+            List<SysMenu> sysMenus = IService.findList(wrapper);
+            List<MenuModel> menuModels = WrapperUtil.transformInstance(sysMenus, MenuModel.class);
+            menuModelList.addAll(menuModels);
         }
 
         //配置
@@ -149,6 +140,9 @@ public class MenuRestController extends BaseRestController<SysMenu, MenuModel, I
 
     /**
      * 当前登陆用户菜单
+     *
+     * 判断是否是超级管理员，如果是 则显示全部菜单 否则显示有权限菜单
+     *
      * @return ResultVo
      */
     @ApiOperation(value = "当前登陆用户菜单", notes = "当前登陆用户菜单")
@@ -158,11 +152,9 @@ public class MenuRestController extends BaseRestController<SysMenu, MenuModel, I
 
         // 获得用户 对应菜单
         List<MenuModel> menuList = UserUtil.getMenuListByUserId(user.getId());
-
-        if(menuList == null){
-            return ResultVo.error(
-                    SystemMsg.EXCEPTION_USER_MENU_NOT_NULL.getCode(),
-                    SystemMsg.EXCEPTION_USER_MENU_NOT_NULL.getMessage());
+        if(CollUtil.isEmpty(menuList)){
+            // 用户暂无角色菜单，请设置后登录
+            throw new ServiceException(SystemMsg.EXCEPTION_USER_MENU_NOT_NULL);
         }
 
         // 这里有坑 如果 为 菜单数据 且 组件(Component)地址为空 不会跳转到主页 也不报错

@@ -98,23 +98,21 @@ public class SysAreaServiceImpl extends CrudServiceImpl<SysAreaMapper, SysArea, 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean delete(String id) {
-        boolean ret = super.delete(id);
-        // 删除子数据
+        // 先删除子数据
         this.deleteByParentId(id);
 
-        return ret;
+        return super.delete(id);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean deleteAll(String[] ids) {
-        boolean ret = super.deleteAll(ids);
-        // 删除子数据
+        // 先删除子数据
         for (String id : ids) {
             this.deleteByParentId(id);
         }
 
-        return ret;
+        return super.deleteAll(ids);
     }
 
     /**
