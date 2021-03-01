@@ -453,6 +453,8 @@ public class DictUtil {
                 dictWrapperModel.setTypeCode(typeCode);
                 dictWrapperModel.setDictName(model.getDictName());
                 dictWrapperModel.setDictValue(model.getDictValue());
+                dictWrapperModel.setDictValue(model.getDictValue());
+                dictWrapperModel.setModel(model);
                 dictWrapperModels.add(dictWrapperModel);
             }
          }
