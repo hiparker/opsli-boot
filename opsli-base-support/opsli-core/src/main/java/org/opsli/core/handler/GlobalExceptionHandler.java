@@ -82,9 +82,9 @@ public class GlobalExceptionHandler {
      * 拦截 业务异常
      */
     @ExceptionHandler(ServiceException.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public ResultVo<?> bussinessException(ServiceException e) {
+    public ResultVo<?> businessException(ServiceException e) {
         log.warn("业务异常 - 异常编号：{} - 异常信息：{}",e.getCode(),e.getMessage());
         return ResultVo.error(e.getCode(), e.getMessage());
     }
@@ -93,7 +93,7 @@ public class GlobalExceptionHandler {
      * 拦截 自定义 空异常
      */
     @ExceptionHandler(EmptyException.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public ResultVo<?> emptyException(EmptyException e) {
         return ResultVo.error(e.getCode(), e.getMessage());
@@ -103,7 +103,7 @@ public class GlobalExceptionHandler {
      * 拦截 自定义 Jwt 认证异常
      */
     @ExceptionHandler(JwtException.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public ResultVo<?> jwtException(JwtException e) {
         return ResultVo.error(e.getCode(), e.getMessage());
@@ -124,7 +124,7 @@ public class GlobalExceptionHandler {
      * 拦截 自定义 Shiro 认证异常
      */
     @ExceptionHandler(LockedAccountException.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public ResultVo<?> lockedAccountException(LockedAccountException e) {
         // 账号已被锁定,请联系管理员
@@ -135,7 +135,7 @@ public class GlobalExceptionHandler {
      * 拦截 自定义 Shiro 认证异常
      */
     @ExceptionHandler(AuthorizationException.class)
-    @ResponseStatus(HttpStatus.NOT_ACCEPTABLE)
+    @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public ResultVo<?> authorizationException(AuthorizationException e) {
         // 无权访问该方法
@@ -148,7 +148,7 @@ public class GlobalExceptionHandler {
      * 拦截 自定义 Shiro 认证异常
      */
     @ExceptionHandler(UnsupportedTokenException.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public ResultVo<?> unsupportedTokenException(UnsupportedTokenException e) {
         // 找不到认证授权器
@@ -162,7 +162,7 @@ public class GlobalExceptionHandler {
      * 拦截 自定义 Token 认证异常
      */
     @ExceptionHandler(TokenException.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public ResultVo<?> tokenException(TokenException e) {
         // Token 异常
