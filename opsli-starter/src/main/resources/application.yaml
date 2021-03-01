@@ -210,4 +210,4 @@ opsli:
   # Excel
   excel:
     # Excel 最大导出操作数量 防止OOM  -1为无限制
-    export-max-count: 50000
+    export-max-count: 100000
