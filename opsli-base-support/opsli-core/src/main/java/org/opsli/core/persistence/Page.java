@@ -19,13 +19,12 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.github.pagehelper.PageSerializable;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.opsli.api.base.warpper.ApiWrapper;
 import org.opsli.core.base.entity.BaseEntity;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * 分页类
@@ -106,11 +105,11 @@ public class Page<T extends BaseEntity,E extends ApiWrapper> extends PageSeriali
      * 获取bootstrap data分页数据
      * @return map对象
      */
-    public Map<String, Object> getBootstrapData(){
-        Map<String, Object> map = new HashMap<>(2);
-        map.put("rows", this.getList());
-        map.put("total", this.getTotal());
-        return map;
+    public Page.PageData getPageData(){
+        Page.PageData pageData = new PageData();
+        pageData.setRows(this.getList());
+        pageData.setTotal(this.getTotal());
+        return pageData;
     }
 
 
@@ -138,6 +137,23 @@ public class Page<T extends BaseEntity,E extends ApiWrapper> extends PageSeriali
 
     public void setQueryWrapper(QueryWrapper<T> queryWrapper) {
         this.queryWrapper = queryWrapper;
+    }
+
+
+    //////////////////////////////////////////////////////////
+
+    /**
+     * 分页对象
+     */
+    @Data
+    public static class PageData {
+
+        /** 条数 */
+        private Long total;
+
+        /** 行 */
+        private List rows;
+
     }
 
 }

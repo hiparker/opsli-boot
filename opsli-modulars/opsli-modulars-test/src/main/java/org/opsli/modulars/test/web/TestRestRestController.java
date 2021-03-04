@@ -271,7 +271,7 @@ public class TestRestRestController extends BaseRestController<TestEntity, TestM
         page.setQueryWrapper(queryBuilder.build());
         page = IService.findPage(page);
 
-        return ResultVo.success(page.getBootstrapData());
+        return ResultVo.success(page.getPageData());
     }
 
     @ApiOperation(value = "导出Excel", notes = "导出Excel")

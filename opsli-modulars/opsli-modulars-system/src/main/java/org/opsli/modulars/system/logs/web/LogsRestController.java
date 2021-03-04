@@ -81,7 +81,7 @@ public class LogsRestController extends BaseRestController<SysLogs, LogsModel, I
         page.setQueryWrapper(queryBuilder.build());
         page = IService.findPage(page);
 
-        return ResultVo.success(page.getBootstrapData());
+        return ResultVo.success(page.getPageData());
     }
 
 

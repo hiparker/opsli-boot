@@ -331,7 +331,7 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
             userModel.setSecretKey(null);
             userModel.setPassword(null);
         }
-        return ResultVo.success(page.getBootstrapData());
+        return ResultVo.success(page.getPageData());
     }
 
     /**

@@ -8,9 +8,7 @@
             count(0) as `count`
         from
         sys_org
-        <where>
-            ${ew.sqlSegment}
-        </where>
+        ${ew.customSqlSegment}
     </select>
 
     <select id="hasUse" parameterType="SysOrg" resultType="Integer">
@@ -18,9 +16,7 @@
             count(0)
         from
         sys_user_org_ref
-        <where>
-            ${ew.sqlSegment}
-        </where>
+        ${ew.customSqlSegment}
     </select>
 
 </mapper>

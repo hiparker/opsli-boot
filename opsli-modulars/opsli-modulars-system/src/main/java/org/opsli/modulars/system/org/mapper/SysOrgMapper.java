@@ -17,6 +17,7 @@ package org.opsli.modulars.system.org.mapper;
 
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.core.toolkit.Constants;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.opsli.core.base.entity.HasChildren;
@@ -39,13 +40,13 @@ public interface SysOrgMapper extends BaseMapper<SysOrg> {
      * 是否有下级
      * @return
      */
-    List<HasChildren> hasChildren(@Param("ew") Wrapper<SysOrg> wrapper);
+    List<HasChildren> hasChildren(@Param(Constants.WRAPPER) Wrapper wrapper);
 
 
     /**
      * 是否被引用
      * @return
      */
-    Integer hasUse(@Param("ew") Wrapper<SysOrg> wrapper);
+    Integer hasUse(@Param(Constants.WRAPPER) Wrapper wrapper);
 
 }

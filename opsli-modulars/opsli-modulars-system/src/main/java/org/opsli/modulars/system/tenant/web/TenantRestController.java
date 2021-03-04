@@ -91,7 +91,7 @@ public class TenantRestController extends BaseRestController<SysTenant, TenantMo
         page.setQueryWrapper(queryBuilder.build());
         page = IService.findPage(page);
 
-        return ResultVo.success(page.getBootstrapData());
+        return ResultVo.success(page.getPageData());
     }
 
     /**

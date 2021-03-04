@@ -46,9 +46,7 @@
         from
         sys_user a
         <include refid="joins"></include>
-        <where>
-            ${ew.sqlSegment}
-        </where>
+        ${ew.customSqlSegment}
     </select>
 
     <select id="queryAllPerms" resultType="String">

@@ -21,6 +21,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.opsli.common.constants.MyBatisConstants;
 import org.opsli.common.utils.HumpUtil;
 import org.opsli.core.base.entity.BaseEntity;
+import org.opsli.core.persistence.querybuilder.conf.WebQueryConf;
 
 import java.util.Map;
 
@@ -52,6 +53,8 @@ public class WebQueryBuilder<T extends BaseEntity> implements QueryBuilder<T>{
     private final Class<? extends BaseEntity> entityClazz;
     /** 默认排序字段 */
     private final String defaultOrderField;
+    /** 配置类 */
+    private WebQueryConf conf;
 
     /**
      * 构造函数 只是生产 查询器
@@ -68,6 +71,18 @@ public class WebQueryBuilder<T extends BaseEntity> implements QueryBuilder<T>{
      * 构造函数 只是生产 查询器
      * @param entityClazz Entity 的 clazz
      * @param parameterMap request 参数
+     */
+    public WebQueryBuilder(Class<T> entityClazz, Map<String, String[]> parameterMap, WebQueryConf conf){
+        this.parameterMap = parameterMap;
+        this.entityClazz = entityClazz;
+        this.defaultOrderField = MyBatisConstants.FIELD_UPDATE_TIME;
+        this.conf = conf;
+    }
+
+    /**
+     * 构造函数 只是生产 查询器
+     * @param entityClazz Entity 的 clazz
+     * @param parameterMap request 参数
      * @param defaultOrderField 默认排序字段
      */
     public WebQueryBuilder(Class<T> entityClazz, Map<String, String[]> parameterMap,
@@ -77,6 +92,22 @@ public class WebQueryBuilder<T extends BaseEntity> implements QueryBuilder<T>{
         this.defaultOrderField = defaultOrderField;
     }
 
+    /**
+     * 构造函数 只是生产 查询器
+     * @param entityClazz Entity 的 clazz
+     * @param parameterMap request 参数
+     * @param defaultOrderField 默认排序字段
+     * @param conf 配置
+     */
+    public WebQueryBuilder(Class<T> entityClazz, Map<String, String[]> parameterMap,
+                           String defaultOrderField, WebQueryConf conf){
+        this.parameterMap = parameterMap;
+        this.entityClazz = entityClazz;
+        this.defaultOrderField = defaultOrderField;
+        this.conf = conf;
+    }
+
+
     @Override
     public QueryWrapper<T> build() {
         QueryWrapper<T> queryWrapper = new QueryWrapper<>();
@@ -85,7 +116,7 @@ public class WebQueryBuilder<T extends BaseEntity> implements QueryBuilder<T>{
 
     /**
      * 创建 查询条件构造器
-     * @return
+     * @return QueryWrapper
      */
     private  <T extends BaseEntity> QueryWrapper<T> createQueryWrapper(QueryWrapper<T> queryWrapper){
         if(this.parameterMap == null){
@@ -106,16 +137,18 @@ public class WebQueryBuilder<T extends BaseEntity> implements QueryBuilder<T>{
             if(keyHandle.length < 2){
                 continue;
             }
+
+            // 键
+            String key = keyHandle[0];
+            // 操作
+            String handle = keyHandle[1];
+
             // 判断 字段是否合法
-            boolean hasField = this.validationField(keyHandle);
+            boolean hasField = this.validationField(key);
             if(hasField){
                 // 验证操作是否合法
-                boolean hasHandle = this.validationHandle(keyHandle);
+                boolean hasHandle = this.validationHandle(handle);
                 if(hasHandle){
-                    // 操作
-                    String handle = keyHandle[1];
-                    // 键
-                    String key = keyHandle[0];
                     // 处理值
                     String value = values[0];
                     // 赋值
@@ -130,7 +163,21 @@ public class WebQueryBuilder<T extends BaseEntity> implements QueryBuilder<T>{
         // 如果没有排序 默认按照 修改时间倒叙排序
         if(orderCount == 0){
             if(StringUtils.isNotEmpty(this.defaultOrderField)){
-                queryWrapper.orderByDesc(HumpUtil.humpToUnderline(this.defaultOrderField));
+                String key = this.defaultOrderField;
+                String keyStr = null;
+                if(conf != null){
+                    keyStr = conf.get(key);
+                }
+
+                // 检测 Conf 配置中是否已经指定该配置
+                if(StringUtils.isNotEmpty(keyStr)){
+                    key = keyStr;
+                }else{
+                    // 转换驼峰 为 数据库下划线字段
+                    key = HumpUtil.humpToUnderline(key);
+                }
+
+                queryWrapper.orderByDesc(key);
             }
         }
         return queryWrapper;
@@ -150,8 +197,19 @@ public class WebQueryBuilder<T extends BaseEntity> implements QueryBuilder<T>{
         ){
             return;
         }
-        // 转换驼峰 为 数据库下划线字段
-        key = HumpUtil.humpToUnderline(key);
+        String keyStr = null;
+        if(conf != null){
+            keyStr = conf.get(key);
+        }
+
+        // 检测 Conf 配置中是否已经指定该配置
+        if(StringUtils.isNotEmpty(keyStr)){
+            key = keyStr;
+        }else{
+            // 转换驼峰 为 数据库下划线字段
+            key = HumpUtil.humpToUnderline(key);
+        }
+
         switch (handle) {
             case EQ:
                 // 全值匹配
@@ -186,37 +244,50 @@ public class WebQueryBuilder<T extends BaseEntity> implements QueryBuilder<T>{
 
     /**
      * 检测 字段是否合法
-     * @param keyHandle
-     * @return
+     * @param key key值
+     * @return boolean
      */
-    private boolean validationField(String[] keyHandle){
-        if(entityClazz == null || keyHandle == null || StringUtils.isEmpty(keyHandle[0])){
+    private boolean validationField(String key){
+        if(StringUtils.isEmpty(key)){
             return false;
         }
+
+        boolean ret;
+        // 先判断 conf 文件中是否包含 改 key
+        if(conf != null){
+            ret = conf.hashKey(key);
+            if(ret){
+                return true;
+            }
+        }
+
+        // entity 对象是否为空
+        if(entityClazz == null){
+            return false;
+        }
+
         // 判断当前传入参数 是否是Entity的字段
-        return ReflectUtil.hasField(entityClazz, keyHandle[0]);
+        return ReflectUtil.hasField(entityClazz, key);
     }
 
 
     /**
      * 检测 操作是否合法
-     * @param keyHandle
-     * @return
+     * @param handle 操作
+     * @return boolean
      */
-    private boolean validationHandle(String[] keyHandle){
-        if(keyHandle == null || StringUtils.isEmpty(keyHandle[1])){
+    private boolean validationHandle(String handle){
+        if(StringUtils.isEmpty(handle)){
             return false;
         }
-        String handle = keyHandle[1];
-        if (EQ.equals(handle)) {
-            return true;
-        } else if (LIKE.equals(handle)) {
-            return true;
-        } else if (BEGIN.equals(handle)) {
-            return true;
-        } else if (END.equals(handle)) {
-            return true;
+        switch (handle) {
+            case EQ:
+            case END:
+            case LIKE:
+            case BEGIN:
+                return true;
+            default:
+                return ORDER.equals(handle);
         }
-        return ORDER.equals(handle);
     }
 }

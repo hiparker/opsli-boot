@@ -9,9 +9,7 @@
             count(0) as `count`
         from
         sys_area
-        <where>
-            ${ew.sqlSegment}
-        </where>
+        ${ew.customSqlSegment}
     </select>
 
 

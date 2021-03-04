@@ -97,7 +97,7 @@ public class SysOptionsRestController extends BaseRestController<SysOptions, Opt
         page.setQueryWrapper(queryBuilder.build());
         page = IService.findPage(page);
 
-        return ResultVo.success(page.getBootstrapData());
+        return ResultVo.success(page.getPageData());
     }
 
     /**

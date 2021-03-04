@@ -17,6 +17,7 @@ package org.opsli.modulars.system.area.mapper;
 
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.core.toolkit.Constants;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.opsli.core.base.entity.HasChildren;
@@ -39,6 +40,6 @@ public interface SysAreaMapper extends BaseMapper<SysArea> {
      * 是否有下级
      * @return List
      */
-    List<HasChildren> hasChildren(@Param("ew") Wrapper<SysArea> wrapper);
+    List<HasChildren> hasChildren(@Param(Constants.WRAPPER) Wrapper wrapper);
 
 }
