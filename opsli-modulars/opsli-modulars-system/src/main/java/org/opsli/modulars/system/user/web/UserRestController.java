@@ -21,6 +21,7 @@ import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.ReflectUtil;
+import cn.hutool.core.util.StrUtil;
 import com.alibaba.excel.util.CollectionUtils;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.google.common.collect.Lists;
@@ -44,7 +45,6 @@ import org.opsli.common.exception.TokenException;
 import org.opsli.common.utils.HumpUtil;
 import org.opsli.common.utils.WrapperUtil;
 import org.opsli.core.base.controller.BaseRestController;
-import org.opsli.core.msg.CoreMsg;
 import org.opsli.core.msg.TokenMsg;
 import org.opsli.core.persistence.Page;
 import org.opsli.core.persistence.querybuilder.GenQueryBuilder;
@@ -460,7 +460,9 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
         UserModel userModel = IService.queryByUserName(username);
         if(userModel == null){
             // 暂无该用户
-            throw new ServiceException(SystemMsg.EXCEPTION_USER_NULL);
+            throw new ServiceException(SystemMsg.EXCEPTION_USER_NULL.getCode(),
+                    StrUtil.format(SystemMsg.EXCEPTION_USER_NULL.getMessage(), username)
+            );
         }
         return ResultVo.success(userModel);
     }
