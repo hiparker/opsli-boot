@@ -16,16 +16,13 @@
 package org.opsli.common.utils;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.core.util.ReflectUtil;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -76,6 +73,10 @@ public final class WrapperUtil {
      * @return M
      */
     public static <T,M> M transformInstance(Object source, Class<M> target, boolean isClone){
+        if(source == null){
+            return null;
+        }
+
         if(isClone){
             source = ObjectUtil.cloneByStream(source);
         }
@@ -99,6 +100,10 @@ public final class WrapperUtil {
      * @return List<M>
      */
     public static <T,M> List<M> transformInstance(Collection<T> source, Class<M> target, boolean isClone){
+        if(CollUtil.isEmpty(source)){
+            return null;
+        }
+
         if(isClone){
             source = ObjectUtil.cloneByStream(source);
         }
