@@ -23,7 +23,7 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
-import org.opsli.common.api.TokenThreadLocal;
+import org.opsli.core.api.TokenThreadLocal;
 import org.opsli.common.exception.ServiceException;
 import org.opsli.core.utils.LogUtil;
 import org.opsli.core.utils.UserTokenUtil;
