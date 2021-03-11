@@ -59,6 +59,9 @@ public class UserUtil {
     public static final String PREFIX_ID_MENUS = "userId:menus:";
     public static final String PREFIX_USERNAME = "username:";
 
+    /** 修改租户权限 */
+    private static final String PERMS_TENANT = "system_user_tenant";
+
     /** 用户Service */
     private static UserApi userApi;
 
@@ -584,6 +587,23 @@ public class UserUtil {
             return null;
         }
         return user.getTenantId();
+    }
+
+    /**
+     * 是否有修改租户的权限
+     * @param currUser model
+     * @return boolean
+     */
+    public static boolean isHasUpdateTenantPerms(final UserModel currUser){
+        // 排除超级管理员
+        if(UserUtil.SUPER_ADMIN.equals(currUser.getUsername())){
+            return true;
+        }
+
+        // 获得当前用户权限
+        List<String> userAllPermsByUserId = UserUtil.getUserAllPermsByUserId(currUser.getId());
+        return !CollUtil.isEmpty(userAllPermsByUserId) &&
+                userAllPermsByUserId.contains(PERMS_TENANT);
     }
 
     /**

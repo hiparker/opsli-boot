@@ -24,7 +24,10 @@ import org.opsli.common.constants.MyBatisConstants;
 import org.opsli.common.enums.DictType;
 import org.opsli.common.exception.ServiceException;
 import org.opsli.core.base.service.impl.CrudServiceImpl;
+import org.opsli.core.persistence.querybuilder.GenQueryBuilder;
+import org.opsli.core.persistence.querybuilder.QueryBuilder;
 import org.opsli.core.persistence.querybuilder.chain.TenantHandler;
+import org.opsli.core.utils.UserUtil;
 import org.opsli.modulars.system.SystemMsg;
 import org.opsli.modulars.system.role.entity.SysRole;
 import org.opsli.modulars.system.role.mapper.RoleMapper;
@@ -60,6 +63,14 @@ public class RoleServiceImpl extends CrudServiceImpl<RoleMapper, SysRole, RoleMo
             return null;
         }
 
+        // 判断用户是否有 修改租户的能力 (超级管理员除外)
+        if(StringUtils.isNotEmpty(model.getTenantId())){
+            // 如果没有租户修改能力 则清空对应字段
+            if(!UserUtil.isHasUpdateTenantPerms(UserUtil.getUser())){
+                model.setTenantId(null);
+            }
+        }
+
         // 唯一验证
         Integer count = this.uniqueVerificationByCode(model);
         if(count != null && count > 0){
@@ -75,6 +86,14 @@ public class RoleServiceImpl extends CrudServiceImpl<RoleMapper, SysRole, RoleMo
     public RoleModel update(RoleModel model) {
         if(model == null){
             return null;
+        }
+
+        // 判断用户是否有 修改租户的能力 (超级管理员除外)
+        if(StringUtils.isNotEmpty(model.getTenantId())){
+            // 如果没有租户修改能力 则清空对应字段
+            if(!UserUtil.isHasUpdateTenantPerms(UserUtil.getUser())){
+                model.setTenantId(null);
+            }
         }
 
         // 唯一验证
@@ -120,6 +139,33 @@ public class RoleServiceImpl extends CrudServiceImpl<RoleMapper, SysRole, RoleMo
         // 删除角色下 权限
         iRoleMenuRefService.delPermsByRoleIds(roleIds);
         return super.deleteAll(models);
+    }
+
+    @Override
+    public List<SysRole> findList(QueryWrapper<SysRole> queryWrapper) {
+        // 如果没有租户修改能力 则默认增加租户限制
+        if(!UserUtil.isHasUpdateTenantPerms(UserUtil.getUser())){
+            // 多租户处理
+            TenantHandler tenantHandler = new TenantHandler();
+            tenantHandler.handler(entityClazz, queryWrapper);
+        }
+
+        return super.list(queryWrapper);
+    }
+
+    @Override
+    public List<SysRole> findAllList() {
+        QueryBuilder<SysRole> queryBuilder = new GenQueryBuilder<>();
+        QueryWrapper<SysRole> queryWrapper = queryBuilder.build();
+
+        // 如果没有租户修改能力 则默认增加租户限制
+        if(!UserUtil.isHasUpdateTenantPerms(UserUtil.getUser())){
+            // 多租户处理
+            TenantHandler tenantHandler = new TenantHandler();
+            tenantHandler.handler(entityClazz, queryWrapper);
+        }
+
+        return super.list(queryWrapper);
     }
 
     /**
