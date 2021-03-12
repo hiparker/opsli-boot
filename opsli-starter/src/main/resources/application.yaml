@@ -183,6 +183,7 @@ opsli:
     # 超级管理员账号
     super-admin: system
     # 重置默认密码 密码至少包含大小写字母，数字，且不少于6位
+    # 优先使用 option 缓存， 如果缓存为空则使用配置文件
     default-pass: Aa123456
     # Token
     token:

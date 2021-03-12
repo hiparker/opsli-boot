@@ -109,6 +109,15 @@ public interface UserApi {
     @PostMapping("/resetPasswordById")
     ResultVo<?> resetPasswordById(String userId);
 
+    /**
+     * 锁定账户
+     *
+     * @param userId 用户ID
+     * @param locked 锁定状态
+     * @return ResultVo
+     */
+    @PostMapping("/lockAccount")
+    ResultVo<?> lockAccount(String userId, String locked);
 
     /**
      * 上传头像

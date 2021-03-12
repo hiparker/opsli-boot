@@ -24,6 +24,7 @@ import com.github.pagehelper.PageInfo;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
 import org.opsli.api.wrapper.system.menu.MenuModel;
+import org.opsli.api.wrapper.system.options.OptionsModel;
 import org.opsli.api.wrapper.system.user.UserAndOrgModel;
 import org.opsli.api.wrapper.system.user.UserModel;
 import org.opsli.api.wrapper.system.user.UserPassword;
@@ -38,13 +39,17 @@ import org.opsli.core.persistence.Page;
 import org.opsli.core.persistence.querybuilder.GenQueryBuilder;
 import org.opsli.core.persistence.querybuilder.QueryBuilder;
 import org.opsli.core.persistence.querybuilder.chain.TenantHandler;
+import org.opsli.core.utils.OptionsUtil;
 import org.opsli.core.utils.UserUtil;
 import org.opsli.modulars.system.SystemMsg;
 import org.opsli.modulars.system.menu.entity.SysMenu;
 import org.opsli.modulars.system.menu.service.IMenuService;
+import org.opsli.modulars.system.role.entity.SysRole;
+import org.opsli.modulars.system.role.service.IRoleService;
 import org.opsli.modulars.system.user.entity.SysUser;
 import org.opsli.modulars.system.user.entity.SysUserAndOrg;
 import org.opsli.modulars.system.user.mapper.UserMapper;
+import org.opsli.modulars.system.user.service.IUserRoleRefService;
 import org.opsli.modulars.system.user.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -67,6 +72,10 @@ public class UserServiceImpl extends CrudServiceImpl<UserMapper, SysUser, UserMo
     private UserMapper mapper;
     @Autowired
     private IMenuService iMenuService;
+    @Autowired
+    private IRoleService iRoleService;
+    @Autowired
+    private IUserRoleRefService iUserRoleRefService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -121,7 +130,33 @@ public class UserServiceImpl extends CrudServiceImpl<UserMapper, SysUser, UserMo
             this.update(updateWrapper);
         }
 
-        return super.insert(model);
+        UserModel insertModel = super.insert(model);
+
+        // 新增用户 设置默认角色
+        if(insertModel != null){
+            String defRole = null;
+            // 获得option 缓存中 角色编号
+            OptionsModel optionsModel = OptionsUtil.getOptionByCode("def_role");
+            if(optionsModel != null){
+                defRole = optionsModel.getOptionValue();
+            }
+
+            if(StringUtils.isNotBlank(defRole)){
+                QueryWrapper<SysRole> roleQueryWrapper = new QueryWrapper<>();
+                roleQueryWrapper.eq("role_code", defRole);
+                roleQueryWrapper.eq(
+                        HumpUtil.humpToUnderline(MyBatisConstants.FIELD_DELETE_LOGIC),
+                        DictType.NO_YES_NO.getCode());
+                SysRole sysRole = iRoleService.getOne(roleQueryWrapper);
+                if(sysRole != null){
+                    // 设置用户默认角色
+                    iUserRoleRefService.setRoles(insertModel.getId(),
+                            Convert.toStrArray(sysRole.getId()));
+                }
+            }
+        }
+
+        return insertModel;
     }
 
     @Override
@@ -160,6 +195,7 @@ public class UserServiceImpl extends CrudServiceImpl<UserMapper, SysUser, UserMo
         model.setPassword(null);
         model.setSecretKey(null);
         model.setLoginIp(null);
+        model.setLocked(null);
 
         UserModel update = super.update(model);
         if(update != null){
@@ -179,11 +215,38 @@ public class UserServiceImpl extends CrudServiceImpl<UserMapper, SysUser, UserMo
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
+    public boolean lockAccount(String userId, String locked) {
+        UserModel model = this.get(userId);
+        if(model == null){
+            return false;
+        }
+
+        UserModel currUser = UserUtil.getUser();
+        if(StringUtils.equals(currUser.getId(), userId)){
+            // 不可锁定自身
+            throw new ServiceException(SystemMsg.EXCEPTION_USER_LOCK_SELF);
+        }
+
+        UpdateWrapper<SysUser> updateWrapper = new UpdateWrapper<>();
+        updateWrapper.set("locked", locked).eq(
+                HumpUtil.humpToUnderline(MyBatisConstants.FIELD_ID), userId
+        );
+        if(this.update(updateWrapper)){
+            // 刷新用户缓存
+            this.clearCache(Collections.singletonList(model));
+            return true;
+        }
+        return false;
+    }
+
+    @Override
     public boolean delete(String id) {
         // 杜绝我删我自己行为
         UserModel currUser = UserUtil.getUser();
         if(StringUtils.equals(currUser.getId(), id)){
-            return false;
+            // 不可删除自身
+            throw new ServiceException(SystemMsg.EXCEPTION_USER_DEL_SELF);
         }
 
         UserModel userModel = super.get(id);
@@ -210,7 +273,8 @@ public class UserServiceImpl extends CrudServiceImpl<UserMapper, SysUser, UserMo
         // 杜绝我删我自己行为
         UserModel currUser = UserUtil.getUser();
         if(StringUtils.equals(currUser.getId(), userModel.getId())){
-            return false;
+            // 不可删除自身
+            throw new ServiceException(SystemMsg.EXCEPTION_USER_DEL_SELF);
         }
 
         boolean ret = super.delete(model);
@@ -232,7 +296,8 @@ public class UserServiceImpl extends CrudServiceImpl<UserMapper, SysUser, UserMo
         UserModel currUser = UserUtil.getUser();
         for (String id : ids) {
             if(StringUtils.equals(currUser.getId(), id)){
-                return false;
+                // 不可删除自身
+                throw new ServiceException(SystemMsg.EXCEPTION_USER_DEL_SELF);
             }
         }
 
@@ -266,7 +331,8 @@ public class UserServiceImpl extends CrudServiceImpl<UserMapper, SysUser, UserMo
         List<String> idList = Lists.newArrayListWithCapacity(models.size());
         for (UserModel model : models) {
             if(StringUtils.equals(currUser.getId(), model.getId())){
-                return false;
+                // 不可删除自身
+                throw new ServiceException(SystemMsg.EXCEPTION_USER_DEL_SELF);
             }
             idList.add(model.getId());
         }

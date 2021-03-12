@@ -101,7 +101,7 @@ public final class WrapperUtil {
      */
     public static <T,M> List<M> transformInstance(Collection<T> source, Class<M> target, boolean isClone){
         if(CollUtil.isEmpty(source)){
-            return null;
+            return Lists.newArrayList();
         }
 
         if(isClone){

@@ -89,7 +89,7 @@ public class RoleRestController extends BaseRestController<SysRole, RoleModel, I
      * @return ResultVo
      */
     @ApiOperation(value = "获得分页数据", notes = "获得分页数据 - 查询构造器")
-    @RequiresPermissions("system_role_select")
+    //@RequiresPermissions("system_role_select")
     @Override
     public ResultVo<?> findPage(Integer pageNo, Integer pageSize, HttpServletRequest request) {
 

@@ -131,13 +131,6 @@ public class SysOptionsServiceImpl extends CrudServiceImpl<SysOptionsMapper, Sys
                 throw new ServiceException(SystemMsg.EXCEPTION_OPTIONS_UPDATE);
             }
 
-            // 唯一验证
-            Integer count = this.uniqueVerificationByCode(optionsModel);
-            if(count != null && count > 0){
-                // 重复
-                throw new ServiceException(SystemMsg.EXCEPTION_OPTIONS_UNIQUE);
-            }
-
             // 设置值
             optionsModel.setOptionValue(value);
             optionsModel.setVersion(null);

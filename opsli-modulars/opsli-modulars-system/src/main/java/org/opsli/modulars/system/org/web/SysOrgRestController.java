@@ -22,11 +22,13 @@ import cn.hutool.core.lang.tree.TreeNodeConfig;
 import cn.hutool.core.lang.tree.TreeUtil;
 import cn.hutool.core.util.ReflectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.opsli.api.base.result.ResultVo;
 import org.opsli.api.web.system.org.SysOrgRestApi;
@@ -88,6 +90,7 @@ public class SysOrgRestController extends BaseRestController<SysOrg, SysOrgModel
         // 获得用户 对应菜单
         List<SysOrg> dataList = IService.findList(wrapper);
         List<SysOrgModel> orgModelList = WrapperUtil.transformInstance(dataList, modelClazz);
+
         // 0 为初始值
         if(PARENT_ID.equals(parentId)){
             // 显示全部

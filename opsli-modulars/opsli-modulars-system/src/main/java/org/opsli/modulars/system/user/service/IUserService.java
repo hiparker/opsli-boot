@@ -105,6 +105,14 @@ public interface IUserService extends CrudServiceInterface<SysUser, UserModel> {
 
 
     /**
+     * 锁定账户
+     * @param userId 用户ID
+     * @param locked 状态
+     * @return
+     */
+    boolean lockAccount(String userId, String locked);
+
+    /**
      * 查询分页数据 自定义
      *
      * @return  Page<T>

@@ -35,6 +35,7 @@ import org.opsli.api.wrapper.system.user.UserModel;
 import org.opsli.common.annotation.ApiRestController;
 import org.opsli.common.annotation.EnableLog;
 import org.opsli.common.annotation.RequiresPermissionsCus;
+import org.opsli.common.constants.MenuConstants;
 import org.opsli.common.exception.ServiceException;
 import org.opsli.common.utils.WrapperUtil;
 import org.opsli.core.base.controller.BaseRestController;
@@ -69,9 +70,6 @@ import java.util.Map;
 public class MenuRestController extends BaseRestController<SysMenu, MenuModel, IMenuService>
         implements MenuApi {
 
-    /** 外部链接值 */
-    private static final String EXTERNAL_LINKS_VAL = "3";
-
     /**
      * 根据 获得用户 菜单 - 权限
      * 判断是否是超级管理员，如果是 则显示全部菜单 否则显示有权限菜单
@@ -89,6 +87,14 @@ public class MenuRestController extends BaseRestController<SysMenu, MenuModel, I
             // 用户暂无角色菜单，请设置后登录
             throw new ServiceException(SystemMsg.EXCEPTION_USER_MENU_NOT_NULL);
         }
+
+        // 这里有坑 如果 为 菜单数据 且 组件(Component)地址为空 不会跳转到主页 也不报错
+        // 修复菜单问题导致无法跳转主页
+        menuModelList.removeIf(menuModel -> MenuConstants.MENU.equals(menuModel.getType()) &&
+                (StringUtils.isEmpty(menuModel.getComponent()) ||
+                        StringUtils.isEmpty(menuModel.getMenuCode()) ||
+                        StringUtils.isEmpty(menuModel.getUrl())
+                ));
 
         // 获得当前用户权限
         List<String> perms = UserUtil.getUserAllPermsByUserId(user.getId());
@@ -117,7 +123,7 @@ public class MenuRestController extends BaseRestController<SysMenu, MenuModel, I
                     tree.setName(treeNode.getMenuName());
                     // 扩展属性 ...
                     // 不是外链 则处理组件
-                    if(!EXTERNAL_LINKS_VAL.equals(treeNode.getType())){
+                    if(!MenuConstants.EXTERNAL.equals(treeNode.getType())){
                         tree.putExtra("component", treeNode.getComponent());
                     }
                     tree.putExtra("type", treeNode.getType());
@@ -128,7 +134,7 @@ public class MenuRestController extends BaseRestController<SysMenu, MenuModel, I
                     metaMap.put("title", treeNode.getMenuName());
                     metaMap.put("icon", treeNode.getIcon());
                     // 外链处理
-                    if(EXTERNAL_LINKS_VAL.equals(treeNode.getType())){
+                    if(MenuConstants.EXTERNAL.equals(treeNode.getType())){
                         metaMap.put("target", "_blank");
                         metaMap.put("badge", "New");
                     }
@@ -159,7 +165,7 @@ public class MenuRestController extends BaseRestController<SysMenu, MenuModel, I
 
         // 这里有坑 如果 为 菜单数据 且 组件(Component)地址为空 不会跳转到主页 也不报错
         // 修复菜单问题导致无法跳转主页
-        menuList.removeIf(menuModel -> "1".equals(menuModel.getType()) &&
+        menuList.removeIf(menuModel -> MenuConstants.MENU.equals(menuModel.getType()) &&
                 (StringUtils.isEmpty(menuModel.getComponent()) ||
                  StringUtils.isEmpty(menuModel.getMenuCode()) ||
                 StringUtils.isEmpty(menuModel.getUrl())
@@ -181,7 +187,7 @@ public class MenuRestController extends BaseRestController<SysMenu, MenuModel, I
                     tree.setName(treeNode.getMenuCode());
                     // 扩展属性 ...
                     // 不是外链 则处理组件
-                    if(!EXTERNAL_LINKS_VAL.equals(treeNode.getType())){
+                    if(!MenuConstants.EXTERNAL.equals(treeNode.getType())){
                         tree.putExtra("component", treeNode.getComponent());
                     }else{
                         // 如果是外链 则判断是否存在 BASE_PATH
@@ -200,7 +206,7 @@ public class MenuRestController extends BaseRestController<SysMenu, MenuModel, I
                     metaMap.put("title", treeNode.getMenuName());
                     metaMap.put("icon", treeNode.getIcon());
                     // 外链处理
-                    if(EXTERNAL_LINKS_VAL.equals(treeNode.getType())){
+                    if(MenuConstants.EXTERNAL.equals(treeNode.getType())){
                         metaMap.put("target", "_blank");
                     }
                     tree.putExtra("meta", metaMap);

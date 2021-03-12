@@ -20,8 +20,17 @@ public enum DictType {
         this.code = code;
     }
 
-
     public String getCode(){
         return this.code;
+    }
+
+    public static DictType getType(String code) {
+        DictType[] var1 = values();
+        for (DictType type : var1) {
+            if (type.code.equalsIgnoreCase(code)) {
+                return type;
+            }
+        }
+        return null;
     }
 }

@@ -35,11 +35,13 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.opsli.api.base.result.ResultVo;
 import org.opsli.api.web.system.user.UserApi;
 import org.opsli.api.wrapper.system.menu.MenuModel;
+import org.opsli.api.wrapper.system.options.OptionsModel;
 import org.opsli.api.wrapper.system.user.*;
 import org.opsli.common.annotation.ApiRestController;
 import org.opsli.common.annotation.EnableLog;
 import org.opsli.common.annotation.RequiresPermissionsCus;
 import org.opsli.common.constants.MyBatisConstants;
+import org.opsli.common.enums.DictType;
 import org.opsli.common.exception.ServiceException;
 import org.opsli.common.exception.TokenException;
 import org.opsli.common.utils.HumpUtil;
@@ -50,6 +52,7 @@ import org.opsli.core.persistence.Page;
 import org.opsli.core.persistence.querybuilder.GenQueryBuilder;
 import org.opsli.core.persistence.querybuilder.QueryBuilder;
 import org.opsli.core.persistence.querybuilder.WebQueryBuilder;
+import org.opsli.core.utils.OptionsUtil;
 import org.opsli.core.utils.OrgUtil;
 import org.opsli.core.utils.UserUtil;
 import org.opsli.modulars.system.SystemMsg;
@@ -259,8 +262,17 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
         // 演示模式 不允许操作
         super.demoError();
 
+        // 配置文件默认密码
+        String defPass = globalProperties.getAuth().getDefaultPass();
+
+        // 缓存默认密码 优先缓存
+        OptionsModel optionsModel = OptionsUtil.getOptionByCode("def_pass");
+        if(optionsModel != null){
+            defPass = optionsModel.getOptionValue();
+        }
+
         UserPassword userPassword = new UserPassword();
-        userPassword.setNewPassword(globalProperties.getAuth().getDefaultPass());
+        userPassword.setNewPassword(defPass);
         userPassword.setUserId(userId);
 
         boolean resetPasswordFlag = IService.resetPassword(userPassword);
@@ -268,8 +280,35 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
             return ResultVo.error("重置密码失败");
         }
 
-        return ResultVo.success("重置密码成功！默认密码为：" + globalProperties.getAuth().getDefaultPass());
+        return ResultVo.success("重置密码成功！默认密码为：" + defPass);
     }
+
+    /**
+     * 锁定账户
+     * @return ResultVo
+     */
+    @ApiOperation(value = "锁定账户", notes = "锁定账户")
+    @RequiresPermissions("system_user_lockAccount")
+    @EnableLog
+    @Override
+    public ResultVo<?> lockAccount(String userId, String locked) {
+        // 演示模式 不允许操作
+        super.demoError();
+
+        DictType dictType = DictType.getType(locked);
+        if(dictType == null){
+            // 非法参数
+            throw new ServiceException(SystemMsg.EXCEPTION_USER_ILLEGAL_PARAMETER);
+        }
+
+        // 锁定账户
+        boolean lockAccountFlag = IService.lockAccount(userId, locked);
+        if(!lockAccountFlag){
+            return ResultVo.error("锁定账户失败");
+        }
+        return ResultVo.success();
+    }
+
 
     /**
      * 用户信息 查一条
