@@ -31,6 +31,8 @@ public enum ValiArgsType {
     IS_GENERAL,
     /** 数字 */
     IS_NUMBER,
+    /** 小数浮点 */
+    IS_DECIMAL,
     /** 纯字母 */
     IS_LETTER,
     /** 大写 */

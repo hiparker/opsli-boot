@@ -132,6 +132,18 @@ public final class ValidationUtil {
                             throw new ServiceException(msg);
                         }
                         break;
+                    // 小数浮点
+                    case IS_DECIMAL:
+                        if(StringUtils.isEmpty(value)){
+                            break;
+                        }
+                        boolean decimal = Validator.isMoney(value);
+                        if(!decimal){
+                            ValidationMsg msg = ValidationMsg.EXCEPTION_IS_DECIMAL;
+                            msg.setFieldName(fieldName);
+                            throw new ServiceException(msg);
+                        }
+                        break;
                     // 纯字母
                     case IS_LETTER:
                         if(StringUtils.isEmpty(value)){
