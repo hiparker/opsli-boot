@@ -2,6 +2,7 @@ package org.opsli.core.listener;
 
 import lombok.extern.slf4j.Slf4j;
 import org.opsli.core.general.StartPrint;
+import org.opsli.core.utils.OptionsUtil;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
@@ -19,6 +20,9 @@ public class ApplicationReadyEventListener implements ApplicationListener<Applic
     @Override
     public void onApplicationEvent(ApplicationReadyEvent event) {
         event.getApplicationContext();
+        // 加载配置参数
+        OptionsUtil.loadAllOption();
+        // 输出启动日志
         StartPrint.getInstance().successPrint();
     }
 

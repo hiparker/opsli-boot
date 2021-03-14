@@ -256,6 +256,47 @@ public class OptionsUtil {
     }
 
     /**
+     * 加载配置文件到缓存中
+     * @return boolean
+     */
+    public static boolean loadAllOption(){
+        try {
+            // 分布式加锁
+            if(!DistributedLockUtil.lock(PREFIX_CODE)){
+                // 无法申领分布式锁
+                log.error(CoreMsg.REDIS_EXCEPTION_LOCK.getMessage());
+                return false;
+            }
+
+            // 数据库查询数据
+            ResultVo<List<OptionsModel>> optionsApiAll = optionsApi.findAll();
+            if(optionsApiAll.isSuccess()){
+                // 处理数据
+                Map<String, OptionsModel> optionsModelMap = convertOptionsMap(optionsApiAll.getData());
+                if(CollUtil.isNotEmpty(optionsModelMap)){
+                    // 保存至缓存
+                    for (Map.Entry<String, OptionsModel> entry : optionsModelMap.entrySet()) {
+                        String optionCode = entry.getKey();
+                        OptionsModel model = entry.getValue();
+                        CacheUtil.putHash(PREFIX_CODE, optionCode, model);
+                    }
+
+                    // 返回数据
+                    return true;
+                }
+            }
+        }catch (Exception e){
+            log.error(e.getMessage(),e);
+            return false;
+        }finally {
+            // 释放锁
+            DistributedLockUtil.unlock(PREFIX_CODE);
+        }
+        return false;
+    }
+
+
+    /**
      * 处理缓存参数数据
      * @param optionsMap List
      * @return List

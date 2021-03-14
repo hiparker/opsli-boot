@@ -34,7 +34,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.request.RequestAttributes;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 import static org.opsli.common.constants.OrderConstants.UTIL_ORDER;
@@ -75,6 +79,19 @@ public class UserUtil {
     public static UserModel getUser(){
         String token = TokenThreadLocal.get();
 
+        // 如果 token 为空 则尝试去 request 获取
+        if(StringUtils.isEmpty(token)){
+            try {
+                RequestAttributes ra = RequestContextHolder.getRequestAttributes();
+                ServletRequestAttributes sra = (ServletRequestAttributes) ra;
+                if (sra != null) {
+                    HttpServletRequest request = sra.getRequest();
+                    token = UserTokenUtil.getRequestToken(request);
+                }
+            }catch (Exception ignored){}
+        }
+
+        // 如果还是没获取到token 则抛出异常
         if(StringUtils.isEmpty(token)){
             // Token失效，请重新登录
             throw new TokenException(TokenMsg.EXCEPTION_TOKEN_LOSE_EFFICACY);

@@ -61,23 +61,30 @@ public class TokenAop {
     @Around("requestMapping()")
     public Object tokenAop(ProceedingJoinPoint point) throws Throwable {
 
-        // 将 Token放入 线程缓存
-        try {
-            RequestAttributes ra = RequestContextHolder.getRequestAttributes();
-            ServletRequestAttributes sra = (ServletRequestAttributes) ra;
-            if(sra != null) {
-                HttpServletRequest request = sra.getRequest();
-                String requestToken = UserTokenUtil.getRequestToken(request);
-                if(StringUtils.isNotEmpty(requestToken)){
-                    // 放入当前线程缓存中
-                    TokenThreadLocal.put(requestToken);
+        // Token
+        String requestToken = TokenThreadLocal.get();
+
+        // 如果 ThreadLocal为空 则去当前request中获取
+        if(StringUtils.isEmpty(requestToken)){
+            // 将 Token放入 线程缓存
+            try {
+                RequestAttributes ra = RequestContextHolder.getRequestAttributes();
+                ServletRequestAttributes sra = (ServletRequestAttributes) ra;
+                if(sra != null) {
+                    HttpServletRequest request = sra.getRequest();
+                    requestToken = UserTokenUtil.getRequestToken(request);
+                    if(StringUtils.isNotEmpty(requestToken)){
+                        // 放入当前线程缓存中
+                        TokenThreadLocal.put(requestToken);
+                    }
                 }
+            }catch (ServiceException e){
+                throw e;
+            }catch (Exception e){
+                log.error(e.getMessage(),e);
             }
-        }catch (ServiceException e){
-            throw e;
-        }catch (Exception e){
-            log.error(e.getMessage(),e);
         }
+
 
         // 计时器
         TimeInterval timer = DateUtil.timer();
@@ -96,8 +103,11 @@ public class TokenAop {
             long timerCount = timer.interval();
             //保存日志
             LogUtil.saveLog(point, exception, timerCount);
+
             // 线程销毁时 删除 token
-            TokenThreadLocal.remove();
+            if(StringUtils.isNotEmpty(requestToken)){
+                TokenThreadLocal.remove();
+            }
         }
 
         return returnValue;
