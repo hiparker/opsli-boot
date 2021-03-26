@@ -13,8 +13,16 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.opsli.common.api;
+package org.opsli.core.api;
 
+
+import org.apache.commons.lang3.StringUtils;
+import org.opsli.core.utils.UserTokenUtil;
+import org.springframework.web.context.request.RequestAttributes;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * 用于存放当前线程下 Token
@@ -34,7 +42,24 @@ public class TokenThreadLocal {
     }
 
     public static String get() {
-        return TOKEN_DATA.get();
+
+        String token = TOKEN_DATA.get();
+
+        // 2021-03-10
+        // 这里纠正 Token 在被多聚合项目 aop切面 remove后 无法获得Token bug
+        // 如果 token 为空 则尝试去 request 获取
+        if(StringUtils.isEmpty(token)){
+            try {
+                RequestAttributes ra = RequestContextHolder.getRequestAttributes();
+                ServletRequestAttributes sra = (ServletRequestAttributes) ra;
+                if (sra != null) {
+                    HttpServletRequest request = sra.getRequest();
+                    token = UserTokenUtil.getRequestToken(request);
+                }
+            }catch (Exception ignored){}
+        }
+
+        return token;
     }
 
     public static void remove() {

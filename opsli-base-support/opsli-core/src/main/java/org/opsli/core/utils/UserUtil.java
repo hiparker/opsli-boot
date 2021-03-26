@@ -24,7 +24,7 @@ import org.opsli.api.base.result.ResultVo;
 import org.opsli.api.web.system.user.UserApi;
 import org.opsli.api.wrapper.system.menu.MenuModel;
 import org.opsli.api.wrapper.system.user.UserModel;
-import org.opsli.common.api.TokenThreadLocal;
+import org.opsli.core.api.TokenThreadLocal;
 import org.opsli.common.exception.TokenException;
 import org.opsli.core.autoconfigure.properties.GlobalProperties;
 import org.opsli.core.cache.local.CacheUtil;
@@ -34,11 +34,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
-import org.springframework.web.context.request.RequestAttributes;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
-
-import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 import static org.opsli.common.constants.OrderConstants.UTIL_ORDER;
@@ -78,18 +73,6 @@ public class UserUtil {
      */
     public static UserModel getUser(){
         String token = TokenThreadLocal.get();
-
-        // 如果 token 为空 则尝试去 request 获取
-        if(StringUtils.isEmpty(token)){
-            try {
-                RequestAttributes ra = RequestContextHolder.getRequestAttributes();
-                ServletRequestAttributes sra = (ServletRequestAttributes) ra;
-                if (sra != null) {
-                    HttpServletRequest request = sra.getRequest();
-                    token = UserTokenUtil.getRequestToken(request);
-                }
-            }catch (Exception ignored){}
-        }
 
         // 如果还是没获取到token 则抛出异常
         if(StringUtils.isEmpty(token)){

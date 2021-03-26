@@ -26,7 +26,7 @@ import org.opsli.api.wrapper.system.tenant.TenantModel;
 import org.opsli.api.wrapper.system.user.UserModel;
 import org.opsli.common.annotation.InterfaceCrypto;
 import org.opsli.common.annotation.Limiter;
-import org.opsli.common.api.TokenThreadLocal;
+import org.opsli.core.api.TokenThreadLocal;
 import org.opsli.common.enums.AlertType;
 import org.opsli.common.enums.OptionsType;
 import org.opsli.common.exception.TokenException;

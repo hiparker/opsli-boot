@@ -1,7 +1,6 @@
 package org.opsli.core.security.shiro.realm;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.io.IoUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.authc.*;
 import org.apache.shiro.authz.AuthorizationInfo;
@@ -9,7 +8,7 @@ import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.opsli.api.wrapper.system.user.UserModel;
-import org.opsli.common.api.TokenThreadLocal;
+import org.opsli.core.api.TokenThreadLocal;
 import org.opsli.common.exception.TokenException;
 import org.opsli.core.msg.TokenMsg;
 import org.opsli.core.security.shiro.token.JwtToken;
@@ -17,8 +16,6 @@ import org.opsli.core.utils.UserTokenUtil;
 import org.opsli.core.utils.UserUtil;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletResponse;
-import java.io.PrintWriter;
 import java.util.List;
 
 /**
