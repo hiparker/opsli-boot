@@ -203,7 +203,8 @@ public class UserServiceImpl extends CrudServiceImpl<UserMapper, SysUser, UserMo
             if(!StringUtils.equals(userModel.getMobile(), update.getMobile())){
                 UpdateWrapper<SysUser> updateWrapper = new UpdateWrapper<>();
                 updateWrapper.set("mobile", null);
-                updateWrapper.eq("mobile", update.getMobile());
+                updateWrapper.eq("mobile", model.getMobile());
+                updateWrapper.notIn(MyBatisConstants.FIELD_ID, update.getId());
                 this.update(updateWrapper);
             }
 
