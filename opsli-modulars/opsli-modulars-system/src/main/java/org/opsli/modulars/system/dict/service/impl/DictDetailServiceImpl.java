@@ -301,7 +301,7 @@ public class DictDetailServiceImpl extends CrudServiceImpl<DictDetailMapper, Sys
         QueryWrapper<SysDictDetail> wrapper = new QueryWrapper<>();
 
         // name 唯一
-        wrapper.eq(MyBatisConstants.FIELD_DELETE_LOGIC,  DictType.NO_YES_NO.getCode())
+        wrapper.eq(MyBatisConstants.FIELD_DELETE_LOGIC,  DictType.NO_YES_NO.getValue())
                 .eq("type_code", model.getTypeCode());
 
         // 名称 或者 Val 重复

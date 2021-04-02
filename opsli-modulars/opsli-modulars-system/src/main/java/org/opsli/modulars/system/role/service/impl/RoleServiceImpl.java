@@ -181,7 +181,7 @@ public class RoleServiceImpl extends CrudServiceImpl<RoleMapper, SysRole, RoleMo
         QueryWrapper<SysRole> wrapper = new QueryWrapper<>();
 
         // code 唯一
-        wrapper.eq(MyBatisConstants.FIELD_DELETE_LOGIC,  DictType.NO_YES_NO.getCode())
+        wrapper.eq(MyBatisConstants.FIELD_DELETE_LOGIC,  DictType.NO_YES_NO.getValue())
                 .eq("role_code", model.getRoleCode());
 
         // 重复校验排除自身

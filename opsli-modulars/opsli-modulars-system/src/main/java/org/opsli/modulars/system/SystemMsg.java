@@ -63,7 +63,7 @@ public enum SystemMsg implements BaseMsg {
     EXCEPTION_USER_FILE_NULL(20310,"请选择文件"),
     EXCEPTION_USER_ILLEGAL_PARAMETER(20311,"非法参数"),
     EXCEPTION_USER_LOCK_SELF(20312,"不可锁定自身"),
-    EXCEPTION_USER_DEL_SELF(20312,"不可删除自身"),
+    EXCEPTION_USER_DEL_SELF(20313,"不可删除自身"),
 
 
     /**

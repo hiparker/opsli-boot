@@ -295,8 +295,7 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
         // 演示模式 不允许操作
         super.demoError();
 
-        DictType dictType = DictType.getType(locked);
-        if(dictType == null){
+        if(!DictType.hasDict(DictType.NO_YES_YES.getType(), locked)){
             // 非法参数
             throw new ServiceException(SystemMsg.EXCEPTION_USER_ILLEGAL_PARAMETER);
         }
@@ -304,7 +303,7 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
         // 锁定账户
         boolean lockAccountFlag = IService.lockAccount(userId, locked);
         if(!lockAccountFlag){
-            return ResultVo.error("锁定账户失败");
+            return ResultVo.error("变更用户状态账户失败");
         }
         return ResultVo.success();
     }

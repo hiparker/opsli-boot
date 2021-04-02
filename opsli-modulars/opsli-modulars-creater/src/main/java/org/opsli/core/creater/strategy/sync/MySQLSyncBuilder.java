@@ -157,11 +157,11 @@ public class MySQLSyncBuilder implements SyncStrategy {
             }
 
             // 判断是否为主键
-            if(DictType.NO_YES_YES.getCode().equals(tmp.getIzPk())){
+            if(DictType.NO_YES_YES.getValue().equals(tmp.getIzPk())){
                 str.append(" ").append("PRIMARY KEY");
             }else{
                 // 判断是否非空
-                if(DictType.NO_YES_YES.getCode().equals(tmp.getIzNotNull())){
+                if(DictType.NO_YES_YES.getValue().equals(tmp.getIzNotNull())){
                     str.append(" ").append("NOT NULL");
                 }
             }

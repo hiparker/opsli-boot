@@ -146,7 +146,7 @@ public class UserServiceImpl extends CrudServiceImpl<UserMapper, SysUser, UserMo
                 roleQueryWrapper.eq("role_code", defRole);
                 roleQueryWrapper.eq(
                         HumpUtil.humpToUnderline(MyBatisConstants.FIELD_DELETE_LOGIC),
-                        DictType.NO_YES_NO.getCode());
+                        DictType.NO_YES_NO.getValue());
                 SysRole sysRole = iRoleService.getOne(roleQueryWrapper);
                 if(sysRole != null){
                     // 设置用户默认角色
@@ -599,7 +599,7 @@ public class UserServiceImpl extends CrudServiceImpl<UserMapper, SysUser, UserMo
 
         // 逻辑删除 查询未删除数据
         queryWrapper.eq(
-                HumpUtil.humpToUnderline(MyBatisConstants.FIELD_DELETE_LOGIC), DictType.NO_YES_NO.getCode());
+                HumpUtil.humpToUnderline(MyBatisConstants.FIELD_DELETE_LOGIC), DictType.NO_YES_NO.getValue());
 
         return mapper.findList(queryWrapper);
     }
@@ -641,7 +641,7 @@ public class UserServiceImpl extends CrudServiceImpl<UserMapper, SysUser, UserMo
         QueryWrapper<SysUser> wrapper = new QueryWrapper<>();
 
         // no 唯一
-        wrapper.eq(MyBatisConstants.FIELD_DELETE_LOGIC,  DictType.NO_YES_NO.getCode())
+        wrapper.eq(MyBatisConstants.FIELD_DELETE_LOGIC,  DictType.NO_YES_NO.getValue())
                 .eq("no", model.getNo());
 
         // 重复校验排除自身
@@ -665,7 +665,7 @@ public class UserServiceImpl extends CrudServiceImpl<UserMapper, SysUser, UserMo
         QueryWrapper<SysUser> wrapper = new QueryWrapper<>();
 
         // name 唯一
-        wrapper.eq(MyBatisConstants.FIELD_DELETE_LOGIC,  DictType.NO_YES_NO.getCode())
+        wrapper.eq(MyBatisConstants.FIELD_DELETE_LOGIC,  DictType.NO_YES_NO.getValue())
                 .eq("username", model.getUsername());
 
         // 重复校验排除自身

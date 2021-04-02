@@ -80,7 +80,7 @@ public class TableServiceImpl extends CrudServiceImpl<TableMapper, CreaterTable,
         if(!model.getIzApi()){
             // 新增后 默认未同步
             model.setIzSync(
-                    DictType.NO_YES_NO.getCode());
+                    DictType.NO_YES_NO.getValue());
         }
 
         // 默认旧表名称为当前新增名称（用于删除表操作）
@@ -108,7 +108,7 @@ public class TableServiceImpl extends CrudServiceImpl<TableMapper, CreaterTable,
 
         // 修改后 默认未同步
         model.setIzSync(
-                DictType.NO_YES_NO.getCode());
+                DictType.NO_YES_NO.getValue());
 
         // 默认旧表名称为 修改前表名 便于改表后删除操作
         model.setOldTableName(oldModel.getTableName());

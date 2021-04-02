@@ -284,7 +284,7 @@ public enum JavaCodeBuilder {
                 StringBuilder stb = new StringBuilder();
                 boolean izNotNull = false;
                 // 如果非空 则开启非空验证
-                if(DictType.NO_YES_YES.getCode().equals(columnModel.getIzNotNull())){
+                if(DictType.NO_YES_YES.getValue().equals(columnModel.getIzNotNull())){
                     izNotNull = true;
                     stb.append("ValiArgsType.").append(ValiArgsType.IS_NOT_NULL);
                 }

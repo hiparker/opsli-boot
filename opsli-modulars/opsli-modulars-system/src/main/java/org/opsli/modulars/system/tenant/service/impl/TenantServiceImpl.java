@@ -212,7 +212,7 @@ public class TenantServiceImpl extends CrudServiceImpl<TenantMapper, SysTenant, 
         QueryWrapper<SysTenant> wrapper = new QueryWrapper<>();
 
         // name 唯一
-        wrapper.eq(MyBatisConstants.FIELD_DELETE_LOGIC, DictType.NO_YES_NO.getCode())
+        wrapper.eq(MyBatisConstants.FIELD_DELETE_LOGIC, DictType.NO_YES_NO.getValue())
                 .eq("tenant_name", model.getTenantName());
 
         // 重复校验排除自身

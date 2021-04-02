@@ -216,7 +216,7 @@ public class SysOrgServiceImpl extends CrudServiceImpl<SysOrgMapper, SysOrg, Sys
             return null;
         }
         QueryWrapper<SysOrg> wrapper = new QueryWrapper<>();
-        wrapper.eq(MyBatisConstants.FIELD_DELETE_LOGIC,  DictType.NO_YES_NO.getCode())
+        wrapper.eq(MyBatisConstants.FIELD_DELETE_LOGIC,  DictType.NO_YES_NO.getValue())
                 .eq("org_code", model.getOrgCode());
 
         // 重复校验排除自身
@@ -245,7 +245,7 @@ public class SysOrgServiceImpl extends CrudServiceImpl<SysOrgMapper, SysOrg, Sys
         QueryWrapper<SysOrg> wrapper = new QueryWrapper<>();
 
         wrapper.in(HumpUtil.humpToUnderline(MyBatisConstants.FIELD_PARENT_ID), parentIds)
-                .eq(MyBatisConstants.FIELD_DELETE_LOGIC,  DictType.NO_YES_NO.getCode())
+                .eq(MyBatisConstants.FIELD_DELETE_LOGIC,  DictType.NO_YES_NO.getValue())
                 .groupBy(HumpUtil.humpToUnderline(MyBatisConstants.FIELD_PARENT_ID));
 
         return mapper.hasChildren(wrapper);

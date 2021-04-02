@@ -76,7 +76,7 @@ public enum VueCodeBuilder {
         List<CreaterTableColumnModel> moreQueryList = new ArrayList<>();
         for (CreaterTableColumnModel createrTableColumnModel : columnList) {
             if (StringUtils.isNotBlank(createrTableColumnModel.getQueryType()) &&
-                    createrTableColumnModel.getIzShowList().equals(DictType.NO_YES_YES.getCode())
+                    createrTableColumnModel.getIzShowList().equals(DictType.NO_YES_YES.getValue())
             ) {
                 queryList.add(createrTableColumnModel);
             }
@@ -145,7 +145,7 @@ public enum VueCodeBuilder {
                 String[] validateTypes = validateType.split(",");
                 Set<String> validateTypeSet = new HashSet<>(Arrays.asList(validateTypes));
                 // 如果非空 则开启非空验证
-                if(DictType.NO_YES_YES.getCode().equals(columnModel.getIzNotNull())){
+                if(DictType.NO_YES_YES.getValue().equals(columnModel.getIzNotNull())){
                     validateTypeSet.add(ValiArgsType.IS_NOT_NULL.toString());
                 }
 
@@ -165,7 +165,7 @@ public enum VueCodeBuilder {
 
         // 处理数据
         if(columnList.size() == 1){
-            if(DictType.NO_YES_YES.getCode().equals(columnList.get(0).getIzShowForm()) &&
+            if(DictType.NO_YES_YES.getValue().equals(columnList.get(0).getIzShowForm()) &&
                 StringUtils.isNotBlank(columnList.get(0).getShowType())
                 ){
                 List<CreaterTableColumnModel> formTmpList = new ArrayList<>();
@@ -175,7 +175,7 @@ public enum VueCodeBuilder {
         }else{
             for (int i = 0; i < columnList.size(); i+=2) {
                 List<CreaterTableColumnModel> formTmpList = new ArrayList<>();
-                if(DictType.NO_YES_YES.getCode().equals(columnList.get(i).getIzShowForm()) &&
+                if(DictType.NO_YES_YES.getValue().equals(columnList.get(i).getIzShowForm()) &&
                         StringUtils.isNotBlank(columnList.get(i).getShowType())
                 ){
                     formTmpList.add(columnList.get(i));
