@@ -269,8 +269,11 @@ public class SysOptionsRestController extends BaseRestController<SysOptions, Opt
      */
     @Override
     public ResultVo<Map<String, OptionsModel>> findAllOptions() {
+        // 数据库查询数据
+        List<SysOptions> allList = IService.findAllList();
         return ResultVo.success(
-                OptionsUtil.findAllOptions()
+                OptionsUtil.convertOptionsMap(
+                        WrapperUtil.transformInstance(allList, OptionsModel.class))
         );
     }
 
