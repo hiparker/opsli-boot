@@ -8,7 +8,7 @@ spring:
   #redis 配置
   redis:
     database: 0
-    host: 127.0.0.1
+    host: 10.0.0.254
     password: '123456'
     port: 6379
 
@@ -50,7 +50,7 @@ redisson:
     server:
       enable: true
       type: standalone
-      address: "127.0.0.1:6379"
+      address: "10.0.0.254:6379"
       password: 123456
       database: 0
 

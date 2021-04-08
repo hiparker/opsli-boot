@@ -15,8 +15,11 @@
  */
 package org.opsli.common.thread.wait;
 
+import cn.hutool.core.collection.CollUtil;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -31,28 +34,37 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Slf4j
 public class AsyncProcessWaitExecutor {
 
-    /** 线程初始值 */
-    private final int initVal;
     /** 任务执行计数器 */
     private AtomicInteger count;
-    /** 门闩 线程锁 */
-    private CountDownLatch latch;
+    /** 任务队列 */
+    private final List<Runnable> taskList;
 
-    public AsyncProcessWaitExecutor(final int initVal){
-        this.initVal = initVal;
-        if(this.initVal > 0){
-            // 计数器
-            count = new AtomicInteger(this.initVal);
-            latch = new CountDownLatch(this.initVal);
-        }
+    public AsyncProcessWaitExecutor(){
+        taskList = new ArrayList<>();
     }
 
     /**
      * 执行
      * @param task 任务
      */
-    public void execute(final Runnable task){
-        if(this.initVal > 0){
+    public void put(final Runnable task){
+        taskList.add(task);
+    }
+
+    /**
+     * 执行 线程锁 等待查询结果 结果完成后继续执行
+     */
+    public void execute(){
+        if(CollUtil.isEmpty(this.taskList)){
+            return;
+        }
+
+        // 初始化锁参数
+        count = new AtomicInteger(this.taskList.size());
+        // 门闩 线程锁
+        CountDownLatch latch = new CountDownLatch(this.taskList.size());
+
+        for (Runnable task : this.taskList) {
             // 多线程执行任务
             boolean execute = AsyncProcessQueueWait.execute(task, count, latch);
             // 执行任务被拒绝 门闩减1 计数器不动 End
@@ -60,20 +72,12 @@ public class AsyncProcessWaitExecutor {
                 latch.countDown();
             }
         }
-    }
 
-
-    /**
-     * 线程锁 等待查询结果 结果完成后继续执行
-     */
-    public void await(){
-        if(this.initVal > 0){
-            // 线程锁 等待查询结果 结果完成后继续执行
-            try {
-                latch.await();
-            }catch (Exception e){
-                log.error(e.getMessage(), e);
-            }
+        // 线程锁 等待查询结果 结果完成后继续执行
+        try {
+            latch.await();
+        }catch (Exception e){
+            log.error(e.getMessage(), e);
         }
     }
 
@@ -81,11 +85,10 @@ public class AsyncProcessWaitExecutor {
      * 线程锁 等待查询结果 结果完成后继续执行
      */
     public boolean isSuccess(){
-        if(this.initVal > 0){
-            return count.get() == 0;
+        if(CollUtil.isEmpty(this.taskList)){
+            return true;
         }
-        return true;
+        return count.get() == 0;
     }
-
 
 }
