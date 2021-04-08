@@ -127,6 +127,17 @@ public interface TenantApi {
     @GetMapping("/importExcel/template")
     void importTemplate(HttpServletResponse response);
 
+
+    /**
+     * 变更租户状态
+     *
+     * @param tenantId 租户ID
+     * @param enable 状态
+     * @return ResultVo
+     */
+    @PostMapping("/enableTenant")
+    ResultVo<?> enableTenant(String tenantId, String enable);
+
     // =========================
 
     /**

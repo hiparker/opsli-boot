@@ -18,10 +18,12 @@ package org.opsli.modulars.system.tenant.service.impl;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.google.common.collect.Lists;
 
 import org.apache.commons.lang3.StringUtils;
 import org.opsli.api.wrapper.system.tenant.TenantModel;
+import org.opsli.api.wrapper.system.user.UserModel;
 import org.opsli.common.constants.MyBatisConstants;
 import org.opsli.common.enums.DictType;
 import org.opsli.common.exception.ServiceException;
@@ -29,6 +31,7 @@ import org.opsli.common.utils.HumpUtil;
 import org.opsli.core.base.service.impl.CrudServiceImpl;
 import org.opsli.core.msg.CoreMsg;
 import org.opsli.core.utils.TenantUtil;
+import org.opsli.core.utils.UserUtil;
 import org.opsli.modulars.system.SystemMsg;
 import org.opsli.modulars.system.tenant.entity.SysTenant;
 import org.opsli.modulars.system.tenant.mapper.TenantMapper;
@@ -59,6 +62,32 @@ public class TenantServiceImpl extends CrudServiceImpl<TenantMapper, SysTenant, 
 
     @Autowired
     private IUserService iUserService;
+
+    @Override
+    public boolean enableTenant(String tenantId, String enable) {
+        TenantModel model = this.get(tenantId);
+        if(model == null){
+            return false;
+        }
+
+        String currTenantId = UserUtil.getTenantId();
+        if(StringUtils.equals(currTenantId, tenantId)){
+            // 不可操作自身
+            throw new ServiceException(SystemMsg.EXCEPTION_TENANT_HANDLE_SELF);
+
+        }
+
+        UpdateWrapper<SysTenant> updateWrapper = new UpdateWrapper<>();
+        updateWrapper.set("enable", enable)
+                .eq(
+                    HumpUtil.humpToUnderline(MyBatisConstants.FIELD_ID), tenantId);
+        if(this.update(updateWrapper)){
+            // 清除缓存
+            this.clearCache(Collections.singletonList(tenantId));
+            return true;
+        }
+        return false;
+    }
 
     @Override
     @Transactional(rollbackFor = Exception.class)

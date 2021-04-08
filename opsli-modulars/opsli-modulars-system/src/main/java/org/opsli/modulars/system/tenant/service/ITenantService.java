@@ -30,4 +30,14 @@ import org.opsli.modulars.system.tenant.entity.SysTenant;
 public interface ITenantService extends CrudServiceInterface<SysTenant, TenantModel> {
 
 
+    /**
+     * 变更租户状态
+     *
+     * @param tenantId 租户ID
+     * @param enable 启用状态
+     * @return boolean
+     */
+    boolean enableTenant(String tenantId, String enable);
+
+
 }

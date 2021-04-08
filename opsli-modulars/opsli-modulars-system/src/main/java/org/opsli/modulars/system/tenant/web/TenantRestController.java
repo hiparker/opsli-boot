@@ -29,12 +29,15 @@ import org.opsli.api.wrapper.system.tenant.TenantModel;
 import org.opsli.common.annotation.ApiRestController;
 import org.opsli.common.annotation.EnableLog;
 import org.opsli.common.annotation.RequiresPermissionsCus;
+import org.opsli.common.enums.DictType;
+import org.opsli.common.exception.ServiceException;
 import org.opsli.common.utils.WrapperUtil;
 import org.opsli.core.base.controller.BaseRestController;
 import org.opsli.core.persistence.Page;
 import org.opsli.core.persistence.querybuilder.GenQueryBuilder;
 import org.opsli.core.persistence.querybuilder.QueryBuilder;
 import org.opsli.core.persistence.querybuilder.WebQueryBuilder;
+import org.opsli.modulars.system.SystemMsg;
 import org.opsli.modulars.system.tenant.entity.SysTenant;
 import org.opsli.modulars.system.tenant.service.ITenantService;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
@@ -57,6 +60,31 @@ import java.lang.reflect.Method;
 public class TenantRestController extends BaseRestController<SysTenant, TenantModel, ITenantService>
         implements TenantApi {
 
+
+    /**
+     * 变更租户状态账户
+     * @return ResultVo
+     */
+    @ApiOperation(value = "变更租户状态账户", notes = "变更租户状态账户")
+    @RequiresPermissions("system_tenant_enable")
+    @EnableLog
+    @Override
+    public ResultVo<?> enableTenant(String tenantId, String enable) {
+        // 演示模式 不允许操作
+        super.demoError();
+
+        if(!DictType.hasDict(DictType.NO_YES_YES.getType(), enable)){
+            // 非法参数
+            throw new ServiceException(SystemMsg.EXCEPTION_USER_ILLEGAL_PARAMETER);
+        }
+
+        // 变更租户状态账户
+        boolean enableStatus = IService.enableTenant(tenantId, tenantId);
+        if(!enableStatus){
+            return ResultVo.error("变更用户状态账户失败");
+        }
+        return ResultVo.success();
+    }
 
     /**
      * 租户 查一条

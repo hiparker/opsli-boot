@@ -71,6 +71,8 @@ public enum SystemMsg implements BaseMsg {
      */
     EXCEPTION_TENANT_UNIQUE(20400,"租户名称重复，该租户已存在"),
     EXCEPTION_TENANT_USED_DEL(20401,"该租户正在被其他用户绑定，无法删除"),
+    EXCEPTION_TENANT_HANDLE_SELF(20402,"不可操作自身"),
+
 
     /**
      * 组织机构
