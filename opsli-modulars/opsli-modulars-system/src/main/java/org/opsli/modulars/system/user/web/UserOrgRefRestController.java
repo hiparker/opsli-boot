@@ -40,7 +40,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @CreateTime: 2020-09-13 17:40
  * @Description: 用户组织
  */
-@Api(tags = "用户组织")
+@Api(tags = UserOrgRefApi.TITLE)
 @Slf4j
 @ApiRestController("/sys/user/org")
 public class UserOrgRefRestController implements UserOrgRefApi {

@@ -46,7 +46,7 @@ import org.opsli.api.web.gentest.carinfo.TestCarRestApi;
 * @CreateTime: 2020-12-20 20:12:57
 * @Description: 汽车信息 Controller
 */
-@Api(tags = "汽车信息")
+@Api(tags = TestCarRestApi.TITLE)
 @Slf4j
 @ApiRestController("/gentest/carinfo")
 public class TestCarRestController extends BaseRestController<TestCar, TestCarModel, ITestCarService>
@@ -173,7 +173,7 @@ public class TestCarRestController extends BaseRestController<TestCar, TestCarMo
         // 当前方法
         Method method = ReflectUtil.getMethodByName(this.getClass(), "exportExcel");
         QueryBuilder<TestCar> queryBuilder = new WebQueryBuilder<>(entityClazz, request.getParameterMap());
-        super.excelExport(TestCarRestApi.TITLE, queryBuilder.build(), response, method);
+        super.excelExport(TestCarRestApi.SUB_TITLE, queryBuilder.build(), response, method);
     }
 
     /**
@@ -202,7 +202,7 @@ public class TestCarRestController extends BaseRestController<TestCar, TestCarMo
     public void importTemplate(HttpServletResponse response) {
         // 当前方法
         Method method = ReflectUtil.getMethodByName(this.getClass(), "importTemplate");
-        super.importTemplate(TestCarRestApi.TITLE, response, method);
+        super.importTemplate(TestCarRestApi.SUB_TITLE, response, method);
     }
 
 }

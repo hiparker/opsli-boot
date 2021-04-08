@@ -150,7 +150,7 @@ public class TestRestController extends BaseRestController<TestEntity, TestModel
         // 当前方法
         Method method = ReflectUtil.getMethodByName(this.getClass(), "exportExcel");
         QueryBuilder<TestEntity> queryBuilder = new WebQueryBuilder<>(entityClazz, request.getParameterMap());
-        super.excelExport(TestRestApi.TITLE, queryBuilder.build(), response, method);
+        super.excelExport(TestRestApi.SUB_TITLE, queryBuilder.build(), response, method);
     }
 
     /**
@@ -177,7 +177,7 @@ public class TestRestController extends BaseRestController<TestEntity, TestModel
     public void importTemplate(HttpServletResponse response) {
         // 当前方法
         Method method = ReflectUtil.getMethodByName(this.getClass(), "importTemplate");
-        super.importTemplate(TestRestApi.TITLE, response, method);
+        super.importTemplate(TestRestApi.SUB_TITLE, response, method);
     }
 
 

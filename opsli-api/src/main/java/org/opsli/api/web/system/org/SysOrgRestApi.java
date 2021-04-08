@@ -44,7 +44,9 @@ import org.opsli.api.wrapper.system.org.SysOrgModel;
 public interface SysOrgRestApi {
 
     /** 标题 */
-    String TITLE = "组织机构";
+    String TITLE = "组织机构管理";
+    /** 子标题 */
+    String SUB_TITLE = "组织机构";
 
 
     @GetMapping("/findTreeLazyByUser")

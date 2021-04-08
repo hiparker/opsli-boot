@@ -44,7 +44,9 @@ import javax.servlet.http.HttpServletResponse;
 public interface SysAreaRestApi {
 
     /** 标题 */
-    String TITLE = "地域";
+    String TITLE = "地域管理";
+    /** 子标题 */
+    String SUB_TITLE = "地域";
 
     /**
     * 组织机构表 查一条

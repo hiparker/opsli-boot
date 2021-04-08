@@ -46,7 +46,9 @@ import javax.servlet.http.HttpServletResponse;
 public interface TableApi {
 
     /** 标题 */
-    String TITLE = "代码生成器 - 表";
+    String TITLE = "代码生成器-表";
+    /** 子标题 */
+    String SUB_TITLE = "代码生成器-表";
 
     /**
      * 表 查一条

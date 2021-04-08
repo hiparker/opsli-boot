@@ -43,7 +43,9 @@ import javax.servlet.http.HttpServletResponse;
 public interface CreaterLogsApi {
 
     /** 标题 */
-    String TITLE = "代码生成器 - 生成记录";
+    String TITLE = "代码生成器-日志";
+    /** 子标题 */
+    String SUB_TITLE = "代码生成器-日志";
 
     /**
      * 生成记录 查一条

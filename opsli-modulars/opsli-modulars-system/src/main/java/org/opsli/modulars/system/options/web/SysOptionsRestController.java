@@ -57,7 +57,7 @@ import java.util.Map;
 *
 * @author Parker
 */
-@Api(tags = "系统参数")
+@Api(tags = OptionsApi.TITLE)
 @Slf4j
 @ApiRestController("/sys/options")
 public class SysOptionsRestController extends BaseRestController<SysOptions, OptionsModel, ISysOptionsService>
@@ -213,7 +213,7 @@ public class SysOptionsRestController extends BaseRestController<SysOptions, Opt
         // 当前方法
         Method method = ReflectUtil.getMethodByName(this.getClass(), "exportExcel");
         QueryBuilder<SysOptions> queryBuilder = new WebQueryBuilder<>(entityClazz, request.getParameterMap());
-        super.excelExport(OptionsApi.TITLE, queryBuilder.build(), response, method);
+        super.excelExport(OptionsApi.SUB_TITLE, queryBuilder.build(), response, method);
     }
 
     /**
@@ -241,7 +241,7 @@ public class SysOptionsRestController extends BaseRestController<SysOptions, Opt
     public void importTemplate(HttpServletResponse response) {
         // 当前方法
         Method method = ReflectUtil.getMethodByName(this.getClass(), "importTemplate");
-        super.importTemplate(OptionsApi.TITLE, response, method);
+        super.importTemplate(OptionsApi.SUB_TITLE, response, method);
     }
 
     // =========================

@@ -52,7 +52,10 @@ import java.util.Map;
 public interface OptionsApi {
 
     /** 标题 */
-    String TITLE = "系统参数";
+    String TITLE = "系统参数管理";
+    /** 子标题 */
+    String SUB_TITLE = "系统参数";
+
 
     /**
     * 系统参数 查一条

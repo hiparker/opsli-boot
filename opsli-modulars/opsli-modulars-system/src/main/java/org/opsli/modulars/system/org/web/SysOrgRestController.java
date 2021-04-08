@@ -44,6 +44,7 @@ import org.opsli.core.base.entity.HasChildren;
 import org.opsli.core.persistence.querybuilder.GenQueryBuilder;
 import org.opsli.core.persistence.querybuilder.QueryBuilder;
 import org.opsli.core.persistence.querybuilder.WebQueryBuilder;
+import org.opsli.core.utils.TreeBuildUtil;
 import org.opsli.modulars.system.org.entity.SysOrg;
 import org.opsli.modulars.system.org.service.ISysOrgService;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
@@ -62,7 +63,7 @@ import java.util.Set;
 * @CreateTime: 2020-11-28 18:59:59
 * @Description: 组织机构表 Controller
 */
-@Api(tags = "组织机构管理")
+@Api(tags = SysOrgRestApi.TITLE)
 @Slf4j
 @ApiRestController("/sys/org")
 public class SysOrgRestController extends BaseRestController<SysOrg, SysOrgModel, ISysOrgService>
@@ -74,6 +75,10 @@ public class SysOrgRestController extends BaseRestController<SysOrg, SysOrgModel
     public static final String ORG_ALL = "all";
     /** 未分组 */
     public static final String ORG_NULL = "org_null";
+    /** 排序字段 */
+    private static final String SORT_FIELD = "sortNo";
+    /** 是否包含子集 */
+    private static final String HAS_CHILDREN = "hasChildren";
 
     /**
      * 获得组织树 懒加载
@@ -91,77 +96,26 @@ public class SysOrgRestController extends BaseRestController<SysOrg, SysOrgModel
         List<SysOrg> dataList = IService.findList(wrapper);
         List<SysOrgModel> orgModelList = WrapperUtil.transformInstance(dataList, modelClazz);
 
-        // 0 为初始值
-        if(PARENT_ID.equals(parentId)){
-            // 显示全部
-            SysOrgModel orgAll = new SysOrgModel();
-            orgAll.setId(ORG_ALL);
-            orgAll.setOrgCode("-2");
-            orgAll.setOrgName("全部");
-            orgAll.setOrgType("-2");
-            orgAll.setParentId("0");
-            orgAll.setSortNo(-2);
-            orgModelList.add(orgAll);
-
-            // 未分组
-            SysOrgModel orgNull = new SysOrgModel();
-            orgNull.setId(ORG_NULL);
-            orgNull.setOrgCode("-1");
-            orgNull.setOrgName("未分组");
-            orgNull.setOrgType("-1");
-            orgNull.setParentId("0");
-            orgNull.setSortNo(-1);
-            orgModelList.add(orgNull);
-        }
+        // 处理展示节点
+        this.handleShowNodes(parentId, orgModelList);
 
         //配置
         TreeNodeConfig treeNodeConfig = new TreeNodeConfig();
         // 自定义属性名 都要默认值的
-        treeNodeConfig.setWeightKey("sortNo");
-        treeNodeConfig.setNameKey("orgName");
+        treeNodeConfig.setWeightKey(SORT_FIELD);
         // 最大递归深度 最多支持4层菜单
         treeNodeConfig.setDeep(3);
 
         //转换器
-        List<Tree<String>> treeNodes = TreeUtil.build(orgModelList, parentId, treeNodeConfig,
-                (treeNode, tree) -> {
-                    tree.setId(treeNode.getId());
-                    tree.setParentId(treeNode.getParentId());
-                    tree.setWeight(treeNode.getSortNo());
-                    tree.setName(treeNode.getOrgName());
-                    // 扩展属性 ...
-                    // 不是外链 则处理组件
-                    tree.putExtra("orgCode", treeNode.getOrgCode());
-                    tree.putExtra("orgType", treeNode.getOrgType());
-                    tree.putExtra("version", treeNode.getVersion());
-                    tree.putExtra("tenantId", treeNode.getTenantId());
-                });
+        List<Tree<Object>> treeNodes = TreeBuildUtil.INSTANCE.build(orgModelList, parentId, treeNodeConfig);
 
-        Set<String> parentIds = Sets.newHashSet();
-        for (Tree<String> treeNode : treeNodes) {
-            parentIds.add(treeNode.getId());
-        }
-
-        // 数据排查是否存在下级
-        List<HasChildren> hasChildrenList = IService.hasChildren(parentIds);
-        if(CollUtil.isNotEmpty(hasChildrenList)){
-            Map<String, Boolean> tmp = Maps.newHashMap();
-            for (HasChildren hasChildren : hasChildrenList) {
-                if(hasChildren.getCount() != null && hasChildren.getCount() > 0){
-                    tmp.put(hasChildren.getParentId(), true);
-                }
-            }
-
-            for (Tree<String> treeNode : treeNodes) {
-                Boolean tmpFlag = tmp.get(treeNode.getId());
-                if(tmpFlag != null && tmpFlag){
-                    treeNode.putExtra("hasChildren", true);
-                }
-            }
-        }
+        // 处理是否包含子集
+        this.handleTreeHasChildren(treeNodes);
 
         return ResultVo.success(treeNodes);
     }
+
+
 
 
     /**
@@ -184,48 +138,15 @@ public class SysOrgRestController extends BaseRestController<SysOrg, SysOrgModel
         //配置
         TreeNodeConfig treeNodeConfig = new TreeNodeConfig();
         // 自定义属性名 都要默认值的
-        treeNodeConfig.setWeightKey("sortNo");
-        treeNodeConfig.setNameKey("orgName");
+        treeNodeConfig.setWeightKey(SORT_FIELD);
         // 最大递归深度 最多支持4层菜单
         treeNodeConfig.setDeep(3);
 
         //转换器
-        List<Tree<String>> treeNodes = TreeUtil.build(orgModelList, parentId, treeNodeConfig,
-                (treeNode, tree) -> {
-                    tree.setId(treeNode.getId());
-                    tree.setParentId(treeNode.getParentId());
-                    tree.setWeight(treeNode.getSortNo());
-                    tree.setName(treeNode.getOrgName());
-                    // 扩展属性 ...
-                    // 不是外链 则处理组件
-                    tree.putExtra("orgCode", treeNode.getOrgCode());
-                    tree.putExtra("orgType", treeNode.getOrgType());
-                    tree.putExtra("version", treeNode.getVersion());
-                    tree.putExtra("tenantId", treeNode.getTenantId());
-                });
+        List<Tree<Object>> treeNodes = TreeBuildUtil.INSTANCE.build(orgModelList, parentId, treeNodeConfig);
 
-        Set<String> parentIds = Sets.newHashSet();
-        for (Tree<String> treeNode : treeNodes) {
-            parentIds.add(treeNode.getId());
-        }
-
-        // 数据排查是否存在下级
-        List<HasChildren> hasChildrenList = IService.hasChildren(parentIds);
-        if(CollUtil.isNotEmpty(hasChildrenList)){
-            Map<String, Boolean> tmp = Maps.newHashMap();
-            for (HasChildren hasChildren : hasChildrenList) {
-                if(hasChildren.getCount() != null && hasChildren.getCount() > 0){
-                    tmp.put(hasChildren.getParentId(), true);
-                }
-            }
-
-            for (Tree<String> treeNode : treeNodes) {
-                Boolean tmpFlag = tmp.get(treeNode.getId());
-                if(tmpFlag != null && tmpFlag){
-                    treeNode.putExtra("hasChildren", true);
-                }
-            }
-        }
+        // 处理是否包含子集
+        this.handleTreeHasChildren(treeNodes);
 
         return ResultVo.success(treeNodes);
     }
@@ -250,25 +171,12 @@ public class SysOrgRestController extends BaseRestController<SysOrg, SysOrgModel
         //配置
         TreeNodeConfig treeNodeConfig = new TreeNodeConfig();
         // 自定义属性名 都要默认值的
-        treeNodeConfig.setWeightKey("sortNo");
-        treeNodeConfig.setNameKey("orgName");
+        treeNodeConfig.setWeightKey(SORT_FIELD);
         // 最大递归深度 最多支持4层菜单
         treeNodeConfig.setDeep(3);
 
         //转换器
-        List<Tree<String>> treeNodes = TreeUtil.build(orgModelList, parentId, treeNodeConfig,
-                (treeNode, tree) -> {
-                    tree.setId(treeNode.getId());
-                    tree.setParentId(treeNode.getParentId());
-                    tree.setWeight(treeNode.getSortNo());
-                    tree.setName(treeNode.getOrgName());
-                    // 扩展属性 ...
-                    // 不是外链 则处理组件
-                    tree.putExtra("orgCode", treeNode.getOrgCode());
-                    tree.putExtra("orgType", treeNode.getOrgType());
-                    tree.putExtra("version", treeNode.getVersion());
-                    tree.putExtra("tenantId", treeNode.getTenantId());
-                });
+        List<Tree<Object>> treeNodes = TreeBuildUtil.INSTANCE.build(orgModelList, parentId, treeNodeConfig);
 
         return ResultVo.success(treeNodes);
     }
@@ -310,25 +218,12 @@ public class SysOrgRestController extends BaseRestController<SysOrg, SysOrgModel
         //配置
         TreeNodeConfig treeNodeConfig = new TreeNodeConfig();
         // 自定义属性名 都要默认值的
-        treeNodeConfig.setWeightKey("sortNo");
-        treeNodeConfig.setNameKey("orgName");
+        treeNodeConfig.setWeightKey(SORT_FIELD);
         // 最大递归深度 最多支持4层菜单
         treeNodeConfig.setDeep(3);
 
         //转换器
-        List<Tree<String>> treeNodes = TreeUtil.build(dataList, "0", treeNodeConfig,
-                (treeNode, tree) -> {
-                    tree.setId(treeNode.getId());
-                    tree.setParentId(treeNode.getParentId());
-                    tree.setWeight(treeNode.getSortNo());
-                    tree.setName(treeNode.getOrgName());
-                    // 扩展属性 ...
-                    // 不是外链 则处理组件
-                    tree.putExtra("orgCode", treeNode.getOrgCode());
-                    tree.putExtra("orgType", treeNode.getOrgType());
-                    tree.putExtra("version", treeNode.getVersion());
-                    tree.putExtra("tenantId", treeNode.getTenantId());
-                });
+        List<Tree<Object>> treeNodes = TreeBuildUtil.INSTANCE.build(dataList, treeNodeConfig);
 
         return ResultVo.success(treeNodes);
     }
@@ -421,7 +316,7 @@ public class SysOrgRestController extends BaseRestController<SysOrg, SysOrgModel
         // 当前方法
         Method method = ReflectUtil.getMethodByName(this.getClass(), "exportExcel");
         QueryBuilder<SysOrg> queryBuilder = new WebQueryBuilder<>(entityClazz, request.getParameterMap());
-        super.excelExport(SysOrgRestApi.TITLE, queryBuilder.build(), response, method);
+        super.excelExport(SysOrgRestApi.SUB_TITLE, queryBuilder.build(), response, method);
     }
 
     /**
@@ -448,7 +343,73 @@ public class SysOrgRestController extends BaseRestController<SysOrg, SysOrgModel
     public void importTemplate(HttpServletResponse response) {
         // 当前方法
         Method method = ReflectUtil.getMethodByName(this.getClass(), "importTemplate");
-        super.importTemplate(SysOrgRestApi.TITLE, response, method);
+        super.importTemplate(SysOrgRestApi.SUB_TITLE, response, method);
+    }
+
+    // ==============================
+
+
+    /**
+     * 处理展示节点
+     * @param parentId 父节点ID
+     * @param orgModelList 组织集合
+     */
+    private void handleShowNodes(String parentId, List<SysOrgModel> orgModelList) {
+        // 0 为初始值
+        if(PARENT_ID.equals(parentId)){
+            // 显示全部
+            SysOrgModel orgAll = new SysOrgModel();
+            orgAll.setId(ORG_ALL);
+            orgAll.setOrgCode("-2");
+            orgAll.setOrgName("全部");
+            orgAll.setOrgType("-2");
+            orgAll.setParentId("0");
+            orgAll.setSortNo(-2);
+            orgModelList.add(orgAll);
+
+            // 未分组
+            SysOrgModel orgNull = new SysOrgModel();
+            orgNull.setId(ORG_NULL);
+            orgNull.setOrgCode("-1");
+            orgNull.setOrgName("未分组");
+            orgNull.setOrgType("-1");
+            orgNull.setParentId("0");
+            orgNull.setSortNo(-1);
+            orgModelList.add(orgNull);
+        }
+    }
+
+    /**
+     * 处理是否包含子集
+     * @param treeNodes 树节点
+     */
+    private void handleTreeHasChildren(List<Tree<Object>> treeNodes) {
+        if(CollUtil.isEmpty(treeNodes)){
+            return;
+        }
+
+        Set<String> parentIds = Sets.newHashSet();
+        for (Tree<Object> treeNode : treeNodes) {
+            parentIds.add(Convert.toStr(treeNode.getId()));
+        }
+
+        // 数据排查是否存在下级
+        List<HasChildren> hasChildrenList = IService.hasChildren(parentIds);
+        if (CollUtil.isNotEmpty(hasChildrenList)) {
+            Map<String, Boolean> tmp = Maps.newHashMap();
+            for (HasChildren hasChildren : hasChildrenList) {
+                if (hasChildren.getCount() != null && hasChildren.getCount() > 0) {
+                    tmp.put(hasChildren.getParentId(), true);
+                }
+            }
+
+            for (Tree<Object> treeNode : treeNodes) {
+                Boolean tmpFlag = tmp.get(Convert.toStr(treeNode.getId()));
+                if (tmpFlag != null && tmpFlag) {
+                    treeNode.putExtra(HAS_CHILDREN, true);
+                }
+            }
+        }
     }
 
 }

@@ -38,7 +38,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 public interface UserOrgRefApi {
 
     /** 标题 */
-    String TITLE = "组织机构";
+    String TITLE = "用户组织管理";
+    /** 子标题 */
+    String SUB_TITLE = "用户组织";
 
 
     /**

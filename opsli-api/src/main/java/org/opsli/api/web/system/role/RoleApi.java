@@ -44,7 +44,9 @@ import javax.servlet.http.HttpServletResponse;
 public interface RoleApi {
 
     /** 标题 */
-    String TITLE = "角色";
+    String TITLE = "角色管理";
+    /** 子标题 */
+    String SUB_TITLE = "角色";
 
     /**
      * 角色 查一条

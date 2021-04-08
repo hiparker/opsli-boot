@@ -37,7 +37,7 @@ import javax.servlet.http.HttpServletResponse;
  * @CreateTime: 2020-09-13 17:40
  * @Description: 代码生成器日志
  */
-@Api(tags = "代码生成器-日志")
+@Api(tags = CreaterLogsApi.TITLE)
 @Slf4j
 @ApiRestController("/creater/logs")
 public class CreaterLogsRestController extends BaseRestController<CreaterLogs, CreaterLogsModel, ICreateLogsService>

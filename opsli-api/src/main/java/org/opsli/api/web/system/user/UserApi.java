@@ -49,7 +49,9 @@ import java.util.List;
 public interface UserApi {
 
     /** 标题 */
-    String TITLE = "用户信息";
+    String TITLE = "用户管理";
+    /** 子标题 */
+    String SUB_TITLE = "用户";
 
     /**
      * 当前登陆用户信息

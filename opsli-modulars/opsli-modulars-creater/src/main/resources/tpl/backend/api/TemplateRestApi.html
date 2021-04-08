@@ -56,7 +56,9 @@ import #(apiPath).wrapper.#(data.moduleName).#(data.model.tableName)Model;
 public interface #(data.model.tableName)RestApi {
 
     /** 标题 */
-    String TITLE = "#(data.codeTitleBrief)";
+    String TITLE = "#(data.codeTitle)";
+    /** 子标题 */
+    String SUB_TITLE = "#(data.codeTitleBrief)";
 
     /**
     * #(data.codeTitle) 查一条

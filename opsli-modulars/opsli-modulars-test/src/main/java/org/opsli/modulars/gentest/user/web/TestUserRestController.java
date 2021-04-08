@@ -47,7 +47,7 @@ import java.lang.reflect.Method;
 * @CreateTime: 2020-11-22 12:12:05
 * @Description: 某系统用户 Controller
 */
-@Api(tags = "某系统用户")
+@Api(tags = TestUserRestApi.TITLE)
 @Slf4j
 @ApiRestController("/gentest/user")
 public class TestUserRestController extends BaseRestController<TestUser, TestUserModel, ITestUserService>
@@ -166,7 +166,7 @@ public class TestUserRestController extends BaseRestController<TestUser, TestUse
         // 当前方法
         Method method = ReflectUtil.getMethodByName(this.getClass(), "exportExcel");
         QueryBuilder<TestUser> queryBuilder = new WebQueryBuilder<>(entityClazz, request.getParameterMap());
-        super.excelExport(TestUserRestApi.TITLE, queryBuilder.build(), response, method);
+        super.excelExport(TestUserRestApi.SUB_TITLE, queryBuilder.build(), response, method);
     }
 
     /**
@@ -195,7 +195,7 @@ public class TestUserRestController extends BaseRestController<TestUser, TestUse
     public void importTemplate(HttpServletResponse response) {
         // 当前方法
         Method method = ReflectUtil.getMethodByName(this.getClass(), "importTemplate");
-        super.importTemplate(TestUserRestApi.TITLE, response, method);
+        super.importTemplate(TestUserRestApi.SUB_TITLE, response, method);
     }
 
 }

@@ -226,7 +226,7 @@ public class RoleRestController extends BaseRestController<SysRole, RoleModel, I
         // 当前方法
         Method method = ReflectUtil.getMethodByName(this.getClass(), "exportExcel");
         QueryBuilder<SysRole> queryBuilder = new WebQueryBuilder<>(entityClazz, request.getParameterMap());
-        super.excelExport(RoleApi.TITLE, queryBuilder.build(), response, method);
+        super.excelExport(RoleApi.SUB_TITLE, queryBuilder.build(), response, method);
     }
 
     /**
@@ -254,7 +254,7 @@ public class RoleRestController extends BaseRestController<SysRole, RoleModel, I
     public void importTemplate(HttpServletResponse response) {
         // 当前方法
         Method method = ReflectUtil.getMethodByName(this.getClass(), "importTemplate");
-        super.importTemplate(RoleApi.TITLE, response, method);
+        super.importTemplate(RoleApi.SUB_TITLE, response, method);
     }
 
 }

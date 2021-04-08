@@ -40,7 +40,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 public interface UserRoleRefApi {
 
     /** 标题 */
-    String TITLE = "用户角色";
+    String TITLE = "用户角色管理";
+    /** 子标题 */
+    String SUB_TITLE = "用户角色";
 
 
     /**

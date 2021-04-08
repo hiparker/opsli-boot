@@ -49,7 +49,7 @@ import java.util.stream.Collectors;
  * @CreateTime: 2020-09-13 17:40
  * @Description: 角色权限
  */
-@Api(tags = "角色权限")
+@Api(tags = RoleMenuRefApi.TITLE)
 @Slf4j
 @ApiRestController("/sys/role/perms")
 public class RoleMenuRefRestController implements RoleMenuRefApi {

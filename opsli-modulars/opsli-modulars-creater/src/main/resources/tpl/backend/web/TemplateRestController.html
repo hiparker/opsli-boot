@@ -62,7 +62,7 @@ import #(apiPath).web.#(data.moduleName).#(data.model.tableName)RestApi;
 * @CreateTime: #(currTime)
 * @Description: #(data.codeTitle) Controller
 */
-@Api(tags = "#(data.codeTitle)")
+@Api(tags = #(data.model.tableName)RestApi.TITLE)
 @Slf4j
 #if(data.subModuleName != null && data.subModuleName != "")
 @ApiRestController("/#(data.moduleName)/#(data.subModuleName)")
@@ -220,7 +220,7 @@ public class #(data.model.tableName)RestController extends BaseRestController<#(
         // 当前方法
         Method method = ReflectUtil.getMethodByName(this.getClass(), "exportExcel");
         QueryBuilder<#(data.model.tableName)> queryBuilder = new WebQueryBuilder<>(entityClazz, request.getParameterMap());
-        super.excelExport(#(data.model.tableName)RestApi.TITLE, queryBuilder.build(), response, method);
+        super.excelExport(#(data.model.tableName)RestApi.SUB_TITLE, queryBuilder.build(), response, method);
     }
 
     /**
@@ -256,7 +256,7 @@ public class #(data.model.tableName)RestController extends BaseRestController<#(
     public void importTemplate(HttpServletResponse response) {
         // 当前方法
         Method method = ReflectUtil.getMethodByName(this.getClass(), "importTemplate");
-        super.importTemplate(#(data.model.tableName)RestApi.TITLE, response, method);
+        super.importTemplate(#(data.model.tableName)RestApi.SUB_TITLE, response, method);
     }
 
 }

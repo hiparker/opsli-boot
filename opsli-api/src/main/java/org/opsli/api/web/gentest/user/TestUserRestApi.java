@@ -44,7 +44,9 @@ import org.opsli.api.wrapper.gentest.user.TestUserModel;
 public interface TestUserRestApi {
 
     /** 标题 */
-    String TITLE = "用户";
+    String TITLE = "测试某系统用户管理";
+    /** 子标题 */
+    String SUB_TITLE = "测试用户";
 
     /**
     * 某系统用户 查一条

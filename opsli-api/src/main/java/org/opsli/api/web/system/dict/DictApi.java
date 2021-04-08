@@ -44,7 +44,9 @@ import javax.servlet.http.HttpServletResponse;
 public interface DictApi {
 
     /** 标题 */
-    String TITLE = "数据字典";
+    String TITLE = "数据字典管理";
+    /** 子标题 */
+    String SUB_TITLE = "数据字典";
 
     /**
      * 数据字典 查一条

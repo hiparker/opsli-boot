@@ -44,7 +44,10 @@ import java.util.List;
  */
 public interface DictDetailApi {
 
-    String TITLE = "数据字典明细";
+    /** 标题 */
+    String TITLE = "数据字典明细管理";
+    /** 子标题 */
+    String SUB_TITLE = "数据字典明细";
 
     /**
      * 数据字典 查一条

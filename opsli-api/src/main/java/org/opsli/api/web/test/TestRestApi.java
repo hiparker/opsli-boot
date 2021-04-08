@@ -44,7 +44,9 @@ import javax.servlet.http.HttpServletResponse;
 public interface TestRestApi {
 
     /** 标题 */
-    String TITLE = "测试";
+    String TITLE = "测试类管理";
+    /** 子标题 */
+    String SUB_TITLE = "测试类";
 
     /**
      * 测试 查一条

@@ -40,7 +40,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @CreateTime: 2020-09-13 17:40
  * @Description: 用户角色
  */
-@Api(tags = "用户角色")
+@Api(tags = UserRoleRefApi.TITLE)
 @Slf4j
 @ApiRestController("/sys/user/roles")
 public class UserRoleRefRestController implements UserRoleRefApi {

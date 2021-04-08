@@ -83,7 +83,7 @@ import java.util.Map;
  * @CreateTime: 2020-09-13 17:40
  * @Description: 用户信息
  */
-@Api(tags = "用户管理")
+@Api(tags = UserApi.TITLE)
 @Slf4j
 @ApiRestController("/sys/user")
 public class UserRestController extends BaseRestController<SysUser, UserModel, IUserService>
@@ -458,7 +458,7 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
         // 当前方法
         Method method = ReflectUtil.getMethodByName(this.getClass(), "exportExcel");
         QueryBuilder<SysUser> queryBuilder = new WebQueryBuilder<>(entityClazz, request.getParameterMap());
-        super.excelExport(UserApi.TITLE, queryBuilder.build(), response, method);
+        super.excelExport(UserApi.SUB_TITLE, queryBuilder.build(), response, method);
     }
 
     /**
@@ -484,7 +484,7 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
     public void importTemplate(HttpServletResponse response) {
         // 当前方法
         Method method = ReflectUtil.getMethodByName(this.getClass(), "importTemplate");
-        super.importTemplate(UserApi.TITLE, response, method);
+        super.importTemplate(UserApi.SUB_TITLE, response, method);
     }
 
     /**

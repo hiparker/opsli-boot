@@ -53,7 +53,7 @@ import java.util.List;
  * @CreateTime: 2020-09-13 17:40
  * @Description: 代码生成器 - 表
  */
-@Api(tags = "代码生成器-表")
+@Api(tags = TableApi.TITLE)
 @Slf4j
 @ApiRestController("/creater/table")
 public class TableRestController extends BaseRestController<CreaterTable, CreaterTableModel, ITableService>

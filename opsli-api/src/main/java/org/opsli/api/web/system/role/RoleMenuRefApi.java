@@ -45,7 +45,9 @@ import javax.servlet.http.HttpServletResponse;
 public interface RoleMenuRefApi {
 
     /** 标题 */
-    String TITLE = "角色权限";
+    String TITLE = "角色权限管理";
+    /** 子标题 */
+    String SUB_TITLE = "角色权限";
 
     /**
      * 获得当前已有权限

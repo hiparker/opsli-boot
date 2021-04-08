@@ -15,6 +15,7 @@
 */
 package org.opsli.modulars.system.area.web;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.io.IoUtil;
@@ -48,6 +49,7 @@ import org.opsli.core.base.entity.HasChildren;
 import org.opsli.core.persistence.querybuilder.GenQueryBuilder;
 import org.opsli.core.persistence.querybuilder.QueryBuilder;
 import org.opsli.core.persistence.querybuilder.WebQueryBuilder;
+import org.opsli.core.utils.TreeBuildUtil;
 import org.opsli.modulars.system.area.entity.SysArea;
 import org.opsli.modulars.system.area.service.ISysAreaService;
 import org.springframework.core.io.ClassPathResource;
@@ -69,12 +71,16 @@ import java.util.Set;
 * @CreateTime: 2020-11-28 18:59:59
 * @Description: 地域表 Controller
 */
-@Api(tags = "地域管理")
+@Api(tags = SysAreaRestApi.TITLE)
 @Slf4j
 @ApiRestController("/sys/area")
 public class SysAreaRestController extends BaseRestController<SysArea, SysAreaModel, ISysAreaService>
     implements SysAreaRestApi {
 
+    /** 是否包含子集 */
+    private static final String HAS_CHILDREN = "hasChildren";
+    /** 排序字段 */
+    private static final String SORT_FIELD = "sortNo";
 
     /**
     * 地域 查一条
@@ -101,64 +107,25 @@ public class SysAreaRestController extends BaseRestController<SysArea, SysAreaMo
     @Override
     public ResultVo<?> findTree(String parentId) {
 
-        QueryBuilder<SysArea> queryBuilder = new GenQueryBuilder<>();
-        QueryWrapper<SysArea> wrapper = queryBuilder.build();
+        QueryWrapper<SysArea> wrapper = new QueryWrapper<>();
         wrapper.eq(HumpUtil.humpToUnderline(MyBatisConstants.FIELD_PARENT_ID), parentId);
+        List<SysArea> dataList =  IService.findList(wrapper);
 
-        // 获得用户 对应地域
-        List<SysArea> dataList = IService.findList(wrapper);
+        // 获得BeanMapList
+        List<Map<String, Object>> beanMapList = this.getBeanMapList(dataList);
 
         //配置
         TreeNodeConfig treeNodeConfig = new TreeNodeConfig();
         // 自定义属性名 都要默认值的
-        treeNodeConfig.setWeightKey("sortNo");
-        treeNodeConfig.setNameKey("areaName");
-        // 最大递归深度 最多支持4层菜单
+        treeNodeConfig.setWeightKey(SORT_FIELD);
+        // 最大递归深度 最多支持1层
         treeNodeConfig.setDeep(1);
 
-        List<Tree<String>> treeNodes = TreeUtil.build(dataList, parentId, treeNodeConfig,
-                (treeNode, tree) -> {
+        //转换器
+        List<Tree<Object>> treeNodes = TreeBuildUtil.INSTANCE.build(beanMapList, parentId, treeNodeConfig);
 
-                    String areaCode = treeNode.getAreaCode();
-                    int sort = 0;
-                    if(StringUtils.isNotEmpty(areaCode)){
-                        try {
-                            sort = Integer.parseInt(areaCode);
-                        }catch (Exception ignored){}
-                    }
-
-                    tree.setId(treeNode.getId());
-                    tree.setParentId(treeNode.getParentId());
-                    tree.setWeight(sort);
-                    tree.setName(treeNode.getAreaName());
-                    // 扩展属性 ...
-                    // 不是外链 则处理组件
-                    tree.putExtra("areaCode", areaCode);
-                    tree.putExtra("version", treeNode.getVersion());
-                });
-
-        Set<String> parentIds = Sets.newHashSet();
-        for (Tree<String> treeNode : treeNodes) {
-            parentIds.add(treeNode.getId());
-        }
-
-        // 数据排查是否存在下级
-        List<HasChildren> hasChildrenList = IService.hasChildren(parentIds);
-        if(CollUtil.isNotEmpty(hasChildrenList)){
-            Map<String, Boolean> tmp = Maps.newHashMap();
-            for (HasChildren hasChildren : hasChildrenList) {
-                if(hasChildren.getCount() != null && hasChildren.getCount() > 0){
-                    tmp.put(hasChildren.getParentId(), true);
-                }
-            }
-
-            for (Tree<String> treeNode : treeNodes) {
-                Boolean tmpFlag = tmp.get(treeNode.getId());
-                if(tmpFlag != null && tmpFlag){
-                    treeNode.putExtra("hasChildren", true);
-                }
-            }
-        }
+        // 处理是否包含子集
+        this.handleTreeHasChildren(treeNodes);
 
         return ResultVo.success(treeNodes);
     }
@@ -178,58 +145,21 @@ public class SysAreaRestController extends BaseRestController<SysArea, SysAreaMo
 
         List<SysArea> dataList =  IService.findList(new QueryWrapper<>());
 
+        // 获得BeanMapList
+        List<Map<String, Object>> beanMapList = this.getBeanMapList(dataList);
 
         //配置
         TreeNodeConfig treeNodeConfig = new TreeNodeConfig();
         // 自定义属性名 都要默认值的
-        treeNodeConfig.setWeightKey("sortNo");
-        treeNodeConfig.setNameKey("areaName");
-        // 最大递归深度
+        treeNodeConfig.setWeightKey(SORT_FIELD);
+        // 最大递归深度 最多支持1层
         treeNodeConfig.setDeep(deep);
 
-        List<Tree<String>> treeNodes = TreeUtil.build(dataList, "0", treeNodeConfig,
-                (treeNode, tree) -> {
+        //转换器
+        List<Tree<Object>> treeNodes = TreeBuildUtil.INSTANCE.build(beanMapList, treeNodeConfig);
 
-                    String areaCode = treeNode.getAreaCode();
-                    int sort = 0;
-                    if(StringUtils.isNotEmpty(areaCode)){
-                        try {
-                            sort = Integer.parseInt(areaCode);
-                        }catch (Exception ignored){}
-                    }
-
-                    tree.setId(treeNode.getId());
-                    tree.setParentId(treeNode.getParentId());
-                    tree.setWeight(sort);
-                    tree.setName(treeNode.getAreaName());
-                    // 扩展属性 ...
-                    // 不是外链 则处理组件
-                    tree.putExtra("areaCode", areaCode);
-                    tree.putExtra("version", treeNode.getVersion());
-                });
-
-        Set<String> parentIds = Sets.newHashSet();
-        for (Tree<String> treeNode : treeNodes) {
-            parentIds.add(treeNode.getId());
-        }
-
-        // 数据排查是否存在下级
-        List<HasChildren> hasChildrenList = IService.hasChildren(parentIds);
-        if(CollUtil.isNotEmpty(hasChildrenList)){
-            Map<String, Boolean> tmp = Maps.newHashMap();
-            for (HasChildren hasChildren : hasChildrenList) {
-                if(hasChildren.getCount() != null && hasChildren.getCount() > 0){
-                    tmp.put(hasChildren.getParentId(), true);
-                }
-            }
-
-            for (Tree<String> treeNode : treeNodes) {
-                Boolean tmpFlag = tmp.get(treeNode.getId());
-                if(tmpFlag != null && tmpFlag){
-                    treeNode.putExtra("hasChildren", true);
-                }
-            }
-        }
+        // 处理是否包含子集
+        this.handleTreeHasChildren(treeNodes);
 
         return ResultVo.success(treeNodes);
     }
@@ -322,7 +252,7 @@ public class SysAreaRestController extends BaseRestController<SysArea, SysAreaMo
         // 当前方法
         Method method = ReflectUtil.getMethodByName(this.getClass(), "exportExcel");
         QueryBuilder<SysArea> queryBuilder = new WebQueryBuilder<>(entityClazz, request.getParameterMap());
-        super.excelExport(SysAreaRestApi.TITLE, queryBuilder.build(), response, method);
+        super.excelExport(SysAreaRestApi.SUB_TITLE, queryBuilder.build(), response, method);
     }
 
     /**
@@ -349,8 +279,74 @@ public class SysAreaRestController extends BaseRestController<SysArea, SysAreaMo
     public void importTemplate(HttpServletResponse response) {
         // 当前方法
         Method method = ReflectUtil.getMethodByName(this.getClass(), "importTemplate");
-        super.importTemplate(SysAreaRestApi.TITLE, response, method);
+        super.importTemplate(SysAreaRestApi.SUB_TITLE, response, method);
     }
+
+    // ==============================
+
+    /**
+     * 获得BeanMap集合
+     * @param dataList 数据集合
+     * @return List
+     */
+    private List<Map<String, Object>> getBeanMapList(List<SysArea> dataList) {
+        List<Map<String, Object>> beanMapList = Lists.newArrayList();
+        if(CollUtil.isEmpty(dataList)){
+            return beanMapList;
+        }
+
+        // 转化为 BeanMap 处理数据
+        for (SysArea sysArea : dataList) {
+            Map<String, Object> beanToMap = BeanUtil.beanToMap(sysArea);
+
+            // 获得排序
+            String areaCode = sysArea.getAreaCode();
+            int sort = 0;
+            if(StringUtils.isNotEmpty(areaCode)){
+                try {
+                    sort = Integer.parseInt(areaCode);
+                }catch (Exception ignored){}
+            }
+            beanToMap.put(SORT_FIELD, sort);
+
+            beanMapList.add(beanToMap);
+        }
+        return beanMapList;
+    }
+
+    /**
+     * 处理是否包含子集
+     * @param treeNodes 树节点
+     */
+    private void handleTreeHasChildren(List<Tree<Object>> treeNodes) {
+        if(CollUtil.isEmpty(treeNodes)){
+            return;
+        }
+
+        Set<String> parentIds = Sets.newHashSet();
+        for (Tree<Object> treeNode : treeNodes) {
+            parentIds.add(Convert.toStr(treeNode.getId()));
+        }
+
+        // 数据排查是否存在下级
+        List<HasChildren> hasChildrenList = IService.hasChildren(parentIds);
+        if (CollUtil.isNotEmpty(hasChildrenList)) {
+            Map<String, Boolean> tmp = Maps.newHashMap();
+            for (HasChildren hasChildren : hasChildrenList) {
+                if (hasChildren.getCount() != null && hasChildren.getCount() > 0) {
+                    tmp.put(hasChildren.getParentId(), true);
+                }
+            }
+
+            for (Tree<Object> treeNode : treeNodes) {
+                Boolean tmpFlag = tmp.get(Convert.toStr(treeNode.getId()));
+                if (tmpFlag != null && tmpFlag) {
+                    treeNode.putExtra(HAS_CHILDREN, true);
+                }
+            }
+        }
+    }
+
 
     /**
      * 导入数据

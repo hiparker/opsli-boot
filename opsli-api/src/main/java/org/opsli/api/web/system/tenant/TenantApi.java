@@ -44,7 +44,9 @@ import javax.servlet.http.HttpServletResponse;
 public interface TenantApi {
 
     /** 标题 */
-    String TITLE = "租户";
+    String TITLE = "租户管理";
+    /** 子标题 */
+    String SUB_TITLE = "租户";
 
     /**
      * 租户 查一条

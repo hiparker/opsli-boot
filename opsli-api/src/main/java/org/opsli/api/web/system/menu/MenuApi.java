@@ -45,7 +45,9 @@ import java.util.List;
 public interface MenuApi {
 
     /** 标题 */
-    String TITLE = "菜单";
+    String TITLE = "菜单管理";
+    /** 子标题 */
+    String SUB_TITLE = "菜单";
 
 
     /**

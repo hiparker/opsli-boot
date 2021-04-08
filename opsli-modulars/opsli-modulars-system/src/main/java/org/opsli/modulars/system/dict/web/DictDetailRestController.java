@@ -56,7 +56,7 @@ import java.util.List;
  * @CreateTime: 2020-09-13 17:40
  * @Description: 数据字典明细
  */
-@Api(tags = "数据字典明细")
+@Api(tags = DictDetailApi.TITLE)
 @Slf4j
 @ApiRestController("/sys/dict/detail")
 public class DictDetailRestController extends BaseRestController<SysDictDetail, DictDetailModel, IDictDetailService>
@@ -218,7 +218,7 @@ public class DictDetailRestController extends BaseRestController<SysDictDetail, 
         // 当前方法
         Method method = ReflectUtil.getMethodByName(this.getClass(), "exportExcel");
         QueryBuilder<SysDictDetail> queryBuilder = new WebQueryBuilder<>(entityClazz, request.getParameterMap());
-        super.excelExport(DictDetailApi.TITLE, queryBuilder.build(), response, method);
+        super.excelExport(DictDetailApi.SUB_TITLE, queryBuilder.build(), response, method);
     }
 
     /**
@@ -245,7 +245,7 @@ public class DictDetailRestController extends BaseRestController<SysDictDetail, 
     public void importTemplate(HttpServletResponse response) {
         // 当前方法
         Method method = ReflectUtil.getMethodByName(this.getClass(), "importTemplate");
-        super.importTemplate(DictDetailApi.TITLE, response, method);
+        super.importTemplate(DictDetailApi.SUB_TITLE, response, method);
     }
 
     /**

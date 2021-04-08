@@ -41,7 +41,7 @@ import javax.servlet.http.HttpServletRequest;
  * @CreateTime: 2020-09-13 17:40
  * @Description: 系统日志
  */
-@Api(tags = "系统日志")
+@Api(tags = LogsApi.TITLE)
 @Slf4j
 @ApiRestController("/sys/logs")
 public class LogsRestController extends BaseRestController<SysLogs, LogsModel, ILogsService>

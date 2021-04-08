@@ -43,7 +43,9 @@ import javax.servlet.http.HttpServletRequest;
 public interface LogsApi {
 
     /** 标题 */
-    String TITLE = "日志";
+    String TITLE = "日志管理";
+    /** 子标题 */
+    String SUB_TITLE = "日志";
 
     /**
      * 日志 查一条

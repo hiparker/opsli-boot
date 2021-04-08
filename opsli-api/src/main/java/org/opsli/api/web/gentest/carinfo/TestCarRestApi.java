@@ -44,7 +44,9 @@ import org.opsli.api.wrapper.gentest.carinfo.TestCarModel;
 public interface TestCarRestApi {
 
     /** 标题 */
-    String TITLE = "汽车信息";
+    String TITLE = "汽车信息管理";
+    /** 子标题 */
+    String SUB_TITLE = "汽车信息";
 
     /**
     * 汽车信息 查一条

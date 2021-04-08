@@ -15,13 +15,16 @@
  */
 package org.opsli.modulars.system.menu.web;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.lang.tree.Tree;
 import cn.hutool.core.lang.tree.TreeNodeConfig;
 import cn.hutool.core.lang.tree.TreeUtil;
 import cn.hutool.core.util.ReflectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -44,6 +47,7 @@ import org.opsli.core.persistence.Page;
 import org.opsli.core.persistence.querybuilder.GenQueryBuilder;
 import org.opsli.core.persistence.querybuilder.QueryBuilder;
 import org.opsli.core.persistence.querybuilder.WebQueryBuilder;
+import org.opsli.core.utils.TreeBuildUtil;
 import org.opsli.core.utils.UserUtil;
 import org.opsli.modulars.system.SystemMsg;
 import org.opsli.modulars.system.menu.entity.SysMenu;
@@ -64,11 +68,20 @@ import java.util.Map;
  * @CreateTime: 2020-09-13 17:40
  * @Description: 菜单管理
  */
-@Api(tags = "菜单管理")
+@Api(tags = MenuApi.TITLE)
 @Slf4j
 @ApiRestController("/sys/menu")
 public class MenuRestController extends BaseRestController<SysMenu, MenuModel, IMenuService>
         implements MenuApi {
+
+    private static final String SORT_FIELD = "order";
+
+    /** 菜单排除字段 */
+    private static final String[] EXCLUSION_FIELDS = {
+            "createBy", "createTime", "updateBy", "updateTime",
+            "deleted", "menuCode", "menuName", "ts", "encryptData",
+            "hidden", "version", "sortNo", "url", "icon"
+    };
 
     /**
      * 根据 获得用户 菜单 - 权限
@@ -107,39 +120,8 @@ public class MenuRestController extends BaseRestController<SysMenu, MenuModel, I
             menuModelList.addAll(menuModels);
         }
 
-        //配置
-        TreeNodeConfig treeNodeConfig = new TreeNodeConfig();
-        // 自定义属性名 都要默认值的
-        treeNodeConfig.setWeightKey("order");
-        // 最大递归深度 最多支持4层菜单
-        treeNodeConfig.setDeep(4);
-
-        //转换器
-        List<Tree<String>> treeNodes = TreeUtil.build(menuModelList, "0", treeNodeConfig,
-                (treeNode, tree) -> {
-                    tree.setId(treeNode.getId());
-                    tree.setParentId(treeNode.getParentId());
-                    tree.setWeight(treeNode.getSortNo());
-                    tree.setName(treeNode.getMenuName());
-                    // 扩展属性 ...
-                    // 不是外链 则处理组件
-                    if(!MenuConstants.EXTERNAL.equals(treeNode.getType())){
-                        tree.putExtra("component", treeNode.getComponent());
-                    }
-                    tree.putExtra("type", treeNode.getType());
-                    tree.putExtra("path", treeNode.getUrl());
-                    tree.putExtra("redirect", treeNode.getRedirect());
-                    // 处理 meta
-                    Map<String,String> metaMap = Maps.newHashMapWithExpectedSize(3);
-                    metaMap.put("title", treeNode.getMenuName());
-                    metaMap.put("icon", treeNode.getIcon());
-                    // 外链处理
-                    if(MenuConstants.EXTERNAL.equals(treeNode.getType())){
-                        metaMap.put("target", "_blank");
-                        metaMap.put("badge", "New");
-                    }
-                    tree.putExtra("meta", metaMap);
-                });
+        // 获得菜单树
+        List<Tree<Object>> treeNodes = getMenuTrees(menuModelList);
 
         return ResultVo.success(treeNodes);
     }
@@ -157,60 +139,22 @@ public class MenuRestController extends BaseRestController<SysMenu, MenuModel, I
         UserModel user = UserUtil.getUser();
 
         // 获得用户 对应菜单
-        List<MenuModel> menuList = UserUtil.getMenuListByUserId(user.getId());
-        if(CollUtil.isEmpty(menuList)){
+        List<MenuModel> menuModelList = UserUtil.getMenuListByUserId(user.getId());
+        if(CollUtil.isEmpty(menuModelList)){
             // 用户暂无角色菜单，请设置后登录
             throw new ServiceException(SystemMsg.EXCEPTION_USER_MENU_NOT_NULL);
         }
 
         // 这里有坑 如果 为 菜单数据 且 组件(Component)地址为空 不会跳转到主页 也不报错
         // 修复菜单问题导致无法跳转主页
-        menuList.removeIf(menuModel -> MenuConstants.MENU.equals(menuModel.getType()) &&
+        menuModelList.removeIf(menuModel -> MenuConstants.MENU.equals(menuModel.getType()) &&
                 (StringUtils.isEmpty(menuModel.getComponent()) ||
                  StringUtils.isEmpty(menuModel.getMenuCode()) ||
                 StringUtils.isEmpty(menuModel.getUrl())
                         ));
 
-        //配置
-        TreeNodeConfig treeNodeConfig = new TreeNodeConfig();
-        // 自定义属性名 都要默认值的
-        treeNodeConfig.setWeightKey("order");
-        // 最大递归深度 最多支持4层菜单
-        treeNodeConfig.setDeep(4);
-
-        //转换器
-        List<Tree<String>> treeNodes = TreeUtil.build(menuList, "0", treeNodeConfig,
-                (treeNode, tree) -> {
-                    tree.setId(treeNode.getId());
-                    tree.setParentId(treeNode.getParentId());
-                    tree.setWeight(treeNode.getSortNo());
-                    tree.setName(treeNode.getMenuCode());
-                    // 扩展属性 ...
-                    // 不是外链 则处理组件
-                    if(!MenuConstants.EXTERNAL.equals(treeNode.getType())){
-                        tree.putExtra("component", treeNode.getComponent());
-                    }else{
-                        // 如果是外链 则判断是否存在 BASE_PATH
-                        // 设置BASE_PATH
-                        if(StringUtils.isNotEmpty(treeNode.getUrl())){
-                            treeNode.setUrl(treeNode.getUrl().replace("${BASE_PATH}",
-                                    StartPrint.getInstance().getBasePath()
-                            ));
-                        }
-                    }
-                    tree.putExtra("path", treeNode.getUrl());
-                    tree.putExtra("type", treeNode.getType());
-                    tree.putExtra("redirect", treeNode.getRedirect());
-                    // 处理 meta
-                    Map<String,String> metaMap = Maps.newHashMapWithExpectedSize(3);
-                    metaMap.put("title", treeNode.getMenuName());
-                    metaMap.put("icon", treeNode.getIcon());
-                    // 外链处理
-                    if(MenuConstants.EXTERNAL.equals(treeNode.getType())){
-                        metaMap.put("target", "_blank");
-                    }
-                    tree.putExtra("meta", metaMap);
-                });
+        // 获得菜单树
+        List<Tree<Object>> treeNodes = getMenuTrees(menuModelList, EXCLUSION_FIELDS);
 
         return ResultVo.success(treeNodes);
     }
@@ -230,33 +174,10 @@ public class MenuRestController extends BaseRestController<SysMenu, MenuModel, I
 
         // 获得用户 对应菜单
         List<SysMenu> menuList = IService.findList(queryBuilder.build());
+        List<MenuModel> menuModelList = WrapperUtil.transformInstance(menuList, MenuModel.class);
 
-        //配置
-        TreeNodeConfig treeNodeConfig = new TreeNodeConfig();
-        // 自定义属性名 都要默认值的
-        treeNodeConfig.setWeightKey("sortNo");
-        treeNodeConfig.setNameKey("menuName");
-        // 最大递归深度 最多支持4层菜单
-        treeNodeConfig.setDeep(4);
-
-        //转换器
-        List<Tree<String>> treeNodes = TreeUtil.build(menuList, "0", treeNodeConfig,
-                (treeNode, tree) -> {
-                    tree.setId(treeNode.getId());
-                    tree.setParentId(treeNode.getParentId());
-                    tree.setWeight(treeNode.getSortNo());
-                    tree.setName(treeNode.getMenuName());
-                    // 扩展属性 ...
-                    // 不是外链 则处理组件
-                    tree.putExtra("menuCode", treeNode.getMenuCode());
-                    tree.putExtra("component", treeNode.getComponent());
-                    tree.putExtra("type", treeNode.getType());
-                    tree.putExtra("url", treeNode.getUrl());
-                    tree.putExtra("redirect", treeNode.getRedirect());
-                    tree.putExtra("icon", treeNode.getIcon());
-                    tree.putExtra("hidden", treeNode.getHidden());
-                    tree.putExtra("version", treeNode.getVersion());
-                });
+        // 获得菜单树
+        List<Tree<Object>> treeNodes = getMenuTrees(menuModelList);
 
         return ResultVo.success(treeNodes);
     }
@@ -401,7 +322,7 @@ public class MenuRestController extends BaseRestController<SysMenu, MenuModel, I
         // 当前方法
         Method method = ReflectUtil.getMethodByName(this.getClass(), "exportExcel");
         QueryBuilder<SysMenu> queryBuilder = new WebQueryBuilder<>(entityClazz, request.getParameterMap());
-        super.excelExport(MenuApi.TITLE, queryBuilder.build(), response, method);
+        super.excelExport(MenuApi.SUB_TITLE, queryBuilder.build(), response, method);
     }
 
     /**
@@ -429,7 +350,7 @@ public class MenuRestController extends BaseRestController<SysMenu, MenuModel, I
     public void importTemplate(HttpServletResponse response) {
         // 当前方法
         Method method = ReflectUtil.getMethodByName(this.getClass(), "importTemplate");
-        super.importTemplate(MenuApi.TITLE, response, method);
+        super.importTemplate(MenuApi.SUB_TITLE, response, method);
     }
 
 
@@ -448,4 +369,101 @@ public class MenuRestController extends BaseRestController<SysMenu, MenuModel, I
         }
         return ResultVo.success(menu);
     }
+
+
+    // ==============================
+
+    /**
+     * 获得BeanMap集合
+     * @param dataList 数据集合
+     * @return List
+     */
+    private List<Map<String, Object>> getBeanMapList(List<MenuModel> dataList, String[] exclusionFields) {
+        List<Map<String, Object>> beanMapList = Lists.newArrayList();
+        if(CollUtil.isEmpty(dataList)){
+            return beanMapList;
+        }
+
+        // 转化为 BeanMap 处理数据
+        for (MenuModel model : dataList) {
+            Map<String, Object> beanToMap = BeanUtil.beanToMap(model);
+            // 排除字段
+            if(exclusionFields != null && exclusionFields.length > 0){
+                for (String exclusionField : exclusionFields) {
+                    beanToMap.remove(exclusionField);
+                }
+            }
+
+
+            // 扩展属性 ...
+            // 不是外链 则处理组件
+            if(!MenuConstants.EXTERNAL.equals(model.getType())){
+                beanToMap.put("component", model.getComponent());
+            }else{
+                // 如果是外链 则判断是否存在 BASE_PATH
+                // 设置BASE_PATH
+                if(StringUtils.isNotEmpty(model.getUrl())){
+                    model.setUrl(model.getUrl().replace("${BASE_PATH}",
+                            StartPrint.getInstance().getBasePath()
+                    ));
+                }
+            }
+
+            beanToMap.put(SORT_FIELD, model.getSortNo());
+            beanToMap.put("path", model.getUrl());
+            beanToMap.put("name", model.getMenuName());
+
+            // 处理 meta
+            Map<String,String> metaMap = Maps.newHashMapWithExpectedSize(3);
+            metaMap.put("title", model.getMenuName());
+            metaMap.put("icon", model.getIcon());
+            // 外链处理
+            if(MenuConstants.EXTERNAL.equals(model.getType())){
+                metaMap.put("target", "_blank");
+            }
+
+            beanToMap.put("meta", metaMap);
+            beanMapList.add(beanToMap);
+        }
+
+        return beanMapList;
+    }
+
+
+    /**
+     * 获得菜单树
+     * @param menuList 菜单集合
+     * @return List
+     */
+    private List<Tree<Object>> getMenuTrees(List<MenuModel> menuList) {
+        //转换器
+        return this.getMenuTrees(menuList, null);
+    }
+
+    /**
+     * 获得菜单树
+     * @param menuList 菜单集合
+     * @param exclusionFields 排除字段
+     * @return List
+     */
+    private List<Tree<Object>> getMenuTrees(List<MenuModel> menuList, String[] exclusionFields) {
+        if(CollUtil.isEmpty(menuList)){
+            return ListUtil.empty();
+        }
+
+
+        // 获得BeanMapList
+        List<Map<String, Object>> beanMapList = this.getBeanMapList(menuList, exclusionFields);
+
+        //配置
+        TreeNodeConfig treeNodeConfig = new TreeNodeConfig();
+        // 自定义属性名 都要默认值的
+        treeNodeConfig.setWeightKey(SORT_FIELD);
+        // 最大递归深度 最多支持4层菜单
+        treeNodeConfig.setDeep(4);
+
+        //转换器
+        return TreeBuildUtil.INSTANCE.build(beanMapList, treeNodeConfig);
+    }
+
 }

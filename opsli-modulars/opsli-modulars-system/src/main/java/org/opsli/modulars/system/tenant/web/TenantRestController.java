@@ -51,7 +51,7 @@ import java.lang.reflect.Method;
  * @CreateTime: 2020-09-13 17:40
  * @Description: 租户管理
  */
-@Api(tags = "租户管理")
+@Api(tags = TenantApi.TITLE)
 @Slf4j
 @ApiRestController("/sys/tenant")
 public class TenantRestController extends BaseRestController<SysTenant, TenantModel, ITenantService>
@@ -179,7 +179,7 @@ public class TenantRestController extends BaseRestController<SysTenant, TenantMo
         // 当前方法
         Method method = ReflectUtil.getMethodByName(this.getClass(), "exportExcel");
         QueryBuilder<SysTenant> queryBuilder = new WebQueryBuilder<>(entityClazz, request.getParameterMap());
-        super.excelExport(RoleApi.TITLE, queryBuilder.build(), response, method);
+        super.excelExport(TenantApi.SUB_TITLE, queryBuilder.build(), response, method);
     }
 
     /**
@@ -206,7 +206,7 @@ public class TenantRestController extends BaseRestController<SysTenant, TenantMo
     public void importTemplate(HttpServletResponse response) {
         // 当前方法
         Method method = ReflectUtil.getMethodByName(this.getClass(), "importTemplate");
-        super.importTemplate(RoleApi.TITLE, response, method);
+        super.importTemplate(TenantApi.SUB_TITLE, response, method);
     }
 
     // =========================
