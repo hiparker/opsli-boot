@@ -64,17 +64,32 @@ public class TenantServiceImpl extends CrudServiceImpl<TenantMapper, SysTenant, 
     private IUserService iUserService;
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public boolean enableTenant(String tenantId, String enable) {
+        if(!DictType.hasDict(DictType.NO_YES_YES.getType(), enable)){
+            // 非法参数
+            throw new ServiceException(SystemMsg.EXCEPTION_USER_ILLEGAL_PARAMETER);
+        }
+
         TenantModel model = this.get(tenantId);
         if(model == null){
             return false;
         }
 
-        String currTenantId = UserUtil.getTenantId();
+        String currTenantId = UserUtil.getRealTenantId();
         if(StringUtils.equals(currTenantId, tenantId)){
             // 不可操作自身
             throw new ServiceException(SystemMsg.EXCEPTION_TENANT_HANDLE_SELF);
+        }
 
+        // 超级管理员
+        UserModel superAdmin = UserUtil.getUserByUserName(UserUtil.SUPER_ADMIN);
+        if(superAdmin != null){
+            String superAdminTenantId = superAdmin.getTenantId();
+            if(StringUtils.equals(superAdminTenantId, tenantId)){
+                // 不可操作超管租户
+                throw new ServiceException(SystemMsg.EXCEPTION_TENANT_HANDLE_SUPER_ADMIN);
+            }
         }
 
         UpdateWrapper<SysTenant> updateWrapper = new UpdateWrapper<>();

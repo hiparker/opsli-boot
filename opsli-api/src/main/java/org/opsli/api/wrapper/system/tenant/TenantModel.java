@@ -51,7 +51,7 @@ public class TenantModel extends ApiWrapper {
     @ExcelInfo(dictType = "no_yes")
     @ValidationArgs({ValiArgsType.IS_NOT_NULL})
     @ValidationArgsLenMax(1)
-    private String izUsable;
+    private String enable;
 
     /** 备注 */
     @ApiModelProperty(value = "备注")

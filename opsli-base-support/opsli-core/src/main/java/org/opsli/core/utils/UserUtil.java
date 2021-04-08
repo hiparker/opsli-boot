@@ -590,6 +590,15 @@ public class UserUtil {
     }
 
     /**
+     * 获得 真实租户ID
+     * @return String
+     */
+    public static String getRealTenantId(){
+        UserModel user = getUser();
+        return user.getTenantId();
+    }
+
+    /**
      * 是否有修改租户的权限
      * @param currUser model
      * @return boolean

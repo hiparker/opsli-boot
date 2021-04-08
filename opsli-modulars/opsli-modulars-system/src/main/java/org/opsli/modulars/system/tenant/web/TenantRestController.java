@@ -73,13 +73,8 @@ public class TenantRestController extends BaseRestController<SysTenant, TenantMo
         // 演示模式 不允许操作
         super.demoError();
 
-        if(!DictType.hasDict(DictType.NO_YES_YES.getType(), enable)){
-            // 非法参数
-            throw new ServiceException(SystemMsg.EXCEPTION_USER_ILLEGAL_PARAMETER);
-        }
-
         // 变更租户状态账户
-        boolean enableStatus = IService.enableTenant(tenantId, tenantId);
+        boolean enableStatus = IService.enableTenant(tenantId, enable);
         if(!enableStatus){
             return ResultVo.error("变更用户状态账户失败");
         }
@@ -250,7 +245,7 @@ public class TenantRestController extends BaseRestController<SysTenant, TenantMo
         QueryBuilder<SysTenant> queryBuilder = new GenQueryBuilder<>();
         QueryWrapper<SysTenant> queryWrapper = queryBuilder.build();
         queryWrapper.eq("id", tenantId)
-                .eq("iz_usable", "1");
+                .eq("enable", DictType.NO_YES_YES.getValue());
         SysTenant entity = IService.getOne(queryWrapper);
 
         return ResultVo.success(

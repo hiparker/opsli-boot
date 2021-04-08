@@ -2,16 +2,19 @@ package org.opsli.core.security.shiro.realm;
 
 import cn.hutool.core.collection.CollUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.authc.*;
 import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
+import org.opsli.api.wrapper.system.tenant.TenantModel;
 import org.opsli.api.wrapper.system.user.UserModel;
 import org.opsli.core.api.TokenThreadLocal;
 import org.opsli.common.exception.TokenException;
 import org.opsli.core.msg.TokenMsg;
 import org.opsli.core.security.shiro.token.JwtToken;
+import org.opsli.core.utils.TenantUtil;
 import org.opsli.core.utils.UserTokenUtil;
 import org.opsli.core.utils.UserUtil;
 import org.springframework.stereotype.Component;
@@ -89,6 +92,15 @@ public class JwtRealm extends AuthorizingRealm implements FlagRealm {
             // token失效，请重新登录
             throw new TokenException(
                     TokenMsg.EXCEPTION_LOGIN_ACCOUNT_LOCKED);
+        }
+
+        // 4. 验证租户是否启用
+        // 如果不是超级管理员 需要验证租户是否生效
+        if(!StringUtils.equals(UserUtil.SUPER_ADMIN, user.getUsername())){
+            TenantModel tenant = TenantUtil.getTenant(user.getTenantId());
+            if(tenant == null){
+                throw new TokenException(TokenMsg.EXCEPTION_LOGIN_TENANT_NOT_USABLE);
+            }
         }
 
         return new SimpleAuthenticationInfo(user, accessToken, getName());
