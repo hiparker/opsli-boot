@@ -75,8 +75,7 @@ public enum DictType {
         DictType[] var1 = values();
         for (DictType dict : var1) {
             if(dict.type.equals(type) &&
-                    dict.value.equalsIgnoreCase(value)
-            ){
+                    dict.value.equalsIgnoreCase(value)){
                 return true;
             }
         }

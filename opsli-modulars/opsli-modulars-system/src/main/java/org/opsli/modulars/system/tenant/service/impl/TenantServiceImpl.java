@@ -111,6 +111,9 @@ public class TenantServiceImpl extends CrudServiceImpl<TenantMapper, SysTenant, 
             return null;
         }
 
+        // 默认为未启用
+        model.setEnable(DictType.NO_YES_NO.getValue());
+
         // 唯一验证
         Integer count = this.uniqueVerificationByName(model);
         if(count != null && count > 0){
@@ -127,6 +130,8 @@ public class TenantServiceImpl extends CrudServiceImpl<TenantMapper, SysTenant, 
         if(model == null){
             return null;
         }
+
+        model.setEnable(null);
 
         // 唯一验证
         Integer count = this.uniqueVerificationByName(model);
@@ -157,6 +162,22 @@ public class TenantServiceImpl extends CrudServiceImpl<TenantMapper, SysTenant, 
             return false;
         }
 
+        String currTenantId = UserUtil.getRealTenantId();
+        if(StringUtils.equals(currTenantId, id)){
+            // 不可操作自身
+            throw new ServiceException(SystemMsg.EXCEPTION_TENANT_HANDLE_SELF);
+        }
+
+        // 超级管理员
+        UserModel superAdmin = UserUtil.getUserByUserName(UserUtil.SUPER_ADMIN);
+        if(superAdmin != null){
+            String superAdminTenantId = superAdmin.getTenantId();
+            if(StringUtils.equals(superAdminTenantId, id)){
+                // 不可操作超管租户
+                throw new ServiceException(SystemMsg.EXCEPTION_TENANT_HANDLE_SUPER_ADMIN);
+            }
+        }
+
         // 如果有租户还在被引用 则不允许删除该租户
         this.validationUsedByDel(Collections.singletonList(id));
 
@@ -183,6 +204,22 @@ public class TenantServiceImpl extends CrudServiceImpl<TenantMapper, SysTenant, 
             return false;
         }
 
+        String currTenantId = UserUtil.getRealTenantId();
+        if(StringUtils.equals(currTenantId, model.getId())){
+            // 不可操作自身
+            throw new ServiceException(SystemMsg.EXCEPTION_TENANT_HANDLE_SELF);
+        }
+
+        // 超级管理员
+        UserModel superAdmin = UserUtil.getUserByUserName(UserUtil.SUPER_ADMIN);
+        if(superAdmin != null){
+            String superAdminTenantId = superAdmin.getTenantId();
+            if(StringUtils.equals(superAdminTenantId, model.getId())){
+                // 不可操作超管租户
+                throw new ServiceException(SystemMsg.EXCEPTION_TENANT_HANDLE_SUPER_ADMIN);
+            }
+        }
+
         // 如果有租户还在被引用 则不允许删除该租户
         this.validationUsedByDel(Collections.singletonList(model.getId()));
 
@@ -205,6 +242,25 @@ public class TenantServiceImpl extends CrudServiceImpl<TenantMapper, SysTenant, 
     @Transactional(rollbackFor = Exception.class)
     public boolean deleteAll(String[] ids) {
         List<String> idList = Convert.toList(String.class, ids);
+
+
+        String currTenantId = UserUtil.getRealTenantId();
+        if(CollUtil.isNotEmpty(idList)){
+            if(idList.contains(currTenantId)){
+                // 不可操作自身
+                throw new ServiceException(SystemMsg.EXCEPTION_TENANT_HANDLE_SELF);
+            }
+
+            // 超级管理员
+            UserModel superAdmin = UserUtil.getUserByUserName(UserUtil.SUPER_ADMIN);
+            if(superAdmin != null){
+                String superAdminTenantId = superAdmin.getTenantId();
+                if(idList.contains(superAdminTenantId)){
+                    // 不可操作超管租户
+                    throw new ServiceException(SystemMsg.EXCEPTION_TENANT_HANDLE_SUPER_ADMIN);
+                }
+            }
+        }
 
         // 如果有租户还在被引用 则不允许删除该租户
         this.validationUsedByDel(idList);
@@ -229,6 +285,24 @@ public class TenantServiceImpl extends CrudServiceImpl<TenantMapper, SysTenant, 
         List<String> idList = Lists.newArrayListWithCapacity(models.size());
         for (TenantModel model : models) {
             idList.add(model.getId());
+        }
+
+        String currTenantId = UserUtil.getRealTenantId();
+        if(CollUtil.isNotEmpty(idList)){
+            if(idList.contains(currTenantId)){
+                // 不可操作自身
+                throw new ServiceException(SystemMsg.EXCEPTION_TENANT_HANDLE_SELF);
+            }
+
+            // 超级管理员
+            UserModel superAdmin = UserUtil.getUserByUserName(UserUtil.SUPER_ADMIN);
+            if(superAdmin != null){
+                String superAdminTenantId = superAdmin.getTenantId();
+                if(idList.contains(superAdminTenantId)){
+                    // 不可操作超管租户
+                    throw new ServiceException(SystemMsg.EXCEPTION_TENANT_HANDLE_SUPER_ADMIN);
+                }
+            }
         }
 
         // 如果有租户还在被引用 则不允许删除该租户

@@ -284,26 +284,21 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
     }
 
     /**
-     * 锁定账户
+     * 变更账户状态
      * @return ResultVo
      */
     @ApiOperation(value = "锁定账户", notes = "锁定账户")
-    @RequiresPermissions("system_user_lockAccount")
+    @RequiresPermissions("system_user_enable")
     @EnableLog
     @Override
-    public ResultVo<?> lockAccount(String userId, String locked) {
+    public ResultVo<?> enableAccount(String userId, String enable) {
         // 演示模式 不允许操作
         super.demoError();
 
-        if(!DictType.hasDict(DictType.NO_YES_YES.getType(), locked)){
-            // 非法参数
-            throw new ServiceException(SystemMsg.EXCEPTION_USER_ILLEGAL_PARAMETER);
-        }
-
-        // 锁定账户
-        boolean lockAccountFlag = IService.lockAccount(userId, locked);
+        // 变更账户状态
+        boolean lockAccountFlag = IService.enableAccount(userId, enable);
         if(!lockAccountFlag){
-            return ResultVo.error("变更用户状态账户失败");
+            return ResultVo.error("变更用户状态失败");
         }
         return ResultVo.success();
     }

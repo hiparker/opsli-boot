@@ -46,8 +46,8 @@ public class SysUserAndOrg extends BaseEntity {
     /** 盐值，密码秘钥 */
     private String secretKey;
 
-    /** 是否锁定 */
-    private String locked;
+    /** 启用状态 */
+    private String enable;
 
     /** 真实姓名 */
     private String realName;

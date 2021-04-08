@@ -17,8 +17,15 @@
 SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
 
+-- 用户变更
+ALTER TABLE `sys_user` CHANGE COLUMN `locked` `enable` char(1) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '是否启用' AFTER `secret_key`;
+
+-- 租户变更
+ALTER TABLE `sys_tenant` CHANGE COLUMN `iz_usable` `enable` char(1) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '是否启用  0是  1否' AFTER `tenant_name`;
+
+
 -- ----------------------------
--- Table structure for sys_area
+-- 地域表数据变更
 -- ----------------------------
 DROP TABLE IF EXISTS `sys_area`;
 CREATE TABLE `sys_area`  (

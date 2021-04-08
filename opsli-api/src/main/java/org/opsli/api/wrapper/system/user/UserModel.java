@@ -59,12 +59,12 @@ public class UserModel extends ApiWrapper {
     @ValidationArgsLenMax(50)
     private String secretKey;
 
-    /** 是否锁定 */
-    @ApiModelProperty(value = "是否锁定")
+    /** 是否启用 */
+    @ApiModelProperty(value = "是否启用")
     @ExcelIgnore
     @ValidationArgs({ValiArgsType.IS_NOT_NULL})
     @ValidationArgsLenMax(1)
-    private String locked;
+    private String enable;
 
     /** 真实姓名 */
     @ApiModelProperty(value = "真实姓名")

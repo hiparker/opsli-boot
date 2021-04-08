@@ -112,14 +112,14 @@ public interface UserApi {
     ResultVo<?> resetPasswordById(String userId);
 
     /**
-     * 锁定账户
+     * 变更账户状态
      *
      * @param userId 用户ID
-     * @param locked 锁定状态
+     * @param enable 启用状态
      * @return ResultVo
      */
-    @PostMapping("/lockAccount")
-    ResultVo<?> lockAccount(String userId, String locked);
+    @PostMapping("/enableAccount")
+    ResultVo<?> enableAccount(String userId, String enable);
 
     /**
      * 上传头像

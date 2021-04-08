@@ -108,6 +108,8 @@ public class UserServiceImpl extends CrudServiceImpl<UserMapper, SysUser, UserMo
         // 防止非法操作 - 不允许直接操控到 关键数据
         // 需要注意的是 不要轻易改修改策略
         model.setLoginIp(null);
+        // 默认用户状态为启用
+        model.setEnable(DictType.NO_YES_YES.getValue());
 
         // 新增可以直接设置密码
         if(StringUtils.isNotEmpty(model.getPassword())){
@@ -195,7 +197,7 @@ public class UserServiceImpl extends CrudServiceImpl<UserMapper, SysUser, UserMo
         model.setPassword(null);
         model.setSecretKey(null);
         model.setLoginIp(null);
-        model.setLocked(null);
+        model.setEnable(null);
 
         UserModel update = super.update(model);
         if(update != null){
@@ -217,7 +219,12 @@ public class UserServiceImpl extends CrudServiceImpl<UserMapper, SysUser, UserMo
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public boolean lockAccount(String userId, String locked) {
+    public boolean enableAccount(String userId, String enable) {
+        if(!DictType.hasDict(DictType.NO_YES_YES.getType(), enable)){
+            // 非法参数
+            throw new ServiceException(SystemMsg.EXCEPTION_USER_ILLEGAL_PARAMETER);
+        }
+
         UserModel model = this.get(userId);
         if(model == null){
             return false;
@@ -225,12 +232,19 @@ public class UserServiceImpl extends CrudServiceImpl<UserMapper, SysUser, UserMo
 
         UserModel currUser = UserUtil.getUser();
         if(StringUtils.equals(currUser.getId(), userId)){
-            // 不可锁定自身
-            throw new ServiceException(SystemMsg.EXCEPTION_USER_LOCK_SELF);
+            // 不可操作自身
+            throw new ServiceException(SystemMsg.EXCEPTION_USER_HANDLE_SELF);
         }
 
+        if(StringUtils.equals(UserUtil.SUPER_ADMIN, model.getUsername())){
+            // 不可操作超管账号
+            throw new ServiceException(SystemMsg.EXCEPTION_USER_HANDLE_SUPER_ADMIN);
+        }
+
+
         UpdateWrapper<SysUser> updateWrapper = new UpdateWrapper<>();
-        updateWrapper.set("locked", locked).eq(
+        updateWrapper.set("enable", enable)
+                .eq(
                 HumpUtil.humpToUnderline(MyBatisConstants.FIELD_ID), userId
         );
         if(this.update(updateWrapper)){
@@ -243,14 +257,23 @@ public class UserServiceImpl extends CrudServiceImpl<UserMapper, SysUser, UserMo
 
     @Override
     public boolean delete(String id) {
+        UserModel userModel = super.get(id);
+        // 非法判断
+        if(userModel == null){
+            return false;
+        }
+
         // 杜绝我删我自己行为
         UserModel currUser = UserUtil.getUser();
         if(StringUtils.equals(currUser.getId(), id)){
-            // 不可删除自身
-            throw new ServiceException(SystemMsg.EXCEPTION_USER_DEL_SELF);
+            // 不可操作自身
+            throw new ServiceException(SystemMsg.EXCEPTION_USER_HANDLE_SELF);
+        }
+        if(StringUtils.equals(UserUtil.SUPER_ADMIN, userModel.getUsername())){
+            // 不可操作超管账号
+            throw new ServiceException(SystemMsg.EXCEPTION_USER_HANDLE_SUPER_ADMIN);
         }
 
-        UserModel userModel = super.get(id);
         boolean ret = super.delete(id);
         if(ret){
             // 刷新用户缓存
@@ -261,11 +284,10 @@ public class UserServiceImpl extends CrudServiceImpl<UserMapper, SysUser, UserMo
 
     @Override
     public boolean delete(UserModel model) {
-        UserModel userModel = null;
-        if(model != null){
-            userModel = this.get(model.getId());
-
+        if(model == null){
+            return false;
         }
+        UserModel userModel = super.get(model.getId());
         // 非法判断
         if(userModel == null){
             return false;
@@ -274,8 +296,12 @@ public class UserServiceImpl extends CrudServiceImpl<UserMapper, SysUser, UserMo
         // 杜绝我删我自己行为
         UserModel currUser = UserUtil.getUser();
         if(StringUtils.equals(currUser.getId(), userModel.getId())){
-            // 不可删除自身
-            throw new ServiceException(SystemMsg.EXCEPTION_USER_DEL_SELF);
+            // 不可操作自身
+            throw new ServiceException(SystemMsg.EXCEPTION_USER_HANDLE_SELF);
+        }
+        if(StringUtils.equals(UserUtil.SUPER_ADMIN, userModel.getUsername())){
+            // 不可操作超管账号
+            throw new ServiceException(SystemMsg.EXCEPTION_USER_HANDLE_SUPER_ADMIN);
         }
 
         boolean ret = super.delete(model);
@@ -293,18 +319,29 @@ public class UserServiceImpl extends CrudServiceImpl<UserMapper, SysUser, UserMo
             return false;
         }
 
+        List<String> idList = Convert.toList(String.class, ids);
+
         // 杜绝我删我自己行为
         UserModel currUser = UserUtil.getUser();
-        for (String id : ids) {
-            if(StringUtils.equals(currUser.getId(), id)){
-                // 不可删除自身
-                throw new ServiceException(SystemMsg.EXCEPTION_USER_DEL_SELF);
+        if(CollUtil.isNotEmpty(idList)){
+            if(idList.contains(currUser.getId())){
+                // 不可操作自身
+                throw new ServiceException(SystemMsg.EXCEPTION_USER_HANDLE_SELF);
+            }
+
+            // 超级管理员
+            UserModel superAdmin = UserUtil.getUserByUserName(UserUtil.SUPER_ADMIN);
+            if(superAdmin != null){
+                String superAdminId = superAdmin.getId();
+                if(idList.contains(superAdminId)){
+                    // 不可操作超管账号
+                    throw new ServiceException(SystemMsg.EXCEPTION_USER_HANDLE_SUPER_ADMIN);
+                }
             }
         }
 
         QueryBuilder<SysUser> queryBuilder = new GenQueryBuilder<>();
         QueryWrapper<SysUser> queryWrapper = queryBuilder.build();
-        List<String> idList = Convert.toList(String.class, ids);
         queryWrapper.in(HumpUtil.humpToUnderline(MyBatisConstants.FIELD_ID),idList);
         List<UserModel> modelList = super.transformTs2Ms(
                 this.findList(queryWrapper)
@@ -326,16 +363,28 @@ public class UserServiceImpl extends CrudServiceImpl<UserMapper, SysUser, UserMo
             return false;
         }
 
-        // 杜绝我删我自己行为
-        UserModel currUser = UserUtil.getUser();
-
         List<String> idList = Lists.newArrayListWithCapacity(models.size());
         for (UserModel model : models) {
-            if(StringUtils.equals(currUser.getId(), model.getId())){
-                // 不可删除自身
-                throw new ServiceException(SystemMsg.EXCEPTION_USER_DEL_SELF);
-            }
             idList.add(model.getId());
+        }
+
+        // 杜绝我删我自己行为
+        UserModel currUser = UserUtil.getUser();
+        if(CollUtil.isNotEmpty(idList)){
+            if(idList.contains(currUser.getId())){
+                // 不可操作自身
+                throw new ServiceException(SystemMsg.EXCEPTION_USER_HANDLE_SELF);
+            }
+
+            // 超级管理员
+            UserModel superAdmin = UserUtil.getUserByUserName(UserUtil.SUPER_ADMIN);
+            if(superAdmin != null){
+                String superAdminId = superAdmin.getId();
+                if(idList.contains(superAdminId)){
+                    // 不可操作超管账号
+                    throw new ServiceException(SystemMsg.EXCEPTION_USER_HANDLE_SUPER_ADMIN);
+                }
+            }
         }
 
         QueryBuilder<SysUser> queryBuilder = new GenQueryBuilder<>();

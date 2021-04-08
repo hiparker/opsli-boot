@@ -26,6 +26,7 @@ import org.opsli.api.wrapper.system.tenant.TenantModel;
 import org.opsli.api.wrapper.system.user.UserModel;
 import org.opsli.common.annotation.InterfaceCrypto;
 import org.opsli.common.annotation.Limiter;
+import org.opsli.common.enums.DictType;
 import org.opsli.core.api.TokenThreadLocal;
 import org.opsli.common.enums.AlertType;
 import org.opsli.common.enums.OptionsType;
@@ -108,15 +109,21 @@ public class LoginRestController {
         // 如果验证成功， 则清除锁定信息
         UserTokenUtil.clearLockAccount(form.getUsername());
 
-        // 账号锁定
-        if(JwtRealm.LOCK_VAL.equals(user.getLocked())){
-            throw new TokenException(TokenMsg.EXCEPTION_LOGIN_ACCOUNT_LOCKED);
-        }
 
-        // 如果不是超级管理员 需要验证租户是否生效
+
+        // 如果不是超级管理员
         if(!StringUtils.equals(UserUtil.SUPER_ADMIN, user.getUsername())){
+            // 账号锁定验证
+            if(StringUtils.isEmpty(user.getEnable()) ||
+                    DictType.NO_YES_NO.getValue().equals(user.getEnable())){
+                // 账号已被锁定,请联系管理员
+                throw new TokenException(TokenMsg.EXCEPTION_LOGIN_ACCOUNT_LOCKED);
+            }
+
+            // 租户启用验证
             TenantModel tenant = TenantUtil.getTenant(user.getTenantId());
             if(tenant == null){
+                // 租户未启用，请联系管理员
                 throw new TokenException(TokenMsg.EXCEPTION_LOGIN_TENANT_NOT_USABLE);
             }
         }

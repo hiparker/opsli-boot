@@ -10,6 +10,7 @@ import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.opsli.api.wrapper.system.tenant.TenantModel;
 import org.opsli.api.wrapper.system.user.UserModel;
+import org.opsli.common.enums.DictType;
 import org.opsli.core.api.TokenThreadLocal;
 import org.opsli.common.exception.TokenException;
 import org.opsli.core.msg.TokenMsg;
@@ -32,8 +33,6 @@ import java.util.List;
 @Slf4j
 public class JwtRealm extends AuthorizingRealm implements FlagRealm {
 
-    /** 账号锁定状态 */
-    public static final String LOCK_VAL = "1";
 
     @Override
     public boolean supports(AuthenticationToken token) {
@@ -86,19 +85,26 @@ public class JwtRealm extends AuthorizingRealm implements FlagRealm {
         String userId = UserTokenUtil.getUserIdByToken(accessToken);
         UserModel user = UserUtil.getUser(userId);
 
-        // 3. 校验账户是否锁定
-        if(user == null || user.getLocked().equals(LOCK_VAL)){
-            // 账号已被锁定,请联系管理员
+        // 3. 是否存在该用户
+        if(user == null){
             // token失效，请重新登录
             throw new TokenException(
                     TokenMsg.EXCEPTION_LOGIN_ACCOUNT_LOCKED);
         }
 
-        // 4. 验证租户是否启用
-        // 如果不是超级管理员 需要验证租户是否生效
+        // 4. 如果不是超级管理员
         if(!StringUtils.equals(UserUtil.SUPER_ADMIN, user.getUsername())){
+            // 4.1 账号锁定验证
+            if(StringUtils.isEmpty(user.getEnable()) ||
+                    DictType.NO_YES_NO.getValue().equals(user.getEnable())){
+                // 账号已被锁定,请联系管理员
+                throw new TokenException(TokenMsg.EXCEPTION_LOGIN_ACCOUNT_LOCKED);
+            }
+
+            // 4.2 租户启用验证
             TenantModel tenant = TenantUtil.getTenant(user.getTenantId());
             if(tenant == null){
+                // 租户未启用，请联系管理员
                 throw new TokenException(TokenMsg.EXCEPTION_LOGIN_TENANT_NOT_USABLE);
             }
         }
@@ -127,8 +133,8 @@ public class JwtRealm extends AuthorizingRealm implements FlagRealm {
         String userId = UserTokenUtil.getUserIdByToken(accessToken);
         UserModel user = UserUtil.getUser(userId);
 
-        // 3. 校验账户是否锁定
-        if(user == null || user.getLocked().equals(JwtRealm.LOCK_VAL)){
+        // 3. 校验账户是否启用 否
+        if(user == null || DictType.NO_YES_NO.getValue().equals(user.getEnable())){
             // 账号已被锁定,请联系管理员
             // token失效，请重新登录
             throw new TokenException(

@@ -11,7 +11,7 @@
         a.secret_key as secretKey,
         a.no as no,
         a.real_name as realName,
-        a.locked as locked,
+        a.enable as enable,
         a.mobile as mobile,
         a.email as email,
         a.avatar as avatar,
