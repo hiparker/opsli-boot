@@ -170,6 +170,15 @@ public interface UserApi {
     ResultVo<?> update(@RequestBody UserModel model);
 
     /**
+     * 用户自身信息 修改
+     * @param model 模型
+     * @return ResultVo
+     */
+    @PostMapping("/updateSelf")
+    ResultVo<?> updateSelf(@RequestBody UserModel model);
+
+
+    /**
      * 用户信息 删除
      * @param id ID
      * @return ResultVo

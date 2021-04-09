@@ -394,12 +394,29 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
     public ResultVo<?> update(UserModel model) {
         // 演示模式 不允许操作
         super.demoError();
-
         // 调用修改方法
         IService.update(model);
         return ResultVo.success("修改用户信息成功");
     }
 
+    /**
+     * 用户信息 自身修改
+     * @param model 模型
+     * @return ResultVo
+     */
+    @ApiOperation(value = "修改自身用户信息", notes = "修改自身用户信息")
+    @EnableLog
+    @Override
+    public ResultVo<?> updateSelf(UserModel model) {
+        UserModel currUser = UserUtil.getUser();
+        if(!StringUtils.equals(currUser.getId(), model.getId())){
+            // 非法参数 防止其他用户 通过该接口 修改非自身用户数据
+            throw new ServiceException(SystemMsg.EXCEPTION_USER_ILLEGAL_PARAMETER);
+        }
+        // 调用修改方法
+        IService.update(model);
+        return ResultVo.success("修改用户信息成功");
+    }
 
     /**
      * 用户信息 删除

@@ -62,7 +62,6 @@ public class UserModel extends ApiWrapper {
     /** 是否启用 */
     @ApiModelProperty(value = "是否启用")
     @ExcelIgnore
-    @ValidationArgs({ValiArgsType.IS_NOT_NULL})
     @ValidationArgsLenMax(1)
     private String enable;
 
