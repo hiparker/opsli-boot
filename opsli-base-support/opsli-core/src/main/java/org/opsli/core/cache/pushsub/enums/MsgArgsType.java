@@ -42,11 +42,6 @@ public enum MsgArgsType {
     /** 用户数据*/
     USER_MODEL_DATA,
 
-    /** 菜单编号 */
-    MENU_CODE,
-    /** 菜单数据*/
-    MENU_MODEL_DATA,
-
     /** 组织 用户ID */
     ORG_USER_ID,
     /** 组织 用户数据 */

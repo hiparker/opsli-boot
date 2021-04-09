@@ -163,9 +163,9 @@ public interface MenuApi {
 
     // ================= 普通
     /**
-     * 根据菜单编号 获得菜单
-     * @param menuCode 菜单编号
+     * 根据菜单权限 获得菜单
+     * @param permissions 菜单权限
      * @return ResultVo
      */
-    ResultVo<MenuModel> getByCode(String menuCode);
+    ResultVo<MenuModel> getByPermissions(String permissions);
 }

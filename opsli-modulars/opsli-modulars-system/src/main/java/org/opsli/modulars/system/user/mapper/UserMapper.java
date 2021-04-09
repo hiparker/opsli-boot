@@ -67,6 +67,13 @@ public interface UserMapper extends BaseMapper<SysUser> {
     List<SysMenu> findMenuListByUserId(String userId);
 
     /**
+     * 根据用户ID 获得全部菜单集合
+     * @param userId
+     * @return
+     */
+    List<SysMenu> findMenuAllListByUserId(String userId);
+
+    /**
      * 修改密码
      * @param userPassword
      * @return

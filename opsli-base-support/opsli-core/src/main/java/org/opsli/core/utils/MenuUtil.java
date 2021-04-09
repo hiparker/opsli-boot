@@ -50,13 +50,13 @@ public class MenuUtil {
 
 
     /**
-     * 根据 menuCode 获得菜单
-     * @param menuCode
+     * 根据 权限 获得菜单
+     * @param permissions
      * @return
      */
-    public static MenuModel getMenuByCode(String menuCode){
+    public static MenuModel getMenuByPermissions(String permissions){
         // 缓存Key
-        String cacheKey = PREFIX_CODE + menuCode;
+        String cacheKey = PREFIX_CODE + permissions;
 
         // 先从缓存里拿
         MenuModel menuModel = CacheUtil.getTimed(MenuModel.class, cacheKey);
@@ -86,7 +86,7 @@ public class MenuUtil {
             }
 
             // 查询数据库
-            ResultVo<MenuModel> resultVo = menuApi.getByCode(menuCode);
+            ResultVo<MenuModel> resultVo = menuApi.getByPermissions(permissions);
             if(resultVo.isSuccess()){
                 menuModel = resultVo.getData();
                 // 存入缓存
@@ -117,21 +117,21 @@ public class MenuUtil {
      * @return
      */
     public static boolean refreshMenu(MenuModel menu){
-        if(menu == null || StringUtils.isEmpty(menu.getMenuCode())){
+        if(menu == null || StringUtils.isEmpty(menu.getPermissions())){
             return true;
         }
 
         // 计数器
         int count = 0;
 
-        MenuModel model = CacheUtil.getTimed(MenuModel.class, PREFIX_CODE + menu.getMenuCode());
-        boolean hasNilFlag = CacheUtil.hasNilFlag(PREFIX_CODE + menu.getMenuCode());
+        MenuModel model = CacheUtil.getTimed(MenuModel.class, PREFIX_CODE + menu.getPermissions());
+        boolean hasNilFlag = CacheUtil.hasNilFlag(PREFIX_CODE + menu.getPermissions());
 
         // 只要不为空 则执行刷新
         if (hasNilFlag){
             count++;
             // 清除空拦截
-            boolean tmp = CacheUtil.delNilFlag(PREFIX_CODE + menu.getMenuCode());
+            boolean tmp = CacheUtil.delNilFlag(PREFIX_CODE + menu.getPermissions());
             if(tmp){
                 count--;
             }
@@ -140,7 +140,7 @@ public class MenuUtil {
         if(model != null){
             count++;
             // 先删除
-            boolean tmp = CacheUtil.del(PREFIX_CODE + menu.getMenuCode());
+            boolean tmp = CacheUtil.del(PREFIX_CODE + menu.getPermissions());
             if(tmp){
                 count--;
             }

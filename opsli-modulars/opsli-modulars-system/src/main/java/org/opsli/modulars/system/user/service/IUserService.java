@@ -72,6 +72,13 @@ public interface IUserService extends CrudServiceInterface<SysUser, UserModel> {
      */
     List<MenuModel> getMenuListByUserId(String userId);
 
+    /**
+     * 根据用户ID 获得全部菜单集合
+     * @param userId
+     * @return
+     */
+    List<MenuModel> getMenuAllListByUserId(String userId);
+
 
     /**
      * 修改密码

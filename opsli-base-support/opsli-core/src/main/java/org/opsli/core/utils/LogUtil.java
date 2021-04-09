@@ -162,7 +162,7 @@ public final class LogUtil {
                     List<MenuModel> menuListByUserId = UserUtil.getMenuListByUserId(user.getId());
                     if(menuListByUserId != null){
                         // 根据当前controller权限 获得对应权限数据
-                        MenuModel permsModel = MenuUtil.getMenuByCode(perms);
+                        MenuModel permsModel = MenuUtil.getMenuByPermissions(perms);
                         if(permsModel != null){
                             // 依次获得菜单全名
                             StringBuilder logTitleBuf = new StringBuilder();

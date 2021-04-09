@@ -52,6 +52,8 @@ import org.opsli.core.utils.UserUtil;
 import org.opsli.modulars.system.SystemMsg;
 import org.opsli.modulars.system.menu.entity.SysMenu;
 import org.opsli.modulars.system.menu.service.IMenuService;
+import org.opsli.modulars.system.user.service.IUserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import javax.servlet.http.HttpServletRequest;
@@ -74,17 +76,20 @@ import java.util.Map;
 public class MenuRestController extends BaseRestController<SysMenu, MenuModel, IMenuService>
         implements MenuApi {
 
+    @Autowired
+    private IUserService iUserService;
+
     private static final String SORT_FIELD = "order";
 
     /** 菜单排除字段 */
     private static final String[] EXCLUSION_FIELDS = {
             "createBy", "createTime", "updateBy", "updateTime",
-            "deleted", "menuCode", "menuName", "ts", "encryptData",
+            "deleted", "permissions", "menuName", "ts", "encryptData",
             "hidden", "version", "sortNo", "url", "icon"
     };
 
     /**
-     * 根据 获得用户 菜单 - 权限
+     * 根据 获得用户 菜单 - 按钮权限 不是高频率
      * 判断是否是超级管理员，如果是 则显示全部菜单 否则显示有权限菜单
      *
      * @return ResultVo
@@ -95,7 +100,7 @@ public class MenuRestController extends BaseRestController<SysMenu, MenuModel, I
         UserModel user = UserUtil.getUser();
 
         // 获得当前用户菜单
-        List<MenuModel> menuModelList = UserUtil.getMenuListByUserId(user.getId());
+        List<MenuModel> menuModelList = iUserService.getMenuAllListByUserId(user.getId());
         if(CollUtil.isEmpty(menuModelList)){
             // 用户暂无角色菜单，请设置后登录
             throw new ServiceException(SystemMsg.EXCEPTION_USER_MENU_NOT_NULL);
@@ -105,20 +110,8 @@ public class MenuRestController extends BaseRestController<SysMenu, MenuModel, I
         // 修复菜单问题导致无法跳转主页
         menuModelList.removeIf(menuModel -> MenuConstants.MENU.equals(menuModel.getType()) &&
                 (StringUtils.isEmpty(menuModel.getComponent()) ||
-                        StringUtils.isEmpty(menuModel.getMenuCode()) ||
                         StringUtils.isEmpty(menuModel.getUrl())
                 ));
-
-        // 获得当前用户权限
-        List<String> perms = UserUtil.getUserAllPermsByUserId(user.getId());
-        if(CollUtil.isNotEmpty(perms)){
-            QueryBuilder<SysMenu> queryBuilder = new GenQueryBuilder<>();
-            QueryWrapper<SysMenu> wrapper = queryBuilder.build();
-            wrapper.in("menu_code", perms);
-            List<SysMenu> sysMenus = IService.findList(wrapper);
-            List<MenuModel> menuModels = WrapperUtil.transformInstance(sysMenus, MenuModel.class);
-            menuModelList.addAll(menuModels);
-        }
 
         // 获得菜单树
         List<Tree<Object>> treeNodes = getMenuTrees(menuModelList);
@@ -127,7 +120,7 @@ public class MenuRestController extends BaseRestController<SysMenu, MenuModel, I
     }
 
     /**
-     * 当前登陆用户菜单
+     * 当前登陆用户菜单 高频率
      *
      * 判断是否是超级管理员，如果是 则显示全部菜单 否则显示有权限菜单
      *
@@ -149,7 +142,6 @@ public class MenuRestController extends BaseRestController<SysMenu, MenuModel, I
         // 修复菜单问题导致无法跳转主页
         menuModelList.removeIf(menuModel -> MenuConstants.MENU.equals(menuModel.getType()) &&
                 (StringUtils.isEmpty(menuModel.getComponent()) ||
-                 StringUtils.isEmpty(menuModel.getMenuCode()) ||
                 StringUtils.isEmpty(menuModel.getUrl())
                         ));
 
@@ -357,13 +349,13 @@ public class MenuRestController extends BaseRestController<SysMenu, MenuModel, I
     // ==================
 
     /**
-     * 根据菜单编号 获得菜单
-     * @param menuCode 菜单编号
+     * 根据菜单权限 获得菜单
+     * @param permissions 菜单权限
      * @return ResultVo
      */
     @Override
-    public ResultVo<MenuModel> getByCode(String menuCode) {
-        MenuModel menu = IService.getByCode(menuCode);
+    public ResultVo<MenuModel> getByPermissions(String permissions) {
+        MenuModel menu = IService.getByPermissions(permissions);
         if(menu == null){
             ResultVo.error("暂无数据");
         }

@@ -450,7 +450,7 @@ public class UserServiceImpl extends CrudServiceImpl<UserMapper, SysUser, UserMo
             queryWrapper.eq("hidden", '0');
             List<SysMenu> menuList = iMenuService.findList(queryWrapper);
             for (SysMenu sysMenu : menuList) {
-                perms.add(sysMenu.getMenuCode());
+                perms.add(sysMenu.getPermissions());
             }
         }else{
             perms = mapper.queryAllPerms(userId);
@@ -480,6 +480,31 @@ public class UserServiceImpl extends CrudServiceImpl<UserMapper, SysUser, UserMo
             menuList = iMenuService.findList(queryWrapper);
         }else{
             menuList = mapper.findMenuListByUserId(userId);
+        }
+
+        return WrapperUtil.transformInstance(menuList, MenuModel.class);
+    }
+
+    @Override
+    public List<MenuModel> getMenuAllListByUserId(String userId) {
+
+        UserModel userModel = this.get(userId);
+        if(userModel == null){
+            return new ArrayList<>();
+        }
+
+        List<SysMenu> menuList;
+
+        // 判断是否是超级管理员 如果是超级管理员 则默认享有全部权限
+        if(StringUtils.equals(UserUtil.SUPER_ADMIN, userModel.getUsername())){
+            QueryBuilder<SysMenu> queryBuilder = new GenQueryBuilder<>();
+            QueryWrapper<SysMenu> queryWrapper = queryBuilder.build();
+            queryWrapper.notIn("parent_id", -1);
+            queryWrapper.in("type", '1', '3');
+            queryWrapper.eq("hidden", '0');
+            menuList = iMenuService.findList(queryWrapper);
+        }else{
+            menuList = mapper.findMenuAllListByUserId(userId);
         }
 
         return WrapperUtil.transformInstance(menuList, MenuModel.class);

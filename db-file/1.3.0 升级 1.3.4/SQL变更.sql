@@ -24,10 +24,165 @@ ALTER TABLE `sys_user` CHANGE COLUMN `locked` `enable` char(1) CHARACTER SET utf
 ALTER TABLE `sys_tenant` CHANGE COLUMN `iz_usable` `enable` char(1) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '是否启用  0是  1否' AFTER `tenant_name`;
 
 -- 菜单变更
-ALTER TABLE `sys_menu` ADD COLUMN `always_show` char(1) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '0' COMMENT '是否总是显示 0是  1否' AFTER `sort_no`,
-DROP PRIMARY KEY,
-ADD PRIMARY KEY (`id`) USING BTREE;
+-- ----------------------------
+-- Table structure for sys_menu
+-- ----------------------------
+DROP TABLE IF EXISTS `sys_menu`;
+CREATE TABLE `sys_menu` (
+    `id` bigint(19) NOT NULL COMMENT '功能主键',
+    `parent_id` bigint(19) DEFAULT '0' COMMENT '父级主键',
+    `menu_name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '名称',
+    `permissions` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '权限',
+    `icon` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '图标',
+    `type` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '类型: 1-菜单 2-按钮 3-链接',
+    `url` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT 'url地址',
+    `component` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '组件',
+    `redirect` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '重定向',
+    `sort_no` int(11) NOT NULL COMMENT '排序',
+    `always_show` char(1) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '0' COMMENT '是否总是显示 0是  1否',
+    `hidden` char(1) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '0' COMMENT '是否隐藏 0是  1否',
+    `deleted` char(1) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '0' COMMENT '删除状态',
+    `version` int(11) NOT NULL COMMENT '版本（乐观锁）',
+    `create_by` bigint(19) NOT NULL COMMENT '创建用户',
+    `create_time` datetime NOT NULL COMMENT '创建日期',
+    `update_by` bigint(19) NOT NULL COMMENT '修改用户',
+    `update_time` datetime NOT NULL COMMENT '修改日期',
+    `ts` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '时间戳',
+    PRIMARY KEY (`id`) USING BTREE,
+    KEY `pid` (`parent_id`) USING BTREE COMMENT '上级id'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC COMMENT='系统功能表';
 
+-- ----------------------------
+-- Records of sys_menu
+-- ----------------------------
+BEGIN;
+INSERT INTO `sys_menu` VALUES (1, 0, '系统配置', NULL, 'cog', '1', '/system', 'Layout', NULL, 3, '0', '0', '0', 0, 1, '2020-04-14 19:07:31', 1, '2020-10-08 03:15:16', '2021-04-09 23:14:15');
+INSERT INTO `sys_menu` VALUES (2, 1, '菜单管理', NULL, NULL, '1', 'menu', 'views/modules/sys/menuManagement/index', NULL, 1, '0', '0', '0', 0, 1, '2020-04-14 19:07:31', 1, '2020-10-07 23:49:36', '2021-04-09 23:14:15');
+INSERT INTO `sys_menu` VALUES (3, 1, '用户管理', NULL, '<vab-icon :icon=\"[\'fas\', \'users\']\"></vab-icon>', '1', 'user', 'views/modules/sys/userManagement/index', NULL, 2, '0', '0', '0', 0, 1, '2020-04-14 19:07:31', 1, '2020-10-10 17:03:04', '2021-04-09 23:14:15');
+INSERT INTO `sys_menu` VALUES (4, 1, '角色管理', NULL, NULL, '1', 'role', 'views/modules/sys/roleManagement/index', NULL, 3, '0', '0', '0', 0, 1, '2020-09-24 14:01:31', 1, '2020-10-07 23:49:47', '2021-04-09 23:14:15');
+INSERT INTO `sys_menu` VALUES (1312756531833356289, 1, '字典管理', NULL, NULL, '1', 'dict', 'views/modules/sys/dictManagement/index', NULL, 4, '0', '0', '0', 1, 1, '2020-10-04 09:08:42', 1, '2020-10-10 19:01:46', '2021-04-09 23:14:15');
+INSERT INTO `sys_menu` VALUES (1313789204920131585, 3, '增加', 'system_user_insert', NULL, '2', NULL, NULL, NULL, 2, '0', '0', '0', 0, 1, '2020-10-07 05:32:10', 1, '2020-10-07 10:42:13', '2021-04-09 23:13:01');
+INSERT INTO `sys_menu` VALUES (1313789308506857474, 3, '修改', 'system_user_update', NULL, '2', NULL, NULL, NULL, 3, '0', '0', '0', 0, 1, '2020-10-07 05:32:35', 1, '2020-10-07 06:42:26', '2021-04-09 23:13:01');
+INSERT INTO `sys_menu` VALUES (1313789400169177089, 3, '删除', 'system_user_delete', NULL, '2', NULL, NULL, NULL, 4, '0', '0', '0', 0, 1, '2020-10-07 05:32:57', 1, '2020-10-07 06:42:38', '2021-04-09 23:13:01');
+INSERT INTO `sys_menu` VALUES (1313789529840279554, 3, '导出', 'system_user_export', NULL, '2', NULL, NULL, NULL, 5, '0', '0', '0', 0, 1, '2020-10-07 05:33:28', 1, '2020-10-07 06:42:43', '2021-04-09 23:13:01');
+INSERT INTO `sys_menu` VALUES (1313806847370620930, 3, '查看', 'system_user_select', NULL, '2', NULL, NULL, NULL, 1, '0', '0', '0', 0, 1, '2020-10-07 06:42:16', 1, '2020-10-07 06:42:16', '2021-04-09 23:13:01');
+INSERT INTO `sys_menu` VALUES (1313864645827678210, 3, '设置角色', 'system_user_setRole', '', '2', NULL, NULL, NULL, 6, '0', '0', '0', 0, 1, '2020-10-07 10:31:57', 1, '2020-10-08 03:18:38', '2021-04-09 23:13:01');
+INSERT INTO `sys_menu` VALUES (1313864777918894082, 3, '修改密码', 'system_user_updatePassword', NULL, '2', NULL, NULL, NULL, 7, '0', '0', '0', 0, 1, '2020-10-07 10:32:28', 1, '2020-10-07 10:32:28', '2021-04-09 23:13:01');
+INSERT INTO `sys_menu` VALUES (1313866576193212418, 2, '增加', 'system_menu_insert', NULL, '2', NULL, NULL, NULL, 2, '0', '0', '0', 0, 1, '2020-10-07 10:39:37', 1, '2020-10-07 10:42:03', '2021-04-09 23:13:01');
+INSERT INTO `sys_menu` VALUES (1313866652533739522, 2, '修改', 'system_menu_update', NULL, '2', NULL, NULL, NULL, 3, '0', '0', '0', 0, 1, '2020-10-07 10:39:55', 1, '2020-10-07 10:41:01', '2021-04-09 23:13:01');
+INSERT INTO `sys_menu` VALUES (1313866789838475265, 2, '删除', 'system_menu_delete', NULL, '2', NULL, NULL, NULL, 4, '0', '0', '0', 0, 1, '2020-10-07 10:40:28', 1, '2020-10-07 10:41:11', '2021-04-09 23:13:01');
+INSERT INTO `sys_menu` VALUES (1313866828526735361, 2, '查看', 'system_menu_select', NULL, '2', NULL, NULL, NULL, 1, '0', '0', '0', 2, 1, '2020-10-07 10:40:37', 1, '2021-04-09 23:51:37', '2021-04-09 23:51:37');
+INSERT INTO `sys_menu` VALUES (1313867061172195330, 4, '查看', 'system_role_select', NULL, '2', NULL, NULL, NULL, 1, '0', '0', '0', 0, 1, '2020-10-07 10:41:33', 1, '2020-10-07 10:41:33', '2021-04-09 23:13:01');
+INSERT INTO `sys_menu` VALUES (1313867122731995137, 4, '增加', 'system_role_insert', NULL, '2', NULL, NULL, NULL, 2, '0', '0', '0', 0, 1, '2020-10-07 10:41:47', 1, '2020-10-07 10:42:25', '2021-04-09 23:13:01');
+INSERT INTO `sys_menu` VALUES (1313867360502894594, 4, '修改', 'system_role_update', NULL, '2', NULL, NULL, NULL, 3, '0', '0', '0', 0, 1, '2020-10-07 10:42:44', 1, '2020-10-07 10:42:44', '2021-04-09 23:13:01');
+INSERT INTO `sys_menu` VALUES (1313867409949544450, 4, '删除', 'system_role_delete', NULL, '2', NULL, NULL, NULL, 4, '0', '0', '0', 0, 1, '2020-10-07 10:42:56', 1, '2020-10-07 10:42:56', '2021-04-09 23:13:01');
+INSERT INTO `sys_menu` VALUES (1313867556498526209, 1312756531833356289, '查看', 'system_dict_select', NULL, '2', NULL, NULL, NULL, 1, '0', '0', '0', 0, 1, '2020-10-07 10:43:31', 1, '2020-10-07 10:43:31', '2021-04-09 23:13:01');
+INSERT INTO `sys_menu` VALUES (1313867617949274113, 1312756531833356289, '增加', 'system_dict_insert', NULL, '2', NULL, NULL, NULL, 2, '0', '0', '0', 0, 1, '2020-10-07 10:43:45', 1, '2020-10-07 10:43:51', '2021-04-09 23:13:01');
+INSERT INTO `sys_menu` VALUES (1313867682814185474, 1312756531833356289, '修改', 'system_dict_update', NULL, '2', NULL, NULL, NULL, 3, '0', '0', '0', 0, 1, '2020-10-07 10:44:01', 1, '2020-10-07 10:44:01', '2021-04-09 23:13:01');
+INSERT INTO `sys_menu` VALUES (1313867732508299265, 1312756531833356289, '删除', 'system_dict_delete', NULL, '2', NULL, NULL, NULL, 4, '0', '0', '0', 0, 1, '2020-10-07 10:44:13', 1, '2020-10-07 10:44:13', '2021-04-09 23:13:01');
+INSERT INTO `sys_menu` VALUES (1313885644824522754, 4, '设置权限', 'system_role_setPerms', NULL, '2', NULL, NULL, NULL, 5, '0', '0', '0', 0, 1, '2020-10-07 11:55:23', 1, '2020-10-07 11:55:23', '2021-04-09 23:13:01');
+INSERT INTO `sys_menu` VALUES (1314066547072872450, 0, '首页', NULL, '', '1', '/', 'Layout', 'index', 1, '0', '0', '0', 11, 1, '2020-10-07 23:54:14', 1, '2021-04-09 23:51:27', '2021-04-09 23:51:27');
+INSERT INTO `sys_menu` VALUES (1314066863436640258, 1314066547072872450, '首页', NULL, 'home', '1', 'index', 'views/index/index', NULL, 1, '0', '0', '0', 0, 1, '2020-10-07 23:55:29', 1, '2020-10-08 03:20:38', '2021-04-09 23:14:15');
+INSERT INTO `sys_menu` VALUES (1314068325453574145, 0, '开发工具', NULL, 'tools', '1', '/deve', 'Layout', NULL, 100, '0', '0', '0', 0, 1, '2020-10-08 00:01:18', 1, '2020-10-08 03:51:15', '2021-04-09 23:14:15');
+INSERT INTO `sys_menu` VALUES (1314071137365307394, 1314068325453574145, '组件', NULL, '', '1', 'vab', 'EmptyLayout', NULL, 3, '0', '0', '0', 1, 1, '2020-10-08 00:12:28', 1, '2020-11-15 16:36:56', '2021-04-09 23:14:15');
+INSERT INTO `sys_menu` VALUES (1314074765178187777, 1314071137365307394, '外链', NULL, NULL, '3', 'https://github.com/hiparker/opsli-boot?utm_source=gold_browser_extension', NULL, NULL, 1, '0', '0', '0', 0, 1, '2020-10-08 00:26:53', 1, '2020-10-08 00:30:21', '2021-04-09 23:14:15');
+INSERT INTO `sys_menu` VALUES (1314075128635600897, 1314071137365307394, '图标', NULL, NULL, '1', 'icon', 'EmptyLayout', NULL, 2, '0', '0', '0', 0, 1, '2020-10-08 00:28:20', 1, '2020-10-08 00:48:16', '2021-04-09 23:14:15');
+INSERT INTO `sys_menu` VALUES (1314075267769053186, 1314075128635600897, '常规图标', NULL, NULL, '1', 'awesomeIcon', 'views/vab/icon/index', NULL, 1, '0', '0', '0', 0, 1, '2020-10-08 00:28:53', 1, '2020-10-08 00:48:19', '2021-04-09 23:14:15');
+INSERT INTO `sys_menu` VALUES (1314075542684708865, 1314075128635600897, '小清新图标', NULL, NULL, '1', 'remixIcon', 'views/vab/icon/remixIcon', NULL, 2, '0', '0', '0', 0, 1, '2020-10-08 00:29:58', 1, '2020-10-08 00:48:22', '2021-04-09 23:14:15');
+INSERT INTO `sys_menu` VALUES (1314075764852797442, 1314075128635600897, '多彩图标', NULL, NULL, '1', 'colorfulIcon', 'views/vab/icon/colorfulIcon', NULL, 3, '0', '0', '0', 0, 1, '2020-10-08 00:30:51', 1, '2020-10-08 00:48:25', '2021-04-09 23:14:15');
+INSERT INTO `sys_menu` VALUES (1314075970382082050, 1314071137365307394, '表格', NULL, NULL, '1', 'table', 'EmptyLayout', NULL, 3, '0', '0', '0', 0, 1, '2020-10-08 00:31:40', 1, '2020-10-08 00:48:31', '2021-04-09 23:14:15');
+INSERT INTO `sys_menu` VALUES (1314076169481498625, 1314075970382082050, '综合表格', NULL, NULL, '1', 'comprehensiveTable', 'views/vab/table/index', NULL, 1, '0', '0', '0', 0, 1, '2020-10-08 00:32:28', 1, '2020-10-08 00:48:34', '2021-04-09 23:14:15');
+INSERT INTO `sys_menu` VALUES (1314076280542474242, 1314075970382082050, '行内编辑', NULL, NULL, '1', 'inlineEditTable', 'views/vab/table/inlineEditTable', NULL, 2, '0', '0', '0', 0, 1, '2020-10-08 00:32:54', 1, '2020-10-08 00:32:54', '2021-04-09 23:14:15');
+INSERT INTO `sys_menu` VALUES (1314076678317682689, 1314071137365307394, '地图', NULL, NULL, '1', 'map', 'views/vab/map/index', NULL, 4, '0', '0', '0', 0, 1, '2020-10-08 00:34:29', 1, '2020-10-08 00:34:29', '2021-04-09 23:14:15');
+INSERT INTO `sys_menu` VALUES (1314077008057085954, 1314071137365307394, 'WebSocket', NULL, NULL, '1', 'websocket', 'views/vab/webSocket/index', NULL, 5, '0', '0', '0', 0, 1, '2020-10-08 00:35:48', 1, '2020-10-08 00:35:48', '2021-04-09 23:14:15');
+INSERT INTO `sys_menu` VALUES (1314077108560998402, 1314071137365307394, '表单', NULL, NULL, '1', 'form', 'views/vab/form/index', NULL, 6, '0', '0', '0', 0, 1, '2020-10-08 00:36:12', 1, '2020-10-08 00:36:12', '2021-04-09 23:14:15');
+INSERT INTO `sys_menu` VALUES (1314077229235318786, 1314071137365307394, '常用组件', NULL, NULL, '1', 'element', 'views/vab/element/index', NULL, 7, '0', '0', '0', 0, 1, '2020-10-08 00:36:40', 1, '2020-10-08 00:36:52', '2021-04-09 23:14:15');
+INSERT INTO `sys_menu` VALUES (1314077399507283970, 1314071137365307394, '树', NULL, NULL, '1', 'tree', 'views/vab/tree/index', NULL, 8, '0', '0', '0', 0, 1, '2020-10-08 00:37:21', 1, '2020-10-08 00:37:21', '2021-04-09 23:14:15');
+INSERT INTO `sys_menu` VALUES (1314077518340304897, 1314071137365307394, '卡片', NULL, NULL, '1', 'card', 'views/vab/card/index', NULL, 9, '0', '0', '0', 0, 1, '2020-10-08 00:37:49', 1, '2020-10-08 00:37:49', '2021-04-09 23:14:15');
+INSERT INTO `sys_menu` VALUES (1314077631905280001, 1314071137365307394, '滚动侦测', NULL, NULL, '1', 'betterscroll', 'views/vab/betterScroll/index', NULL, 10, '0', '0', '0', 0, 1, '2020-10-08 00:38:16', 1, '2020-10-08 00:38:16', '2021-04-09 23:14:15');
+INSERT INTO `sys_menu` VALUES (1314077729003417602, 1314071137365307394, '验证码', NULL, NULL, '1', 'verify', 'views/vab/verify/index', NULL, 11, '0', '0', '0', 0, 1, '2020-10-08 00:38:40', 1, '2020-10-08 00:38:40', '2021-04-09 23:14:15');
+INSERT INTO `sys_menu` VALUES (1314120834868060162, 1314071137365307394, '放大镜', NULL, NULL, '1', 'magnifier', 'views/vab/magnifier/index', NULL, 12, '0', '0', '0', 0, 1, '2020-10-08 03:29:57', 1, '2020-10-08 03:30:45', '2021-04-09 23:14:15');
+INSERT INTO `sys_menu` VALUES (1314121004749955073, 1314071137365307394, '图表', NULL, NULL, '1', 'echarts', 'views/vab/echarts/index', NULL, 13, '0', '0', '0', 0, 1, '2020-10-08 03:30:37', 1, '2020-10-08 03:30:54', '2021-04-09 23:14:15');
+INSERT INTO `sys_menu` VALUES (1314121200103858178, 1314071137365307394, 'Loading', NULL, NULL, '1', 'loading', 'views/vab/loading/index', NULL, 14, '0', '0', '0', 0, 1, '2020-10-08 03:31:24', 1, '2020-10-08 03:31:24', '2021-04-09 23:14:15');
+INSERT INTO `sys_menu` VALUES (1314121675192672257, 1314071137365307394, '视频播放器', NULL, NULL, '1', 'player', 'views/vab/player/index', NULL, 15, '0', '0', '0', 0, 1, '2020-10-08 03:33:17', 1, '2020-10-08 03:33:17', '2021-04-09 23:14:15');
+INSERT INTO `sys_menu` VALUES (1314121808793837570, 1314071137365307394, 'Markdown编辑器', NULL, NULL, '1', 'markdownEditor', 'views/vab/markdownEditor/index', NULL, 16, '0', '0', '0', 0, 1, '2020-10-08 03:33:49', 1, '2020-10-08 03:33:49', '2021-04-09 23:14:15');
+INSERT INTO `sys_menu` VALUES (1314121928784486402, 1314071137365307394, '富文本编辑器', NULL, NULL, '1', 'editor', 'views/vab/editor/index', NULL, 17, '0', '0', '0', 0, 1, '2020-10-08 03:34:18', 1, '2020-10-08 03:35:21', '2021-04-09 23:14:15');
+INSERT INTO `sys_menu` VALUES (1314122020136427521, 1314071137365307394, '二维码', NULL, NULL, '1', 'qrCode', 'views/vab/qrCode/index', NULL, 18, '0', '0', '0', 0, 1, '2020-10-08 03:34:39', 1, '2020-10-08 03:35:26', '2021-04-09 23:14:15');
+INSERT INTO `sys_menu` VALUES (1314122123047870466, 1314071137365307394, '返回顶部', NULL, NULL, '1', 'backToTop', 'views/vab/backToTop/index', NULL, 20, '0', '0', '0', 0, 1, '2020-10-08 03:35:04', 1, '2020-10-08 03:37:41', '2021-04-09 23:14:15');
+INSERT INTO `sys_menu` VALUES (1314122353273217025, 1314071137365307394, '图像拖拽比对', NULL, NULL, '1', 'imgComparison', 'views/vab/imgComparison/index', NULL, 19, '0', '0', '0', 0, 1, '2020-10-08 03:35:59', 1, '2020-10-08 03:35:59', '2021-04-09 23:14:15');
+INSERT INTO `sys_menu` VALUES (1314122457908518914, 1314071137365307394, '代码生成机', NULL, NULL, '1', 'codeGenerator', 'views/vab/codeGenerator/index', NULL, 21, '0', '0', '0', 1, 1, '2020-10-08 03:36:24', 1313694379541635074, '2020-10-11 17:21:34', '2021-04-09 23:14:15');
+INSERT INTO `sys_menu` VALUES (1314122556776652802, 1314071137365307394, 'markdown阅读器', NULL, NULL, '1', 'markdown', 'views/vab/markdown/index', NULL, 22, '0', '0', '0', 0, 1, '2020-10-08 03:36:47', 1, '2020-10-08 03:37:58', '2021-04-09 23:14:15');
+INSERT INTO `sys_menu` VALUES (1314122628184678401, 1314071137365307394, '小组件', NULL, NULL, '1', 'smallComponents', 'views/vab/smallComponents/index', NULL, 23, '0', '0', '0', 0, 1, '2020-10-08 03:37:04', 1, '2020-10-08 03:38:03', '2021-04-09 23:14:15');
+INSERT INTO `sys_menu` VALUES (1314122717041008641, 1314071137365307394, '上传', NULL, NULL, '1', 'upload', 'views/vab/upload/index', NULL, 24, '0', '0', '0', 0, 1, '2020-10-08 03:37:26', 1, '2020-10-08 03:38:10', '2021-04-09 23:14:15');
+INSERT INTO `sys_menu` VALUES (1314123071354839041, 1314071137365307394, 'Sticky吸附', NULL, NULL, '1', 'sticky', 'views/vab/sticky/index', NULL, 25, '0', '0', '0', 0, 1, '2020-10-08 03:38:50', 1, '2020-10-08 03:38:59', '2021-04-09 23:14:15');
+INSERT INTO `sys_menu` VALUES (1314123272790482945, 1314071137365307394, '错误日志模拟', NULL, NULL, '1', 'errorLog', 'views/vab/errorLog/index', NULL, 26, '0', '0', '0', 0, 1, '2020-10-08 03:39:38', 1, '2020-10-08 03:39:38', '2021-04-09 23:14:15');
+INSERT INTO `sys_menu` VALUES (1314123690283114498, 1314068325453574145, '商城', NULL, NULL, '1', 'mall', 'EmptyLayout', NULL, 4, '0', '0', '0', 1, 1, '2020-10-08 03:41:18', 1, '2020-11-15 16:37:13', '2021-04-09 23:14:15');
+INSERT INTO `sys_menu` VALUES (1314123894637993985, 1314123690283114498, '支付', NULL, NULL, '1', 'pay', 'views/mall/pay/index', NULL, 1, '0', '0', '0', 0, 1, '2020-10-08 03:42:06', 1, '2020-10-08 03:42:06', '2021-04-09 23:14:15');
+INSERT INTO `sys_menu` VALUES (1314123990633029633, 1314123690283114498, '商品列表', NULL, NULL, '1', 'goodsList', 'views/mall/goodsList/index', NULL, 2, '0', '0', '0', 0, 1, '2020-10-08 03:42:29', 1, '2020-10-08 03:43:01', '2021-04-09 23:14:15');
+INSERT INTO `sys_menu` VALUES (1314124102365093890, 1314123690283114498, '商品详情', NULL, NULL, '1', 'goodsDetail', 'views/mall/goodsDetail/index', NULL, 3, '0', '0', '0', 0, 1, '2020-10-08 03:42:56', 1, '2020-10-08 03:42:56', '2021-04-09 23:14:15');
+INSERT INTO `sys_menu` VALUES (1314124553093390338, 1314124403138633730, 'Error401', NULL, NULL, '1', '401', 'views/401', NULL, 1, '0', '0', '0', 0, 1, '2020-10-08 03:44:43', 1, '2020-10-08 03:45:19', '2021-04-09 23:14:15');
+INSERT INTO `sys_menu` VALUES (1314124676338819074, 1314124403138633730, 'Error404', NULL, NULL, '1', '404', 'views/404', NULL, 2, '0', '0', '0', 0, 1, '2020-10-08 03:45:13', 1, '2020-10-08 03:45:13', '2021-04-09 23:14:15');
+INSERT INTO `sys_menu` VALUES (1314610817013919745, 0, '运维工具', NULL, 'laptop-code', '1', '/devops', 'Layout', 'noRedirect', 99, '0', '0', '0', 1, 1, '2020-10-09 11:56:58', 1, '2020-11-13 11:05:54', '2021-04-09 23:14:15');
+INSERT INTO `sys_menu` VALUES (1314616518671085570, 1314610817013919745, '日志监控', NULL, NULL, '1', 'logs', 'views/modules/sys/logsManagement/index', NULL, 2, '0', '0', '0', 1, 1, '2020-10-09 12:19:37', 1313694379541635074, '2021-01-18 11:45:28', '2021-04-09 23:14:15');
+INSERT INTO `sys_menu` VALUES (1314782679522099201, 1314616518671085570, '查看', 'devops_logs_select', NULL, '2', NULL, NULL, NULL, 1, '0', '0', '0', 0, 1, '2020-10-09 23:19:53', 1, '2020-10-09 23:19:53', '2021-04-09 23:13:01');
+INSERT INTO `sys_menu` VALUES (1314782733087555586, 1314616518671085570, '删除', 'devops_logs_delete', NULL, '2', NULL, NULL, NULL, 2, '0', '0', '0', 0, 1, '2020-10-09 23:20:06', 1, '2020-10-09 23:22:09', '2021-04-09 23:13:01');
+INSERT INTO `sys_menu` VALUES (1314786106243301378, 1314068325453574145, '系统接口', NULL, NULL, '3', 'http://${BASE_PATH}/doc.html', NULL, NULL, 2, '0', '0', '0', 1, 1, '2020-10-09 23:33:30', 1, '2020-11-15 16:37:23', '2021-04-09 23:14:15');
+INSERT INTO `sys_menu` VALUES (1314799744349913090, 1314610817013919745, '数据库监控', NULL, NULL, '3', 'http://${BASE_PATH}/druid', NULL, NULL, 3, '0', '0', '0', 1, 1, '2020-10-10 00:27:42', 1313694379541635074, '2021-01-18 11:45:37', '2021-04-09 23:14:15');
+INSERT INTO `sys_menu` VALUES (1314884045724717057, 1312756531833356289, '设置字典', 'system_dict_setDict', NULL, '2', NULL, NULL, NULL, 1, '0', '0', '0', 0, 1, '2020-10-10 19:02:41', 1, '2020-10-10 19:02:41', '2021-04-09 23:13:01');
+INSERT INTO `sys_menu` VALUES (1315201380721446914, 1, '租户管理', NULL, NULL, '1', 'tenant', 'views/modules/sys/tenantManagement/index', NULL, 5, '0', '0', '0', 0, 1, '2020-10-11 16:03:39', 1, '2020-10-11 16:03:39', '2021-04-09 23:14:15');
+INSERT INTO `sys_menu` VALUES (1315201734892670977, 1315201380721446914, '查看', 'system_tenant_select', NULL, '2', NULL, NULL, NULL, 1, '0', '0', '0', 0, 1, '2020-10-11 16:05:04', 1, '2020-10-11 16:05:04', '2021-04-09 23:13:01');
+INSERT INTO `sys_menu` VALUES (1315201809668722690, 1315201380721446914, '增加', 'system_tenant_insert', NULL, '2', NULL, NULL, NULL, 2, '0', '0', '0', 0, 1, '2020-10-11 16:05:21', 1, '2020-10-11 16:05:21', '2021-04-09 23:13:01');
+INSERT INTO `sys_menu` VALUES (1315201864219840513, 1315201380721446914, '修改', 'system_tenant_update', NULL, '2', NULL, NULL, NULL, 3, '0', '0', '0', 0, 1, '2020-10-11 16:05:34', 1, '2020-10-11 16:05:34', '2021-04-09 23:13:01');
+INSERT INTO `sys_menu` VALUES (1315201925477650433, 1315201380721446914, '删除', 'system_tenant_delete', NULL, '2', NULL, NULL, NULL, 4, '0', '0', '0', 1, 1, '2020-10-11 16:05:49', 1, '2020-10-11 16:12:27', '2021-04-09 23:13:01');
+INSERT INTO `sys_menu` VALUES (1327085543511293954, 0, '测试模块', NULL, 'box', '1', '/gentest', 'Layout', NULL, 4, '0', '0', '0', 4, 1, '2020-11-13 11:07:04', 1313694379541635074, '2020-11-22 12:28:12', '2021-04-09 23:14:15');
+INSERT INTO `sys_menu` VALUES (1327085856930660353, 1327085543511293954, '业务测试', NULL, '', '1', 'test', 'views/modules/test/index', '', 1, '0', '0', '0', 6, 1, '2020-11-13 11:08:19', 1313694379541635074, '2020-11-22 12:28:29', '2021-04-09 23:14:15');
+INSERT INTO `sys_menu` VALUES (1327086205548625921, 1327085856930660353, '查看', 'gentest_test_select', '', '2', NULL, NULL, NULL, 1, '0', '0', '0', 3, 1, '2020-11-13 11:09:42', 1, '2021-04-10 00:06:54', '2021-04-10 00:06:54');
+INSERT INTO `sys_menu` VALUES (1327086298750255105, 1327085856930660353, '增加', 'gentest_test_insert', '', '2', NULL, NULL, NULL, 2, '0', '0', '0', 3, 1, '2020-11-13 11:10:04', 1, '2021-04-10 00:06:57', '2021-04-10 00:06:56');
+INSERT INTO `sys_menu` VALUES (1327086378794352642, 1327085856930660353, '修改', 'gentest_test_update', '', '2', NULL, NULL, NULL, 3, '0', '0', '0', 1, 1, '2020-11-13 11:10:23', 1313694379541635074, '2020-11-22 12:22:58', '2021-04-09 23:13:01');
+INSERT INTO `sys_menu` VALUES (1327086433609711617, 1327085856930660353, '删除', 'gentest_test_delete', '', '2', NULL, NULL, NULL, 4, '0', '0', '0', 2, 1, '2020-11-13 11:10:37', 1313694379541635074, '2020-11-22 12:23:04', '2021-04-09 23:13:01');
+INSERT INTO `sys_menu` VALUES (1327893773049262082, 1314068325453574145, '代码生成器', NULL, '', '1', 'creater', 'views/modules/creater/table/index', NULL, 1, '0', '0', '0', 2, 1, '2020-11-15 16:38:41', 1, '2020-11-15 17:18:08', '2021-04-09 23:14:15');
+INSERT INTO `sys_menu` VALUES (1327894701135491073, 1327893773049262082, '查看', 'deve_creater_select', '', '2', NULL, NULL, NULL, 1, '0', '0', '0', 2, 1, '2020-11-15 16:42:22', 1, '2020-11-15 16:43:08', '2021-04-09 23:13:01');
+INSERT INTO `sys_menu` VALUES (1327894767283859457, 1327893773049262082, '新增', 'deve_creater_insert', '', '2', NULL, NULL, NULL, 2, '0', '0', '0', 0, 1, '2020-11-15 16:42:38', 1, '2020-11-15 16:42:38', '2021-04-09 23:13:01');
+INSERT INTO `sys_menu` VALUES (1327894837093855234, 1327893773049262082, '修改', 'deve_creater_update', '', '2', NULL, NULL, NULL, 3, '0', '0', '0', 1, 1, '2020-11-15 16:42:55', 1, '2020-11-15 16:43:14', '2021-04-09 23:13:01');
+INSERT INTO `sys_menu` VALUES (1327894965179510785, 1327893773049262082, '删除', 'deve_creater_delete', '', '2', NULL, NULL, NULL, 4, '0', '0', '0', 0, 1, '2020-11-15 16:43:25', 1, '2020-11-15 16:43:25', '2021-04-09 23:13:01');
+INSERT INTO `sys_menu` VALUES (1327895061598171137, 1327893773049262082, '生成', 'deve_creater_create', '', '2', NULL, NULL, NULL, 5, '0', '0', '0', 0, 1, '2020-11-15 16:43:48', 1, '2020-11-15 16:43:48', '2021-04-09 23:13:01');
+INSERT INTO `sys_menu` VALUES (1327903778221699074, 1327893773049262082, '同步', 'deve_creater_sync', '', '2', NULL, NULL, NULL, 6, '0', '0', '0', 0, 1, '2020-11-15 17:18:27', 1, '2020-11-15 17:18:27', '2021-04-09 23:13:01');
+INSERT INTO `sys_menu` VALUES (1329374800267452417, 1327893773049262082, '导入数据表', 'deve_creater_import', '', '2', NULL, NULL, NULL, 7, '0', '0', '0', 1, 1313694379541635074, '2020-11-19 18:43:46', 1313694379541635074, '2020-11-19 18:43:52', '2021-04-09 23:13:01');
+INSERT INTO `sys_menu` VALUES (1330365141900591105, 1327085543511293954, '某系统用户', NULL, '', '1', 'user', 'views/modules/gentest/user/index', NULL, 2, '0', '0', '0', 3, 1313694379541635074, '2020-11-22 12:19:01', 1313694379541635074, '2020-11-22 12:28:57', '2021-04-09 23:14:15');
+INSERT INTO `sys_menu` VALUES (1330365525440331778, 1330365141900591105, '查看', 'gentest_user_select', '', '2', NULL, NULL, NULL, 1, '0', '0', '0', 1, 1313694379541635074, '2020-11-22 12:20:33', 1313694379541635074, '2020-11-22 12:23:48', '2021-04-09 23:13:01');
+INSERT INTO `sys_menu` VALUES (1330365570587820033, 1330365141900591105, '新增', 'gentest_user_insert', '', '2', NULL, NULL, NULL, 2, '0', '0', '0', 2, 1313694379541635074, '2020-11-22 12:20:44', 1313694379541635074, '2020-11-22 12:24:01', '2021-04-09 23:13:01');
+INSERT INTO `sys_menu` VALUES (1330365615181660162, 1330365141900591105, '修改', 'gentest_user_update', '', '2', NULL, NULL, NULL, 3, '0', '0', '0', 2, 1313694379541635074, '2020-11-22 12:20:54', 1313694379541635074, '2020-11-22 12:24:14', '2021-04-09 23:13:01');
+INSERT INTO `sys_menu` VALUES (1330365717015166977, 1330365141900591105, '删除', 'gentest_user_delete', '', '2', NULL, NULL, NULL, 4, '0', '0', '0', 1, 1313694379541635074, '2020-11-22 12:21:19', 1313694379541635074, '2020-11-22 12:23:33', '2021-04-09 23:13:01');
+INSERT INTO `sys_menu` VALUES (1332662450423635969, 1, '组织机构', NULL, '', '1', 'org', 'views/modules/sys/orgManagement/index', NULL, 6, '0', '0', '0', 1, 1, '2020-11-28 20:27:43', 1, '2020-11-28 20:28:09', '2021-04-09 23:14:15');
+INSERT INTO `sys_menu` VALUES (1332662689314414594, 1332662450423635969, '查看', 'system_org_select', '', '2', NULL, NULL, NULL, 1, '0', '0', '0', 0, 1, '2020-11-28 20:28:39', 1, '2020-11-28 20:28:39', '2021-04-09 23:13:01');
+INSERT INTO `sys_menu` VALUES (1332662758860169217, 1332662450423635969, '增加', 'system_org_insert', '', '2', NULL, NULL, NULL, 2, '0', '0', '0', 0, 1, '2020-11-28 20:28:56', 1, '2020-11-28 20:28:56', '2021-04-09 23:13:01');
+INSERT INTO `sys_menu` VALUES (1332662809711910913, 1332662450423635969, '修改', 'system_org_update', '', '2', NULL, NULL, NULL, 3, '0', '0', '0', 0, 1, '2020-11-28 20:29:08', 1, '2020-11-28 20:29:08', '2021-04-09 23:13:01');
+INSERT INTO `sys_menu` VALUES (1332662858294534146, 1332662450423635969, '删除', 'system_org_delete', '', '2', NULL, NULL, NULL, 4, '0', '0', '0', 0, 1, '2020-11-28 20:29:20', 1, '2020-11-28 20:29:20', '2021-04-09 23:13:01');
+INSERT INTO `sys_menu` VALUES (1335439751687208961, 1, '地域管理', NULL, '', '1', 'area', 'views/modules/sys/areaManagement/index', NULL, 7, '0', '0', '0', 2, 1313694379541635074, '2020-12-06 12:23:43', 1313694379541635074, '2020-12-06 12:24:05', '2021-04-09 23:14:15');
+INSERT INTO `sys_menu` VALUES (1335439904372457474, 1335439751687208961, '新增', 'system_area_insert', '', '2', NULL, NULL, NULL, 2, '0', '0', '0', 1, 1313694379541635074, '2020-12-06 12:24:19', 1313694379541635074, '2020-12-06 12:24:50', '2021-04-09 23:13:01');
+INSERT INTO `sys_menu` VALUES (1335440004809261058, 1335439751687208961, '查看', 'system_area_select', '', '2', NULL, NULL, NULL, 1, '0', '0', '0', 0, 1313694379541635074, '2020-12-06 12:24:43', 1313694379541635074, '2020-12-06 12:24:43', '2021-04-09 23:13:01');
+INSERT INTO `sys_menu` VALUES (1335440081128816642, 1335439751687208961, '修改', 'system_area_update', '', '2', NULL, NULL, NULL, 3, '0', '0', '0', 1, 1313694379541635074, '2020-12-06 12:25:01', 1313694379541635074, '2020-12-06 12:25:07', '2021-04-09 23:13:01');
+INSERT INTO `sys_menu` VALUES (1335440153140822017, 1335439751687208961, '删除', 'system_area_delete', '', '2', NULL, NULL, NULL, 4, '0', '0', '0', 0, 1313694379541635074, '2020-12-06 12:25:18', 1313694379541635074, '2020-12-06 12:25:18', '2021-04-09 23:13:01');
+INSERT INTO `sys_menu` VALUES (1335619974709936130, 3, '设置组织机构', 'system_user_setOrg', '', '2', NULL, NULL, NULL, 8, '0', '0', '0', 1, 1313694379541635074, '2020-12-07 00:19:51', 1313694379541635074, '2020-12-07 00:19:59', '2021-04-09 23:13:01');
+INSERT INTO `sys_menu` VALUES (1337719928086458369, 1330365141900591105, '导出', 'gentest_user_export', '', '2', NULL, NULL, NULL, 5, '0', '0', '0', 1, 1313694379541635074, '2020-12-12 19:24:19', 1313694379541635074, '2020-12-13 00:27:59', '2021-04-09 23:13:01');
+INSERT INTO `sys_menu` VALUES (1337720128930705409, 1330365141900591105, '导入', 'gentest_user_import', '', '2', NULL, NULL, NULL, 6, '0', '0', '0', 1, 1313694379541635074, '2020-12-12 19:25:07', 1313694379541635074, '2020-12-13 00:28:04', '2021-04-09 23:13:01');
+INSERT INTO `sys_menu` VALUES (1337796232345407489, 1327085856930660353, '导出', 'gentest_test_export', '', '2', NULL, NULL, NULL, 5, '0', '0', '0', 1, 1313694379541635074, '2020-12-13 00:27:31', 1313694379541635074, '2020-12-13 00:27:40', '2021-04-09 23:13:01');
+INSERT INTO `sys_menu` VALUES (1337796311940714498, 1327085856930660353, '导入', 'gentest_test_import', '', '2', NULL, NULL, NULL, 6, '0', '0', '0', 1, 1313694379541635074, '2020-12-13 00:27:50', 1, '2020-12-13 00:28:53', '2021-04-09 23:13:01');
+INSERT INTO `sys_menu` VALUES (1340626549594677250, 1327085543511293954, '汽车信息', NULL, '', '1', 'carinfo', 'views/modules/gentest/carinfo/index', NULL, 3, '0', '0', '0', 4, 1313694379541635074, '2020-12-20 19:54:12', 1313694379541635074, '2020-12-20 20:20:04', '2021-04-09 23:14:15');
+INSERT INTO `sys_menu` VALUES (1340626612895113217, 1340626549594677250, '查看', 'gentest_carinfo_select', '', '2', NULL, NULL, NULL, 1, '0', '0', '0', 1, 1313694379541635074, '2020-12-20 19:54:27', 1313694379541635074, '2020-12-20 20:21:52', '2021-04-09 23:13:01');
+INSERT INTO `sys_menu` VALUES (1340626666078887937, 1340626549594677250, '新增', 'gentest_carinfo_insert', '', '2', NULL, NULL, NULL, 2, '0', '0', '0', 1, 1313694379541635074, '2020-12-20 19:54:39', 1313694379541635074, '2020-12-20 20:21:45', '2021-04-09 23:13:01');
+INSERT INTO `sys_menu` VALUES (1340626895356321793, 1340626549594677250, '修改', 'gentest_carinfo_update', '', '2', NULL, NULL, NULL, 3, '0', '0', '0', 1, 1313694379541635074, '2020-12-20 19:55:34', 1313694379541635074, '2020-12-20 20:22:08', '2021-04-09 23:13:01');
+INSERT INTO `sys_menu` VALUES (1340626939119689729, 1340626549594677250, '删除', 'gentest_carinfo_delete', '', '2', NULL, NULL, NULL, 4, '0', '0', '0', 1, 1313694379541635074, '2020-12-20 19:55:45', 1313694379541635074, '2020-12-20 20:22:00', '2021-04-09 23:13:01');
+INSERT INTO `sys_menu` VALUES (1340626988251766786, 1340626549594677250, '导入', 'gentest_carinfo_import', '', '2', NULL, NULL, NULL, 5, '0', '0', '0', 1, 1313694379541635074, '2020-12-20 19:55:56', 1313694379541635074, '2020-12-20 20:22:16', '2021-04-09 23:13:01');
+INSERT INTO `sys_menu` VALUES (1340627032942075906, 1340626549594677250, '导出', 'gentest_carinfo_export', '', '2', NULL, NULL, NULL, 6, '0', '0', '0', 2, 1313694379541635074, '2020-12-20 19:56:07', 1313694379541635074, '2020-12-20 20:22:22', '2021-04-09 23:13:01');
+INSERT INTO `sys_menu` VALUES (1351012936860155906, 1314610817013919745, '系统监控', NULL, '', '1', 'sysmonitor', 'views/modules/sys/monitorManagement/index', NULL, 1, '0', '0', '0', 1, 1313694379541635074, '2021-01-18 11:45:59', 1313694379541635074, '2021-01-18 11:47:15', '2021-04-09 23:14:15');
+INSERT INTO `sys_menu` VALUES (1351013587816136705, 1351012936860155906, '查看', 'devops_sysmonitor_select', '', '2', NULL, NULL, NULL, 1, '0', '0', '0', 0, 1, '2021-01-18 11:48:35', 1, '2021-01-18 11:48:35', '2021-04-09 23:13:01');
+INSERT INTO `sys_menu` VALUES (1360233188433977345, 1, '参数配置', NULL, '', '1', 'set', 'views/modules/sys/setManagement/index', NULL, 99, '0', '0', '0', 3, 1313694379541635074, '2021-02-12 22:23:59', 1313694379541635074, '2021-02-16 21:44:06', '2021-04-09 23:14:15');
+INSERT INTO `sys_menu` VALUES (1360233383397810177, 1360233188433977345, '更新', 'system_options_update', '', '2', NULL, NULL, NULL, 1, '0', '0', '0', 2, 1313694379541635074, '2021-02-12 22:24:45', 1313694379541635074, '2021-02-14 01:37:07', '2021-04-09 23:13:01');
+INSERT INTO `sys_menu` VALUES (1369905408109674498, 3, '分配租户', 'system_user_tenant', '', '2', NULL, NULL, NULL, 9, '0', '0', '0', 1, 1, '2021-03-11 14:57:55', 1, '2021-03-11 14:58:04', '2021-04-09 23:13:01');
+INSERT INTO `sys_menu` VALUES (1370051609388388353, 3, '重置密码', 'system_user_resetPassword', '', '2', NULL, NULL, NULL, 10, '0', '0', '0', 1, 1, '2021-03-12 00:38:53', 1, '2021-03-12 00:39:04', '2021-04-09 23:13:01');
+INSERT INTO `sys_menu` VALUES (1370404146704654337, 3, '变更账户状态', 'system_user_enable', '', '2', NULL, NULL, NULL, 11, '0', '0', '0', 2, 1, '2021-03-12 23:59:44', 1, '2021-04-08 23:59:33', '2021-04-09 23:13:01');
+INSERT INTO `sys_menu` VALUES (1380173787882696705, 1315201380721446914, '变更租户状态', 'system_tenant_enable', '', '2', NULL, NULL, NULL, 5, '0', '0', '0', 0, 1, '2021-04-08 23:00:48', 1, '2021-04-08 23:00:48', '2021-04-09 23:13:01');
 
 -- ----------------------------
 -- 地域表数据变更

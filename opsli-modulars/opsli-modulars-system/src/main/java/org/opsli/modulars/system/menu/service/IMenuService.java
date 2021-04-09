@@ -31,10 +31,10 @@ public interface IMenuService extends CrudServiceInterface<SysMenu, MenuModel> {
 
 
     /**
-     * 根据菜单编号 获得菜单
-     * @param menuCode
+     * 根据菜单权限 获得菜单
+     * @param permissions
      * @return
      */
-    MenuModel getByCode(String menuCode);
+    MenuModel getByPermissions(String permissions);
 
 }

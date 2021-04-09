@@ -54,6 +54,9 @@ import java.util.List;
 @Service
 public class MenuServiceImpl extends CrudServiceImpl<MenuMapper, SysMenu, MenuModel> implements IMenuService {
 
+    /** 按钮类型 */
+    private static final String BUTTON_TYPE = "2";
+
     @Autowired(required = false)
     private MenuMapper mapper;
     @Autowired
@@ -62,10 +65,10 @@ public class MenuServiceImpl extends CrudServiceImpl<MenuMapper, SysMenu, MenuMo
     private IRoleMenuRefService iRoleMenuRefService;
 
     @Override
-    public MenuModel getByCode(String menuCode) {
+    public MenuModel getByPermissions(String permissions) {
         QueryBuilder<SysMenu> queryBuilder = new GenQueryBuilder<>();
         QueryWrapper<SysMenu> queryWrapper = queryBuilder.build();
-        queryWrapper.eq("menu_code", menuCode);
+        queryWrapper.eq("permissions", permissions);
         List<SysMenu> sysMenus = super.findList(queryWrapper);
         if(sysMenus != null && !sysMenus.isEmpty()){
             return transformT2M(sysMenus.get(0));
@@ -80,11 +83,11 @@ public class MenuServiceImpl extends CrudServiceImpl<MenuMapper, SysMenu, MenuMo
             return null;
         }
 
-        // 唯一验证
-        Integer count = this.uniqueVerificationByCode(model);
+        // 按钮 权限唯一验证
+        Integer count = this.uniqueVerificationByPermissions(model);
         if(count != null && count > 0){
             // 重复
-            throw new ServiceException(SystemMsg.EXCEPTION_ROLE_UNIQUE);
+            throw new ServiceException(SystemMsg.EXCEPTION_MENU_PERMISSIONS_UNIQUE);
         }
 
         // 如果上级ID 为空 则默认为 0
@@ -124,11 +127,11 @@ public class MenuServiceImpl extends CrudServiceImpl<MenuMapper, SysMenu, MenuMo
             return null;
         }
 
-        // 唯一验证
-        Integer count = this.uniqueVerificationByCode(model);
+        // 按钮 权限唯一验证
+        Integer count = this.uniqueVerificationByPermissions(model);
         if(count != null && count > 0){
             // 重复
-            throw new ServiceException(SystemMsg.EXCEPTION_ROLE_UNIQUE);
+            throw new ServiceException(SystemMsg.EXCEPTION_MENU_PERMISSIONS_UNIQUE);
         }
 
         MenuModel menuModel = super.update(model);
@@ -186,30 +189,6 @@ public class MenuServiceImpl extends CrudServiceImpl<MenuMapper, SysMenu, MenuMo
         return super.deleteAll(ids);
     }
 
-    /**
-     * 唯一验证
-     * @param model model
-     * @return Integer
-     */
-    @Transactional(readOnly = true)
-    public Integer uniqueVerificationByCode(MenuModel model){
-        if(model == null){
-            return null;
-        }
-        QueryWrapper<SysMenu> wrapper = new QueryWrapper<>();
-
-        // code 唯一
-        wrapper.eq(MyBatisConstants.FIELD_DELETE_LOGIC,  DictType.NO_YES_NO.getValue())
-                .eq("menu_code", model.getMenuCode());
-
-        // 重复校验排除自身
-        if(StringUtils.isNotEmpty(model.getId())){
-            wrapper.notIn(MyBatisConstants.FIELD_ID, model.getId());
-        }
-
-        return super.count(wrapper);
-    }
-
 
     /**
      * 逐级删除子数据
@@ -235,6 +214,35 @@ public class MenuServiceImpl extends CrudServiceImpl<MenuMapper, SysMenu, MenuMo
     }
 
     // ============
+
+    /**
+     * 唯一验证 指比较菜单为 按钮
+     * @param model model
+     * @return Integer
+     */
+    @Transactional(readOnly = true)
+    public Integer uniqueVerificationByPermissions(MenuModel model){
+        if(model == null){
+            return null;
+        }
+        if(!BUTTON_TYPE.equals(model.getType())){
+            return null;
+        }
+
+        QueryWrapper<SysMenu> wrapper = new QueryWrapper<>();
+
+        // code 唯一
+        wrapper.eq(MyBatisConstants.FIELD_DELETE_LOGIC,  DictType.NO_YES_NO.getValue())
+                .eq("permissions", model.getPermissions())
+                .eq("type", BUTTON_TYPE);
+
+        // 重复校验排除自身
+        if(StringUtils.isNotEmpty(model.getId())){
+            wrapper.notIn(MyBatisConstants.FIELD_ID, model.getId());
+        }
+
+        return super.count(wrapper);
+    }
 
     /**
      * 清除缓存
