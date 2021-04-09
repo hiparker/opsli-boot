@@ -109,4 +109,11 @@ public class MenuModel extends ApiWrapper {
     @ValidationArgs({ValiArgsType.IS_NOT_NULL})
     private String hidden;
 
+    /** 是否总是显示 0为否 1为是 */
+    @ApiModelProperty(value = "是否隐藏")
+    @ExcelProperty(value = "是否隐藏", order = 8)
+    @ExcelInfo(dictType = "no_yes")
+    @ValidationArgs({ValiArgsType.IS_NOT_NULL})
+    private String alwaysShow;
+
 }

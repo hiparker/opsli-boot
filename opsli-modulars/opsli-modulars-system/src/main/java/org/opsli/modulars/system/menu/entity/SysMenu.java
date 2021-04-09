@@ -68,6 +68,9 @@ public class SysMenu extends BaseEntity {
     /** 是否隐藏 0为否 1为是 */
     private String hidden;
 
+    /** 是否总是显示 0为否 1为是 */
+    private String alwaysShow;
+
     // ========================================
 
     /** 逻辑删除字段 */
