@@ -23,6 +23,11 @@ ALTER TABLE `sys_user` CHANGE COLUMN `locked` `enable` char(1) CHARACTER SET utf
 -- 租户变更
 ALTER TABLE `sys_tenant` CHANGE COLUMN `iz_usable` `enable` char(1) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '是否启用  0是  1否' AFTER `tenant_name`;
 
+-- 菜单变更
+ALTER TABLE `sys_menu` ADD COLUMN `always_show` char(1) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '0' COMMENT '是否总是显示 0是  1否' AFTER `sort_no`,
+DROP PRIMARY KEY,
+ADD PRIMARY KEY (`id`) USING BTREE;
+
 
 -- ----------------------------
 -- 地域表数据变更
