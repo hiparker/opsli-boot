@@ -500,7 +500,6 @@ public class UserServiceImpl extends CrudServiceImpl<UserMapper, SysUser, UserMo
             QueryBuilder<SysMenu> queryBuilder = new GenQueryBuilder<>();
             QueryWrapper<SysMenu> queryWrapper = queryBuilder.build();
             queryWrapper.notIn("parent_id", -1);
-            queryWrapper.in("type", '1', '3');
             queryWrapper.eq("hidden", '0');
             menuList = iMenuService.findList(queryWrapper);
         }else{
