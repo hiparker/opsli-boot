@@ -50,9 +50,9 @@ redisson:
     server:
       enable: true
       type: standalone
-      address: "127.0.0.1:6379"
-      password: 123456
-      database: 0
+      address: "${spring.redis.host}:${spring.redis.port}"
+      password: "${spring.redis.password}"
+      database: ${spring.redis.database}
 
 # knife4j 文档 配置
 knife4j:
