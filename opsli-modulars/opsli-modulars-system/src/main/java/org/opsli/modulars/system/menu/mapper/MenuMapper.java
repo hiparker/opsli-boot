@@ -15,9 +15,15 @@
  */
 package org.opsli.modulars.system.menu.mapper;
 
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.core.toolkit.Constants;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+import org.opsli.core.base.entity.HasChildren;
 import org.opsli.modulars.system.menu.entity.SysMenu;
+
+import java.util.List;
 
 /**
  * @BelongsProject: opsli-boot
@@ -28,5 +34,14 @@ import org.opsli.modulars.system.menu.entity.SysMenu;
  */
 @Mapper
 public interface MenuMapper extends BaseMapper<SysMenu> {
+
+    /**
+     * 是否有下级
+     * @param wrapper 条件查询器
+     * @return List
+     */
+    List<HasChildren> hasChildren(@Param(Constants.WRAPPER) Wrapper wrapper);
+
+
 
 }

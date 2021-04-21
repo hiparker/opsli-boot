@@ -16,8 +16,12 @@
 package org.opsli.modulars.system.menu.service;
 
 import org.opsli.api.wrapper.system.menu.MenuModel;
+import org.opsli.core.base.entity.HasChildren;
 import org.opsli.core.base.service.interfaces.CrudServiceInterface;
 import org.opsli.modulars.system.menu.entity.SysMenu;
+
+import java.util.List;
+import java.util.Set;
 
 
 /**
@@ -32,9 +36,24 @@ public interface IMenuService extends CrudServiceInterface<SysMenu, MenuModel> {
 
     /**
      * 根据菜单权限 获得菜单
-     * @param permissions
-     * @return
+     * @param permissions 权限
+     * @return MenuModel
      */
     MenuModel getByPermissions(String permissions);
+
+
+    /**
+     * 是否有下级
+     * @param parentIds 父节点Id Set
+     * @return List
+     */
+    List<HasChildren> hasChildren(Set<String> parentIds);
+
+    /**
+     * 是否有下级 - 选择控件
+     * @param parentIds 父节点Id Set
+     * @return List
+     */
+    List<HasChildren> hasChildrenByChoose(Set<String> parentIds);
 
 }

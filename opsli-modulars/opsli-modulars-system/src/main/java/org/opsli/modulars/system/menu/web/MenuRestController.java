@@ -26,6 +26,7 @@ import cn.hutool.core.util.ReflectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -39,9 +40,12 @@ import org.opsli.common.annotation.ApiRestController;
 import org.opsli.common.annotation.EnableLog;
 import org.opsli.common.annotation.RequiresPermissionsCus;
 import org.opsli.common.constants.MenuConstants;
+import org.opsli.common.constants.MyBatisConstants;
 import org.opsli.common.exception.ServiceException;
+import org.opsli.common.utils.HumpUtil;
 import org.opsli.common.utils.WrapperUtil;
 import org.opsli.core.base.controller.BaseRestController;
+import org.opsli.core.base.entity.HasChildren;
 import org.opsli.core.general.StartPrint;
 import org.opsli.core.persistence.Page;
 import org.opsli.core.persistence.querybuilder.GenQueryBuilder;
@@ -61,6 +65,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 
 /**
@@ -79,7 +84,17 @@ public class MenuRestController extends BaseRestController<SysMenu, MenuModel, I
     @Autowired
     private IUserService iUserService;
 
+    /** 排序字段 */
     private static final String SORT_FIELD = "order";
+    /** 是否包含子集 */
+    private static final String HAS_CHILDREN = "hasChildren";
+    /** 是否是叶子节点 */
+    private static final String IS_LEAF = "isLeaf";
+
+    /** 虚拟总节点 ID */
+    private static final String VIRTUAL_TOTAL_NODE = "-1";
+    /** 根节点 ID */
+    private static final String BASE_NODE = "0";
 
     /** 菜单排除字段 */
     private static final String[] EXCLUSION_FIELDS = {
@@ -151,11 +166,91 @@ public class MenuRestController extends BaseRestController<SysMenu, MenuModel, I
         return ResultVo.success(treeNodes);
     }
 
+
     /**
-     * 获得菜单树
+     * 获得菜单树 懒加载
      * @return ResultVo
      */
-    @ApiOperation(value = "获得菜单树", notes = "获得菜单树")
+    @ApiOperation(value = "获得菜单树 懒加载", notes = "获得菜单树 懒加载")
+    @RequiresPermissions("system_menu_select")
+    @Override
+    public ResultVo<?> findMenuTreeByLazy(String parentId) {
+        List<MenuModel> menuModelList;
+        if(StringUtils.isEmpty(parentId)){
+            menuModelList = Lists.newArrayList();
+            parentId = VIRTUAL_TOTAL_NODE;
+            MenuModel model = new MenuModel();
+            model.setId(BASE_NODE);
+            model.setMenuName("根节点");
+            model.setHidden("0");
+            model.setSortNo(-1);
+            model.setType("1");
+            model.setParentId(parentId);
+            menuModelList.add(model);
+        }else{
+            // 只查菜单
+            QueryBuilder<SysMenu> queryBuilder = new GenQueryBuilder<>();
+            QueryWrapper<SysMenu> queryWrapper = queryBuilder.build();
+            queryWrapper.eq(HumpUtil.humpToUnderline(MyBatisConstants.FIELD_PARENT_ID), parentId);
+            queryWrapper.eq("type", "1");
+
+            // 获得菜单
+            List<SysMenu> menuList = IService.findList(queryWrapper);
+            menuModelList = WrapperUtil.transformInstance(menuList, MenuModel.class);
+        }
+
+        // 获得菜单树
+        List<Tree<Object>> treeNodes = getMenuTrees(menuModelList, parentId,1);
+
+        // 处理是否包含子集
+        this.handleTreeIsLeafByChoose(treeNodes);
+
+        return ResultVo.success(treeNodes);
+    }
+
+    /**
+     * 获得列表菜单树 懒加载
+     * @return ResultVo
+     */
+    @ApiOperation(value = "获得列表菜单树 懒加载", notes = "获得列表菜单树 懒加载")
+    @RequiresPermissions("system_menu_select")
+    @Override
+    public ResultVo<?> findMenuTreePageByLazy(String parentId) {
+        List<MenuModel> menuModelList;
+        if(StringUtils.isEmpty(parentId)){
+            menuModelList = Lists.newArrayList();
+            parentId = VIRTUAL_TOTAL_NODE;
+            MenuModel model = new MenuModel();
+            model.setId(BASE_NODE);
+            model.setMenuName("根节点");
+            model.setHidden("0");
+            model.setSortNo(-1);
+            model.setType("1");
+            model.setParentId(parentId);
+            menuModelList.add(model);
+        }else{
+            QueryBuilder<SysMenu> queryBuilder = new GenQueryBuilder<>();
+            QueryWrapper<SysMenu> queryWrapper = queryBuilder.build();
+            queryWrapper.eq(HumpUtil.humpToUnderline(MyBatisConstants.FIELD_PARENT_ID), parentId);
+
+            // 获得菜单
+            List<SysMenu> menuList = IService.findList(queryWrapper);
+            menuModelList = WrapperUtil.transformInstance(menuList, MenuModel.class);
+        }
+        // 获得菜单树
+        List<Tree<Object>> treeNodes = getMenuTrees(menuModelList, parentId,1);
+
+        // 处理是否包含子集
+        this.handleTreeHasChildren(treeNodes);
+
+        return ResultVo.success(treeNodes);
+    }
+
+    /**
+     * 获得列表菜单树
+     * @return ResultVo
+     */
+    @ApiOperation(value = "获得列表菜单树", notes = "获得列表菜单树")
     @RequiresPermissions("system_menu_select")
     @Override
     public ResultVo<?> findMenuTreePage(HttpServletRequest request) {
@@ -164,7 +259,7 @@ public class MenuRestController extends BaseRestController<SysMenu, MenuModel, I
                 request.getParameterMap());
 
 
-        // 获得用户 对应菜单
+        // 获得菜单
         List<SysMenu> menuList = IService.findList(queryBuilder.build());
         List<MenuModel> menuModelList = WrapperUtil.transformInstance(menuList, MenuModel.class);
 
@@ -198,10 +293,21 @@ public class MenuRestController extends BaseRestController<SysMenu, MenuModel, I
     @RequiresPermissions("system_menu_select")
     @Override
     public ResultVo<MenuModel> get(MenuModel model) {
-        // 如果系统内部调用 则直接查数据库
-        if(model != null && model.getIzApi() != null && model.getIzApi()){
-            model = IService.get(model);
+        if(model != null){
+            if(StringUtils.equals(BASE_NODE, model.getId())){
+                model.setMenuName("根节点");
+                model.setHidden("0");
+                model.setSortNo(-1);
+                model.setType("1");
+                model.setParentId(VIRTUAL_TOTAL_NODE);
+            }else{
+                // 如果系统内部调用 则直接查数据库
+                if (model.getIzApi() != null && model.getIzApi()){
+                    model = IService.get(model);
+                }
+            }
         }
+
         return ResultVo.success(model);
     }
 
@@ -429,7 +535,17 @@ public class MenuRestController extends BaseRestController<SysMenu, MenuModel, I
      */
     private List<Tree<Object>> getMenuTrees(List<MenuModel> menuList) {
         //转换器
-        return this.getMenuTrees(menuList, null);
+        return this.getMenuTrees(menuList, null,4 );
+    }
+
+    /**
+     * 获得菜单树
+     * @param menuList 菜单集合
+     * @return List
+     */
+    private List<Tree<Object>> getMenuTrees(List<MenuModel> menuList, String parentId, int deep) {
+        //转换器
+        return this.getMenuTrees(menuList, null, parentId, deep);
     }
 
     /**
@@ -439,10 +555,25 @@ public class MenuRestController extends BaseRestController<SysMenu, MenuModel, I
      * @return List
      */
     private List<Tree<Object>> getMenuTrees(List<MenuModel> menuList, String[] exclusionFields) {
+        return getMenuTrees(menuList, exclusionFields, null, 4);
+    }
+
+    /**
+     * 获得菜单树
+     * @param menuList 菜单集合
+     * @param exclusionFields 排除字段
+     * @return List
+     */
+    private List<Tree<Object>> getMenuTrees(List<MenuModel> menuList, String[] exclusionFields,
+                                            String parentId,  int deep) {
         if(CollUtil.isEmpty(menuList)){
             return ListUtil.empty();
         }
 
+        // 如果层级等于 0 默认为4层
+        if(deep == 0){
+            deep = 4;
+        }
 
         // 获得BeanMapList
         List<Map<String, Object>> beanMapList = this.getBeanMapList(menuList, exclusionFields);
@@ -452,10 +583,82 @@ public class MenuRestController extends BaseRestController<SysMenu, MenuModel, I
         // 自定义属性名 都要默认值的
         treeNodeConfig.setWeightKey(SORT_FIELD);
         // 最大递归深度 最多支持4层菜单
-        treeNodeConfig.setDeep(4);
+        treeNodeConfig.setDeep(deep);
 
+        // 如果 parentId 不为空
+        if(StringUtils.isNotEmpty(parentId)){
+            //转换器
+            return TreeBuildUtil.INSTANCE.build(beanMapList, parentId ,treeNodeConfig);
+        }
         //转换器
         return TreeBuildUtil.INSTANCE.build(beanMapList, treeNodeConfig);
     }
 
+
+    /**
+     * 处理是否包含子集
+     * @param treeNodes 树节点
+     */
+    private void handleTreeHasChildren(List<Tree<Object>> treeNodes) {
+        if(CollUtil.isEmpty(treeNodes)){
+            return;
+        }
+
+        Set<String> parentIds = Sets.newHashSet();
+        for (Tree<Object> treeNode : treeNodes) {
+            parentIds.add(Convert.toStr(treeNode.getId()));
+        }
+
+        // 数据排查是否存在下级
+        List<HasChildren> hasChildrenList = IService.hasChildren(parentIds);
+        if (CollUtil.isNotEmpty(hasChildrenList)) {
+            Map<String, Boolean> tmp = Maps.newHashMap();
+            for (HasChildren hasChildren : hasChildrenList) {
+                if (hasChildren.getCount() != null && hasChildren.getCount() > 0) {
+                    tmp.put(hasChildren.getParentId(), true);
+                }
+            }
+
+            for (Tree<Object> treeNode : treeNodes) {
+                Boolean tmpFlag = tmp.get(Convert.toStr(treeNode.getId()));
+                if (tmpFlag != null && tmpFlag) {
+                    treeNode.putExtra(HAS_CHILDREN, true);
+                }
+            }
+        }
+    }
+
+
+    /**
+     * 处理是否包含子集
+     * @param treeNodes 树节点
+     */
+    private void handleTreeIsLeafByChoose(List<Tree<Object>> treeNodes) {
+        if(CollUtil.isEmpty(treeNodes)){
+            return;
+        }
+
+        Set<String> parentIds = Sets.newHashSet();
+        for (Tree<Object> treeNode : treeNodes) {
+            parentIds.add(Convert.toStr(treeNode.getId()));
+        }
+
+        // 数据排查是否存在下级
+        List<HasChildren> hasChildrenList = IService.hasChildrenByChoose(parentIds);
+        Map<String, Boolean> tmp = Maps.newHashMap();
+        for (HasChildren hasChildren : hasChildrenList) {
+            if (hasChildren.getCount() != null && hasChildren.getCount() > 0) {
+                tmp.put(hasChildren.getParentId(), false);
+            }
+        }
+
+        for (Tree<Object> treeNode : treeNodes) {
+            Boolean tmpFlag = tmp.get(Convert.toStr(treeNode.getId()));
+            if (tmpFlag == null || tmpFlag) {
+                treeNode.putExtra(IS_LEAF, true);
+            }else {
+                treeNode.putExtra(IS_LEAF, false);
+            }
+        }
+    }
 }

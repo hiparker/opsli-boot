@@ -36,7 +36,8 @@ public interface ISysOrgService extends CrudServiceInterface<SysOrg, SysOrgModel
 
     /**
      * 是否有下级
-     * @return
+     * @param parentIds 父节点Id Set
+     * @return List
      */
     List<HasChildren> hasChildren(Set<String> parentIds);
 

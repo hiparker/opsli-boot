@@ -38,14 +38,15 @@ public interface SysOrgMapper extends BaseMapper<SysOrg> {
 
     /**
      * 是否有下级
-     * @return
+     * @param wrapper 条件查询器
+     * @return List
      */
     List<HasChildren> hasChildren(@Param(Constants.WRAPPER) Wrapper wrapper);
 
 
     /**
      * 是否被引用
-     * @return
+     * @return Integer
      */
     Integer hasUse(@Param(Constants.WRAPPER) Wrapper wrapper);
 

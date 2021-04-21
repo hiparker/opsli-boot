@@ -3,4 +3,13 @@
 <mapper namespace="org.opsli.modulars.system.menu.mapper.MenuMapper">
 
 
+    <select id="hasChildren" parameterType="SysMenu" resultType="org.opsli.core.base.entity.HasChildren">
+        select
+            parent_id as parentId,
+            count(0) as `count`
+        from
+            sys_menu
+            ${ew.customSqlSegment}
+    </select>
+
 </mapper>

@@ -51,11 +51,28 @@ public interface MenuApi {
 
 
     /**
-     * 获得菜单
+     * 获得列表菜单
      * @return ResultVo
      */
     @GetMapping("/findMenuTreePage")
     ResultVo<?> findMenuTreePage(HttpServletRequest request);
+
+    /**
+     * 懒加载列表菜单
+     * @param parentId 父节点ID
+     * @return
+     */
+    @GetMapping("/findMenuTreePageByLazy")
+    ResultVo<?> findMenuTreePageByLazy(String parentId);
+
+    /**
+     * 懒加载菜单
+     * @param parentId 父节点ID
+     * @return
+     */
+    @GetMapping("/findMenuTreeByLazy")
+    ResultVo<?> findMenuTreeByLazy(String parentId);
+
 
     /**
      * 获得当前用户登录菜单

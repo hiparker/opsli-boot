@@ -25,6 +25,7 @@ import org.opsli.common.constants.MyBatisConstants;
 import org.opsli.common.enums.DictType;
 import org.opsli.common.exception.ServiceException;
 import org.opsli.common.utils.HumpUtil;
+import org.opsli.core.base.entity.HasChildren;
 import org.opsli.core.base.service.impl.CrudServiceImpl;
 import org.opsli.core.msg.CoreMsg;
 import org.opsli.core.persistence.querybuilder.GenQueryBuilder;
@@ -35,6 +36,7 @@ import org.opsli.modulars.system.SystemMsg;
 import org.opsli.modulars.system.menu.entity.SysMenu;
 import org.opsli.modulars.system.menu.mapper.MenuMapper;
 import org.opsli.modulars.system.menu.service.IMenuService;
+import org.opsli.modulars.system.org.entity.SysOrg;
 import org.opsli.modulars.system.role.service.IRoleMenuRefService;
 import org.opsli.modulars.system.user.service.IUserRoleRefService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +44,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Set;
 
 
 /**
@@ -84,11 +87,11 @@ public class MenuServiceImpl extends CrudServiceImpl<MenuMapper, SysMenu, MenuMo
         }
 
         // 按钮 权限唯一验证
-        Integer count = this.uniqueVerificationByPermissions(model);
-        if(count != null && count > 0){
-            // 重复
-            throw new ServiceException(SystemMsg.EXCEPTION_MENU_PERMISSIONS_UNIQUE);
-        }
+//        Integer count = this.uniqueVerificationByPermissions(model);
+//        if(count != null && count > 0){
+//            // 重复
+//            throw new ServiceException(SystemMsg.EXCEPTION_MENU_PERMISSIONS_UNIQUE);
+//        }
 
         // 如果上级ID 为空 则默认为 0
         if(StringUtils.isEmpty(model.getParentId())){
@@ -128,11 +131,11 @@ public class MenuServiceImpl extends CrudServiceImpl<MenuMapper, SysMenu, MenuMo
         }
 
         // 按钮 权限唯一验证
-        Integer count = this.uniqueVerificationByPermissions(model);
-        if(count != null && count > 0){
-            // 重复
-            throw new ServiceException(SystemMsg.EXCEPTION_MENU_PERMISSIONS_UNIQUE);
-        }
+//        Integer count = this.uniqueVerificationByPermissions(model);
+//        if(count != null && count > 0){
+//            // 重复
+//            throw new ServiceException(SystemMsg.EXCEPTION_MENU_PERMISSIONS_UNIQUE);
+//        }
 
         MenuModel menuModel = super.update(model);
         if(menuModel != null){
@@ -211,6 +214,45 @@ public class MenuServiceImpl extends CrudServiceImpl<MenuMapper, SysMenu, MenuMo
             ret = this.deleteByParentId(child.getId());
         }
         return ret;
+    }
+
+    /**
+     * 是否有下级
+     * @param parentIds
+     * @return
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public List<HasChildren> hasChildren(Set<String> parentIds){
+        if(CollUtil.isEmpty(parentIds)){
+            return null;
+        }
+        QueryWrapper<SysMenu> wrapper = new QueryWrapper<>();
+        wrapper.in(HumpUtil.humpToUnderline(MyBatisConstants.FIELD_PARENT_ID), parentIds)
+                .eq(MyBatisConstants.FIELD_DELETE_LOGIC,  DictType.NO_YES_NO.getValue())
+                .groupBy(HumpUtil.humpToUnderline(MyBatisConstants.FIELD_PARENT_ID));
+
+        return mapper.hasChildren(wrapper);
+    }
+
+    /**
+     * 是否有下级
+     * @param parentIds
+     * @return
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public List<HasChildren> hasChildrenByChoose(Set<String> parentIds){
+        if(CollUtil.isEmpty(parentIds)){
+            return null;
+        }
+        QueryWrapper<SysMenu> wrapper = new QueryWrapper<>();
+        wrapper.in(HumpUtil.humpToUnderline(MyBatisConstants.FIELD_PARENT_ID), parentIds)
+                .eq(MyBatisConstants.FIELD_DELETE_LOGIC,  DictType.NO_YES_NO.getValue())
+                .eq("type", "1")
+                .groupBy(HumpUtil.humpToUnderline(MyBatisConstants.FIELD_PARENT_ID));
+
+        return mapper.hasChildren(wrapper);
     }
 
     // ============
