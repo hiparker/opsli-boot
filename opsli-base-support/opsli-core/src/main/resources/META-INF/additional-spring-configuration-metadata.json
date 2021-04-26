@@ -123,6 +123,13 @@
     },
 
     {
+      "name": "opsli.auth.login.revive-mode",
+      "sourceType": "org.opsli.core.autoconfigure.properties.GlobalProperties$Auth$Login",
+      "type": "java.lang.Boolean",
+      "defaultValue": false,
+      "description": "续命模式 (开启续命模式后 在有效时间内 访问任意接口 则自动续命)."
+    },
+    {
       "name": "opsli.auth.login.limit-count",
       "sourceType": "org.opsli.core.autoconfigure.properties.GlobalProperties$Auth$Login",
       "type": "java.lang.Integer",

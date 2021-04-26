@@ -1,8 +1,10 @@
 package org.opsli.core.utils;
 
 import cn.hutool.core.codec.Base64;
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
 import com.auth0.jwt.JWT;
+import com.auth0.jwt.JWTCreator;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTDecodeException;
@@ -37,7 +39,7 @@ public class JwtUtil {
     /**
      * 过期时间改为从配置文件获取 120 分钟 两小时
      */
-    public static long EXPIRE;
+    public static int EXPIRE_MILLISECOND;
 
     /**
      * JWT认证加密私钥(Base64加密)
@@ -80,23 +82,31 @@ public class JwtUtil {
      * @param tokenType token类型
      * @param account 帐号
      * @param userId 用户ID
+     * @param isExpire 是否过期
      * @return java.lang.String 返回加密的Token
      */
-    public static String sign(String tokenType, String account, String userId) {
+    public static String sign(String tokenType, String account, String userId, boolean isExpire) {
+        // 时间戳
+        long currentTimeMillis = System.currentTimeMillis();
         // 帐号加JWT私钥加密
         String secret = account + Base64.decodeStr(ENCRYPT_JWT_INITIAL_SECRET);
-        // 此处过期时间是以毫秒为单位，所以乘以1000
-        Date date = new Date(System.currentTimeMillis() + EXPIRE);
         Algorithm algorithm = Algorithm.HMAC256(secret);
-        // 附带account帐号信息
-        return JWT.create()
+        JWTCreator.Builder builder = JWT.create()
                 .withClaim(SignConstants.TYPE, tokenType)
                 .withClaim(SignConstants.ACCOUNT, account)
                 .withClaim(SignConstants.USER_ID, userId)
-                .withClaim(SignConstants.TIMESTAMP, String.valueOf(System.currentTimeMillis()))
-                // token 过期时间
-                .withExpiresAt(date)
-                .sign(algorithm);
+                .withClaim(SignConstants.TIMESTAMP, String.valueOf(currentTimeMillis));
+
+        // 如果为是 则开启失效时间
+        if(isExpire){
+            // 时间偏移，取最终失效时间
+            Date expireDate = DateUtil.offsetMillisecond(DateUtil.date(currentTimeMillis), EXPIRE_MILLISECOND);
+            // token 过期时间
+            builder.withExpiresAt(expireDate);
+        }
+
+        // 附带account帐号信息
+        return builder.sign(algorithm);
     }
 
 
@@ -113,7 +123,7 @@ public class JwtUtil {
                 && globalProperties.getAuth().getToken() != null
             ){
             // 获得 Token失效时间
-            JwtUtil.EXPIRE = globalProperties.getAuth()
+            JwtUtil.EXPIRE_MILLISECOND = globalProperties.getAuth()
                     .getToken().getEffectiveTime() * 60 * 1000;
 
             // 获得 Token初始盐值
@@ -125,7 +135,7 @@ public class JwtUtil {
     // ==================
 
     public static void main(String[] args) {
-        String token = JwtUtil.sign(TokenTypeConstants.TYPE_SYSTEM, "test","123123");
+        String token = JwtUtil.sign(TokenTypeConstants.TYPE_SYSTEM, "test","123123", true);
 
         boolean verify = JwtUtil.verify(token);
         System.out.println(token);

@@ -100,6 +100,9 @@ public class GlobalProperties {
         @EqualsAndHashCode(callSuper = false)
         public static class Login {
 
+            /** 续命模式 (开启续命模式后 在有效时间内 访问任意接口 则自动续命) */
+            private Boolean reviveMode;
+
             /** 限制登录数量 -1 为无限大 */
             private Integer limitCount;
 
@@ -114,7 +117,6 @@ public class GlobalProperties {
 
             /** 失败锁定时间(秒) */
             private Integer slipLockSpeed;
-
 
         }
 

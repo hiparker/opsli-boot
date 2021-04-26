@@ -19,6 +19,7 @@ import cn.hutool.core.convert.Convert;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.util.BooleanUtil;
 import cn.hutool.core.util.StrUtil;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -43,6 +44,7 @@ import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 import static org.opsli.common.constants.OrderConstants.UTIL_ORDER;
 
@@ -90,7 +92,8 @@ public class UserTokenUtil {
             // 如果当前登录开启 数量限制
             if(LOGIN_PROPERTIES.getLimitCount() > ACCOUNT_LIMIT_INFINITE){
                 // 当前用户已存在 Token数量
-                Long ticketLen = redisPlugin.sSize(CacheUtil.getPrefixName() + TICKET_PREFIX + user.getUsername());
+                Long ticketLen = redisPlugin.sSize(CacheUtil.getPrefixName() +
+                        TICKET_PREFIX + user.getUsername());
                 if(ticketLen !=null && ticketLen >= LOGIN_PROPERTIES.getLimitCount()){
                     // 如果是拒绝后者 则直接抛出异常
                     if(LoginLimitRefuse.AFTER == LOGIN_PROPERTIES.getLimitRefuse()){
@@ -104,29 +107,28 @@ public class UserTokenUtil {
                 }
             }
 
-            // 生效时间
-            int expire = Integer.parseInt(
-                    String.valueOf(JwtUtil.EXPIRE)
-            );
-
+            // 开启续命模式 如果为续命模式 则不指定Token 的 失效时间
             // 生成 Token 包含 username userId timestamp
-            String signToken = JwtUtil.sign(TokenTypeConstants.TYPE_SYSTEM, user.getUsername(), user.getId());
+            boolean reviveMode = LOGIN_PROPERTIES.getReviveMode() != null && LOGIN_PROPERTIES.getReviveMode();
+            String signToken = JwtUtil.sign(
+                    TokenTypeConstants.TYPE_SYSTEM, user.getUsername(), user.getId(), !reviveMode);
 
-            // 获得当前时间戳时间
+            // 获得当前Token时间戳
             long timestamp = Convert.toLong(
                     JwtUtil.getClaim(signToken, SignConstants.TIMESTAMP));
-            DateTime currDate = DateUtil.date(timestamp);
-
             // 获得失效偏移量时间
-            DateTime dateTime = DateUtil.offsetMillisecond(currDate, expire);
-            long endTimestamp = dateTime.getTime();
+            long endTimestamp = DateUtil.offsetMillisecond(
+                    DateUtil.date(timestamp), JwtUtil.EXPIRE_MILLISECOND).getTime();
 
             // 在redis存一份 token 是为了防止 人为造假
             // 保存用户token
-            Long saveLong = redisPlugin.sPut(CacheUtil.getPrefixName() + TICKET_PREFIX + user.getUsername(), signToken);
+            Long saveLong = redisPlugin.sPut(
+                    CacheUtil.getPrefixName() + TICKET_PREFIX + user.getUsername(), signToken);
             if(saveLong != null && saveLong > 0){
                 // 设置该用户全部token失效时间， 如果这时又有新设备登录 则续命
-                redisPlugin.expire(CacheUtil.getPrefixName() + TICKET_PREFIX + user.getUsername(), expire);
+                redisPlugin.expire(
+                        CacheUtil.getPrefixName() + TICKET_PREFIX + user.getUsername(),
+                        JwtUtil.EXPIRE_MILLISECOND, TimeUnit.MILLISECONDS);
 
                 TokenRet tokenRet = new TokenRet();
                 tokenRet.setToken(signToken);
@@ -192,10 +194,12 @@ public class UserTokenUtil {
             UserModel user = UserUtil.getUser(userId);
             if(user != null){
                 // 删除Token信息
-                redisPlugin.sRemove(CacheUtil.getPrefixName() + TICKET_PREFIX + user.getUsername(), token);
+                redisPlugin.sRemove(
+                        CacheUtil.getPrefixName() + TICKET_PREFIX + user.getUsername(), token);
 
                 // 如果缓存中 无该用户任何Token信息 则删除用户缓存
-                Long size = redisPlugin.sSize(CacheUtil.getPrefixName() + TICKET_PREFIX + user.getUsername());
+                Long size = redisPlugin.sSize(
+                        CacheUtil.getPrefixName() + TICKET_PREFIX + user.getUsername());
                 if(size == null || size == 0L){
                     // 删除相关信息
                     UserUtil.refreshUser(user);
@@ -228,11 +232,20 @@ public class UserTokenUtil {
             // 生成MD5 16进制码 用于缩减存储
             // 删除相关信息
             String username = getUserNameByToken(token);
-            boolean hashKey = redisPlugin.sHashKey(CacheUtil.getPrefixName() + TICKET_PREFIX + username, token);
+
+            boolean hashKey = redisPlugin.sHashKey(
+                    CacheUtil.getPrefixName() + TICKET_PREFIX + username, token);
             if(!hashKey){
                 return false;
             }
-            // JWT 自带过期校验 无需多做处理
+
+            // 3. 校验通过后 如果开启续命模式 则整体延长登录时效
+            if(BooleanUtil.isTrue(LOGIN_PROPERTIES.getReviveMode())){
+                // 设置该用户全部token失效时间， 如果这时又有新设备登录 则续命
+                redisPlugin.expire(
+                        CacheUtil.getPrefixName() + TICKET_PREFIX + username,
+                        JwtUtil.EXPIRE_MILLISECOND, TimeUnit.MILLISECONDS);
+            }
 
         } catch (Exception e){
             return false;
@@ -248,9 +261,10 @@ public class UserTokenUtil {
      */
     public static void verifyLockAccount(String username){
         // 判断账号是否临时锁定
-        Long loseTimeMillis = (Long) redisPlugin.get(CacheUtil.getPrefixName() + ACCOUNT_SLIP_LOCK_PREFIX + username);
+        Long loseTimeMillis = (Long) redisPlugin.get(
+                CacheUtil.getPrefixName() + ACCOUNT_SLIP_LOCK_PREFIX + username);
         if(loseTimeMillis != null){
-            Date currDate = new Date();
+            Date currDate = DateUtil.date();
             DateTime loseDate = DateUtil.date(loseTimeMillis);
             // 偏移5分钟
             DateTime currLoseDate = DateUtil.offsetSecond(loseDate, LOGIN_PROPERTIES.getSlipLockSpeed());
@@ -277,19 +291,23 @@ public class UserTokenUtil {
      */
     public static TokenMsg lockAccount(String username){
         // 如果失败次数 超过阈值 则锁定账号
-        Long slipNum = redisPlugin.increment(CacheUtil.getPrefixName() + ACCOUNT_SLIP_COUNT_PREFIX + username);
+        Long slipNum = redisPlugin.increment(
+                CacheUtil.getPrefixName() + ACCOUNT_SLIP_COUNT_PREFIX + username);
         if (slipNum != null){
             // 设置失效时间为 5分钟
-            redisPlugin.expire(CacheUtil.getPrefixName() + ACCOUNT_SLIP_COUNT_PREFIX + username, LOGIN_PROPERTIES.getSlipLockSpeed());
+            redisPlugin.expire(
+                    CacheUtil.getPrefixName() + ACCOUNT_SLIP_COUNT_PREFIX + username, LOGIN_PROPERTIES.getSlipLockSpeed());
 
             // 如果确认 都失败 则存入临时缓存
             if(slipNum >= LOGIN_PROPERTIES.getSlipCount()){
                 long currentTimeMillis = System.currentTimeMillis();
                 // 存入Redis
-                redisPlugin.put(CacheUtil.getPrefixName() + ACCOUNT_SLIP_LOCK_PREFIX + username,
+                redisPlugin.put(
+                        CacheUtil.getPrefixName() + ACCOUNT_SLIP_LOCK_PREFIX + username,
                         currentTimeMillis, LOGIN_PROPERTIES.getSlipLockSpeed());
             }
         }
+
 
         return TokenMsg.EXCEPTION_LOGIN_ACCOUNT_NO;
     }
@@ -300,7 +318,8 @@ public class UserTokenUtil {
      */
     public static long getSlipCount(String username){
         long count = 0L;
-        Object obj = redisPlugin.get(CacheUtil.getPrefixName() + ACCOUNT_SLIP_COUNT_PREFIX + username);
+        Object obj = redisPlugin.get(
+                CacheUtil.getPrefixName() + ACCOUNT_SLIP_COUNT_PREFIX + username);
         if(obj != null){
             try {
                 count = Convert.convert(Long.class, obj);
@@ -316,9 +335,11 @@ public class UserTokenUtil {
      */
     public static void clearLockAccount(String username){
         // 删除失败次数记录
-        redisPlugin.del(CacheUtil.getPrefixName() + ACCOUNT_SLIP_COUNT_PREFIX + username);
+        redisPlugin.del(
+                CacheUtil.getPrefixName() + ACCOUNT_SLIP_COUNT_PREFIX + username);
         // 删除失败次数记录
-        redisPlugin.del(CacheUtil.getPrefixName() + ACCOUNT_SLIP_LOCK_PREFIX + username);
+        redisPlugin.del(
+                CacheUtil.getPrefixName() + ACCOUNT_SLIP_LOCK_PREFIX + username);
     }
 
 
@@ -373,4 +394,5 @@ public class UserTokenUtil {
         private Long endTimestamp;
 
     }
+
 }

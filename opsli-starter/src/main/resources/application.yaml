@@ -197,6 +197,8 @@ opsli:
 
     # 登录设置
     login:
+      # 续命模式 (开启续命模式后 在有效时间内 访问任意接口 则自动续命)
+      revive-mode: false
       # 限制登录数量 -1 为无限大
       limit-count: -1
       # 限制登录拒绝策略 after为后者 before为前者
