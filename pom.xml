@@ -356,15 +356,11 @@
     <!-- 环境选择 -->
     <profiles>
         <profile>
-            <!-- 本地开发环境 -->
+            <!-- 开发环境 -->
             <id>dev</id>
             <properties>
                 <spring.active>dev</spring.active>
             </properties>
-            <activation>
-                <!-- 设置默认激活这个配置 -->
-                <activeByDefault>true</activeByDefault>
-            </activation>
         </profile>
         <profile>
             <!-- 发布环境 -->
@@ -379,6 +375,17 @@
             <properties>
                 <spring.active>beta</spring.active>
             </properties>
+        </profile>
+        <profile>
+            <!-- 本地环境 -->
+            <id>local</id>
+            <properties>
+                <spring.active>local</spring.active>
+            </properties>
+            <activation>
+                <!-- 设置默认激活这个配置 -->
+                <activeByDefault>true</activeByDefault>
+            </activation>
         </profile>
     </profiles>
 
