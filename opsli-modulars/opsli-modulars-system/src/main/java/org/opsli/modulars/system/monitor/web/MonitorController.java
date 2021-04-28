@@ -22,10 +22,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.opsli.api.base.result.ResultVo;
 import org.opsli.common.annotation.ApiRestController;
-import org.opsli.modulars.system.monitor.service.IMonitorService;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.opsli.core.utils.SystemInfoUtil;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.Map;
 
@@ -39,9 +37,6 @@ import java.util.Map;
 @ApiRestController("/sys/monitor")
 public class MonitorController {
 
-    @Autowired
-    private IMonitorService iMonitorService;
-
     /**
      * 查询服务器信息
      * @return ResultVo
@@ -52,15 +47,15 @@ public class MonitorController {
     public ResultVo<?> getSystemInfo() {
         Map<String,Object> map = Maps.newHashMapWithExpectedSize(5);
         //服务器信息
-        map.put("systemInfo",iMonitorService.getSysInfo());
+        map.put("systemInfo", SystemInfoUtil.INSTANCE.getSysInfo());
         //CPU信息
-        map.put("cpuInfo",iMonitorService.getCpuInfo());
+        map.put("cpuInfo", SystemInfoUtil.INSTANCE.getCpuInfo());
         //内存信息
-        map.put("memInfo",iMonitorService.getMemInfo());
+        map.put("memInfo", SystemInfoUtil.INSTANCE.getMemoryInfo());
         //JVM信息
-        map.put("JVMInfo",iMonitorService.getJVMInfo());
+        map.put("JVMInfo", SystemInfoUtil.INSTANCE.getJvmInfo());
         //磁盘信息
-        map.put("sysFileInfo",iMonitorService.getSysFiles());
+        map.put("sysFileInfo", SystemInfoUtil.INSTANCE.getDiskInfo());
         return ResultVo.success(map);
     }
 
@@ -73,7 +68,7 @@ public class MonitorController {
     @ApiOperation(value = "当前CPU信息", notes = "当前CPU信息")
     public ResultVo<?> getCpuInfo() {
         return ResultVo.success(
-                iMonitorService.getCpuInfo());
+                SystemInfoUtil.INSTANCE.getCpuInfo());
     }
 
     /**
@@ -85,7 +80,7 @@ public class MonitorController {
     @ApiOperation(value = "当前内存信息", notes = "当前内存信息")
     public ResultVo<?> getMemInfo() {
         return ResultVo.success(
-                iMonitorService.getMemInfo());
+                SystemInfoUtil.INSTANCE.getMemoryInfo());
     }
 
     /**
@@ -97,7 +92,7 @@ public class MonitorController {
     @ApiOperation(value = "当前JVM信息", notes = "当前JVM信息")
     public ResultVo<?> getJVMInfo() {
         return ResultVo.success(
-                iMonitorService.getJVMInfo());
+                SystemInfoUtil.INSTANCE.getJvmInfo());
     }
 
 }

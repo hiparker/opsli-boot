@@ -18,6 +18,7 @@ package org.opsli.core.general;
 import cn.hutool.core.date.BetweenFormatter;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.lang.Console;
+import cn.hutool.core.net.NetUtil;
 import cn.hutool.core.thread.ThreadUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -26,8 +27,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
@@ -87,11 +86,7 @@ public class StartPrint {
      * @return String
      */
     public String getBasePath(){
-        String ip = "127.0.0.1";
-        try {
-            ip = InetAddress.getLocalHost().getHostAddress();
-        }catch (UnknownHostException ignored){}
-        return ip + ":" + serverPort + serverContextPath;
+        return NetUtil.getLocalhostStr() + ":" + serverPort + serverContextPath;
     }
 
     /**

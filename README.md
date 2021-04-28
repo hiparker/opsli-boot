@@ -124,7 +124,6 @@
 │       │   │   │               ├── general                     核心模块 - 打印信息
 │       │   │   │               ├── handler                     核心模块 - 异常拦截处理
 │       │   │   │               ├── listener                    核心模块 - 系统监听器
-│       │   │   │               ├── monitor                     核心模块 - 系统监控
 │       │   │   │               ├── msg                         核心模块 - 信息
 │       │   │   │               ├── persistence                 核心模块 - 查询条件构造器
 │       │   │   │               │   └── querybuilder
