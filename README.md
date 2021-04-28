@@ -280,7 +280,7 @@
 
 ------------
 
-1. 已开源的代码，授权协议采用 AGPL v3 + Apache Licence v2 进行发行。
+1. 已开源的代码，授权协议采用 Apache Licence v2 进行发行。
 2. 您可以免费使用、修改和衍生代码，但不允许修改后和衍生的代码做为闭源软件发布。
 3. 修改后和衍生的代码必须也按照AGPL协议进行流通，对修改后和衍生的代码必须向社会公开。
 4. 如果您修改了代码，需要在被修改的文件中进行说明，并遵守代码格式规范，帮助他人更好的理解您的用意。
@@ -290,7 +290,7 @@
 
 ------------
 
-1. The open source code, the license agreement adopts AGPL v3 + Apache Licence v2 for distribution.
+1. The open source code, the license agreement adopts Apache Licence v2 for distribution.
 2. You can use, modify and derive the code for free, but it is not allowed to release the modified and derived code as closed source software.
 3. The modified and derived code must also be circulated in accordance with the AGPL agreement, and the modified and derived code must be disclosed to the public.
 4. If you modify the code, you need to explain it in the modified file and follow the code format specification to help others better understand your intentions.
