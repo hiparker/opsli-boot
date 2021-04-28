@@ -100,8 +100,8 @@
 │   │   │   │   │               ├── exception                   公共模块 - 异常类
 │   │   │   │   │               ├── msg                         公共模块 - 信息
 │   │   │   │   │               ├── thread                      公共模块 - 线程相关
-│       │   │   │               │   ├── refuse                      拒绝策略线程池
-│       │   │   │               │   └── wait                        等待线程池
+│   │   │   │   │               │   ├── refuse                      拒绝策略线程池
+│   │   │   │   │               │   └── wait                        等待线程池
 │   │   │   │   │               └── utils                       公共模块 - 工具类
 │   │   │   │   │
 │   └── opsli-core                                          基础 - 核心模块
@@ -249,7 +249,7 @@
 │   │   │   │   │                   ├── constant              Redisson分布式锁 - 常量
 │   │   │   │   │                   ├── enums                 Redisson分布式锁 - 枚举类
 │   │   │   │   │                   ├── properties            Redisson分布式锁 - 配置类
-│   │   │   │   │                   ├── strategy              Redisson分布式锁 - 策略
+│   │   │   │   │                   └── strategy              Redisson分布式锁 - 策略
 │   │   │   │   │
 │   └── opsli-plugins-waf                                     Waf软防火墙
 │       ├── src
@@ -264,7 +264,7 @@
 │       │   │   │                   ├── msg                   Waf软防火墙 - 信息
 │       │   │   │                   ├── properties            Waf软防火墙 - 配置类
 │       │   │   │                   ├── servlet               Waf软防火墙 - Servlet处理器
-│       │   │   │                   ├── util                  Waf软防火墙 - 工具包
+│       │   │   │                   └── util                  Waf软防火墙 - 工具包
 │       │   │   │
 └── opsli-starter                                        启动类
     └── src
