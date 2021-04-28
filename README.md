@@ -16,8 +16,8 @@
 
 - 官方网站: <a href="https://opsli.com" target="_blank">https://opsli.com</a>
 - 演示地址: <a href="http://demo.opsli.arcinbj.com" target="_blank">http://demo.opsli.arcinbj.com</a>
-- 文档地址: <a href="http://wiki.opsli.arcinbj.com" target="_blank">http://wiki.opsli.arcinbj.com</a>
-- 作者博客: <a href="http://www.arcinbj.com" target="_blank">http://www.arcinbj.com</a>
+- 文档地址: <a href="http://wiki.opsli.arcinbj.com" target="_blank">http://wiki.opsli.bedebug.com</a>
+- 作者博客: <a href="http://www.bedebug.com" target="_blank">http://www.bedebug.com</a>
 - 问题反馈: <a href="https://github.com/hiparker/opsli-boot/issues" target="_blank">https://github.com/hiparker/opsli-boot/issues</a>
 - 交流Q群: 724850675 (1群)
 
