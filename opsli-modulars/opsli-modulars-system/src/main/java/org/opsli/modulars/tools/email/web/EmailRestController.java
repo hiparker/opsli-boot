@@ -9,6 +9,7 @@ import org.opsli.modulars.tools.email.service.IEmailService;
 import org.opsli.modulars.tools.email.wrapper.EmailModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
 
 /**
@@ -20,7 +21,7 @@ import org.springframework.web.bind.annotation.PostMapping;
  */
 @Api(tags = "邮件类")
 @Slf4j
-@ApiRestController("/email")
+@ApiRestController("/tools/email")
 public class EmailRestController {
 
     @Autowired
@@ -33,11 +34,11 @@ public class EmailRestController {
      */
     @ApiOperation(value = "测试发送邮件", notes = "测试发送邮件")
     @PostMapping("/testSend")
-    public ResultVo<?> testSend(EmailModel model) {
+    public ResultVo<?> testSend(@RequestBody EmailModel model) {
         try {
-            String result = iEmailService
+            iEmailService
                     .send(model.getTo(), model.getSubject(), model.getContent());
-            return ResultVo.success(result);
+            return ResultVo.success("邮件发送成功");
         }catch (Exception e){
             return ResultVo.error("邮件发送失败 - " + e.getMessage());
         }
