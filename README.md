@@ -175,8 +175,9 @@
 │       │   │   │               │   ├── tenant                  系统模块 - 租户
 │       │   │   │               │   └── user                    系统模块 - 用户
 │       │   │   │               │
-│       │   │   │               └── tools                     系统模块 - 工具包
-│       │   │   │                   └── searchhis               系统模块 - 搜索历史
+│       │   │   │               └── tools                     工具包
+│       │   │   │                   ├── searchhis               工具包 - 搜索历史
+│       │   │   │                   └── email                   工具包 - 邮件包
 │       │   │   │
 ├── opsli-plugins                                         插件
 │   ├── opsli-plugins-ehcache                               Ehcache缓存插件 (二级缓存)
