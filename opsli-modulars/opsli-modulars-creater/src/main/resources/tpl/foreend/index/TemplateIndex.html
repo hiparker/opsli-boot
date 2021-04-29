@@ -14,10 +14,10 @@
             <el-form-item>
               <el-select v-model="queryForm.#(column.fieldName+'_'+column.queryType)" placeholder="请选择#(column.fieldComments)" clearable style="width: 100%">
                 <el-option
-                        v-for="item in dict.#(column.dictTypeCode)"
-                        :key="item.dictValue"
-                        :label="item.dictName"
-                        :value="item.dictValue"
+                      v-for="item in dict.#(column.dictTypeCode)"
+                      :key="item.dictValue"
+                      :label="item.dictName"
+                      :value="item.dictValue"
                 ></el-option>
               </el-select>
             </el-form-item>
@@ -101,25 +101,25 @@
         > 添加 </el-button>
 
         <el-button
-                #if(data.subModuleName != null && data.subModuleName != "")
-                v-if="$perms('#(data.moduleName.toLowerCase())_#(data.subModuleName.toLowerCase())_import')"
-                #else
-                v-if="$perms('#(data.moduleName.toLowerCase())_import')"
-                #end
-                icon="el-icon-upload2"
-                type="warning"
-                @click="handleImportExcel"
+            #if(data.subModuleName != null && data.subModuleName != "")
+            v-if="$perms('#(data.moduleName.toLowerCase())_#(data.subModuleName.toLowerCase())_import')"
+            #else
+            v-if="$perms('#(data.moduleName.toLowerCase())_import')"
+            #end
+            icon="el-icon-upload2"
+            type="warning"
+            @click="handleImportExcel"
         > 导入 </el-button>
 
         <el-button
-                #if(data.subModuleName != null && data.subModuleName != "")
-                v-if="$perms('#(data.moduleName.toLowerCase())_#(data.subModuleName.toLowerCase())_export')"
-                #else
-                v-if="$perms('#(data.moduleName.toLowerCase())_export')"
-                #end
-                icon="el-icon-download"
-                type="warning"
-                @click="handleExportExcel"
+            #if(data.subModuleName != null && data.subModuleName != "")
+            v-if="$perms('#(data.moduleName.toLowerCase())_#(data.subModuleName.toLowerCase())_export')"
+            #else
+            v-if="$perms('#(data.moduleName.toLowerCase())_export')"
+            #end
+            icon="el-icon-download"
+            type="warning"
+            @click="handleExportExcel"
         > 导出 </el-button>
 
         <el-button

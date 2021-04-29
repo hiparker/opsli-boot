@@ -99,7 +99,7 @@
       #if(vali != "isNotNull")
       const validate_#(column.fieldName+'_'+vali) = (rule, value, callback) => {
         if (!#(vali)(value)) {
-          callback(new Error(getMsg('#(vali)')));
+          callback(new Error(getMsg("#(vali)")));
         } else {
           callback();
         }
