@@ -21,7 +21,7 @@ public class EmailModel {
 
     /** 收件人 */
     @ApiModelProperty(value = "收件人")
-    @ValidationArgs({ValiArgsType.IS_NOT_NULL})
+    @ValidationArgs({ValiArgsType.IS_EMAIL, ValiArgsType.IS_NOT_NULL})
     @ValidationArgsLenMax(200)
     private String to;
 
