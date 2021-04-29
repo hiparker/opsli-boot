@@ -20,8 +20,6 @@ public class ApplicationReadyEventListener implements ApplicationListener<Applic
     @Override
     public void onApplicationEvent(ApplicationReadyEvent event) {
         event.getApplicationContext();
-        // 加载配置参数
-        OptionsUtil.loadAllOption();
         // 输出启动日志
         StartPrint.getInstance().successPrint();
     }

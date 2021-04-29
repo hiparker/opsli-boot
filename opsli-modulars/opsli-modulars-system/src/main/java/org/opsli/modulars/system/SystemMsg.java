@@ -100,6 +100,7 @@ public enum SystemMsg implements BaseMsg {
      */
     EXCEPTION_OPTIONS_UNIQUE(20700,"参数编号重复，该角色已存在"),
     EXCEPTION_OPTIONS_UPDATE(20701,"更新异常"),
+    EXCEPTION_OPTIONS_LOCKED(20702,"内置数据不可变更"),
 
 
     /**

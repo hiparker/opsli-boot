@@ -50,25 +50,34 @@ public class OptionsModel extends ApiWrapper {
     @ValidationArgsLenMax(100)
     private String optionCode;
 
-    
-    
     /** 参数名称 */
     @ApiModelProperty(value = "参数名称")
     @ExcelProperty(value = "参数名称", order = 2)
     @ExcelInfo
-    @ValidationArgs({ValiArgsType.IS_NOT_NULL, ValiArgsType.IS_GENERAL_WITH_CHINESE})
     @ValidationArgsLenMax(200)
     private String optionName;
 
-    
-    
     /** 参数值 */
     @ApiModelProperty(value = "参数值")
     @ExcelProperty(value = "参数值", order = 3)
     @ExcelInfo
-    @ValidationArgsLenMax(500)
+    @ValidationArgs({ValiArgsType.IS_NOT_NULL})
+
+    @ValidationArgsLenMax(10000)
     private String optionValue;
 
+    /** 是否内置数据 0否  1是*/
+    @ApiModelProperty(value = "是否内置数据 0否  1是")
+    @ExcelProperty(value = "是否内置数据", order = 4)
+    @ExcelInfo(dictType = "no_yes")
+    @ValidationArgsLenMax(1)
+    private String izLock;
 
+    /** 备注 */
+    @ApiModelProperty(value = "备注")
+    @ExcelProperty(value = "备注", order = 5)
+    @ExcelInfo
+    @ValidationArgsLenMax(255)
+    private String remark;
 
 }

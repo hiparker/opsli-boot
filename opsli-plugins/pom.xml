@@ -16,7 +16,6 @@
 
     <!-- 插件 -->
     <modules>
-        <module>opsli-plugins-mail</module>
         <module>opsli-plugins-redis</module>
         <module>opsli-plugins-ehcache</module>
         <module>opsli-plugins-excel</module>

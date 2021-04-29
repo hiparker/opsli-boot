@@ -55,8 +55,8 @@ public class RoleModel extends ApiWrapper {
     @ValidationArgsLenMax(50)
     private String roleName;
 
-    /** 是否内置数据 0是  1否*/
-    @ApiModelProperty(value = "是否内置数据 0是  1否")
+    /** 是否内置数据 0否  1是*/
+    @ApiModelProperty(value = "是否内置数据 0否  1是")
     @ExcelProperty(value = "是否内置数据", order = 3)
     @ExcelInfo(dictType = "no_yes")
     @ValidationArgs({ValiArgsType.IS_NOT_NULL})

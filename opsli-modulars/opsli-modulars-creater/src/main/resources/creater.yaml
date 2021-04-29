@@ -17,7 +17,6 @@ opsli:
     - sys_user_org_ref
     - sys_area
     - sys_org
-    - sys_options
 
 
   # 排除字段

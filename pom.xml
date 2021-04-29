@@ -89,6 +89,7 @@
         <commons.io.version>2.8.0</commons.io.version>
         <commons.lang3.version>3.11</commons.lang3.version>
         <snakeyaml.version>1.27</snakeyaml.version>
+        <email.version>1.6.2</email.version>
 
         <!-- 需要使用着两个版本 来引入对应的模块和插件 -->
         <!-- 插件版本 -->
@@ -316,6 +317,12 @@
             <groupId>org.yaml</groupId>
             <artifactId>snakeyaml</artifactId>
             <version>${snakeyaml.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.sun.mail</groupId>
+            <artifactId>javax.mail</artifactId>
+            <version>${email.version}</version>
         </dependency>
 
         <!-- ———————————————————— 集成工具 - 结束 ———————————————————— -->

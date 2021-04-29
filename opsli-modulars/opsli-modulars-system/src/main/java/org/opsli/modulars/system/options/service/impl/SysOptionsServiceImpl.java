@@ -25,10 +25,12 @@ import com.google.common.collect.Maps;
 import org.apache.commons.lang3.StringUtils;
 import org.opsli.api.wrapper.system.options.OptionsModel;
 import org.opsli.common.constants.MyBatisConstants;
+import org.opsli.common.enums.DictType;
 import org.opsli.common.exception.ServiceException;
 import org.opsli.core.base.service.impl.CrudServiceImpl;
 import org.opsli.core.msg.CoreMsg;
 import org.opsli.core.utils.OptionsUtil;
+import org.opsli.core.utils.ValidationUtil;
 import org.opsli.modulars.system.SystemMsg;
 import org.opsli.modulars.system.options.entity.SysOptions;
 import org.opsli.modulars.system.options.mapper.SysOptionsMapper;
@@ -44,9 +46,7 @@ import java.util.Map;
 
 /**
 * @BelongsProject: opsli-boot
-
 * @BelongsPackage: org.opsli.modulars.system.options.service.impl
-
 * @Author: Parker
 * @CreateTime: 2021-02-07 18:24:38
 * @Description: 系统参数 Service Impl
@@ -65,11 +65,24 @@ public class SysOptionsServiceImpl extends CrudServiceImpl<SysOptionsMapper, Sys
             return null;
         }
 
+        // 验证数据
+        ValidationUtil.verify(model);
+
         // 唯一验证
         Integer count = this.uniqueVerificationByCode(model);
         if(count != null && count > 0){
             // 重复
             throw new ServiceException(SystemMsg.EXCEPTION_OPTIONS_UNIQUE);
+        }
+
+        if (!model.getIzApi()){
+            // 强制为不内置
+            model.setIzLock(DictType.NO_YES_NO.getValue());
+        }
+
+        // 如果参数名称为空 则 默认为Code
+        if(StringUtils.isEmpty(model.getOptionName())){
+            model.setOptionName(model.getOptionCode());
         }
 
         return super.insert(model);
@@ -82,6 +95,25 @@ public class SysOptionsServiceImpl extends CrudServiceImpl<SysOptionsMapper, Sys
             return null;
         }
 
+        // 验证数据
+        ValidationUtil.verify(model);
+
+        // 验证是否是内置数据
+        OptionsModel optionsModel = this.get(model);
+        if(optionsModel == null){
+            return null;
+        }
+
+        if (!model.getIzApi()){
+            if(DictType.NO_YES_YES.getValue().equals(optionsModel.getIzLock())){
+                // 内置数据不可变更
+                throw new ServiceException(SystemMsg.EXCEPTION_OPTIONS_LOCKED);
+            }
+
+            // 强制为不内置
+            model.setIzLock(DictType.NO_YES_NO.getValue());
+        }
+
         // 唯一验证
         Integer count = this.uniqueVerificationByCode(model);
         if(count != null && count > 0){
@@ -89,8 +121,18 @@ public class SysOptionsServiceImpl extends CrudServiceImpl<SysOptionsMapper, Sys
             throw new ServiceException(SystemMsg.EXCEPTION_OPTIONS_UNIQUE);
         }
 
+        String optionCode = model.getOptionCode();
+        // 参数编号不可修改
+        model.setOptionCode(null);
+
+        // 如果参数名称为空 则 默认为Code
+        if(StringUtils.isEmpty(model.getOptionName())){
+            model.setOptionName(model.getOptionCode());
+        }
+
         model = super.update(model);
         if(model != null){
+            model.setOptionCode(optionCode);
             // 清除缓存
             this.clearCache(Collections.singletonList(model));
         }
@@ -127,16 +169,31 @@ public class SysOptionsServiceImpl extends CrudServiceImpl<SysOptionsMapper, Sys
 
             OptionsModel optionsModel = resourceDataDict.get(key);
             if(optionsModel == null){
-                // 更新异常
-                throw new ServiceException(SystemMsg.EXCEPTION_OPTIONS_UPDATE);
+                optionsModel = new OptionsModel();
+                // 新增参数
+
+                // 设置值
+                optionsModel.setIzApi(true);
+                optionsModel.setOptionCode(key);
+                optionsModel.setOptionValue(value);
+                optionsModel.setVersion(0);
+                // 强制设置为内置数据
+                optionsModel.setIzLock(DictType.NO_YES_YES.getValue());
+
+                // 更新
+                this.insert(optionsModel);
+            }else {
+                // 修改参数
+
+                // 设置值
+                optionsModel.setIzApi(true);
+                optionsModel.setOptionValue(value);
+                // 强制设置为内置数据
+                optionsModel.setIzLock(DictType.NO_YES_YES.getValue());
+
+                // 更新
+                this.update(optionsModel);
             }
-
-            // 设置值
-            optionsModel.setOptionValue(value);
-            optionsModel.setVersion(null);
-
-            // 更新
-            this.update(optionsModel);
         }
     }
 
@@ -144,6 +201,16 @@ public class SysOptionsServiceImpl extends CrudServiceImpl<SysOptionsMapper, Sys
     @Transactional(rollbackFor = Exception.class)
     public boolean delete(String id) {
         OptionsModel model = super.get(id);
+        if(model == null){
+            return false;
+        }
+
+        // 验证是否是内置数据
+        if(DictType.NO_YES_YES.getValue().equals(model.getIzLock())){
+            // 内置数据不可变更
+            throw new ServiceException(SystemMsg.EXCEPTION_OPTIONS_LOCKED);
+        }
+
         boolean ret = super.delete(id);
 
         if(ret){
@@ -161,6 +228,14 @@ public class SysOptionsServiceImpl extends CrudServiceImpl<SysOptionsMapper, Sys
         List<OptionsModel> modelList = super.transformTs2Ms(
                 super.findList(queryWrapper)
         );
+
+        // 验证是否是内置数据
+        for (OptionsModel model : modelList) {
+            if(DictType.NO_YES_YES.getValue().equals(model.getIzLock())){
+                // 内置数据不可变更
+                throw new ServiceException(SystemMsg.EXCEPTION_OPTIONS_LOCKED);
+            }
+        }
 
         // 清除缓存
         this.clearCache(modelList);

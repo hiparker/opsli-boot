@@ -14,11 +14,6 @@
     <version>${project.parent.version}</version>
 
     <dependencies>
-        <!-- 引入邮件插件 -->
-        <dependency>
-            <groupId>org.opsliframework.boot</groupId>
-            <artifactId>opsli-plugins-mail</artifactId>
-        </dependency>
 
     </dependencies>
 </project>

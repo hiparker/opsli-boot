@@ -45,6 +45,13 @@ public class SysOptions extends BaseEntity {
     /** 参数值 */
     private String optionValue;
 
+    /** 是否内置数据 0否  1是*/
+    private String izLock;
+
+    /** 备注 */
+    @TableField(updateStrategy = FieldStrategy.IGNORED)
+    private String remark;
+
     // ========================================
 
 

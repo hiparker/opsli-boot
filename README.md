@@ -205,19 +205,6 @@
 │   │   │   │   │                   ├── listener              Excel插件 - 监听器
 │   │   │   │   │                   └── msg                   Excel插件 - 信息
 │   │   │   │   │
-│   ├── opsli-plugins-mail                                  邮件插件
-│   │   ├── src
-│   │   │   ├── main
-│   │   │   │   ├── java
-│   │   │   │   │   └── org
-│   │   │   │   │       └── opsli
-│   │   │   │   │           └── plugins
-│   │   │   │   │               └── mail
-│   │   │   │   │                   ├── exception             邮件插件 - 异常类
-│   │   │   │   │                   ├── handler               邮件插件 - 处理类
-│   │   │   │   │                   ├── model                 邮件插件 - 模型
-│   │   │   │   │                   └── msg                   邮件插件 - 信息
-│   │   │   │   │
 │   └── opsli-plugins-redis                                 Redis缓存插件(一级缓存)
 │   │   ├── src
 │   │   │   ├── main

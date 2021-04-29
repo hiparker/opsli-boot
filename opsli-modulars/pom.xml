@@ -28,12 +28,7 @@
         <!-- 模块版本 ${modulars.version}-->
 
         <dependencies>
-            <!-- 引入邮件插件 -->
-            <dependency>
-                <groupId>org.opsliframework.boot</groupId>
-                <artifactId>opsli-plugins-mail</artifactId>
-                <version>${plugins.version}</version>
-            </dependency>
+
         </dependencies>
     </dependencyManagement>
 

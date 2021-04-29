@@ -21,7 +21,7 @@ SET FOREIGN_KEY_CHECKS = 0;
 ALTER TABLE `sys_user` CHANGE COLUMN `locked` `enable` char(1) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '是否启用' AFTER `secret_key`;
 
 -- 租户变更
-ALTER TABLE `sys_tenant` CHANGE COLUMN `iz_usable` `enable` char(1) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '是否启用  0是  1否' AFTER `tenant_name`;
+ALTER TABLE `sys_tenant` CHANGE COLUMN `iz_usable` `enable` char(1) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '是否启用  0否  1是' AFTER `tenant_name`;
 
 -- 菜单变更
 -- ----------------------------
@@ -39,8 +39,8 @@ CREATE TABLE `sys_menu` (
     `component` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '组件',
     `redirect` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '重定向',
     `sort_no` int(11) NOT NULL COMMENT '排序',
-    `always_show` char(1) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '0' COMMENT '是否总是显示 0是  1否',
-    `hidden` char(1) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '0' COMMENT '是否隐藏 0是  1否',
+    `always_show` char(1) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '0' COMMENT '是否总是显示 0否  1是',
+    `hidden` char(1) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '0' COMMENT '是否隐藏 0否  1是',
     `deleted` char(1) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '0' COMMENT '删除状态',
     `version` int(11) NOT NULL COMMENT '版本（乐观锁）',
     `create_by` bigint(19) NOT NULL COMMENT '创建用户',

@@ -46,7 +46,7 @@ public class SysDictDetail extends BaseEntity {
     /** 字典值 */
     private String dictValue;
 
-    /** 是否内置数据 0是  1否*/
+    /** 是否内置数据 0否  1是*/
     private String izLock;
 
     /** 排序 */

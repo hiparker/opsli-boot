@@ -37,7 +37,7 @@ public class SysTenant extends BaseEntity {
     /** 租户名称 */
     private String tenantName;
 
-    /** 是否启用 0是  1否*/
+    /** 是否启用 0否  1是*/
     private String enable;
 
     /** 备注 */

@@ -31,6 +31,7 @@ import org.opsli.common.annotation.ApiRestController;
 import org.opsli.common.annotation.EnableLog;
 import org.opsli.common.annotation.RequiresPermissionsCus;
 import org.opsli.common.enums.CryptoAsymmetricType;
+import org.opsli.common.enums.DictType;
 import org.opsli.common.utils.WrapperUtil;
 import org.opsli.core.base.controller.BaseRestController;
 import org.opsli.core.persistence.Page;
@@ -93,8 +94,13 @@ public class SysOptionsRestController extends BaseRestController<SysOptions, Opt
     public ResultVo<?> findPage(Integer pageNo, Integer pageSize, HttpServletRequest request) {
 
         QueryBuilder<SysOptions> queryBuilder = new WebQueryBuilder<>(entityClazz, request.getParameterMap());
+
+        // 查询不是内置的数据
+        QueryWrapper<SysOptions> queryWrapper = queryBuilder.build();
+        queryWrapper.eq("iz_lock", DictType.NO_YES_NO.getValue());
+
         Page<SysOptions, OptionsModel> page = new Page<>(pageNo, pageSize);
-        page.setQueryWrapper(queryBuilder.build());
+        page.setQueryWrapper(queryWrapper);
         page = IService.findPage(page);
 
         return ResultVo.success(page.getPageData());
@@ -269,8 +275,11 @@ public class SysOptionsRestController extends BaseRestController<SysOptions, Opt
      */
     @Override
     public ResultVo<Map<String, OptionsModel>> findAllOptions() {
+        QueryWrapper<SysOptions> queryWrapper = new QueryWrapper<>();
+        // 查询内置数据
+        queryWrapper.eq("iz_lock", DictType.NO_YES_YES.getValue());
         // 数据库查询数据
-        List<SysOptions> allList = IService.findAllList();
+        List<SysOptions> allList = IService.findList(queryWrapper);
         return ResultVo.success(
                 OptionsUtil.convertOptionsMap(
                         WrapperUtil.transformInstance(allList, OptionsModel.class))

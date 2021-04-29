@@ -45,7 +45,7 @@ public class TenantModel extends ApiWrapper {
     @ValidationArgsLenMax(50)
     private String tenantName;
 
-    /** 是否启用 0是  1否*/
+    /** 是否启用 0否  1是*/
     @ApiModelProperty(value = "是否启用")
     @ExcelProperty(value = "是否启用", order = 2)
     @ExcelInfo(dictType = "no_yes")

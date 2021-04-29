@@ -41,7 +41,7 @@ public class SysDict extends BaseEntity {
     /** 字典类型名称 */
     private String typeName;
 
-    /** 是否内置数据 0是  1否*/
+    /** 是否内置数据 0否  1是*/
     private String izLock;
 
     /** 备注 */
