@@ -59,13 +59,11 @@ public class UserInfo extends ApiWrapper {
 
     /** 邮箱 */
     @ApiModelProperty(value = "邮箱")
-    @ExcelProperty(value = "邮箱", order = 3)
     @ValidationArgs({ValiArgsType.IS_EMAIL})
     private String email;
 
     /** 工号 */
     @ApiModelProperty(value = "工号")
-    @ExcelProperty(value = "工号", order = 4)
     @ValidationArgs({ValiArgsType.IS_GENERAL})
     @ValidationArgsLenMax(32)
     private String no;

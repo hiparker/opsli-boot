@@ -105,7 +105,6 @@ public class ShiroConfig {
         filterMap.put("/doc.html", "anon");
         filterMap.put("/swagger-ui.html", "anon");
         filterMap.put("/swagger-resources/**", "anon");
-        filterMap.put("/static/file/**", "anon");
         filterMap.put("/**", "last_filter");
 
         shiroFilter.setFilterChainDefinitionMap(filterMap);

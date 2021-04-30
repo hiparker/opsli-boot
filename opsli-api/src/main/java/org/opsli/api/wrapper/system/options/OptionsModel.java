@@ -61,8 +61,6 @@ public class OptionsModel extends ApiWrapper {
     @ApiModelProperty(value = "参数值")
     @ExcelProperty(value = "参数值", order = 3)
     @ExcelInfo
-    @ValidationArgs({ValiArgsType.IS_NOT_NULL})
-
     @ValidationArgsLenMax(10000)
     private String optionValue;
 

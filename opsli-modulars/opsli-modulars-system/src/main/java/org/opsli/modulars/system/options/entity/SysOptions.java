@@ -43,6 +43,7 @@ public class SysOptions extends BaseEntity {
     private String optionName;
 
     /** 参数值 */
+    @TableField(updateStrategy = FieldStrategy.IGNORED)
     private String optionValue;
 
     /** 是否内置数据 0否  1是*/

@@ -62,6 +62,10 @@ import org.opsli.modulars.system.org.web.SysOrgRestController;
 import org.opsli.modulars.system.user.entity.SysUser;
 import org.opsli.modulars.system.user.entity.SysUserAndOrg;
 import org.opsli.modulars.system.user.service.IUserService;
+import org.opsli.modulars.tools.oss.enums.OssStorageType;
+import org.opsli.modulars.tools.oss.factory.OssStorageFactory;
+import org.opsli.modulars.tools.oss.service.BaseOssStorageService;
+import org.opsli.modulars.tools.oss.service.OssStorageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
@@ -203,23 +207,16 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
         }
 
         try {
-            String staticPath = "/static/file";
+            // 调用OSS 服务保存头像
+            OssStorageService ossStorageService = OssStorageFactory.getHandle();
+            BaseOssStorageService.FileAttr fileAttr = ossStorageService.upload(
+                    files.get(0).getInputStream(), "jpg");
+
             UserModel user = UserUtil.getUser();
-
-            String date = DateUtil.format(DateUtil.date(), "yyyyMMdd");
-            String dateTime = DateUtil.format(DateUtil.date(), "yyyyMMddHHmmss");
-            String packageName = globalProperties.getWeb().getUploadPath() + staticPath+"/"+date;
-            String fileName = dateTime+"-"+ IdUtil.simpleUUID() +".jpg";
-            File file = new File(packageName+"/"+fileName);
-            MultipartFile multipartFile = files.get(0);
-            FileUtils.copyInputStreamToFile(multipartFile.getInputStream(), file);
-            FileUtil.mkdir(packageName);
-            FileUtil.touch(file);
-
             // 更新头像至数据库
             UserModel userModel = new UserModel();
             userModel.setId(user.getId());
-            userModel.setAvatar(staticPath + "/" +date+"/"+fileName);
+            userModel.setAvatar(fileAttr.getFileStoragePath());
             IService.updateAvatar(userModel);
             // 刷新用户信息
             UserUtil.refreshUser(user);

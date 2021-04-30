@@ -12,7 +12,7 @@ import org.opsli.common.enums.ValiArgsType;
  * @BelongsPackage: org.opsli.modulars.test.entity
  * @Author: Parker
  * @CreateTime: 2020-09-16 17:33
- * @Description: 租户表
+ * @Description: 邮件服务
  */
 @Data
 @EqualsAndHashCode(callSuper = false)

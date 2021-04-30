@@ -160,8 +160,8 @@ opsli:
     url-patterns: "/*"
     # 排除过滤URL
     url-exclusion:
+      - "/static/files/"
       - "/doc.html"
-      - "/static/file"
 
   # 认证
   auth:
@@ -178,6 +178,7 @@ opsli:
       effective-time: 120
       # 排除过滤URL
       url-exclusion:
+        - "/static/files/**"
         - "/test.html"
 
     # 登录设置
