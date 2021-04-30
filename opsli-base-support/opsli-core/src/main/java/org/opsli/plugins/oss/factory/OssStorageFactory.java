@@ -13,16 +13,16 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.opsli.modulars.tools.oss.factory;
+package org.opsli.plugins.oss.factory;
 
 import cn.hutool.core.util.ClassUtil;
 import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
 import org.opsli.api.wrapper.system.options.OptionsModel;
 import org.opsli.core.utils.OptionsUtil;
-import org.opsli.modulars.tools.oss.enums.OssConfType;
-import org.opsli.modulars.tools.oss.enums.OssStorageType;
-import org.opsli.modulars.tools.oss.service.OssStorageService;
+import org.opsli.plugins.oss.enums.OssConfType;
+import org.opsli.plugins.oss.enums.OssStorageType;
+import org.opsli.plugins.oss.service.OssStorageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;

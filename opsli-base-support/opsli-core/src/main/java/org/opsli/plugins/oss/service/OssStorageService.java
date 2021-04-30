@@ -13,10 +13,10 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.opsli.modulars.tools.oss.service;
+package org.opsli.plugins.oss.service;
 
 
-import org.opsli.modulars.tools.oss.enums.OssStorageType;
+import org.opsli.plugins.oss.enums.OssStorageType;
 
 import java.io.File;
 import java.io.InputStream;

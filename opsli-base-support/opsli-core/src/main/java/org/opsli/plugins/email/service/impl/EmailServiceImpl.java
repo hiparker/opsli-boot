@@ -1,4 +1,4 @@
-package org.opsli.modulars.tools.email.service.impl;
+package org.opsli.plugins.email.service.impl;
 
 import cn.hutool.core.convert.Convert;
 import cn.hutool.extra.mail.MailAccount;
@@ -7,9 +7,9 @@ import org.opsli.api.wrapper.system.options.OptionsModel;
 import org.opsli.common.enums.DictType;
 import org.opsli.core.utils.OptionsUtil;
 import org.opsli.core.utils.ValidationUtil;
-import org.opsli.modulars.tools.email.enums.EmailType;
-import org.opsli.modulars.tools.email.service.IEmailService;
-import org.opsli.modulars.tools.email.wrapper.EmailModel;
+import org.opsli.plugins.email.enums.EmailType;
+import org.opsli.plugins.email.service.IEmailService;
+import org.opsli.plugins.email.wrapper.EmailModel;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
@@ -17,7 +17,7 @@ import java.util.Collections;
 
 /**
  * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.modulars.tools.email.service
+ * @BelongsPackage: org.opsli.plugins.email.service
  * @Author: Parker
  * @CreateTime: 2020-09-16 17:34
  * @Description: 邮件 接口实现类

@@ -13,27 +13,26 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.opsli.modulars.tools.oss.enums;
+package org.opsli.plugins.oss.enums;
 
 /**
- * 本地存储 参数类型
+ * 存储服务类型
  *
  * @author Parker
  */
-public enum LocalStorageType {
+public enum OssConfType {
 
-    /** 本地存储服务 */
-    DOMAIN("storage_local_domain", "域名"),
-    PATH_PREFIX("storage_local_path_prefix", "路径前缀"),
+    /** 存储服务类型 */
+    STORAGE_TYPE("storage_type", "存储服务类型"),
 
     ;
 
     private final String code;
     private final String desc;
 
-    public static LocalStorageType getType(String cacheType) {
-        LocalStorageType[] var1 = values();
-        for (LocalStorageType type : var1) {
+    public static OssConfType getType(String cacheType) {
+        OssConfType[] var1 = values();
+        for (OssConfType type : var1) {
             if (type.code.equalsIgnoreCase(cacheType)) {
                 return type;
             }
@@ -51,7 +50,7 @@ public enum LocalStorageType {
 
     // =================
 
-    LocalStorageType(final String code, final String desc) {
+    OssConfType(final String code, final String desc) {
         this.code = code;
         this.desc = desc;
     }

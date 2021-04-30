@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.opsli.modulars.tools.oss.service;
+package org.opsli.plugins.oss.service;
 
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.io.FileUtil;

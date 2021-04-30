@@ -1,4 +1,4 @@
-package org.opsli.modulars.tools.email.wrapper;
+package org.opsli.plugins.email.wrapper;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;

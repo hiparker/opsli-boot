@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.opsli.modulars.tools.oss.service.impl;
+package org.opsli.plugins.oss.service.impl;
 
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.FileUtil;
@@ -24,10 +24,10 @@ import org.opsli.api.wrapper.system.options.OptionsModel;
 import org.opsli.core.autoconfigure.properties.GlobalProperties;
 import org.opsli.core.utils.OptionsUtil;
 import org.opsli.core.utils.ValidationUtil;
-import org.opsli.modulars.tools.oss.conf.LocalConfig;
-import org.opsli.modulars.tools.oss.enums.LocalStorageType;
-import org.opsli.modulars.tools.oss.enums.OssStorageType;
-import org.opsli.modulars.tools.oss.service.BaseOssStorageService;
+import org.opsli.plugins.oss.conf.LocalConfig;
+import org.opsli.plugins.oss.enums.LocalStorageType;
+import org.opsli.plugins.oss.enums.OssStorageType;
+import org.opsli.plugins.oss.service.BaseOssStorageService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.File;

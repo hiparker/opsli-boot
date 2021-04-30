@@ -5,8 +5,8 @@ import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.opsli.api.base.result.ResultVo;
 import org.opsli.common.annotation.ApiRestController;
-import org.opsli.modulars.tools.email.service.IEmailService;
-import org.opsli.modulars.tools.email.wrapper.EmailModel;
+import org.opsli.plugins.email.service.IEmailService;
+import org.opsli.plugins.email.wrapper.EmailModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 /**
  * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.modulars.tools.email.web
+ * @BelongsPackage: org.opsli.plugins.email.web
  * @Author: Parker
  * @CreateTime: 2020-09-13 17:40
  * @Description: 邮件 Controller

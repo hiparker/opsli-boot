@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.opsli.modulars.tools.email.enums;
+package org.opsli.plugins.email.enums;
 
 /**
  * Email 参数类型

@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.opsli.modulars.tools.oss;
+package org.opsli.plugins.oss;
 
 
 import org.opsli.common.base.msg.BaseMsg;
