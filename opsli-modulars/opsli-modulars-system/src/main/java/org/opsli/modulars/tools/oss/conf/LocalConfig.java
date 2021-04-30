@@ -15,6 +15,7 @@
  */
 package org.opsli.modulars.tools.oss.conf;
 
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import org.opsli.common.annotation.validation.ValidationArgs;
 import org.opsli.common.annotation.validation.ValidationArgsLenMax;
@@ -33,11 +34,13 @@ public class LocalConfig implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /** 域名 */
+    @ApiModelProperty(value = "域名")
     @ValidationArgs({ValiArgsType.IS_NOT_NULL})
     @ValidationArgsLenMax(100)
     private String domain;
 
     /** 前缀 */
+    @ApiModelProperty(value = "前缀")
     @ValidationArgsLenMax(100)
     private String pathPrefix;
 
