@@ -39,6 +39,7 @@ import org.opsli.common.annotation.RequiresPermissionsCus;
 import org.opsli.common.constants.MyBatisConstants;
 import org.opsli.common.exception.ServiceException;
 import org.opsli.common.exception.TokenException;
+import org.opsli.common.utils.CheckStrength;
 import org.opsli.common.utils.HumpUtil;
 import org.opsli.common.utils.WrapperUtil;
 import org.opsli.core.base.controller.BaseRestController;
@@ -112,13 +113,16 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
             throw new TokenException(TokenMsg.EXCEPTION_TOKEN_LOSE_EFFICACY);
         }
 
-        // 个人信息 清除敏感信息
-        user.setPassword(null);
         List<String> userRolesByUserId = UserUtil.getUserRolesByUserId(user.getId());
         List<String> userAllPermsByUserId = UserUtil.getUserAllPermsByUserId(user.getId());
+
         UserInfo userInfo = WrapperUtil.transformInstance(user, UserInfo.class);
         userInfo.setRoles(userRolesByUserId);
         userInfo.setPerms(userAllPermsByUserId);
+        // 获得密码强度
+        userInfo.setPasswordLevel(
+                CheckStrength.getPasswordLevel(user.getPassword()).getCode()
+        );
 
         // 判断是否是超级管理员
         if(StringUtils.equals(UserUtil.SUPER_ADMIN, user.getUsername())){
