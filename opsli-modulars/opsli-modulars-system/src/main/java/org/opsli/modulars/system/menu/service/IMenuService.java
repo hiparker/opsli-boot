@@ -15,6 +15,7 @@
  */
 package org.opsli.modulars.system.menu.service;
 
+import org.opsli.api.wrapper.system.menu.MenuFullModel;
 import org.opsli.api.wrapper.system.menu.MenuModel;
 import org.opsli.core.base.entity.HasChildren;
 import org.opsli.core.base.service.interfaces.CrudServiceInterface;
@@ -55,5 +56,12 @@ public interface IMenuService extends CrudServiceInterface<SysMenu, MenuModel> {
      * @return List
      */
     List<HasChildren> hasChildrenByChoose(Set<String> parentIds);
+
+    /**
+     * 保存完成菜单
+     * @param menu 菜单
+     * @return boolean
+     */
+    void saveMenuByFull(MenuFullModel menu);
 
 }

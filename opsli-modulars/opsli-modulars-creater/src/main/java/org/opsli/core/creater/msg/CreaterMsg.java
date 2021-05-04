@@ -56,6 +56,8 @@ public enum CreaterMsg implements BaseMsg {
     EXCEPTION_CREATE_NULL(50140,"生成失败，数据为空"),
     EXCEPTION_CREATE_TABLE_NULL(50141,"生成失败，暂无表数据"),
     EXCEPTION_CREATE_FIELD_NULL(50142,"生成失败，暂无表字段"),
+    EXCEPTION_CREATE_MENU_CODE_NULL(50143,"生成菜单失败，请先生成代码"),
+    EXCEPTION_CREATE_MENU_PARENT_NULL(50144,"上级菜单不可为空"),
 
     /**
      * 其他

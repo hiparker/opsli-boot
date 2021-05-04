@@ -23,6 +23,9 @@ package org.opsli.common.constants;
  */
 public interface MenuConstants {
 
+    /** 菜单根节点ID */
+    String GEN_ID = "0";
+
     /** 菜单类型 */
     String MENU = "1";
 

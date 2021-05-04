@@ -34,6 +34,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.opsli.api.base.result.ResultVo;
 import org.opsli.api.web.system.menu.MenuApi;
+import org.opsli.api.wrapper.system.menu.MenuFullModel;
 import org.opsli.api.wrapper.system.menu.MenuModel;
 import org.opsli.api.wrapper.system.user.UserModel;
 import org.opsli.common.annotation.ApiRestController;
@@ -93,8 +94,6 @@ public class MenuRestController extends BaseRestController<SysMenu, MenuModel, I
 
     /** 虚拟总节点 ID */
     private static final String VIRTUAL_TOTAL_NODE = "-1";
-    /** 根节点 ID */
-    private static final String BASE_NODE = "0";
 
     /** 菜单排除字段 */
     private static final String[] EXCLUSION_FIELDS = {
@@ -180,7 +179,7 @@ public class MenuRestController extends BaseRestController<SysMenu, MenuModel, I
             menuModelList = Lists.newArrayList();
             parentId = VIRTUAL_TOTAL_NODE;
             MenuModel model = new MenuModel();
-            model.setId(BASE_NODE);
+            model.setId(MenuConstants.GEN_ID);
             model.setMenuName("根节点");
             model.setHidden("0");
             model.setSortNo(-1);
@@ -221,7 +220,7 @@ public class MenuRestController extends BaseRestController<SysMenu, MenuModel, I
             menuModelList = Lists.newArrayList();
             parentId = VIRTUAL_TOTAL_NODE;
             MenuModel model = new MenuModel();
-            model.setId(BASE_NODE);
+            model.setId(MenuConstants.GEN_ID);
             model.setMenuName("根节点");
             model.setHidden("0");
             model.setSortNo(-1);
@@ -294,7 +293,7 @@ public class MenuRestController extends BaseRestController<SysMenu, MenuModel, I
     @Override
     public ResultVo<MenuModel> get(MenuModel model) {
         if(model != null){
-            if(StringUtils.equals(BASE_NODE, model.getId())){
+            if(StringUtils.equals(MenuConstants.GEN_ID, model.getId())){
                 model.setMenuName("根节点");
                 model.setHidden("0");
                 model.setSortNo(-1);
@@ -660,5 +659,16 @@ public class MenuRestController extends BaseRestController<SysMenu, MenuModel, I
                 treeNode.putExtra(IS_LEAF, false);
             }
         }
+    }
+
+    /**
+     * 菜单完整 新增
+     * @param menuFullModel 模型
+     * @return ResultVo
+     */
+    @Override
+    public ResultVo<?> saveMenuByFull(MenuFullModel menuFullModel) {
+        IService.saveMenuByFull(menuFullModel);
+        return ResultVo.success();
     }
 }

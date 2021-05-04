@@ -19,8 +19,10 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.apache.commons.lang3.StringUtils;
+import org.opsli.api.wrapper.system.menu.MenuFullModel;
 import org.opsli.api.wrapper.system.menu.MenuModel;
 import org.opsli.api.wrapper.system.user.UserModel;
+import org.opsli.common.constants.MenuConstants;
 import org.opsli.common.constants.MyBatisConstants;
 import org.opsli.common.enums.DictType;
 import org.opsli.common.exception.ServiceException;
@@ -34,6 +36,7 @@ import org.opsli.core.utils.MenuUtil;
 import org.opsli.core.utils.UserUtil;
 import org.opsli.modulars.system.SystemMsg;
 import org.opsli.modulars.system.menu.entity.SysMenu;
+import org.opsli.modulars.system.menu.factory.MenuFactory;
 import org.opsli.modulars.system.menu.mapper.MenuMapper;
 import org.opsli.modulars.system.menu.service.IMenuService;
 import org.opsli.modulars.system.org.entity.SysOrg;
@@ -86,16 +89,21 @@ public class MenuServiceImpl extends CrudServiceImpl<MenuMapper, SysMenu, MenuMo
             return null;
         }
 
-        // 按钮 权限唯一验证
-//        Integer count = this.uniqueVerificationByPermissions(model);
-//        if(count != null && count > 0){
-//            // 重复
-//            throw new ServiceException(SystemMsg.EXCEPTION_MENU_PERMISSIONS_UNIQUE);
-//        }
-
         // 如果上级ID 为空 则默认为 0
         if(StringUtils.isEmpty(model.getParentId())){
-            model.setParentId("0");
+            model.setParentId(MenuConstants.GEN_ID);
+        }
+
+        // 容错处理
+        // 如果根结点为0 且 为菜单类型 判断首位是否为 / 如果没有则自动加 /
+        if(MenuConstants.GEN_ID.equals(model.getParentId())){
+            if(StringUtils.isNotEmpty(model.getUrl())){
+                char firstChar = '/';
+                char first = model.getUrl().charAt(0);
+                if(firstChar != first){
+                    model.setUrl("/"+model.getUrl());
+                }
+            }
         }
 
         // 菜单有变动 直接刷新超级管理员 菜单缓存
@@ -130,12 +138,17 @@ public class MenuServiceImpl extends CrudServiceImpl<MenuMapper, SysMenu, MenuMo
             return null;
         }
 
-        // 按钮 权限唯一验证
-//        Integer count = this.uniqueVerificationByPermissions(model);
-//        if(count != null && count > 0){
-//            // 重复
-//            throw new ServiceException(SystemMsg.EXCEPTION_MENU_PERMISSIONS_UNIQUE);
-//        }
+        // 容错处理
+        // 如果根结点为0 且 为菜单类型 判断首位是否为 / 如果没有则自动加 /
+        if(MenuConstants.GEN_ID.equals(model.getParentId())){
+            if(StringUtils.isNotEmpty(model.getUrl())){
+                char firstChar = '/';
+                char first = model.getUrl().charAt(0);
+                if(firstChar != first){
+                    model.setUrl("/"+model.getUrl());
+                }
+            }
+        }
 
         MenuModel menuModel = super.update(model);
         if(menuModel != null){
@@ -144,6 +157,46 @@ public class MenuServiceImpl extends CrudServiceImpl<MenuMapper, SysMenu, MenuMo
         }
 
         return menuModel;
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void saveMenuByFull(MenuFullModel menuFullModel) {
+        if(menuFullModel == null){
+            return;
+        }
+
+        // 容错处理
+        // 如果根节点没有 Layout 节点 则自动创建一个
+        if(MenuConstants.GEN_ID.equals(menuFullModel.getParentId())){
+            MenuModel genMenu = new MenuModel();
+            genMenu.setParentId(menuFullModel.getParentId());
+            genMenu.setMenuName(menuFullModel.getTitle());
+            genMenu.setAlwaysShow(DictType.NO_YES_NO.getValue());
+            genMenu.setHidden(DictType.NO_YES_NO.getValue());
+            genMenu.setUrl(menuFullModel.getSubModuleName()+"Gen");
+            genMenu.setType(DictType.MENU_MENU.getValue());
+            genMenu.setComponent("Layout");
+            genMenu.setRedirect(menuFullModel.getSubModuleName());
+            genMenu.setSortNo(1);
+            MenuModel genMenuModel = this.insert(genMenu);
+
+            // 重置上级ID
+            menuFullModel.setParentId(genMenuModel.getId());
+        }
+
+        MenuModel menu = MenuFactory.INSTANCE.createMenu(menuFullModel);
+        // 保存菜单
+        MenuModel menuModel = this.insert(menu);
+
+        // 保存按钮
+
+        // 重置上级ID
+        menuFullModel.setParentId(menuModel.getId());
+        List<MenuModel> menuBtnList = MenuFactory.INSTANCE.createMenuBtnList(menuFullModel);
+        for (MenuModel btnModel : menuBtnList) {
+            this.insert(btnModel);
+        }
     }
 
     @Override

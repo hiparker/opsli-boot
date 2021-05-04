@@ -23,6 +23,8 @@ import org.opsli.api.base.result.ResultVo;
 import org.opsli.common.annotation.ApiRestController;
 import org.opsli.common.annotation.EnableLog;
 import org.opsli.core.base.controller.BaseRestController;
+import org.opsli.core.creater.exception.CreaterException;
+import org.opsli.core.creater.msg.CreaterMsg;
 import org.opsli.modulars.creater.createrlogs.api.CreaterLogsApi;
 import org.opsli.modulars.creater.createrlogs.entity.CreaterLogs;
 import org.opsli.modulars.creater.createrlogs.service.ICreateLogsService;
@@ -67,6 +69,29 @@ public class CreaterLogsRestController extends BaseRestController<CreaterLogs, C
         // 调用生成方法
         IService.create(model, response);
 
+    }
+
+    /**
+     * 生成菜单 修改
+     *
+     * @param menuParentId 上级菜单ID
+     * @param tableId 表ID
+     * @return ResultVo
+     */
+    @ApiOperation(value = "生成菜单", notes = "生成菜单")
+    @RequiresPermissions("deve_creater_createMenu")
+    @EnableLog
+    @Override
+    public ResultVo<?> createMenu(String menuParentId, String tableId) {
+        // 演示模式 不允许操作
+        super.demoError();
+
+        // 调用生成菜单方法
+        boolean menuFlag = IService.createMenu(menuParentId, tableId);
+        if(!menuFlag){
+            return ResultVo.error();
+        }
+        return ResultVo.success();
     }
 
 }

@@ -16,6 +16,7 @@
 package org.opsli.api.web.system.menu;
 
 import org.opsli.api.base.result.ResultVo;
+import org.opsli.api.wrapper.system.menu.MenuFullModel;
 import org.opsli.api.wrapper.system.menu.MenuModel;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -179,10 +180,18 @@ public interface MenuApi {
 
 
     // ================= 普通
+
     /**
      * 根据菜单权限 获得菜单
      * @param permissions 菜单权限
      * @return ResultVo
      */
     ResultVo<MenuModel> getByPermissions(String permissions);
+
+    /**
+     * 菜单完整 新增
+     * @param menuFullModel 模型
+     * @return ResultVo
+     */
+    ResultVo<?> saveMenuByFull(@RequestBody MenuFullModel menuFullModel);
 }

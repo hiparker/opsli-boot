@@ -17,6 +17,10 @@ package org.opsli.modulars.creater.createrlogs.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import org.apache.commons.lang3.StringUtils;
+import org.opsli.api.base.result.ResultVo;
+import org.opsli.api.web.system.menu.MenuApi;
+import org.opsli.api.wrapper.system.menu.MenuFullModel;
 import org.opsli.common.utils.WrapperUtil;
 import org.opsli.core.base.service.impl.CrudServiceImpl;
 import org.opsli.core.creater.exception.CreaterException;
@@ -59,6 +63,8 @@ public class CreateLogsServiceImpl extends CrudServiceImpl<CreaterLogsMapper, Cr
     private ITableService iTableService;
     @Autowired
     private ITableColumnService iTableColumnService;
+    @Autowired
+    private MenuApi menuApi;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -143,6 +149,33 @@ public class CreateLogsServiceImpl extends CrudServiceImpl<CreaterLogsMapper, Cr
 
         }
     }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public boolean createMenu(String menuParentId, String tableId) {
+        if(StringUtils.isEmpty(menuParentId)){
+            // 上级菜单不可为空
+            throw new CreaterException(CreaterMsg.EXCEPTION_CREATE_MENU_PARENT_NULL);
+        }
+
+        CreaterLogsModel byTableId = this.getByTableId(tableId);
+        if(byTableId == null){
+            // 生成菜单失败，请先 生成代码
+            throw new CreaterException(CreaterMsg.EXCEPTION_CREATE_MENU_CODE_NULL);
+        }
+
+        // 完整新增菜单
+        MenuFullModel menuFullModel = new MenuFullModel();
+        menuFullModel.setParentId(menuParentId);
+        menuFullModel.setTitle(byTableId.getCodeTitle());
+        menuFullModel.setModuleName(byTableId.getModuleName());
+        menuFullModel.setSubModuleName(byTableId.getSubModuleName());
+        ResultVo<?> insertRet = menuApi.saveMenuByFull(menuFullModel);
+
+        return insertRet.isSuccess();
+    }
+
+
 }
 
 

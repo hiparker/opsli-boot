@@ -25,18 +25,24 @@ package org.opsli.common.enums;
 public enum DictType {
 
     /** 是否 */
-    NO_YES_NO("no_yes","0"),
-    NO_YES_YES("no_yes","1"),
+    NO_YES_NO("no_yes","0", "否"),
+    NO_YES_YES("no_yes","1", "是"),
 
+    /** 菜单 */
+    MENU_MENU("menu_type","1", "菜单"),
+    MENU_BUTTON("menu_type","2", "按钮"),
+    MENU_EXTERNAL("menu_type","3", "外链"),
 
     ;
 
     private final String type;
     private final String value;
+    private final String desc;
 
-    DictType(String type, String value){
+    DictType(String type, String value, String desc){
         this.type = type;
         this.value = value;
+        this.desc = desc;
     }
 
     public String getValue() {
@@ -45,6 +51,10 @@ public enum DictType {
 
     public String getType() {
         return this.type;
+    }
+
+    public String getDesc() {
+        return this.desc;
     }
 
     /**

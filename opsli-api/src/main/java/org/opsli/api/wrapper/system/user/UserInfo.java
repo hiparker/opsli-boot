@@ -91,9 +91,12 @@ public class UserInfo extends ApiWrapper {
     @ApiModelProperty(value = "权限列表")
     private List<String> perms;
 
-
     /** 是否是超级管理员 */
     @ApiModelProperty(value = "是否是超级管理员")
     private boolean izSuperAdmin;
+
+    /** 密码强度 字典 password_level */
+    @ApiModelProperty(value = "密码强度")
+    private String passwordLevel;
 
 }

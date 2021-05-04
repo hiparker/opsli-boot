@@ -29,7 +29,7 @@ import org.opsli.plugins.excel.annotation.ExcelInfo;
 
 /**
  * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.modulars.test.entity
+ * @BelongsPackage: org.opsli.api.wrapper.system.menu
  * @Author: Parker
  * @CreateTime: 2020-09-16 17:33
  * @Description: 菜单表

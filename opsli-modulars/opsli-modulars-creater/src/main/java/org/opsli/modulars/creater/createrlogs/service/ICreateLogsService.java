@@ -44,14 +44,23 @@ public interface ICreateLogsService extends CrudServiceInterface<CreaterLogs, Cr
 
     /**
      * 根据表Id 查询
-     * @param tableId
+     * @param tableId 表ID
      */
     CreaterLogsModel getByTableId(String tableId);
 
     /**
      * 代码生成
-     * @param model
+     * @param model 模型
+     * @param response response
      */
     void create(CreaterLogsModel model, HttpServletResponse response);
+
+    /**
+     * 生成菜单
+     * @param menuParentId 上级菜单ID
+     * @param tableId 表ID
+     * @return boolean
+     */
+    boolean createMenu(String menuParentId, String tableId);
 
 }

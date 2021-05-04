@@ -56,12 +56,22 @@ public interface CreaterLogsApi {
     ResultVo<CreaterLogsModel> getByTableId(String tableId);
 
     /**
-     * 生成记录 修改
+     * 代码生成 修改
      * @param model 模型
      * @return ResultVo
      */
     @GetMapping("/create")
     void create(CreaterLogsModel model, HttpServletResponse response);
+
+    /**
+     * 生成菜单
+     *
+     * @param menuParentId 上级菜单ID
+     * @param tableId 表ID
+     * @return ResultVo
+     */
+    @PostMapping("/createMenu")
+    ResultVo<?> createMenu(String menuParentId, String tableId);
 
 
 }
