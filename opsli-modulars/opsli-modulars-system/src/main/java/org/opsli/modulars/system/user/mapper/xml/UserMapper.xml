@@ -98,6 +98,7 @@
             c.icon,
             c.url,
             c.component,
+            c.always_show,
             c.sort_no
         from
             sys_user_role_ref a,
@@ -128,6 +129,7 @@
             c.icon,
             c.url,
             c.component,
+            c.always_show,
             c.sort_no
         from
             sys_user_role_ref a,

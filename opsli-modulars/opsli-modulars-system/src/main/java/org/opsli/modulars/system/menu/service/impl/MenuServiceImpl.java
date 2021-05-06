@@ -60,8 +60,8 @@ import java.util.Set;
 @Service
 public class MenuServiceImpl extends CrudServiceImpl<MenuMapper, SysMenu, MenuModel> implements IMenuService {
 
-    /** 按钮类型 */
-    private static final String BUTTON_TYPE = "2";
+    /** 菜单管理ID */
+    private static final String MENU_ID = "2";
 
     @Autowired(required = false)
     private MenuMapper mapper;
@@ -138,6 +138,15 @@ public class MenuServiceImpl extends CrudServiceImpl<MenuMapper, SysMenu, MenuMo
             return null;
         }
 
+        // 如果开启 隐藏功能
+        if(DictType.NO_YES_YES.getValue().equals(model.getHidden())){
+            // 需要判断是否直接隐藏掉 菜单管理功能 （防止直接隐藏掉后 无法管理菜单）
+            if(MENU_ID.equals(model.getId())){
+                // 不可操作自身
+                throw new ServiceException(SystemMsg.EXCEPTION_MENU_HANDLE_SELF);
+            }
+        }
+
         // 容错处理
         // 如果根结点为0 且 为菜单类型 判断首位是否为 / 如果没有则自动加 /
         if(MenuConstants.GEN_ID.equals(model.getParentId())){
@@ -207,6 +216,12 @@ public class MenuServiceImpl extends CrudServiceImpl<MenuMapper, SysMenu, MenuMo
             return false;
         }
 
+        // 需要判断是否直接删 菜单管理功能 （防止直接删除掉后 无法管理菜单）
+        if(MENU_ID.equals(menuModel.getId())){
+            // 不可操作自身
+            throw new ServiceException(SystemMsg.EXCEPTION_MENU_HANDLE_SELF);
+        }
+
         // 清除缓存
         this.clearCache(menuModel);
 
@@ -229,14 +244,19 @@ public class MenuServiceImpl extends CrudServiceImpl<MenuMapper, SysMenu, MenuMo
                 super.findList(queryWrapper)
         );
 
-        // 清除缓存
+        // 循环处理
         for (MenuModel menuModel : menuList) {
-            this.clearCache(menuModel);
-        }
+            // 需要判断是否直接删 菜单管理功能 （防止直接删除掉后 无法管理菜单）
+            if(MENU_ID.equals(menuModel.getId())){
+                // 不可操作自身
+                throw new ServiceException(SystemMsg.EXCEPTION_MENU_HANDLE_SELF);
+            }
 
-        // 先删除子数据
-        for (String id : ids) {
-            this.deleteByParentId(id);
+            // 清除缓存
+            this.clearCache(menuModel);
+
+            // 先删子数据
+            this.deleteByParentId(menuModel.getId());
         }
 
         // 移除权限数据
@@ -320,7 +340,7 @@ public class MenuServiceImpl extends CrudServiceImpl<MenuMapper, SysMenu, MenuMo
         if(model == null){
             return null;
         }
-        if(!BUTTON_TYPE.equals(model.getType())){
+        if(!MenuConstants.BUTTON.equals(model.getType())){
             return null;
         }
 
@@ -329,7 +349,7 @@ public class MenuServiceImpl extends CrudServiceImpl<MenuMapper, SysMenu, MenuMo
         // code 唯一
         wrapper.eq(MyBatisConstants.FIELD_DELETE_LOGIC,  DictType.NO_YES_NO.getValue())
                 .eq("permissions", model.getPermissions())
-                .eq("type", BUTTON_TYPE);
+                .eq("type", MenuConstants.BUTTON);
 
         // 重复校验排除自身
         if(StringUtils.isNotEmpty(model.getId())){
