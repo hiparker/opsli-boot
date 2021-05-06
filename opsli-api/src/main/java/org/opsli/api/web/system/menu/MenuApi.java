@@ -61,7 +61,7 @@ public interface MenuApi {
     /**
      * 懒加载列表菜单
      * @param parentId 父节点ID
-     * @return
+     * @return ResultVo
      */
     @GetMapping("/findMenuTreePageByLazy")
     ResultVo<?> findMenuTreePageByLazy(String parentId);
@@ -69,11 +69,11 @@ public interface MenuApi {
     /**
      * 懒加载菜单
      * @param parentId 父节点ID
-     * @return
+     * @param id 自身ID （不为空 则排除自身）
+     * @return ResultVo
      */
     @GetMapping("/findMenuTreeByLazy")
-    ResultVo<?> findMenuTreeByLazy(String parentId);
-
+    ResultVo<?> findMenuTreeByLazy(String parentId, String id);
 
     /**
      * 获得当前用户登录菜单

@@ -167,13 +167,15 @@ public class MenuRestController extends BaseRestController<SysMenu, MenuModel, I
 
 
     /**
-     * 获得菜单树 懒加载
+     * 懒加载菜单
+     * @param parentId 父节点ID
+     * @param id 自身ID （不为空 则排除自身）
      * @return ResultVo
      */
     @ApiOperation(value = "获得菜单树 懒加载", notes = "获得菜单树 懒加载")
     @RequiresPermissions("system_menu_select")
     @Override
-    public ResultVo<?> findMenuTreeByLazy(String parentId) {
+    public ResultVo<?> findMenuTreeByLazy(String parentId, String id) {
         List<MenuModel> menuModelList;
         if(StringUtils.isEmpty(parentId)){
             menuModelList = Lists.newArrayList();
@@ -190,8 +192,16 @@ public class MenuRestController extends BaseRestController<SysMenu, MenuModel, I
             // 只查菜单
             QueryBuilder<SysMenu> queryBuilder = new GenQueryBuilder<>();
             QueryWrapper<SysMenu> queryWrapper = queryBuilder.build();
-            queryWrapper.eq(HumpUtil.humpToUnderline(MyBatisConstants.FIELD_PARENT_ID), parentId);
+            queryWrapper.eq(
+                    HumpUtil.humpToUnderline(MyBatisConstants.FIELD_PARENT_ID), parentId);
             queryWrapper.eq("type", "1");
+
+            // 如果传入ID 则不包含自身
+            if(StringUtils.isNotEmpty(id)){
+                queryWrapper.notIn(
+                        HumpUtil.humpToUnderline(MyBatisConstants.FIELD_ID), id);
+
+            }
 
             // 获得菜单
             List<SysMenu> menuList = IService.findList(queryWrapper);
