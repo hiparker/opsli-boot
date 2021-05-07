@@ -58,7 +58,7 @@ import java.util.List;
  */
 @Api(tags = "角色管理")
 @Slf4j
-@ApiRestController("/sys/role")
+@ApiRestController("/system/role")
 public class RoleRestController extends BaseRestController<SysRole, RoleModel, IRoleService>
         implements RoleApi {
 

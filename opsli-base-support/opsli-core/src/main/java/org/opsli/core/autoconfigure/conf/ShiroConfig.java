@@ -88,9 +88,9 @@ public class ShiroConfig {
         }
 
         // 登录接口拦截
-        filterMap.put("/sys/login", "anon");
-        filterMap.put("/sys/publicKey", "anon");
-        filterMap.put("/sys/slipCount", "anon");
+        filterMap.put("/system/login", "anon");
+        filterMap.put("/system/publicKey", "anon");
+        filterMap.put("/system/slipCount", "anon");
         filterMap.put("/captcha*", "anon");
 
         // 导出Excel\模版 不做自动拦截 手动拦截

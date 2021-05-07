@@ -73,7 +73,7 @@ public class LoginRestController {
     @Limiter
     @InterfaceCrypto(responseEncrypt = false)
     @ApiOperation(value = "登录", notes = "登录")
-    @PostMapping("/sys/login")
+    @PostMapping("/system/login")
     public ResultVo<UserTokenUtil.TokenRet> login(@RequestBody LoginForm form, HttpServletRequest request){
 
         // 非空验证
@@ -154,7 +154,7 @@ public class LoginRestController {
      */
     @Limiter
     @ApiOperation(value = "登出", notes = "登出")
-    @PostMapping("/sys/logout")
+    @PostMapping("/system/logout")
     public ResultVo<?> logout() {
         String token = TokenThreadLocal.get();
         // 登出失败，没有授权Token
@@ -170,7 +170,7 @@ public class LoginRestController {
      */
     @Limiter
     @ApiOperation(value = "获得当前登录失败次数", notes = "获得当前登录失败次数")
-    @GetMapping("/sys/slipCount")
+    @GetMapping("/system/slipCount")
     public ResultVo<?> slipCount(String username){
         // 获得当前失败次数
         long slipCount = UserTokenUtil.getSlipCount(username);
@@ -201,7 +201,7 @@ public class LoginRestController {
      */
     @Limiter
     @ApiOperation(value = "获得公钥", notes = "获得公钥")
-    @GetMapping("/sys/publicKey")
+    @GetMapping("/system/publicKey")
     public ResultVo<?> getPublicKey(){
 
         // 获得公钥

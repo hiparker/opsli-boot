@@ -42,7 +42,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 @Api(tags = UserRoleRefApi.TITLE)
 @Slf4j
-@ApiRestController("/sys/user/roles")
+@ApiRestController("/system/user/roles")
 public class UserRoleRefRestController implements UserRoleRefApi {
 
     /** 配置类 */

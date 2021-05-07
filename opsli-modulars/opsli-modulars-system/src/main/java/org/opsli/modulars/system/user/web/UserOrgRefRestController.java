@@ -42,7 +42,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 @Api(tags = UserOrgRefApi.TITLE)
 @Slf4j
-@ApiRestController("/sys/user/org")
+@ApiRestController("/system/user/org")
 public class UserOrgRefRestController implements UserOrgRefApi {
 
     /** 配置类 */

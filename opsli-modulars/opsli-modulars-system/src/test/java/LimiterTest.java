@@ -20,7 +20,7 @@ public class LimiterTest {
             AsyncProcessQueueReFuse.execute(()->{
                 Map<String,Object> map = Maps.newHashMap();
                 map.put("username","demo");
-                String ret = HttpUtil.get("http://127.0.0.1:8080/opsli-boot/sys/slipCount", map);
+                String ret = HttpUtil.get("http://127.0.0.1:8080/opsli-boot/system/slipCount", map);
                 System.out.println(ret);
             });
         }

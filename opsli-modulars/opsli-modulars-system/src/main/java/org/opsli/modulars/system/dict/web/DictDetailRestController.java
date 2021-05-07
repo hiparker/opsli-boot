@@ -58,7 +58,7 @@ import java.util.List;
  */
 @Api(tags = DictDetailApi.TITLE)
 @Slf4j
-@ApiRestController("/sys/dict/detail")
+@ApiRestController("/system/dict/detail")
 public class DictDetailRestController extends BaseRestController<SysDictDetail, DictDetailModel, IDictDetailService>
         implements DictDetailApi {
 
