@@ -31,14 +31,17 @@ public enum OptionsType {
     /** 非对称加密 私钥 */
     CRYPTO_ASYMMETRIC_PRIVATE_KEY("crypto_asymmetric_private_key", "加解密-非对称-私钥"),
 
+    /** 存储服务类型 */
+    STORAGE_TYPE("storage_type", "存储服务类型"),
+
     ;
 
     private final String code;
     private final String desc;
 
     public static OptionsType getType(String cacheType) {
-        OptionsType[] var1 = values();
-        for (OptionsType type : var1) {
+        OptionsType[] types = values();
+        for (OptionsType type : types) {
             if (type.code.equalsIgnoreCase(cacheType)) {
                 return type;
             }

@@ -20,15 +20,12 @@ import cn.hutool.core.io.FileUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.opsli.api.wrapper.system.options.OptionsModel;
 import org.opsli.core.autoconfigure.properties.GlobalProperties;
-import org.opsli.core.utils.OptionsUtil;
+import org.opsli.core.utils.GlobalPropertiesUtil;
 import org.opsli.core.utils.ValidationUtil;
-import org.opsli.plugins.oss.conf.LocalConfig;
-import org.opsli.plugins.oss.enums.LocalStorageType;
 import org.opsli.plugins.oss.enums.OssStorageType;
+import org.opsli.plugins.oss.factory.LocalConfigFactory;
 import org.opsli.plugins.oss.service.BaseOssStorageService;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.File;
 import java.io.IOException;
@@ -47,9 +44,6 @@ public class LocalStorageServiceImpl extends BaseOssStorageService {
     /** 固定路径 */
     private static final String FIXED_PATH = "/static/files";
 
-    @Autowired
-    private GlobalProperties globalProperties;
-
     @Override
     public OssStorageType getType() {
         return OssStorageType.LOCAL;
@@ -57,7 +51,9 @@ public class LocalStorageServiceImpl extends BaseOssStorageService {
 
     @Override
     public String getDomain() {
-        return this.getConfig().getDomain();
+        // 获得配置信息
+        LocalConfigFactory.LocalConfig config = LocalConfigFactory.INSTANCE.getConfig();
+        return config.getDomain();
     }
 
     @Override
@@ -67,8 +63,12 @@ public class LocalStorageServiceImpl extends BaseOssStorageService {
             return new FileAttr();
         }
 
+        // 获得系统配置信息
+        GlobalProperties globalProperties = GlobalPropertiesUtil.getGlobalProperties();
+
         // 获得配置信息
-        LocalConfig config = this.getConfig();
+        LocalConfigFactory.LocalConfig config = LocalConfigFactory.INSTANCE.getConfig();
+
         // 验证对象
         ValidationUtil.verify(config);
 
@@ -104,7 +104,6 @@ public class LocalStorageServiceImpl extends BaseOssStorageService {
         fileAttr.setFileStoragePath(
                 config.getDomain() + packageNameByHalf + fileAttr.getName() + fileAttr.getSuffix());
 
-
         // 创建文件夹
         FileUtil.mkdir(packageName);
 
@@ -123,8 +122,11 @@ public class LocalStorageServiceImpl extends BaseOssStorageService {
 
     @Override
     public FileAttr upload(InputStream inputStream, String suffix) {
+        // 获得系统配置信息
+        GlobalProperties globalProperties = GlobalPropertiesUtil.getGlobalProperties();
+
         // 获得配置信息
-        LocalConfig config = this.getConfig();
+        LocalConfigFactory.LocalConfig config = LocalConfigFactory.INSTANCE.getConfig();
         // 验证对象
         ValidationUtil.verify(config);
 
@@ -176,30 +178,6 @@ public class LocalStorageServiceImpl extends BaseOssStorageService {
         FileUtil.touch(tmpFile);
 
         return fileAttr;
-    }
-
-    // ===================
-
-    /**
-     * 获得配置信息
-     * @return 配置
-     */
-    private LocalConfig getConfig(){
-        LocalConfig localConfig = new LocalConfig();
-
-        // 获得配置数据
-        OptionsModel domain = OptionsUtil.getOptionByCode(LocalStorageType.DOMAIN.getCode());
-        OptionsModel pathPrefix = OptionsUtil.getOptionByCode(LocalStorageType.PATH_PREFIX.getCode());
-
-        if(domain != null){
-            localConfig.setDomain(domain.getOptionValue());
-        }
-
-        if(pathPrefix != null){
-            localConfig.setPathPrefix(pathPrefix.getOptionValue());
-        }
-
-        return localConfig;
     }
 
 }

@@ -66,7 +66,10 @@ public enum CoreMsg implements BaseMsg {
     OTHER_EXCEPTION_LIMITER(10700,"当前系统繁忙，请稍后再试"),
     OTHER_EXCEPTION_CRYPTO_EN(10702,"加密失败"),
     OTHER_EXCEPTION_CRYPTO_DE(10703,"解密失败"),
-    OTHER_EXCEPTION_CRYPTO_REFLEX(10703,"解密反射失败"),
+    OTHER_EXCEPTION_CRYPTO_REFLEX(10704,"解密反射失败"),
+    OTHER_EXCEPTION_UTILS_INIT(10705,"系统工具类暂未初始化"),
+
+
     ;
 
     private final int code;

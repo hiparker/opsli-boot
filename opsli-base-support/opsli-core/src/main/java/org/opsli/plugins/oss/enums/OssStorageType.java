@@ -31,8 +31,8 @@ public enum OssStorageType {
     private final String desc;
 
     public static OssStorageType getType(String cacheType) {
-        OssStorageType[] var1 = values();
-        for (OssStorageType type : var1) {
+        OssStorageType[] types = values();
+        for (OssStorageType type : types) {
             if (type.code.equalsIgnoreCase(cacheType)) {
                 return type;
             }

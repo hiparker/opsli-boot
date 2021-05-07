@@ -15,8 +15,10 @@
  */
 package org.opsli.core.utils;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
+import cn.hutool.core.util.ReflectUtil;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
@@ -24,6 +26,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.opsli.api.base.result.ResultVo;
 import org.opsli.api.web.system.options.OptionsApi;
 import org.opsli.api.wrapper.system.options.OptionsModel;
+import org.opsli.common.annotation.OptionDict;
 import org.opsli.common.enums.OptionsType;
 import org.opsli.core.cache.local.CacheUtil;
 import org.opsli.core.msg.CoreMsg;
@@ -32,6 +35,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
+import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
 
@@ -58,19 +62,71 @@ public class OptionsUtil {
     /** 参数 Api */
     private static OptionsApi optionsApi;
 
+    /** 实体类字段 */
+    private static final Map<Class<?>, Field[]> ENTITY_FIELD_MAP = Maps.newHashMap();
+
+    /** 增加初始状态开关 防止异常使用 */
+    private static boolean IS_INIT;
 
     /**
      * 根据 optionsType 枚举 获得参数
-     * @param optionsType
-     * @return
+     * @param optionsType 枚举类
+     * @return model
      */
     public static OptionsModel getOptionByCode(OptionsType optionsType){
+        // 判断 工具类是否初始化完成
+        ThrowExceptionUtil.isThrowException(!IS_INIT,
+                CoreMsg.OTHER_EXCEPTION_UTILS_INIT);
+
         if(optionsType == null){
             return null;
         }
         return OptionsUtil.getOptionByCode(optionsType.getCode());
     }
 
+    /**
+     * 根据 bean 对象 获得参数
+     * @param beanObj 对象
+     * @return T
+     */
+    public static <T> T getOptionByBean(T beanObj){
+        // 判断 工具类是否初始化完成
+        ThrowExceptionUtil.isThrowException(!IS_INIT,
+                CoreMsg.OTHER_EXCEPTION_UTILS_INIT);
+
+        if(beanObj == null){
+            return null;
+        }
+
+        // 判断是否是Bean对象
+        boolean isBean = BeanUtil.isBean(beanObj.getClass());
+        if(!isBean){
+            return null;
+        }
+
+        // 字段缓存 减少每次更新 反射
+        Field[] fields = ENTITY_FIELD_MAP.get(beanObj.getClass());
+        if(fields == null){
+            fields = ReflectUtil.getFields(beanObj.getClass());
+            ENTITY_FIELD_MAP.put(beanObj.getClass(), fields);
+        }
+
+
+        for (Field f : fields) {
+            // 处理注解字段
+            OptionDict optionField = f.getAnnotation(OptionDict.class);
+            if (optionField != null) {
+                String optionCode = optionField.value();
+                // 获得配置
+                OptionsModel option = getOptionByCode(optionCode);
+                if(option != null){
+                    BeanUtil.setProperty(beanObj, f.getName(), option.getOptionValue());
+                }
+            }
+        }
+
+        return beanObj;
+    }
 
     /**
      * 根据 optionCode 获得参数
@@ -78,6 +134,10 @@ public class OptionsUtil {
      * @return OptionsModel
      */
     public static OptionsModel getOptionByCode(String optionCode){
+        // 判断 工具类是否初始化完成
+        ThrowExceptionUtil.isThrowException(!IS_INIT,
+                CoreMsg.OTHER_EXCEPTION_UTILS_INIT);
+
         // 缓存Key
         String cacheKey = PREFIX_CODE;
         // 缓存Key + VALUE
@@ -141,6 +201,10 @@ public class OptionsUtil {
      * @return boolean
      */
     public static boolean refreshOption(OptionsModel option){
+        // 判断 工具类是否初始化完成
+        ThrowExceptionUtil.isThrowException(!IS_INIT,
+                CoreMsg.OTHER_EXCEPTION_UTILS_INIT);
+
         if(option == null || StringUtils.isEmpty(option.getOptionCode())){
             return true;
         }
@@ -184,6 +248,10 @@ public class OptionsUtil {
      * @return List
      */
     public static List<OptionsModel> handleOptionsList(Map<String, Object> optionsMap){
+        // 判断 工具类是否初始化完成
+        ThrowExceptionUtil.isThrowException(!IS_INIT,
+                CoreMsg.OTHER_EXCEPTION_UTILS_INIT);
+
         if(CollUtil.isEmpty(optionsMap)){
             return null;
         }
@@ -204,6 +272,10 @@ public class OptionsUtil {
      * @return Map
      */
     public static Map<String, OptionsModel> convertOptionsMap(List<OptionsModel> optionsModels){
+        // 判断 工具类是否初始化完成
+        ThrowExceptionUtil.isThrowException(!IS_INIT,
+                CoreMsg.OTHER_EXCEPTION_UTILS_INIT);
+
         // 这里不管有没有 都返回一个集合 防止多做一步null处理
         Map<String, OptionsModel> optionsModelMap = Maps.newHashMap();
 
@@ -218,8 +290,13 @@ public class OptionsUtil {
 
     // =====================================
 
+    /**
+     * 初始化
+     */
     @Autowired
-    public void setOptionsApi(OptionsApi optionsApi) {
+    public void init(OptionsApi optionsApi) {
         OptionsUtil.optionsApi = optionsApi;
+
+        IS_INIT = true;
     }
 }

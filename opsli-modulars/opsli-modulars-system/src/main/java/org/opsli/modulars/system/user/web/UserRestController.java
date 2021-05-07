@@ -58,7 +58,7 @@ import org.opsli.modulars.system.org.web.SysOrgRestController;
 import org.opsli.modulars.system.user.entity.SysUser;
 import org.opsli.modulars.system.user.entity.SysUserAndOrg;
 import org.opsli.modulars.system.user.service.IUserService;
-import org.opsli.plugins.oss.factory.OssStorageFactory;
+import org.opsli.plugins.oss.OssStorageFactory;
 import org.opsli.plugins.oss.service.BaseOssStorageService;
 import org.opsli.plugins.oss.service.OssStorageService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -205,7 +205,7 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
 
         try {
             // 调用OSS 服务保存头像
-            OssStorageService ossStorageService = OssStorageFactory.getHandle();
+            OssStorageService ossStorageService = OssStorageFactory.INSTANCE.getHandle();
             BaseOssStorageService.FileAttr fileAttr = ossStorageService.upload(
                     files.get(0).getInputStream(), "jpg");
 
