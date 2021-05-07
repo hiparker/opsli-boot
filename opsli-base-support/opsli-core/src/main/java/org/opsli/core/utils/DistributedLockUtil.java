@@ -17,6 +17,7 @@ package org.opsli.core.utils;
 
 import lombok.extern.slf4j.Slf4j;
 import org.opsli.core.cache.local.CacheUtil;
+import org.opsli.core.msg.CoreMsg;
 import org.opsli.plugins.redisson.RedissonLock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -44,12 +45,19 @@ public class DistributedLockUtil {
     /** Redisson 分布式锁 */
     private static RedissonLock REDISSON_LOCK;
 
+    /** 增加初始状态开关 防止异常使用 */
+    private static boolean IS_INIT;
+
     /**
      * 分布式 加锁
      * @param lockName 锁名称
      * @return boolean
      */
     public static boolean lock(String lockName){
+        // 判断 工具类是否初始化完成
+        ThrowExceptionUtil.isThrowException(!IS_INIT,
+                CoreMsg.OTHER_EXCEPTION_UTILS_INIT);
+
         boolean isLock = true;
         // 分布式上锁
         if(REDISSON_LOCK != null){
@@ -63,6 +71,10 @@ public class DistributedLockUtil {
      * @param lockName 锁名称
      */
     public static void unlock(String lockName){
+        // 判断 工具类是否初始化完成
+        ThrowExceptionUtil.isThrowException(!IS_INIT,
+                CoreMsg.OTHER_EXCEPTION_UTILS_INIT);
+
         // 释放锁
         if(REDISSON_LOCK != null){
             REDISSON_LOCK.unlockByThread(CacheUtil.getPrefixName() + lockName);
@@ -73,11 +85,12 @@ public class DistributedLockUtil {
 
     /**
      * 初始化
-     * @param redissonLock 分布式锁
      */
     @Autowired(required = false)
     public void init(RedissonLock redissonLock){
         DistributedLockUtil.REDISSON_LOCK = redissonLock;
+
+        IS_INIT = true;
     }
 
 

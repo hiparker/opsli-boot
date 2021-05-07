@@ -26,6 +26,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.opsli.common.constants.CacheConstants;
 import org.opsli.common.enums.CacheType;
 import org.opsli.core.autoconfigure.properties.CacheProperties;
+import org.opsli.core.msg.CoreMsg;
+import org.opsli.core.utils.ThrowExceptionUtil;
 import org.opsli.plugins.cache.EhCachePlugin;
 import org.opsli.plugins.redis.RedisPlugin;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -79,6 +81,9 @@ public class CacheUtil {
     /** 热点数据前缀 */
     private static String PREFIX_NAME;
 
+    /** 增加初始状态开关 防止异常使用 */
+    private static boolean IS_INIT;
+
     static {
         try {
             // 读取配置信息
@@ -88,9 +93,13 @@ public class CacheUtil {
 
     /***
      * 获得缓存前缀
-     * @return
+     * @return String
      */
     public static String getPrefixName() {
+        // 判断 工具类是否初始化完成
+        ThrowExceptionUtil.isThrowException(!IS_INIT,
+                CoreMsg.OTHER_EXCEPTION_UTILS_INIT);
+
         return PREFIX_NAME;
     }
 
@@ -102,6 +111,10 @@ public class CacheUtil {
      * @return Object
      */
     public static Object getTimed(final String key){
+        // 判断 工具类是否初始化完成
+        ThrowExceptionUtil.isThrowException(!IS_INIT,
+                CoreMsg.OTHER_EXCEPTION_UTILS_INIT);
+
         // 转换数据泛型
         return CacheUtil.get(key, false, false);
     }
@@ -113,6 +126,10 @@ public class CacheUtil {
      * @return Object
      */
     public static Object getTimed(final String key, final boolean isSaveLocal){
+        // 判断 工具类是否初始化完成
+        ThrowExceptionUtil.isThrowException(!IS_INIT,
+                CoreMsg.OTHER_EXCEPTION_UTILS_INIT);
+
         // 转换数据泛型
         return CacheUtil.get(key, false, isSaveLocal);
     }
@@ -124,6 +141,10 @@ public class CacheUtil {
      * @return <V> 泛型
      */
     public static <V> V getTimed(final Class<V> vClass, final String key){
+        // 判断 工具类是否初始化完成
+        ThrowExceptionUtil.isThrowException(!IS_INIT,
+                CoreMsg.OTHER_EXCEPTION_UTILS_INIT);
+
         // 转换数据泛型
         return CacheUtil.get(vClass, key, false, false);
     }
@@ -135,7 +156,12 @@ public class CacheUtil {
      * @param isSaveLocal 是否保存到本地
      * @return <V> 泛型
      */
-    public static <V> V getTimed(final Class<V> vClass, final String key, final boolean isSaveLocal){
+    public static <V> V getTimed(final Class<V> vClass, final String key,
+                                 final boolean isSaveLocal){
+        // 判断 工具类是否初始化完成
+        ThrowExceptionUtil.isThrowException(!IS_INIT,
+                CoreMsg.OTHER_EXCEPTION_UTILS_INIT);
+
         // 转换数据泛型
         return CacheUtil.get(vClass, key, false, isSaveLocal);
     }
@@ -146,6 +172,10 @@ public class CacheUtil {
      * @return Object
      */
     public static Object getEden(final String key){
+        // 判断 工具类是否初始化完成
+        ThrowExceptionUtil.isThrowException(!IS_INIT,
+                CoreMsg.OTHER_EXCEPTION_UTILS_INIT);
+
         // 转换数据泛型
         return CacheUtil.get(key, true, false);
     }
@@ -157,6 +187,10 @@ public class CacheUtil {
      * @return Object
      */
     public static Object getEden(final String key, final boolean isSaveLocal){
+        // 判断 工具类是否初始化完成
+        ThrowExceptionUtil.isThrowException(!IS_INIT,
+                CoreMsg.OTHER_EXCEPTION_UTILS_INIT);
+
         // 转换数据泛型
         return CacheUtil.get(key, true, isSaveLocal);
     }
@@ -168,6 +202,10 @@ public class CacheUtil {
      * @return <V> 泛型
      */
     public static <V> V getEden(final String key, final Class<V> vClass){
+        // 判断 工具类是否初始化完成
+        ThrowExceptionUtil.isThrowException(!IS_INIT,
+                CoreMsg.OTHER_EXCEPTION_UTILS_INIT);
+
         // 转换数据泛型
         return CacheUtil.get(vClass, key, true, false);
     }
@@ -179,7 +217,12 @@ public class CacheUtil {
      * @param isSaveLocal 是否保存到本地
      * @return <V> 泛型
      */
-    public static <V> V getEden(final String key, final boolean isSaveLocal, final Class<V> vClass){
+    public static <V> V getEden(final String key, final boolean isSaveLocal,
+                                final Class<V> vClass){
+        // 判断 工具类是否初始化完成
+        ThrowExceptionUtil.isThrowException(!IS_INIT,
+                CoreMsg.OTHER_EXCEPTION_UTILS_INIT);
+
         // 转换数据泛型
         return CacheUtil.get(vClass, key, true, isSaveLocal);
     }
@@ -192,7 +235,12 @@ public class CacheUtil {
      * @param isSaveLocal 是否保存到本地
      * @return <V> 泛型
      */
-    private static <V> V get(final Class<V> vClass, final String key, final boolean isEden, final boolean isSaveLocal){
+    private static <V> V get(final Class<V> vClass, final String key, final boolean isEden,
+                             final boolean isSaveLocal){
+        // 判断 工具类是否初始化完成
+        ThrowExceptionUtil.isThrowException(!IS_INIT,
+                CoreMsg.OTHER_EXCEPTION_UTILS_INIT);
+
         // 获得缓存数据
         Object cacheObj = CacheUtil.get(key, isEden, isSaveLocal);
         // 转换数据泛型
@@ -207,6 +255,10 @@ public class CacheUtil {
      * @return Object
      */
     private static Object get(final String key, final boolean isEden, final boolean isSaveLocal){
+        // 判断 工具类是否初始化完成
+        ThrowExceptionUtil.isThrowException(!IS_INIT,
+                CoreMsg.OTHER_EXCEPTION_UTILS_INIT);
+
         try {
             // 缓存 Key
             String cacheKey  = CacheUtil.handleUsualKey(key, isEden);
@@ -252,6 +304,10 @@ public class CacheUtil {
      * @return <V> 泛型
      */
     public static <V> V getHash(final Class<V> vClass, final String key, final String field){
+        // 判断 工具类是否初始化完成
+        ThrowExceptionUtil.isThrowException(!IS_INIT,
+                CoreMsg.OTHER_EXCEPTION_UTILS_INIT);
+
         // 获得缓存数据
         Object cacheObj = CacheUtil.getHash(key, field, false);
         // 转换数据泛型
@@ -266,7 +322,12 @@ public class CacheUtil {
      * @param vClass 泛型Class
      * @return <V> 泛型
      */
-    public static <V> V getHash(final Class<V> vClass, final String key, final String field, final boolean isSaveLocal){
+    public static <V> V getHash(final Class<V> vClass, final String key,
+                                final String field, final boolean isSaveLocal){
+        // 判断 工具类是否初始化完成
+        ThrowExceptionUtil.isThrowException(!IS_INIT,
+                CoreMsg.OTHER_EXCEPTION_UTILS_INIT);
+
         // 获得缓存数据
         Object cacheObj = CacheUtil.getHash(key, field, isSaveLocal);
         // 转换数据泛型
@@ -280,6 +341,10 @@ public class CacheUtil {
      * @return Object
      */
     public static Object getHash(final String key, final String field){
+        // 判断 工具类是否初始化完成
+        ThrowExceptionUtil.isThrowException(!IS_INIT,
+                CoreMsg.OTHER_EXCEPTION_UTILS_INIT);
+
         return CacheUtil.getHash(key, field, false);
     }
 
@@ -290,7 +355,12 @@ public class CacheUtil {
      * @param isSaveLocal 是否保存到本地
      * @return Object
      */
-    public static Object getHash(final String key, final String field, final boolean isSaveLocal){
+    public static Object getHash(final String key, final String field,
+                                 final boolean isSaveLocal){
+        // 判断 工具类是否初始化完成
+        ThrowExceptionUtil.isThrowException(!IS_INIT,
+                CoreMsg.OTHER_EXCEPTION_UTILS_INIT);
+
         try {
             // 缓存 Key
             String cacheKey  = CacheUtil.handleKey(CacheType.EDEN_HASH, key);
@@ -333,6 +403,10 @@ public class CacheUtil {
      * @return Object
      */
     public static Map<String, Object> getHashAll(final String key){
+        // 判断 工具类是否初始化完成
+        ThrowExceptionUtil.isThrowException(!IS_INIT,
+                CoreMsg.OTHER_EXCEPTION_UTILS_INIT);
+
         try {
             // 缓存 Key
             String cacheKey  = CacheUtil.handleKey(CacheType.EDEN_HASH, key);
@@ -376,6 +450,10 @@ public class CacheUtil {
      * @return boolean
      */
     public static boolean put(final String key, final Object value) {
+        // 判断 工具类是否初始化完成
+        ThrowExceptionUtil.isThrowException(!IS_INIT,
+                CoreMsg.OTHER_EXCEPTION_UTILS_INIT);
+
         return CacheUtil.put(key, value, false);
     }
 
@@ -387,6 +465,10 @@ public class CacheUtil {
      * @return boolean
      */
     public static boolean put(final String key, final Object value, final boolean isEden) {
+        // 判断 工具类是否初始化完成
+        ThrowExceptionUtil.isThrowException(!IS_INIT,
+                CoreMsg.OTHER_EXCEPTION_UTILS_INIT);
+
         try {
             // 自动处理 key
 
@@ -430,6 +512,10 @@ public class CacheUtil {
      * @return boolean
      */
     public static boolean putHash(final String key, final String field, final Object value) {
+        // 判断 工具类是否初始化完成
+        ThrowExceptionUtil.isThrowException(!IS_INIT,
+                CoreMsg.OTHER_EXCEPTION_UTILS_INIT);
+
         try {
             // 处理 key
             String cacheKey = CacheUtil.handleKey(CacheType.EDEN_HASH, key);
@@ -456,6 +542,10 @@ public class CacheUtil {
      * @return boolean
      */
     public static boolean del(final String key) {
+        // 判断 工具类是否初始化完成
+        ThrowExceptionUtil.isThrowException(!IS_INIT,
+                CoreMsg.OTHER_EXCEPTION_UTILS_INIT);
+
         try {
             // 计数器
             int count = 0;
@@ -509,6 +599,10 @@ public class CacheUtil {
      * @return boolean
      */
     public static boolean delHash(final String key, final String field) {
+        // 判断 工具类是否初始化完成
+        ThrowExceptionUtil.isThrowException(!IS_INIT,
+                CoreMsg.OTHER_EXCEPTION_UTILS_INIT);
+
         try {
             // 计数器
             int count = 2;
@@ -545,6 +639,10 @@ public class CacheUtil {
      * @return boolean
      */
     public static boolean putNilFlag(String key) {
+        // 判断 工具类是否初始化完成
+        ThrowExceptionUtil.isThrowException(!IS_INIT,
+                CoreMsg.OTHER_EXCEPTION_UTILS_INIT);
+
         try {
             // 处理缓存 key
             String cacheKey = CacheUtil.handleKey(NIL_FLAG_PREFIX + ":" + key);
@@ -564,6 +662,10 @@ public class CacheUtil {
      * @return boolean
      */
     public static boolean delNilFlag(String key) {
+        // 判断 工具类是否初始化完成
+        ThrowExceptionUtil.isThrowException(!IS_INIT,
+                CoreMsg.OTHER_EXCEPTION_UTILS_INIT);
+
         try {
             // 处理缓存 key
             String cacheKey = CacheUtil.handleKey(NIL_FLAG_PREFIX + ":" + key);
@@ -584,6 +686,10 @@ public class CacheUtil {
      * @return boolean
      */
     public static boolean hasNilFlag(String key) {
+        // 判断 工具类是否初始化完成
+        ThrowExceptionUtil.isThrowException(!IS_INIT,
+                CoreMsg.OTHER_EXCEPTION_UTILS_INIT);
+
         try {
             // 处理缓存 key
             String cacheKey = CacheUtil.handleKey(NIL_FLAG_PREFIX + ":" + key);
@@ -604,6 +710,10 @@ public class CacheUtil {
      * @return String
      */
     public static String handleKey(String key){
+        // 判断 工具类是否初始化完成
+        ThrowExceptionUtil.isThrowException(!IS_INIT,
+                CoreMsg.OTHER_EXCEPTION_UTILS_INIT);
+
         return CacheUtil.handleKey(CacheType.TIMED, key);
     }
 
@@ -614,6 +724,10 @@ public class CacheUtil {
      * @return String
      */
     public static String handleKey(CacheType cacheType, String key){
+        // 判断 工具类是否初始化完成
+        ThrowExceptionUtil.isThrowException(!IS_INIT,
+                CoreMsg.OTHER_EXCEPTION_UTILS_INIT);
+
         return PREFIX_NAME + cacheType.getName() + ":" +
                 key;
     }
@@ -674,26 +788,22 @@ public class CacheUtil {
         }
     }
 
-    @Autowired
-    public  void setRedisPlugin(RedisPlugin redisPlugin) {
-        CacheUtil.redisPlugin = redisPlugin;
-    }
-
-    @Autowired
-    public  void setEhCachePlugin(EhCachePlugin ehCachePlugin) {
-        CacheUtil.ehCachePlugin = ehCachePlugin;
-    }
-
     /**
      * 初始化
-     * @param cacheProperties 缓存配置类
      */
     @Autowired
-    public void init(CacheProperties cacheProperties){
+    public void init(CacheProperties cacheProperties,
+                     RedisPlugin redisPlugin,
+                     EhCachePlugin ehCachePlugin){
         if(cacheProperties != null){
             // 获得 超级管理员
             CacheUtil.PREFIX_NAME = Convert.toStr(cacheProperties.getPrefix(), "opsli") + ":";
         }
+
+        CacheUtil.redisPlugin = redisPlugin;
+        CacheUtil.ehCachePlugin = ehCachePlugin;
+
+        IS_INIT = true;
     }
 
 }

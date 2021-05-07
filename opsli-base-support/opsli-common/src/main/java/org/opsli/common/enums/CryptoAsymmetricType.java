@@ -34,8 +34,8 @@ public enum CryptoAsymmetricType {
     private final String desc;
 
     public static CryptoAsymmetricType getCryptoType(String code) {
-        CryptoAsymmetricType[] var1 = values();
-        for (CryptoAsymmetricType type : var1) {
+        CryptoAsymmetricType[] types = values();
+        for (CryptoAsymmetricType type : types) {
             if (type.code.equalsIgnoreCase(code)) {
                 return type;
             }

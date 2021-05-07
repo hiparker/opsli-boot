@@ -33,8 +33,8 @@ public enum CacheType {
     private final String desc;
 
     public static CacheType getCacheType(String cacheType) {
-        CacheType[] var1 = values();
-        for (CacheType type : var1) {
+        CacheType[] types = values();
+        for (CacheType type : types) {
             if (type.name.equalsIgnoreCase(cacheType)) {
                 return type;
             }

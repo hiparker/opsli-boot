@@ -48,13 +48,19 @@ public class MenuUtil {
     /** 菜单 Api */
     private static MenuApi menuApi;
 
+    /** 增加初始状态开关 防止异常使用 */
+    private static boolean IS_INIT;
 
     /**
      * 根据 权限 获得菜单
-     * @param permissions
-     * @return
+     * @param permissions 权限
+     * @return model
      */
     public static MenuModel getMenuByPermissions(String permissions){
+        // 判断 工具类是否初始化完成
+        ThrowExceptionUtil.isThrowException(!IS_INIT,
+                CoreMsg.OTHER_EXCEPTION_UTILS_INIT);
+
         // 缓存Key
         String cacheKey = PREFIX_CODE + permissions;
 
@@ -113,10 +119,14 @@ public class MenuUtil {
 
     /**
      * 刷新菜单 - 删就完了
-     * @param menu
-     * @return
+     * @param menu 菜单model
+     * @return boolean
      */
     public static boolean refreshMenu(MenuModel menu){
+        // 判断 工具类是否初始化完成
+        ThrowExceptionUtil.isThrowException(!IS_INIT,
+                CoreMsg.OTHER_EXCEPTION_UTILS_INIT);
+
         if(menu == null || StringUtils.isEmpty(menu.getPermissions())){
             return true;
         }
@@ -154,9 +164,14 @@ public class MenuUtil {
 
     // =====================================
 
+    /**
+     * 初始化
+     */
     @Autowired
-    public  void setMenuApi(MenuApi menuApi) {
+    public  void init(MenuApi menuApi) {
         MenuUtil.menuApi = menuApi;
+
+        IS_INIT = true;
     }
 
 }

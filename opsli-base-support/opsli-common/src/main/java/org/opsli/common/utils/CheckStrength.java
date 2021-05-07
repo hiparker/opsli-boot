@@ -23,8 +23,8 @@ public class CheckStrength {
     private final String desc;
 
     public static LEVEL getLevel(String code) {
-      LEVEL[] var1 = values();
-      for (LEVEL type : var1) {
+      LEVEL[] types = values();
+      for (LEVEL type : types) {
         if (type.code.equalsIgnoreCase(code)) {
           return type;
         }

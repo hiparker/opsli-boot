@@ -20,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.opsli.api.wrapper.system.user.UserModel;
 import org.opsli.core.cache.local.CacheUtil;
+import org.opsli.core.msg.CoreMsg;
 import org.opsli.plugins.redis.RedisPlugin;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -44,14 +45,16 @@ import static org.opsli.common.constants.OrderConstants.UTIL_ORDER;
 @Lazy(false)
 public class SearchHisUtil {
 
-
     /** 搜索历史缓存数据KEY */
     private static final int DEFAULT_COUNT = 10;
-
+    /** 缓存前缀 */
     private static final String CACHE_PREFIX = "his:username:";
 
     /** Redis插件 */
     private static RedisPlugin redisPlugin;
+
+    /** 增加初始状态开关 防止异常使用 */
+    private static boolean IS_INIT;
 
 
     /**
@@ -60,6 +63,10 @@ public class SearchHisUtil {
      * @param count 获取数量
      */
     public static Set<Object> getSearchHis(HttpServletRequest request, String key, Integer count) {
+        // 判断 工具类是否初始化完成
+        ThrowExceptionUtil.isThrowException(!IS_INIT,
+                CoreMsg.OTHER_EXCEPTION_UTILS_INIT);
+
         if(request == null || StringUtils.isEmpty(key)){
             return null;
         }
@@ -78,10 +85,14 @@ public class SearchHisUtil {
 
     /**
      * 存放搜索历史记录
-     * @param request
+     * @param request request
      * @param keys 搜索key
      */
     public static void putSearchHis(HttpServletRequest request, List<String> keys) {
+        // 判断 工具类是否初始化完成
+        ThrowExceptionUtil.isThrowException(!IS_INIT,
+                CoreMsg.OTHER_EXCEPTION_UTILS_INIT);
+
         if(request == null || CollUtil.isEmpty(keys)){
             return;
         }
@@ -108,9 +119,14 @@ public class SearchHisUtil {
 
     // ===================================
 
+    /**
+     * 初始化
+     */
     @Autowired
-    public  void setRedisPlugin(RedisPlugin redisPlugin) {
+    public void init(RedisPlugin redisPlugin) {
         SearchHisUtil.redisPlugin = redisPlugin;
+
+        IS_INIT = true;
     }
 
 }

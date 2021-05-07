@@ -48,13 +48,19 @@ public class OrgUtil {
     /** 用户 Api */
     private static UserApi userApi;
 
+    /** 增加初始状态开关 防止异常使用 */
+    private static boolean IS_INIT;
 
     /**
      * 根据 userId 获得用户组织
-     * @param userId
-     * @return
+     * @param userId 用户ID
+     * @return model
      */
     public static UserOrgRefModel getOrgByUserId(String userId){
+        // 判断 工具类是否初始化完成
+        ThrowExceptionUtil.isThrowException(!IS_INIT,
+                CoreMsg.OTHER_EXCEPTION_UTILS_INIT);
+
         // 缓存Key
         String cacheKey = PREFIX_CODE + userId;
 
@@ -113,10 +119,14 @@ public class OrgUtil {
 
     /**
      * 刷新用户组织 - 删就完了
-     * @param userId
-     * @return
+     * @param userId 用户ID
+     * @return boolean
      */
     public static boolean refreshOrg(String userId){
+        // 判断 工具类是否初始化完成
+        ThrowExceptionUtil.isThrowException(!IS_INIT,
+                CoreMsg.OTHER_EXCEPTION_UTILS_INIT);
+
         if(StringUtils.isEmpty(userId)){
             return true;
         }
@@ -149,13 +159,16 @@ public class OrgUtil {
     }
 
 
-
-
     // =====================================
 
+    /**
+     * 初始化
+     */
     @Autowired
-    public void setUserApi(UserApi userApi) {
+    public void init(UserApi userApi) {
         OrgUtil.userApi = userApi;
+
+        IS_INIT = true;
     }
 
 }

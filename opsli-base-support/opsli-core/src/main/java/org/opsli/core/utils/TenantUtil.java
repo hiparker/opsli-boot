@@ -48,13 +48,19 @@ public class TenantUtil {
     /** 租户 Api */
     private static TenantApi tenantApi;
 
+    /** 增加初始状态开关 防止异常使用 */
+    private static boolean IS_INIT;
 
     /**
      * 根据 tenantId 获得租户
-     * @param tenantId
-     * @return
+     * @param tenantId 租户ID
+     * @return model
      */
     public static TenantModel getTenant(String tenantId){
+        // 判断 工具类是否初始化完成
+        ThrowExceptionUtil.isThrowException(!IS_INIT,
+                CoreMsg.OTHER_EXCEPTION_UTILS_INIT);
+
         // 缓存Key
         String cacheKey = PREFIX_CODE + tenantId;
 
@@ -113,10 +119,14 @@ public class TenantUtil {
 
     /**
      * 刷新租户 - 删就完了
-     * @param tenantId
-     * @return
+     * @param tenantId 租户ID
+     * @return boolean
      */
     public static boolean refreshTenant(String tenantId){
+        // 判断 工具类是否初始化完成
+        ThrowExceptionUtil.isThrowException(!IS_INIT,
+                CoreMsg.OTHER_EXCEPTION_UTILS_INIT);
+
         if(StringUtils.isEmpty(tenantId)){
             return true;
         }
@@ -150,13 +160,16 @@ public class TenantUtil {
     }
 
 
-
-
     // =====================================
 
+    /**
+     * 初始化
+     */
     @Autowired
-    public void setTenantApi(TenantApi tenantApi) {
+    public void init(TenantApi tenantApi) {
         TenantUtil.tenantApi = tenantApi;
+
+        IS_INIT = true;
     }
 
 }

@@ -36,8 +36,8 @@ public enum EmailType {
     private final String desc;
 
     public static EmailType getType(String cacheType) {
-        EmailType[] var1 = values();
-        for (EmailType type : var1) {
+        EmailType[] types = values();
+        for (EmailType type : types) {
             if (type.code.equalsIgnoreCase(cacheType)) {
                 return type;
             }

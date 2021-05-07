@@ -14,6 +14,7 @@ import org.opsli.core.autoconfigure.properties.GlobalProperties;
 import org.opsli.common.constants.SignConstants;
 import org.opsli.common.constants.TokenTypeConstants;
 import org.opsli.common.exception.JwtException;
+import org.opsli.core.msg.CoreMsg;
 import org.opsli.core.msg.JwtMsg;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -35,7 +36,6 @@ import static org.opsli.common.constants.OrderConstants.UTIL_ORDER;
 @Component
 public class JwtUtil {
 
-
     /**
      * 过期时间改为从配置文件获取 120 分钟 两小时
      */
@@ -46,6 +46,8 @@ public class JwtUtil {
      */
     private static String ENCRYPT_JWT_INITIAL_SECRET;
 
+    /** 增加初始状态开关 防止异常使用 */
+    private static boolean IS_INIT;
 
     /**
      * 校验验证帐号加JWT私钥解密 是否正确
@@ -53,6 +55,10 @@ public class JwtUtil {
      * @return boolean 是否正确
      */
     public static boolean verify(String token) {
+        // 判断 工具类是否初始化完成
+        ThrowExceptionUtil.isThrowException(!IS_INIT,
+                CoreMsg.OTHER_EXCEPTION_UTILS_INIT);
+
         String secret = getClaim(token, SignConstants.ACCOUNT) + Base64.decodeStr(ENCRYPT_JWT_INITIAL_SECRET);
         Algorithm algorithm = Algorithm.HMAC256(secret);
         JWTVerifier verifier = JWT.require(algorithm).build();
@@ -67,6 +73,10 @@ public class JwtUtil {
      * @return java.lang.String
      */
     public static String getClaim(String token, String claim) {
+        // 判断 工具类是否初始化完成
+        ThrowExceptionUtil.isThrowException(!IS_INIT,
+                CoreMsg.OTHER_EXCEPTION_UTILS_INIT);
+
         try {
             DecodedJWT jwt = JWT.decode(token);
             return jwt.getClaim(claim).asString();
@@ -86,6 +96,10 @@ public class JwtUtil {
      * @return java.lang.String 返回加密的Token
      */
     public static String sign(String tokenType, String account, String userId, boolean isExpire) {
+        // 判断 工具类是否初始化完成
+        ThrowExceptionUtil.isThrowException(!IS_INIT,
+                CoreMsg.OTHER_EXCEPTION_UTILS_INIT);
+
         // 时间戳
         long currentTimeMillis = System.currentTimeMillis();
         // 帐号加JWT私钥加密
@@ -114,11 +128,9 @@ public class JwtUtil {
 
     /**
      * 初始化
-     * @param globalProperties 配置类
      */
     @Autowired
     public void init(GlobalProperties globalProperties){
-        //
         if(globalProperties != null && globalProperties.getAuth() != null
                 && globalProperties.getAuth().getToken() != null
             ){
@@ -130,6 +142,8 @@ public class JwtUtil {
             JwtUtil.ENCRYPT_JWT_INITIAL_SECRET = globalProperties.getAuth()
                     .getToken().getSecret();
         }
+
+        IS_INIT = true;
     }
 
     // ==================

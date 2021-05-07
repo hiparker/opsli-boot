@@ -24,6 +24,7 @@ import com.wf.captcha.base.Captcha;
 import org.apache.commons.lang3.StringUtils;
 import org.opsli.common.exception.TokenException;
 import org.opsli.core.cache.local.CacheUtil;
+import org.opsli.core.msg.CoreMsg;
 import org.opsli.core.msg.TokenMsg;
 import org.opsli.plugins.redis.RedisPlugin;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,6 +65,9 @@ public class CaptchaUtil {
     /** Redis插件 */
     private static RedisPlugin redisPlugin;
 
+    /** 增加初始状态开关 防止异常使用 */
+    private static boolean IS_INIT;
+
     static {
         CAPTCHA_STRATEGY_LIST = Lists.newArrayListWithCapacity(3);
         CAPTCHA_STRATEGY_LIST.add(new CaptchaStrategyBySpec());
@@ -77,6 +81,10 @@ public class CaptchaUtil {
      * @param uuid UUID
      */
     public static void createCaptcha(String uuid, OutputStream out) {
+        // 判断 工具类是否初始化完成
+        ThrowExceptionUtil.isThrowException(!IS_INIT,
+                CoreMsg.OTHER_EXCEPTION_UTILS_INIT);
+
         if (StringUtils.isBlank(uuid)) {
             throw new RuntimeException("uuid不能为空");
         }
@@ -105,6 +113,10 @@ public class CaptchaUtil {
      * @param code 验证码
      */
     public static void validate(String uuid, String code) {
+        // 判断 工具类是否初始化完成
+        ThrowExceptionUtil.isThrowException(!IS_INIT,
+                CoreMsg.OTHER_EXCEPTION_UTILS_INIT);
+
         // 判断UUID 是否为空
         if (StringUtils.isEmpty(uuid)) {
             throw new TokenException(TokenMsg.EXCEPTION_CAPTCHA_UUID_NULL);
@@ -136,6 +148,10 @@ public class CaptchaUtil {
      * @return boolean
      */
     public static boolean delCaptcha(String uuid) {
+        // 判断 工具类是否初始化完成
+        ThrowExceptionUtil.isThrowException(!IS_INIT,
+                CoreMsg.OTHER_EXCEPTION_UTILS_INIT);
+
         if (StringUtils.isEmpty(uuid)) {
             return false;
         }
@@ -143,15 +159,6 @@ public class CaptchaUtil {
         //删除验证码
         return redisPlugin.del(CacheUtil.getPrefixName() + PREFIX + uuid);
     }
-
-
-    // ==========================
-
-    @Autowired
-    public void setRedisPlugin(RedisPlugin redisPlugin) {
-        CaptchaUtil.redisPlugin = redisPlugin;
-    }
-
 
     // ======================
 
@@ -200,6 +207,18 @@ public class CaptchaUtil {
             // 生成验证码
             return new ArithmeticCaptcha(CAPTCHA_WIDTH, CAPTCHA_HEIGHT);
         }
+    }
+
+    // ==========================
+
+    /**
+     * 初始化
+     */
+    @Autowired
+    public void init(RedisPlugin redisPlugin) {
+        CaptchaUtil.redisPlugin = redisPlugin;
+
+        IS_INIT = true;
     }
 
 }

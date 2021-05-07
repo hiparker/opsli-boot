@@ -24,6 +24,7 @@ import org.opsli.api.base.result.ResultVo;
 import org.opsli.api.web.system.user.UserApi;
 import org.opsli.api.wrapper.system.menu.MenuModel;
 import org.opsli.api.wrapper.system.user.UserModel;
+import org.opsli.common.exception.ServiceException;
 import org.opsli.core.api.TokenThreadLocal;
 import org.opsli.common.exception.TokenException;
 import org.opsli.core.autoconfigure.properties.GlobalProperties;
@@ -67,11 +68,18 @@ public class UserUtil {
     /** 超级管理员 */
     public static String SUPER_ADMIN;
 
+    /** 增加初始状态开关 防止异常使用 */
+    private static boolean IS_INIT;
+
     /**
      * 获得当前系统登陆用户
      * @return UserModel
      */
     public static UserModel getUser(){
+        // 判断 工具类是否初始化完成
+        ThrowExceptionUtil.isThrowException(!IS_INIT,
+                CoreMsg.OTHER_EXCEPTION_UTILS_INIT);
+        
         String token = TokenThreadLocal.get();
 
         // 如果还是没获取到token 则抛出异常
@@ -95,6 +103,9 @@ public class UserUtil {
      * @return UserModel
      */
     public static UserModel getUser(String userId){
+        // 判断 工具类是否初始化完成
+        ThrowExceptionUtil.isThrowException(!IS_INIT,
+                CoreMsg.OTHER_EXCEPTION_UTILS_INIT);
 
         // 缓存Key
         String cacheKey = PREFIX_ID + userId;
@@ -161,6 +172,10 @@ public class UserUtil {
      * @return UserModel
      */
     public static UserModel getUserByUserName(String userName){
+        // 判断 工具类是否初始化完成
+        ThrowExceptionUtil.isThrowException(!IS_INIT,
+                CoreMsg.OTHER_EXCEPTION_UTILS_INIT);
+
         // 缓存Key
         String cacheKey = PREFIX_USERNAME + userName;
 
@@ -220,6 +235,10 @@ public class UserUtil {
      * @return List
      */
     public static List<String> getUserRolesByUserId(String userId){
+        // 判断 工具类是否初始化完成
+        ThrowExceptionUtil.isThrowException(!IS_INIT,
+                CoreMsg.OTHER_EXCEPTION_UTILS_INIT);
+
         // 缓存Key
         String cacheKey = PREFIX_ID_ROLES + userId;
 
@@ -284,6 +303,9 @@ public class UserUtil {
      * @return List
      */
     public static List<String> getUserAllPermsByUserId(String userId){
+        // 判断 工具类是否初始化完成
+        ThrowExceptionUtil.isThrowException(!IS_INIT,
+                CoreMsg.OTHER_EXCEPTION_UTILS_INIT);
 
         // 缓存Key
         String cacheKey = PREFIX_ID_PERMISSIONS + userId;
@@ -348,6 +370,9 @@ public class UserUtil {
      * @return List
      */
     public static List<MenuModel> getMenuListByUserId(String userId){
+        // 判断 工具类是否初始化完成
+        ThrowExceptionUtil.isThrowException(!IS_INIT,
+                CoreMsg.OTHER_EXCEPTION_UTILS_INIT);
 
         // 缓存Key
         String cacheKey = PREFIX_ID_MENUS + userId;
@@ -415,6 +440,10 @@ public class UserUtil {
      * @return boolean
      */
     public static boolean refreshUser(UserModel user){
+        // 判断 工具类是否初始化完成
+        ThrowExceptionUtil.isThrowException(!IS_INIT,
+                CoreMsg.OTHER_EXCEPTION_UTILS_INIT);
+
         if(user == null || StringUtils.isEmpty(user.getId())){
             return true;
         }
@@ -475,6 +504,10 @@ public class UserUtil {
      * @return boolean
      */
     public static boolean refreshUserRoles(String userId){
+        // 判断 工具类是否初始化完成
+        ThrowExceptionUtil.isThrowException(!IS_INIT,
+                CoreMsg.OTHER_EXCEPTION_UTILS_INIT);
+
         Object obj = CacheUtil.getTimed(PREFIX_ID_ROLES + userId);
         boolean hasNilFlag = CacheUtil.hasNilFlag(PREFIX_ID_ROLES + userId);
 
@@ -509,6 +542,11 @@ public class UserUtil {
      * @return boolean
      */
     public static boolean refreshUserAllPerms(String userId){
+        // 判断 工具类是否初始化完成
+        ThrowExceptionUtil.isThrowException(!IS_INIT,
+                CoreMsg.OTHER_EXCEPTION_UTILS_INIT);
+
+
         Object obj = CacheUtil.getTimed(PREFIX_ID_PERMISSIONS + userId);
         boolean hasNilFlag = CacheUtil.hasNilFlag(PREFIX_ID_PERMISSIONS + userId);
 
@@ -544,6 +582,11 @@ public class UserUtil {
      * @return boolean
      */
     public static boolean refreshUserMenus(String userId){
+        // 判断 工具类是否初始化完成
+        ThrowExceptionUtil.isThrowException(!IS_INIT,
+                CoreMsg.OTHER_EXCEPTION_UTILS_INIT);
+
+
         Object obj = CacheUtil.getTimed(PREFIX_ID_MENUS + userId);
         boolean hasNilFlag = CacheUtil.hasNilFlag(PREFIX_ID_MENUS + userId);
 
@@ -577,6 +620,10 @@ public class UserUtil {
      * @return String
      */
     public static String getTenantId(){
+        // 判断 工具类是否初始化完成
+        ThrowExceptionUtil.isThrowException(!IS_INIT,
+                CoreMsg.OTHER_EXCEPTION_UTILS_INIT);
+
         // 判断权限 如果是 admin 超级管理员 则租户ID清空 且findList 不做处理 否则默认都会做处理
         // 如果表中 没有 tenant_id 字段 则不进行多租户处理
 
@@ -594,6 +641,10 @@ public class UserUtil {
      * @return String
      */
     public static String getRealTenantId(){
+        // 判断 工具类是否初始化完成
+        ThrowExceptionUtil.isThrowException(!IS_INIT,
+                CoreMsg.OTHER_EXCEPTION_UTILS_INIT);
+
         UserModel user = getUser();
         return user.getTenantId();
     }
@@ -604,6 +655,11 @@ public class UserUtil {
      * @return boolean
      */
     public static boolean isHasUpdateTenantPerms(final UserModel currUser){
+        // 判断 工具类是否初始化完成
+        ThrowExceptionUtil.isThrowException(!IS_INIT,
+                CoreMsg.OTHER_EXCEPTION_UTILS_INIT);
+
+
         // 排除超级管理员
         if(UserUtil.SUPER_ADMIN.equals(currUser.getUsername())){
             return true;
@@ -622,29 +678,31 @@ public class UserUtil {
      * @return String
      */
     public static String handlePassword(String password, String secretKey){
+        // 判断 工具类是否初始化完成
+        ThrowExceptionUtil.isThrowException(!IS_INIT,
+                CoreMsg.OTHER_EXCEPTION_UTILS_INIT);
+
+
         return new Md5Hash(password, secretKey).toHex();
     }
 
     // =====================================
 
-    @Autowired
-    public void setUserApi(UserApi userApi) {
-        UserUtil.userApi = userApi;
-    }
-
-
     /**
      * 初始化
-     * @param globalProperties 配置类
      */
     @Autowired
-    public void init(GlobalProperties globalProperties){
+    public void init(GlobalProperties globalProperties, UserApi userApi){
         if(globalProperties != null && globalProperties.getAuth() != null
                 && globalProperties.getAuth().getToken() != null
             ){
             // 获得 超级管理员
             UserUtil.SUPER_ADMIN = globalProperties.getAuth().getSuperAdmin();
         }
+
+        UserUtil.userApi = userApi;
+
+        IS_INIT = true;
     }
 
 }

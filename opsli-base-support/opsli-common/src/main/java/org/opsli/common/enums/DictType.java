@@ -64,8 +64,8 @@ public enum DictType {
      * @return DictType
      */
     public static DictType getDict(String type, String value) {
-        DictType[] var1 = values();
-        for (DictType dict : var1) {
+        DictType[] types = values();
+        for (DictType dict : types) {
             if(dict.type.equals(type) &&
                     dict.value.equalsIgnoreCase(value)
             ){
@@ -82,8 +82,8 @@ public enum DictType {
      * @return boolean
      */
     public static boolean hasDict(String type, String value) {
-        DictType[] var1 = values();
-        for (DictType dict : var1) {
+        DictType[] types = values();
+        for (DictType dict : types) {
             if(dict.type.equals(type) &&
                     dict.value.equalsIgnoreCase(value)){
                 return true;

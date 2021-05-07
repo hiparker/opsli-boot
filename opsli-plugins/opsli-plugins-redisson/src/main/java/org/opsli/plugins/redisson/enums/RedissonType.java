@@ -37,15 +37,12 @@ public enum RedissonType {
     private final String desc;
 
     public static RedissonType getType(String type) {
-        RedissonType[] var1 = values();
-        int var2 = var1.length;
-
-        for (RedissonType e : var1) {
+        RedissonType[] types = values();
+        for (RedissonType e : types) {
             if (e.type.equalsIgnoreCase(type)) {
                 return e;
             }
         }
-
         return null;
     }
 

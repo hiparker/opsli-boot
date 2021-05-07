@@ -35,6 +35,7 @@ import org.opsli.common.enums.LoginLimitRefuse;
 import org.opsli.common.exception.TokenException;
 import org.opsli.core.autoconfigure.properties.GlobalProperties;
 import org.opsli.core.cache.local.CacheUtil;
+import org.opsli.core.msg.CoreMsg;
 import org.opsli.core.msg.TokenMsg;
 import org.opsli.plugins.redis.RedisPlugin;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -74,7 +75,8 @@ public class UserTokenUtil {
     public static GlobalProperties.Auth.Login LOGIN_PROPERTIES;
     /** Redis插件 */
     private static RedisPlugin redisPlugin;
-
+    /** 增加初始状态开关 防止异常使用 */
+    private static boolean IS_INIT;
 
     /**
      * 根据 user 创建Token
@@ -82,6 +84,11 @@ public class UserTokenUtil {
      * @return UserTokenUtil.TokenRet
      */
     public static ResultVo<UserTokenUtil.TokenRet> createToken(UserModel user) {
+        // 判断 工具类是否初始化完成
+        ThrowExceptionUtil.isThrowException(!IS_INIT,
+                CoreMsg.OTHER_EXCEPTION_UTILS_INIT);
+
+
         if (user == null) {
             // 生成Token失败
             throw new TokenException(TokenMsg.EXCEPTION_TOKEN_CREATE_ERROR);
@@ -152,6 +159,11 @@ public class UserTokenUtil {
      * @return String
      */
     public static String getUserIdByToken(String token) {
+        // 判断 工具类是否初始化完成
+        ThrowExceptionUtil.isThrowException(!IS_INIT,
+                CoreMsg.OTHER_EXCEPTION_UTILS_INIT);
+
+
         if(StringUtils.isEmpty(token)){
             return null;
         }
@@ -168,6 +180,11 @@ public class UserTokenUtil {
      * @return String
      */
     public static String getUserNameByToken(String token) {
+        // 判断 工具类是否初始化完成
+        ThrowExceptionUtil.isThrowException(!IS_INIT,
+                CoreMsg.OTHER_EXCEPTION_UTILS_INIT);
+
+
         if(StringUtils.isEmpty(token)){
             return null;
         }
@@ -185,6 +202,11 @@ public class UserTokenUtil {
      * @param token token
      */
     public static void logout(String token) {
+        // 判断 工具类是否初始化完成
+        ThrowExceptionUtil.isThrowException(!IS_INIT,
+                CoreMsg.OTHER_EXCEPTION_UTILS_INIT);
+
+
         if(StringUtils.isEmpty(token)){
             return;
         }
@@ -217,6 +239,11 @@ public class UserTokenUtil {
      * @param token token
      */
     public static boolean verify(String token) {
+        // 判断 工具类是否初始化完成
+        ThrowExceptionUtil.isThrowException(!IS_INIT,
+                CoreMsg.OTHER_EXCEPTION_UTILS_INIT);
+
+
         if(StringUtils.isEmpty(token)){
             return false;
         }
@@ -260,6 +287,11 @@ public class UserTokenUtil {
      * @param username 用户名
      */
     public static void verifyLockAccount(String username){
+        // 判断 工具类是否初始化完成
+        ThrowExceptionUtil.isThrowException(!IS_INIT,
+                CoreMsg.OTHER_EXCEPTION_UTILS_INIT);
+
+
         // 判断账号是否临时锁定
         Long loseTimeMillis = (Long) redisPlugin.get(
                 CacheUtil.getPrefixName() + ACCOUNT_SLIP_LOCK_PREFIX + username);
@@ -290,6 +322,11 @@ public class UserTokenUtil {
      * @param username 用户名
      */
     public static TokenMsg lockAccount(String username){
+        // 判断 工具类是否初始化完成
+        ThrowExceptionUtil.isThrowException(!IS_INIT,
+                CoreMsg.OTHER_EXCEPTION_UTILS_INIT);
+
+
         // 如果失败次数 超过阈值 则锁定账号
         Long slipNum = redisPlugin.increment(
                 CacheUtil.getPrefixName() + ACCOUNT_SLIP_COUNT_PREFIX + username);
@@ -317,6 +354,11 @@ public class UserTokenUtil {
      * @param username 用户名
      */
     public static long getSlipCount(String username){
+        // 判断 工具类是否初始化完成
+        ThrowExceptionUtil.isThrowException(!IS_INIT,
+                CoreMsg.OTHER_EXCEPTION_UTILS_INIT);
+
+
         long count = 0L;
         Object obj = redisPlugin.get(
                 CacheUtil.getPrefixName() + ACCOUNT_SLIP_COUNT_PREFIX + username);
@@ -334,6 +376,11 @@ public class UserTokenUtil {
      * @param username 用户名
      */
     public static void clearLockAccount(String username){
+        // 判断 工具类是否初始化完成
+        ThrowExceptionUtil.isThrowException(!IS_INIT,
+                CoreMsg.OTHER_EXCEPTION_UTILS_INIT);
+
+
         // 删除失败次数记录
         redisPlugin.del(
                 CacheUtil.getPrefixName() + ACCOUNT_SLIP_COUNT_PREFIX + username);
@@ -349,6 +396,10 @@ public class UserTokenUtil {
      * 获取请求的token
      */
     public static String getRequestToken(HttpServletRequest httpRequest){
+        // 判断 工具类是否初始化完成
+        ThrowExceptionUtil.isThrowException(!IS_INIT,
+                CoreMsg.OTHER_EXCEPTION_UTILS_INIT);
+
 
         //从header中获取token
         String token = httpRequest.getHeader(TOKEN_NAME);
@@ -363,7 +414,6 @@ public class UserTokenUtil {
 
     /**
      * 初始化
-     * @param globalProperties 配置类
      */
     @Autowired
     public void init(GlobalProperties globalProperties, RedisPlugin redisPlugin){
@@ -376,6 +426,8 @@ public class UserTokenUtil {
 
         // Redis 插件
         UserTokenUtil.redisPlugin = redisPlugin;
+
+        IS_INIT = true;
     }
 
 
