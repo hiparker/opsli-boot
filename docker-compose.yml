@@ -47,5 +47,8 @@ services:
       - opsli-boot-redis
     container_name: opsli-boot
     image: opsli-boot
+    environment:
+      TZ: Asia/Shanghai
+      LANG: en_US.UTF-8
     ports:
       - "8080:8080"
