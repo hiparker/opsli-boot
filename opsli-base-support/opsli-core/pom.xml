@@ -16,6 +16,7 @@
 
     <dependencies>
         <!-- 需要使用着两个版本 来引入对应的模块和插件 -->
+        <!-- 基础版本 ${base.version} -->
         <!-- 插件版本 ${plugins.version} -->
         <!-- 模块版本 ${modulars.version}-->
 
@@ -23,14 +24,14 @@
         <dependency>
             <groupId>org.opsliframework.boot</groupId>
             <artifactId>opsli-common</artifactId>
-            <version>${version}</version>
+            <version>${base.version}</version>
         </dependency>
 
         <!-- 引入API模块 -->
         <dependency>
             <groupId>org.opsliframework.boot</groupId>
             <artifactId>opsli-api</artifactId>
-            <version>${version}</version>
+            <version>${api.version}</version>
         </dependency>
 
         <!-- 引入Redis插件 -->

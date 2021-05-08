@@ -24,6 +24,7 @@
     <!-- 规定子类所引用的版本***** -->
     <dependencyManagement>
         <!-- 需要使用着两个版本 来引入对应的模块和插件 -->
+        <!-- 基础版本 ${base.version} -->
         <!-- 插件版本 ${plugins.version} -->
         <!-- 模块版本 ${modulars.version}-->
 
@@ -34,6 +35,7 @@
 
     <dependencies>
         <!-- 需要使用着两个版本 来引入对应的模块和插件 -->
+        <!-- 基础版本 ${base.version} -->
         <!-- 插件版本 ${plugins.version} -->
         <!-- 模块版本 ${modulars.version}-->
 
@@ -41,7 +43,7 @@
         <dependency>
             <groupId>org.opsliframework.boot</groupId>
             <artifactId>opsli-core</artifactId>
-            <version>${project.parent.version}</version>
+            <version>${base.version}</version>
         </dependency>
 
     </dependencies>

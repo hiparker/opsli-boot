@@ -92,6 +92,10 @@
         <email.version>1.6.2</email.version>
 
         <!-- 需要使用着两个版本 来引入对应的模块和插件 -->
+        <!-- API版本 -->
+        <api.version>1.0.0</api.version>
+        <!-- 基础版本 -->
+        <base.version>1.0.0</base.version>
         <!-- 插件版本 -->
         <plugins.version>1.0.0</plugins.version>
         <!-- 模块版本 -->
