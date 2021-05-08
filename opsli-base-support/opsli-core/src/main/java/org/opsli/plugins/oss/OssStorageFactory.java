@@ -42,7 +42,7 @@ public enum OssStorageFactory {
     INSTANCE;
 
     /** OSS 服务容器 */
-    private final Map<OssStorageType, OssStorageService> ossStorageServiceMap = Maps.newHashMap();
+    private final Map<OssStorageType, OssStorageService> ossStorageServiceMap;
 
     /**
      * 获得OSS 执行类
@@ -79,8 +79,8 @@ public enum OssStorageFactory {
      * 初始化
      */
     OssStorageFactory(){
-        // 清空执行器集合
-        ossStorageServiceMap.clear();
+        // 初始化容器
+        ossStorageServiceMap = Maps.newHashMap();
 
         // 拿到实现了 OssStorageService 接口的,所有子类
         Set<Class<?>> clazzSet = ClassUtil.scanPackageBySuper(
