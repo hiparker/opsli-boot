@@ -1,54 +1,18 @@
 version: '3.3'
 services:
-  # 构建 MySQL数据库 这里不指定数据库文件 防止误操作 等隐患问题
-  opsli-boot-mysql:
-    build: ./db-file
-    image: opsli-boot-mysql
-    restart: always
-    environment:
-      # root 账户默认密码 生产时请更改
-      MYSQL_ROOT_PASSWORD: 123456
-      MYSQL_ROOT_HOST: '%'
-      TZ: Asia/Shanghai
-      LANG: en_US.UTF-8
-    container_name: opsli-boot-mysql
-    command:
-      --character-set-server=utf8mb4
-      --collation-server=utf8mb4_general_ci
-      --explicit_defaults_for_timestamp=true
-      --lower_case_table_names=1
-      --max_allowed_packet=128M
-      --default-authentication-plugin=caching_sha2_password
-    volumes:
-      - /var/mysql/data:/var/lib/mysql #挂载 MySQL数据
-    ports:
-      - "3306:3306"
-
-  # 构建 Redis
-  opsli-boot-redis:
-    image: redis:6.2.3
-    restart: always
-    container_name: opsli-boot-redis
-    environment:
-      TZ: Asia/Shanghai
-      LANG: en_US.UTF-8
-    command: redis-server /usr/local/etc/redis/redis.conf --appendonly yes    # 表示通过挂载配置文件追加配置
-    volumes:
-      - /var/redis/data:/data #挂载 Redis数据
-      - /var/redis/conf/redis.conf:/usr/local/etc/redis/redis.conf #挂载 Redis配置
-    ports:
-      - "6379:6379"
-
   opsli-boot:
     build: ./
     restart: on-failure
-    depends_on:
-      - opsli-boot-mysql
-      - opsli-boot-redis
     container_name: opsli-boot
     image: opsli-boot
     environment:
       TZ: Asia/Shanghai
       LANG: en_US.UTF-8
+    command:
+      - -Xmx2048m
+      - -Xms2048m
+      - -XX:+UseG1GC
+      - -XX:MaxGCPauseMillis=200
+      - --spring.profiles.active=dev
     ports:
       - "8080:8080"
