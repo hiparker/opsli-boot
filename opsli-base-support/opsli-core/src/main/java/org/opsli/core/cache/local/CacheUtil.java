@@ -77,6 +77,8 @@ public class CacheUtil {
     public static final String JSON_KEY = "data";
     /** 空状态 key 前缀 */
     private static final String NIL_FLAG_PREFIX = "nil";
+    /** 空状态 生效阈值 */
+    private final static long NIL_FLAG_THRESHOLD = 3;
 
     /** 热点数据前缀 */
     private static String PREFIX_NAME;
@@ -642,12 +644,15 @@ public class CacheUtil {
         // 判断 工具类是否初始化完成
         ThrowExceptionUtil.isThrowException(!IS_INIT,
                 CoreMsg.OTHER_EXCEPTION_UTILS_INIT);
+        // 处理缓存 key
+        String cacheKey = CacheUtil.handleKey(NIL_FLAG_PREFIX + ":" + key);
 
         try {
-            // 处理缓存 key
-            String cacheKey = CacheUtil.handleKey(NIL_FLAG_PREFIX + ":" + key);
             // 存入Redis
-            return redisPlugin.put(cacheKey, 1, TTL_NIL_DATA_TIME);
+            Long increment = redisPlugin.increment(cacheKey);
+            // 设置失效时间
+            redisPlugin.expire(cacheKey, TTL_NIL_DATA_TIME);
+            return increment != null;
         }catch (Exception e){
             log.error(e.getMessage(),e);
         }
@@ -666,9 +671,9 @@ public class CacheUtil {
         ThrowExceptionUtil.isThrowException(!IS_INIT,
                 CoreMsg.OTHER_EXCEPTION_UTILS_INIT);
 
+        // 处理缓存 key
+        String cacheKey = CacheUtil.handleKey(NIL_FLAG_PREFIX + ":" + key);
         try {
-            // 处理缓存 key
-            String cacheKey = CacheUtil.handleKey(NIL_FLAG_PREFIX + ":" + key);
             // 删除Redis
             return redisPlugin.del(cacheKey);
         }catch (Exception e){
@@ -689,12 +694,17 @@ public class CacheUtil {
         // 判断 工具类是否初始化完成
         ThrowExceptionUtil.isThrowException(!IS_INIT,
                 CoreMsg.OTHER_EXCEPTION_UTILS_INIT);
+        // 处理缓存 key
+        String cacheKey = CacheUtil.handleKey(NIL_FLAG_PREFIX + ":" + key);
 
         try {
-            // 处理缓存 key
-            String cacheKey = CacheUtil.handleKey(NIL_FLAG_PREFIX + ":" + key);
-            // 判断Redis 是否 包含当前Nil值
-            return redisPlugin.get(cacheKey) != null;
+            Object nilObj = redisPlugin.get(cacheKey);
+            if(nilObj == null){
+                return false;
+            }
+
+            Long nilNum = Convert.toLong(nilObj, 0L);
+            return NIL_FLAG_THRESHOLD < nilNum;
         }catch (Exception e){
             log.error(e.getMessage(),e);
         }

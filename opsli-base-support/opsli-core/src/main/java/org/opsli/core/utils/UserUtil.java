@@ -16,6 +16,7 @@
 package org.opsli.core.utils;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.convert.Convert;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -79,7 +80,7 @@ public class UserUtil {
         // 判断 工具类是否初始化完成
         ThrowExceptionUtil.isThrowException(!IS_INIT,
                 CoreMsg.OTHER_EXCEPTION_UTILS_INIT);
-        
+
         String token = TokenThreadLocal.get();
 
         // 如果还是没获取到token 则抛出异常
@@ -255,7 +256,7 @@ public class UserUtil {
         // 防止缓存穿透判断
         boolean hasNilFlag = CacheUtil.hasNilFlag(cacheKey);
         if(hasNilFlag){
-            return null;
+            return ListUtil.empty();
         }
 
         try {
@@ -263,7 +264,7 @@ public class UserUtil {
             if(!DistributedLockUtil.lock(cacheKey)){
                 // 无法申领分布式锁
                 log.error(CoreMsg.REDIS_EXCEPTION_LOCK.getMessage());
-                return null;
+                return ListUtil.empty();
             }
 
             // 如果获得锁 则 再次检查缓存里有没有， 如果有则直接退出， 没有的话才发起数据库请求
@@ -290,7 +291,7 @@ public class UserUtil {
         if(CollUtil.isEmpty(roles)){
             // 设置空变量 用于防止穿透判断
             CacheUtil.putNilFlag(cacheKey);
-            return null;
+            return ListUtil.empty();
         }
 
         return roles;
@@ -323,7 +324,7 @@ public class UserUtil {
         // 防止缓存穿透判断
         boolean hasNilFlag = CacheUtil.hasNilFlag(cacheKey);
         if(hasNilFlag){
-            return null;
+            return ListUtil.empty();
         }
 
         try {
@@ -331,7 +332,7 @@ public class UserUtil {
             if(!DistributedLockUtil.lock(cacheKey)){
                 // 无法申领分布式锁
                 log.error(CoreMsg.REDIS_EXCEPTION_LOCK.getMessage());
-                return null;
+                return ListUtil.empty();
             }
 
             // 如果获得锁 则 再次检查缓存里有没有， 如果有则直接退出， 没有的话才发起数据库请求
@@ -358,7 +359,7 @@ public class UserUtil {
         if(CollUtil.isEmpty(permissions)){
             // 设置空变量 用于防止穿透判断
             CacheUtil.putNilFlag(cacheKey);
-            return null;
+            return ListUtil.empty();
         }
 
         return permissions;
@@ -390,7 +391,7 @@ public class UserUtil {
         // 防止缓存穿透判断
         boolean hasNilFlag = CacheUtil.hasNilFlag(cacheKey);
         if(hasNilFlag){
-            return null;
+            return ListUtil.empty();
         }
 
 
@@ -399,7 +400,7 @@ public class UserUtil {
             if(!DistributedLockUtil.lock(cacheKey)){
                 // 无法申领分布式锁
                 log.error(CoreMsg.REDIS_EXCEPTION_LOCK.getMessage());
-                return null;
+                return ListUtil.empty();
             }
 
             // 如果获得锁 则 再次检查缓存里有没有， 如果有则直接退出， 没有的话才发起数据库请求
@@ -426,7 +427,7 @@ public class UserUtil {
         if(CollUtil.isEmpty(menus)){
             // 设置空变量 用于防止穿透判断
             CacheUtil.putNilFlag(cacheKey);
-            return null;
+            return ListUtil.empty();
         }
 
         return menus;
