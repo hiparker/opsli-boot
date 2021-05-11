@@ -70,7 +70,7 @@
         <oshi.version>5.6.1</oshi.version>
         <jna.version>5.8.0</jna.version>
         <ehcache.version>3.9.0</ehcache.version>
-        <redisson.version>3.15.0</redisson.version>
+        <redisson.version>3.15.4</redisson.version>
         <captcha.version>1.6.2</captcha.version>
         <shiro.redis.version>3.3.1</shiro.redis.version>
         <bouncycastle.version>1.68</bouncycastle.version>
