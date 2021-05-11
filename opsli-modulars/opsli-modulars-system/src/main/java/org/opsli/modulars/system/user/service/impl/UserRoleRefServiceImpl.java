@@ -15,11 +15,14 @@
  */
 package org.opsli.modulars.system.user.service.impl;
 
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.collection.ListUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
 import org.opsli.common.exception.ServiceException;
+import org.opsli.common.utils.ListDistinctUtil;
 import org.opsli.core.msg.CoreMsg;
 import org.opsli.core.utils.UserUtil;
 import org.opsli.modulars.system.SystemMsg;
@@ -30,8 +33,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
 import java.util.List;
 
 
@@ -51,15 +52,23 @@ public class UserRoleRefServiceImpl extends ServiceImpl<UserRoleRefMapper, SysUs
     @Override
     public List<String> getUserIdListByRoleId(String roleId) {
         List<String> users = mapper.getUserIdListByRoleId(roleId);
+        if(CollUtil.isEmpty(users)){
+            return ListUtil.empty();
+        }
+
         // 去重
-        return new ArrayList<>(new LinkedHashSet<>(users));
+        return ListDistinctUtil.distinct(users);
     }
 
     @Override
     public List<String> getUserIdListByMenuId(String roleId) {
         List<String> users = mapper.getUserIdListByMenuId(roleId);
+        if(CollUtil.isEmpty(users)){
+            return ListUtil.empty();
+        }
+
         // 去重
-        return new ArrayList<>(new LinkedHashSet<>(users));
+        return ListDistinctUtil.distinct(users);
     }
 
     @Override

@@ -16,7 +16,7 @@ import java.nio.charset.StandardCharsets;
  * @BelongsPackage: com.think.bboss.common.utils
  * @Author: Parker
  * @CreateTime: 2021-01-05 14:26
- * @Description: 周鹏程
+ * @Description: OutputStream 处理
  */
 @Slf4j
 public final class OutputStreamUtil {

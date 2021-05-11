@@ -16,6 +16,7 @@
 package org.opsli.modulars.system.user.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.RandomUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -23,6 +24,7 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.github.pagehelper.PageInfo;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
+import org.opsli.api.base.warpper.ApiWrapper;
 import org.opsli.api.wrapper.system.menu.MenuModel;
 import org.opsli.api.wrapper.system.options.OptionsModel;
 import org.opsli.api.wrapper.system.user.UserAndOrgModel;
@@ -32,6 +34,7 @@ import org.opsli.common.constants.MyBatisConstants;
 import org.opsli.common.enums.DictType;
 import org.opsli.common.exception.ServiceException;
 import org.opsli.common.utils.HumpUtil;
+import org.opsli.common.utils.ListDistinctUtil;
 import org.opsli.common.utils.WrapperUtil;
 import org.opsli.core.base.service.impl.CrudServiceImpl;
 import org.opsli.core.msg.CoreMsg;
@@ -55,7 +58,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 
 /**
@@ -420,14 +426,14 @@ public class UserServiceImpl extends CrudServiceImpl<UserMapper, SysUser, UserMo
     public List<String> getRoleCodeList(String userId) {
         List<String> roles = mapper.getRoleCodeList(userId);
         // 去重
-        return new ArrayList<>(new LinkedHashSet<>(roles));
+        return ListDistinctUtil.distinct(roles);
     }
 
     @Override
     public List<String> getRoleIdList(String userId) {
         List<String> roles = mapper.getRoleIdList(userId);
         // 去重
-        return new ArrayList<>(new LinkedHashSet<>(roles));
+        return ListDistinctUtil.distinct(roles);
     }
 
     @Override
@@ -435,7 +441,7 @@ public class UserServiceImpl extends CrudServiceImpl<UserMapper, SysUser, UserMo
 
         UserModel userModel = this.get(userId);
         if(userModel == null){
-            return new ArrayList<>();
+            return ListUtil.empty();
         }
 
         List<String> perms;
@@ -457,7 +463,7 @@ public class UserServiceImpl extends CrudServiceImpl<UserMapper, SysUser, UserMo
         }
 
         // 去重
-        return new ArrayList<>(new LinkedHashSet<>(perms));
+        return ListDistinctUtil.distinct(perms);
     }
 
     @Override
@@ -465,11 +471,10 @@ public class UserServiceImpl extends CrudServiceImpl<UserMapper, SysUser, UserMo
 
         UserModel userModel = this.get(userId);
         if(userModel == null){
-            return new ArrayList<>();
+            return ListUtil.empty();
         }
 
         List<SysMenu> menuList;
-
         // 判断是否是超级管理员 如果是超级管理员 则默认享有全部权限
         if(StringUtils.equals(UserUtil.SUPER_ADMIN, userModel.getUsername())){
             QueryBuilder<SysMenu> queryBuilder = new GenQueryBuilder<>();
@@ -482,7 +487,11 @@ public class UserServiceImpl extends CrudServiceImpl<UserMapper, SysUser, UserMo
             menuList = mapper.findMenuListByUserId(userId);
         }
 
-        return WrapperUtil.transformInstance(menuList, MenuModel.class);
+        // 去重处理 这里不放在SQL 是为了保证数据库兼容性
+        List<SysMenu> distinctList = ListDistinctUtil.distinct(
+                menuList, Comparator.comparing(ApiWrapper::getId));
+
+        return WrapperUtil.transformInstance(distinctList, MenuModel.class);
     }
 
     @Override
@@ -490,11 +499,10 @@ public class UserServiceImpl extends CrudServiceImpl<UserMapper, SysUser, UserMo
 
         UserModel userModel = this.get(userId);
         if(userModel == null){
-            return new ArrayList<>();
+            return ListUtil.empty();
         }
 
         List<SysMenu> menuList;
-
         // 判断是否是超级管理员 如果是超级管理员 则默认享有全部权限
         if(StringUtils.equals(UserUtil.SUPER_ADMIN, userModel.getUsername())){
             QueryBuilder<SysMenu> queryBuilder = new GenQueryBuilder<>();
@@ -506,7 +514,15 @@ public class UserServiceImpl extends CrudServiceImpl<UserMapper, SysUser, UserMo
             menuList = mapper.findMenuAllListByUserId(userId);
         }
 
-        return WrapperUtil.transformInstance(menuList, MenuModel.class);
+        if(CollUtil.isEmpty(menuList)){
+            return ListUtil.empty();
+        }
+
+        // 去重处理 这里不放在SQL 是为了保证数据库兼容性
+        List<SysMenu> distinctList = ListDistinctUtil.distinct(
+                menuList, Comparator.comparing(ApiWrapper::getId));
+
+        return WrapperUtil.transformInstance(distinctList, MenuModel.class);
     }
 
     @Override
