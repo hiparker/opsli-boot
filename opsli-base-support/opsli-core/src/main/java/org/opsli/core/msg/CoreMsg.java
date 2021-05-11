@@ -27,9 +27,9 @@ import org.opsli.common.base.msg.BaseMsg;
 public enum CoreMsg implements BaseMsg {
 
     /** SQL */
-    SQL_EXCEPTION_UPDATE(10100,"更新数据失败，请稍后再次尝试！"),
-    SQL_EXCEPTION_INSERT(10101,"新增数据失败，请稍后再次尝试！"),
-    SQL_EXCEPTION_DELETE(10102,"删除数据失败，请稍后再次尝试！"),
+    SQL_EXCEPTION_UPDATE(10100,"更新数据失败，是否刷新页面重试？"),
+    SQL_EXCEPTION_INSERT(10100,"新增数据失败，是否刷新页面重试？"),
+    SQL_EXCEPTION_DELETE(10100,"删除数据失败，是否刷新页面重试？"),
     SQL_EXCEPTION_INTEGRITY_CONSTRAINT_VIOLATION(10105,"数据主键冲突或者已有该数据！"),
     SQL_EXCEPTION_NOT_HAVE_DEFAULT_VALUE(10106,"数据异常：{} 字段没有默认值！"),
     SQL_EXCEPTION_UNKNOWN(10106,"数据异常：未知异常，请联系系统管理员 {}"),
