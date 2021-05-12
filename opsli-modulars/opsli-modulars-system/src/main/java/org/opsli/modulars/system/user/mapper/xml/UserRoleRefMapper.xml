@@ -7,18 +7,25 @@
             a.user_id
         from
         sys_user_role_ref a
-        where
-            a.role_id = #{roleId}
+        join sys_user b on a.user_id = b.id
+        <where>
+            b.deleted = 0
+            and a.role_id = #{roleId}
+        </where>
     </select>
 
     <select id="getUserIdListByMenuId"  resultType="String">
         select
-            a.user_id
+            b.user_id
         from
-        sys_user_role_ref a
-        left join sys_role_menu_ref b on b.role_id = a.role_id
-        where
-            b.menu_id = #{menuId}
+        sys_role_menu_ref a
+        join sys_user_role_ref b on b.role_id = a.role_id
+        join sys_menu menu on menu.id = b.menu_id
+        <where>
+            menu.deleted = 0
+            and menu.parent_id != -1
+            and a.menu_id = #{menuId}
+        </where>
     </select>
 
 
