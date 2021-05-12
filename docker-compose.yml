@@ -15,6 +15,6 @@ services:
       - -XX:MaxGCPauseMillis=200
       - --spring.profiles.active=beta
     volumes:
-      - /usr/local/opsli/opsli-boot/run:/usr/local/opsli/opsli-boot #挂载目录
+      - /www/wwwroot/demo.opsli.bedebug.com/backend/run:/usr/local/opsli/opsli-boot #挂载目录
     ports:
       - "7000:7000"
