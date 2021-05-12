@@ -2,7 +2,7 @@
 
 # 端口设置
 server:
-  port: 8080
+  port: 7000
 
 spring:
   #redis 配置
