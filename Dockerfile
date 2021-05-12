@@ -27,4 +27,4 @@ ENTRYPOINT ["java", "-Dfile.encoding=utf-8", "-Djava.security.egd=file:/dev/./ur
 CMD ["-Xmx2048m", "-Xms2048m",  "-XX:+UseG1GC", "-XX:MaxGCPauseMillis=200", "--spring.profiles.active=dev"]
 
 # 暴露端口
-EXPOSE 8080
+EXPOSE 7000

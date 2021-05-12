@@ -54,4 +54,4 @@ services:
       - -XX:MaxGCPauseMillis=200
       - --spring.profiles.active=beta
     ports:
-      - "8080:8080"
+      - "7000:7000"
