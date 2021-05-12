@@ -74,9 +74,9 @@ opsli:
   enable-demo: true
   # web 上传文件路径
   web:
-    upload-path: /www/wwwroot/demo.opsli.com/files
+    upload-path: var/files
 
 # 系统日志
 log:
-  path: /var/log
+  path: var/log
 
