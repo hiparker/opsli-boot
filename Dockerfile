@@ -16,7 +16,7 @@ WORKDIR /usr/local/opsli/opsli-boot
 RUN ["echo","OPSLI 快速开发平台 building..."]
 
 # 拷贝Jar
-ADD ./opsli-starter/target/*.jar ./
+COPY ./opsli-starter/target/*.jar /usr/local/opsli/opsli-boot
 
 # 切换为上海时区
 RUN ln -sf /usr/share/zoneinfo/$TZ /etc/localtime \
