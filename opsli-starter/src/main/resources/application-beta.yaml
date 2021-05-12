@@ -34,8 +34,8 @@ spring:
       datasource:
         master:
           url: jdbc:mysql://172.27.105.47:3306/opsli-boot?characterEncoding=UTF-8&useUnicode=true&useSSL=false&tinyInt1isBit=false&rewriteBatchedStatements=true&serverTimezone=Asia/Shanghai
-          username: root
-          password: MYSQL0p9o8i7u
+          username: opsli-boot
+          password: OPSLI!@#0p9o8i7u
           driver-class-name: com.mysql.cj.jdbc.Driver
       # 多数据源配置
       #slave-datasource:
