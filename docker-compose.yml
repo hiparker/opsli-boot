@@ -13,6 +13,6 @@ services:
       - -Xms2048m
       - -XX:+UseG1GC
       - -XX:MaxGCPauseMillis=200
-      - --spring.profiles.active=dev
+      - --spring.profiles.active=beta
     ports:
       - "8080:8080"
