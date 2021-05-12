@@ -19,6 +19,7 @@ services:
       --lower_case_table_names=1
       --max_allowed_packet=128M
       --default-authentication-plugin=caching_sha2_password
+    privileged: true
     volumes:
       - /var/mysql/data:/var/lib/mysql #挂载 MySQL数据
     ports:
@@ -33,6 +34,7 @@ services:
       TZ: Asia/Shanghai
       LANG: en_US.UTF-8
     command: redis-server /usr/local/etc/redis/redis.conf --appendonly yes    # 表示通过挂载配置文件追加配置
+    privileged: true
     volumes:
       - /var/redis/data:/data #挂载 Redis数据
       - /var/redis/conf/redis.conf:/usr/local/etc/redis/redis.conf #挂载 Redis配置
@@ -53,6 +55,7 @@ services:
       - -XX:+UseG1GC
       - -XX:MaxGCPauseMillis=200
       - --spring.profiles.active=beta
+    privileged: true
     volumes:
       - /www/wwwroot/demo.opsli.bedebug.com/backend/run:/usr/local/opsli/opsli-boot #挂载目录
     ports:
