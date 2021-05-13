@@ -15,6 +15,8 @@
  */
 package org.opsli.common.utils;
 
+import cn.hutool.core.net.NetUtil;
+
 import javax.servlet.http.HttpServletRequest;
 
 /**
@@ -81,6 +83,17 @@ public final class IPUtil {
         }
         return request.getRemoteAddr();
     }
+
+    /***
+     * 获取客户端ip地址(可以穿透代理)
+     * @param request
+     * @return
+     */
+    public static String getMultistageReverseProxyIp(HttpServletRequest request) {
+        String clientIpAddress = getClientIpAddress(request);
+        return NetUtil.getMultistageReverseProxyIp(clientIpAddress);
+    }
+
     /***
      * 获取客户端ip地址(可以穿透代理)
      * @param request

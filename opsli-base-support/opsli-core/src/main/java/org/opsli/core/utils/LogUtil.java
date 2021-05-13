@@ -21,7 +21,6 @@ import cn.hutool.json.JSONUtil;
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.reflect.MethodSignature;
@@ -93,7 +92,7 @@ public final class LogUtil {
             // 操作方法
             String methodName = request.getMethod();
             // 获得IP
-            String clientIpAddress = IPUtil.getClientIpAddress(request);
+            String clientIpAddress = IPUtil.getMultistageReverseProxyIp(request);
 
             // 设置标题
             setTitle(point, method, logsModel, user);
