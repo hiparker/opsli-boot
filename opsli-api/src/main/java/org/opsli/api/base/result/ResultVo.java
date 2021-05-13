@@ -29,9 +29,9 @@ public class ResultVo<T> implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	/** 默认成功信息 */
-	private static final String DEF_SUCCESS_MSG = "操作成功！";
+	public static final String DEF_SUCCESS_MSG = "操作成功！";
 	/** 默认失败信息 */
-	private static final String DEF_ERROR_MSG = "操作失败！";
+	public static final String DEF_ERROR_MSG = "操作失败！";
 
 	/** 成功状态 */
 	@ApiModelProperty(value = "成功状态")
