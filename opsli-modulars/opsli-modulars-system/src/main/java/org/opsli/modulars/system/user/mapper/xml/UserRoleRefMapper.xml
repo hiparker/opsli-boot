@@ -20,7 +20,7 @@
         from
         sys_role_menu_ref a
         join sys_user_role_ref b on b.role_id = a.role_id
-        join sys_menu menu on menu.id = b.menu_id
+        join sys_menu menu on menu.id = a.menu_id
         <where>
             menu.deleted = 0
             and menu.parent_id != -1
