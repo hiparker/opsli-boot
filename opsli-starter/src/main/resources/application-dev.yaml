@@ -79,8 +79,9 @@ opsli:
   enable-demo: false
   # web 上传文件路径
   web:
-    upload-path: /Users/system/Documents/work/tmp/opsli
+    upload-path: var/files
 
 # 系统日志
 log:
-  path: /Users/system/Documents/脚本/opsli/var/log
+  path: var/log
+
