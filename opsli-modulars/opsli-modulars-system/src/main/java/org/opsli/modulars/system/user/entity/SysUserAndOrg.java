@@ -43,6 +43,9 @@ public class SysUserAndOrg extends BaseEntity {
     /** 登录密码 */
     private String password;
 
+    /** 登录密码强度 */
+    private String passwordLevel;
+
     /** 盐值，密码秘钥 */
     private String secretKey;
 

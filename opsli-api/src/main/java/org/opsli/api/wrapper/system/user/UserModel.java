@@ -53,6 +53,13 @@ public class UserModel extends ApiWrapper {
     @ValidationArgsLenMax(50)
     private String password;
 
+    /** 登录密码强度 */
+    @ApiModelProperty(value = "登录密码强度")
+    @ExcelIgnore
+    @ValidationArgsLenMin(1)
+    @ValidationArgsLenMax(1)
+    private String passwordLevel;
+
     /** 盐值，密码秘钥 */
     @ApiModelProperty(value = "盐值，密码秘钥")
     @ExcelIgnore

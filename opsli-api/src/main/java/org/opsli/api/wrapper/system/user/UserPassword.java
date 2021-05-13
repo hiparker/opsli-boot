@@ -59,10 +59,17 @@ public class UserPassword implements Serializable {
     @ValidationArgsLenMax(50)
     private String newPassword;
 
-    /** 盐值，密码秘钥 */
-    @ApiModelProperty(value = "盐值，密码秘钥")
+    /** 盐值，密码秘钥 前端不可改*/
+    @ApiModelProperty(value = "盐值，密码秘钥 前端不可改")
     @ExcelIgnore
     @ValidationArgsLenMax(50)
     private String salt;
+
+    /** 登录密码强度 前端不可改 */
+    @ApiModelProperty(value = "登录密码强度 前端不可改")
+    @ExcelIgnore
+    @ValidationArgsLenMin(1)
+    @ValidationArgsLenMax(1)
+    private String passwordLevel;
 
 }

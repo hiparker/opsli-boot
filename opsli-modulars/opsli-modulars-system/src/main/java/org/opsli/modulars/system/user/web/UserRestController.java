@@ -119,10 +119,6 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
         UserInfo userInfo = WrapperUtil.transformInstance(user, UserInfo.class);
         userInfo.setRoles(userRolesByUserId);
         userInfo.setPerms(userAllPermsByUserId);
-        // 获得密码强度
-        userInfo.setPasswordLevel(
-                CheckStrength.getPasswordLevel(user.getPassword()).getCode()
-        );
 
         // 判断是否是超级管理员
         if(StringUtils.equals(UserUtil.SUPER_ADMIN, user.getUsername())){

@@ -33,6 +33,7 @@ import org.opsli.api.wrapper.system.user.UserPassword;
 import org.opsli.common.constants.MyBatisConstants;
 import org.opsli.common.enums.DictType;
 import org.opsli.common.exception.ServiceException;
+import org.opsli.common.utils.CheckStrength;
 import org.opsli.common.utils.HumpUtil;
 import org.opsli.common.utils.ListDistinctUtil;
 import org.opsli.common.utils.WrapperUtil;
@@ -122,6 +123,10 @@ public class UserServiceImpl extends CrudServiceImpl<UserMapper, SysUser, UserMo
             // 设置随机新盐值
             model.setSecretKey(
                     RandomUtil.randomString(20)
+            );
+            // 获得密码强度
+            model.setPasswordLevel(
+                    CheckStrength.getPasswordLevel(model.getPassword()).getCode()
             );
             // 处理密码
             model.setPassword(
@@ -590,6 +595,10 @@ public class UserServiceImpl extends CrudServiceImpl<UserMapper, SysUser, UserMo
         userPassword.setSalt(
                 RandomUtil.randomString(20)
         );
+        // 获得密码强度
+        userPassword.setPasswordLevel(
+                CheckStrength.getPasswordLevel(userPassword.getNewPassword()).getCode()
+        );
         // 处理密码
         userPassword.setNewPassword(
                 UserUtil.handlePassword(userPassword.getNewPassword(),
@@ -619,6 +628,10 @@ public class UserServiceImpl extends CrudServiceImpl<UserMapper, SysUser, UserMo
         // 设置随机新盐值
         userPassword.setSalt(
                 RandomUtil.randomString(20)
+        );
+        // 获得密码强度
+        userPassword.setPasswordLevel(
+                CheckStrength.getPasswordLevel(userPassword.getNewPassword()).getCode()
         );
         // 处理密码
         userPassword.setNewPassword(

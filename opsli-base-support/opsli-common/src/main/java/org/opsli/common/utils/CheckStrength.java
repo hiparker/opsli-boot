@@ -261,7 +261,7 @@ public class CheckStrength {
     return level;
   }
   /**
-   *获得密码强度等级，包括简单、复杂、强、强、强
+   *获得密码强度等级，包括简单、复杂、高、很高、非常高
    *
    * @param passwd
    * @return
