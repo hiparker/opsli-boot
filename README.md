@@ -15,7 +15,7 @@
 ## 地址
 
 - 官方网站: <a href="https://opsli.com" target="_blank">https://opsli.com</a>
-- 演示地址: <a href="http://demo.opsli.arcinbj.com" target="_blank">http://demo.opsli.arcinbj.com</a>
+- 演示地址: <a href="https://demo.opsli.bedebug.com" target="_blank">https://demo.opsli.bedebug.com</a>
 - 文档地址: <a href="https://wiki.opsli.bedebug.com" target="_blank">https://wiki.opsli.bedebug.com</a>
 - 作者博客: <a href="https://www.bedebug.com" target="_blank">https://www.bedebug.com</a>
 - 问题反馈: <a href="https://github.com/hiparker/opsli-boot/issues" target="_blank">https://github.com/hiparker/opsli-boot/issues</a>
@@ -43,7 +43,7 @@
 
 ## 在线演示
 
-> - 地址：<a href="http://demo.opsli.arcinbj.com" target="_blank">http://demo.opsli.arcinbj.com</a>
+> - 地址：<a href="https://demo.opsli.bedebug.com" target="_blank">https://demo.opsli.bedebug.com</a>
 > - 账号：demo
 > - 密码：Aa123456
 
