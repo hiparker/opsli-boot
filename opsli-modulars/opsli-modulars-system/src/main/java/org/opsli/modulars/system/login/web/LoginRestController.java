@@ -24,9 +24,10 @@ import org.opsli.api.base.result.ResultVo;
 import org.opsli.api.wrapper.system.options.OptionsModel;
 import org.opsli.api.wrapper.system.tenant.TenantModel;
 import org.opsli.api.wrapper.system.user.UserModel;
-import org.opsli.common.annotation.InterfaceCrypto;
+import org.opsli.common.annotation.ApiCryptoAsymmetric;
 import org.opsli.common.annotation.Limiter;
 import org.opsli.common.enums.DictType;
+import org.opsli.core.utils.ValidationUtil;
 import org.opsli.core.api.TokenThreadLocal;
 import org.opsli.common.enums.AlertType;
 import org.opsli.common.enums.OptionsType;
@@ -34,7 +35,6 @@ import org.opsli.common.exception.TokenException;
 import org.opsli.common.thread.refuse.AsyncProcessQueueReFuse;
 import org.opsli.common.utils.IPUtil;
 import org.opsli.core.msg.TokenMsg;
-import org.opsli.core.security.shiro.realm.JwtRealm;
 import org.opsli.core.utils.*;
 import org.opsli.modulars.system.login.entity.LoginForm;
 import org.opsli.modulars.system.user.service.IUserService;
@@ -71,7 +71,7 @@ public class LoginRestController {
      * 登录 登录数据加密
      */
     @Limiter
-    @InterfaceCrypto(responseEncrypt = false)
+    @ApiCryptoAsymmetric(responseEncrypt = false)
     @ApiOperation(value = "登录", notes = "登录")
     @PostMapping("/system/login")
     public ResultVo<UserTokenUtil.TokenRet> login(@RequestBody LoginForm form, HttpServletRequest request){

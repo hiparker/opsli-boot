@@ -44,7 +44,7 @@ public final class ValidationUtil {
 
     /**
      * 验证对象
-     * @param obj
+     * @param obj 验证对象
      */
     public static void verify(Object obj){
         if(obj == null){
@@ -81,9 +81,9 @@ public final class ValidationUtil {
 
     /**
      * 通用校验
-     * @param field
-     * @param types
-     * @param fieldValue
+     * @param field 字段
+     * @param types 类型数组
+     * @param fieldValue 字段值
      */
     private static void check(Field field, ValiArgsType[] types, Object fieldValue){
         // 获得字段名
@@ -326,9 +326,9 @@ public final class ValidationUtil {
 
     /**
      * 最大长度校验
-     * @param field
-     * @param maxLength
-     * @param fieldValue
+     * @param field 字段
+     * @param maxLength 最大长度
+     * @param fieldValue 字段值
      */
     private static void checkMax(Field field, int maxLength, Object fieldValue){
         // 获得字段名
@@ -359,9 +359,9 @@ public final class ValidationUtil {
 
     /**
      * 最小长度校验
-     * @param field
-     * @param minLength
-     * @param fieldValue
+     * @param field 字段
+     * @param minLength 最小长度
+     * @param fieldValue 字段值
      */
     private static void checkMin(Field field, int minLength, Object fieldValue){
         // 获得字段名

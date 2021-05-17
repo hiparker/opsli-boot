@@ -21,6 +21,7 @@
         <module>opsli-plugins-excel</module>
         <module>opsli-plugins-redisson</module>
         <module>opsli-plugins-waf</module>
+        <module>opsli-plugins-crypto</module>
     </modules>
 
     <dependencyManagement>

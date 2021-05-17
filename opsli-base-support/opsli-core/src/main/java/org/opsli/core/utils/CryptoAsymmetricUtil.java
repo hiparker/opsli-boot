@@ -242,7 +242,6 @@ public final class CryptoAsymmetricUtil {
     @Data
     public static class CryptoAsymmetric {
 
-
         /** 加解密类别 */
         private String cryptoType;
 
