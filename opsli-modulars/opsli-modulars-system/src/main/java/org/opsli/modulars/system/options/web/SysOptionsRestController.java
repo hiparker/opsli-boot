@@ -23,6 +23,10 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import opsli.plugins.crypto.CryptoPlugin;
+import opsli.plugins.crypto.enums.CryptoAsymmetricType;
+import opsli.plugins.crypto.model.CryptoAsymmetric;
+import opsli.plugins.crypto.strategy.CryptoAsymmetricService;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.opsli.api.base.result.ResultVo;
 import org.opsli.api.web.system.options.OptionsApi;
@@ -30,14 +34,12 @@ import org.opsli.api.wrapper.system.options.OptionsModel;
 import org.opsli.common.annotation.ApiRestController;
 import org.opsli.common.annotation.EnableLog;
 import org.opsli.common.annotation.RequiresPermissionsCus;
-import org.opsli.common.enums.CryptoAsymmetricType;
 import org.opsli.common.enums.DictType;
 import org.opsli.common.utils.WrapperUtil;
 import org.opsli.core.base.controller.BaseRestController;
 import org.opsli.core.persistence.Page;
 import org.opsli.core.persistence.querybuilder.QueryBuilder;
 import org.opsli.core.persistence.querybuilder.WebQueryBuilder;
-import org.opsli.core.utils.CryptoAsymmetricUtil;
 import org.opsli.core.utils.OptionsUtil;
 import org.opsli.modulars.system.options.entity.SysOptions;
 import org.opsli.modulars.system.options.service.ISysOptionsService;
@@ -311,8 +313,10 @@ public class SysOptionsRestController extends BaseRestController<SysOptions, Opt
             return ResultVo.error();
         }
 
+        CryptoAsymmetricService asymmetricService = CryptoPlugin.getAsymmetric();
+        CryptoAsymmetric keyModel = asymmetricService.createKeyModel(cryptoType);
         return ResultVo.success(
-                CryptoAsymmetricUtil.create(cryptoType)
+                keyModel
         );
     }
 }

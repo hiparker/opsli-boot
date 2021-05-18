@@ -17,6 +17,7 @@ package opsli.plugins.crypto.model;
 
 import lombok.Data;
 import opsli.plugins.crypto.enums.CryptoAsymmetricType;
+import org.opsli.common.annotation.OptionDict;
 
 /**
  * 非对称加密
@@ -28,11 +29,14 @@ import opsli.plugins.crypto.enums.CryptoAsymmetricType;
 public class CryptoAsymmetric {
 
     /** 加解密类别 */
+    @OptionDict("crypto_asymmetric")
     private CryptoAsymmetricType cryptoType;
 
     /** 公钥 */
+    @OptionDict("crypto_asymmetric_public_key")
     private String publicKey;
 
     /** 私钥 */
+    @OptionDict("crypto_asymmetric_private_key")
     private String privateKey;
 }

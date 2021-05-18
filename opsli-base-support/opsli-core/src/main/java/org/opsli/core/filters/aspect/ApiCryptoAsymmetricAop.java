@@ -21,7 +21,6 @@ import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.TypeUtil;
 import lombok.extern.slf4j.Slf4j;
 import opsli.plugins.crypto.CryptoPlugin;
-import opsli.plugins.crypto.enums.CryptoAsymmetricType;
 import opsli.plugins.crypto.model.CryptoAsymmetric;
 import opsli.plugins.crypto.strategy.CryptoAsymmetricService;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -31,12 +30,9 @@ import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.opsli.api.base.encrypt.BaseEncrypt;
 import org.opsli.api.base.result.ResultVo;
-import org.opsli.api.wrapper.system.options.OptionsModel;
 import org.opsli.common.annotation.ApiCryptoAsymmetric;
-import org.opsli.common.enums.OptionsType;
 import org.opsli.common.exception.ServiceException;
 import org.opsli.core.msg.CoreMsg;
-import org.opsli.core.utils.CryptoAsymmetricUtil;
 import org.opsli.core.utils.OptionsUtil;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -82,60 +78,32 @@ public class ApiCryptoAsymmetricAop {
         // 获得方法注解
         ApiCryptoAsymmetric annotation =
                 method.getAnnotation(ApiCryptoAsymmetric.class);
-        if(annotation != null){
-            // TODO 后期引入 享元池设计 防止过度创建对象 先保障能跑起来 2021年5月17日18:23:56  以下全是要优化的地方
-            // 获得非对称加解密 执行器
-            CryptoAsymmetricService asymmetric = CryptoPlugin.getAsymmetric();
-            // 加解密模型
-            CryptoAsymmetric cryptoModel = asymmetric.createNilModel();
-            // 获得缓存配置
-            // 加解密方式
-            OptionsModel cryptoAsymmetric = OptionsUtil.getOptionByCode(OptionsType.CRYPTO_ASYMMETRIC);
-            // 公钥
-            OptionsModel cryptoAsymmetricPublicKey =
-                    OptionsUtil.getOptionByCode(OptionsType.CRYPTO_ASYMMETRIC_PUBLIC_KEY);
-            // 私钥
-            OptionsModel cryptoAsymmetricPrivateKey =
-                    OptionsUtil.getOptionByCode(OptionsType.CRYPTO_ASYMMETRIC_PRIVATE_KEY);
 
-            // 非法验证
-            if(cryptoAsymmetric == null || cryptoAsymmetricPublicKey == null ||
-                    cryptoAsymmetricPrivateKey == null
-            ){
-                throw new RuntimeException();
+        // 获得非对称加解密 执行器
+        CryptoAsymmetricService asymmetric = null;
+        // 加解密模型
+        CryptoAsymmetric cryptoAsymmetric = null;
+        if(annotation != null && annotation.enable()){
+            asymmetric = CryptoPlugin.getAsymmetric();
+            cryptoAsymmetric =
+                    OptionsUtil.getOptionByBean(asymmetric.createNilModel());
+        }
+
+        // 1. 请求解密
+        if(annotation != null && annotation.enable() && annotation.requestDecrypt()){
+            if(cryptoAsymmetric != null){
+                enterDecrypt(args, method, asymmetric, cryptoAsymmetric);
             }
+        }
 
-            // 加解密方式枚举
-            CryptoAsymmetricType cryptoType = CryptoAsymmetricType.getCryptoType(
-                    cryptoAsymmetric.getOptionValue());
-            // 非法验证
-            if(cryptoType == null){
-                throw new RuntimeException();
+        // 2. 执行方法
+        returnValue = point.proceed(args);
+
+        // 3. 返回加密
+        if(annotation != null && annotation.enable() && annotation.responseEncrypt()){
+            if(cryptoAsymmetric != null){
+                returnValue = resultEncrypt(returnValue, asymmetric, cryptoAsymmetric);
             }
-            // TODO 都需要优化掉
-            cryptoModel.setCryptoType(cryptoType);
-            cryptoModel.setPublicKey(cryptoAsymmetricPublicKey.getOptionValue());
-            cryptoModel.setPrivateKey(cryptoAsymmetricPrivateKey.getOptionValue());
-
-            // 1. 拆解请求数据
-            // request 解密
-            if (annotation.enable() && annotation.requestDecrypt()){
-                enterDecrypt(args, method, asymmetric, cryptoModel);
-            }
-
-            // 2. 执行方法
-            returnValue = point.proceed(args);
-
-            // 3. 返回响应数据
-            // response 加密
-            if (annotation.enable() && annotation.responseEncrypt()){
-                returnValue = resultEncrypt(returnValue, asymmetric, cryptoModel);
-            }
-            return returnValue;
-
-
-        }else{
-            returnValue = point.proceed(args);
         }
         return returnValue;
     }
@@ -203,7 +171,6 @@ public class ApiCryptoAsymmetricAop {
                     returnValue = ret;
                 }else {
                     returnValue = asymmetric.encrypt(cryptoModel, returnValue);
-                    CryptoAsymmetricUtil.encrypt(returnValue);
                 }
             }catch (Exception e){
                 // 非对称加密失败
