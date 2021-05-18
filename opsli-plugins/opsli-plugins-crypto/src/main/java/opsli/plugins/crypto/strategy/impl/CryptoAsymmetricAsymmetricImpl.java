@@ -57,21 +57,13 @@ public class CryptoAsymmetricAsymmetricImpl implements CryptoAsymmetricService {
     static{
         // 初始化缓存类对象
         LFU_CACHE_MAP = Maps.newConcurrentMap();
-        LFU_CACHE_MAP.put(CryptoAsymmetricType.RSA,
-                CacheBuilder
-                        .newBuilder().maximumSize(DEFAULT_CACHE_COUNT)
-                        .expireAfterWrite(DEFAULT_CACHE_TIME, TimeUnit.MINUTES).build()
-                );
-        LFU_CACHE_MAP.put(CryptoAsymmetricType.SM2,
-                CacheBuilder
-                        .newBuilder().maximumSize(DEFAULT_CACHE_COUNT)
-                        .expireAfterWrite(DEFAULT_CACHE_TIME, TimeUnit.MINUTES).build()
-        );
-        LFU_CACHE_MAP.put(CryptoAsymmetricType.ECIES,
-                CacheBuilder
-                        .newBuilder().maximumSize(DEFAULT_CACHE_COUNT)
-                        .expireAfterWrite(DEFAULT_CACHE_TIME, TimeUnit.MINUTES).build()
-        );
+        for (CryptoAsymmetricType asymmetricType : CryptoAsymmetricType.values()) {
+            LFU_CACHE_MAP.put(asymmetricType,
+                    CacheBuilder
+                            .newBuilder().maximumSize(DEFAULT_CACHE_COUNT)
+                            .expireAfterWrite(DEFAULT_CACHE_TIME, TimeUnit.MINUTES).build()
+            );
+        }
     }
 
     /**
