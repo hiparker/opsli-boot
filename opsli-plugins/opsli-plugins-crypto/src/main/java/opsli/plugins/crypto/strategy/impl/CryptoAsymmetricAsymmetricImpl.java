@@ -22,6 +22,9 @@ import cn.hutool.crypto.SmUtil;
 import cn.hutool.crypto.asymmetric.*;
 import cn.hutool.json.JSONException;
 import cn.hutool.json.JSONUtil;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
 import opsli.plugins.crypto.enums.CryptoAsymmetricType;
 import opsli.plugins.crypto.exception.CryptoException;
@@ -30,15 +33,46 @@ import opsli.plugins.crypto.msg.CryptoMsg;
 import opsli.plugins.crypto.strategy.CryptoAsymmetricService;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
+
 /**
- * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.core.utils
- * @Author: Parker
- * @CreateTime: 2020-09-19 20:03
- * @Description: 非对称加密工具类
+ * 非对称加密
+ *
+ * @author Parker
+ * @date 2021年5月18日10:53:27
  */
 @Slf4j
 public class CryptoAsymmetricAsymmetricImpl implements CryptoAsymmetricService {
+
+    /** 默认缓存个数 超出后流量自动清理 */
+    private static final int DEFAULT_CACHE_COUNT = 1000;
+    /** 默认缓存时效 超出后自动清理 */
+    private static final int DEFAULT_CACHE_TIME = 20;
+    /** 加解密执行器缓存 防止多次创建 */
+    private static final Map<CryptoAsymmetricType, Cache<String, AbstractAsymmetricCrypto<?>>> LFU_CACHE_MAP;
+
+    static{
+        // 初始化缓存类对象
+        LFU_CACHE_MAP = Maps.newConcurrentMap();
+        LFU_CACHE_MAP.put(CryptoAsymmetricType.RSA,
+                CacheBuilder
+                        .newBuilder().maximumSize(DEFAULT_CACHE_COUNT)
+                        .expireAfterWrite(DEFAULT_CACHE_TIME, TimeUnit.MINUTES).build()
+                );
+        LFU_CACHE_MAP.put(CryptoAsymmetricType.SM2,
+                CacheBuilder
+                        .newBuilder().maximumSize(DEFAULT_CACHE_COUNT)
+                        .expireAfterWrite(DEFAULT_CACHE_TIME, TimeUnit.MINUTES).build()
+        );
+        LFU_CACHE_MAP.put(CryptoAsymmetricType.ECIES,
+                CacheBuilder
+                        .newBuilder().maximumSize(DEFAULT_CACHE_COUNT)
+                        .expireAfterWrite(DEFAULT_CACHE_TIME, TimeUnit.MINUTES).build()
+        );
+    }
 
     /**
      * 创建空模型
@@ -56,26 +90,14 @@ public class CryptoAsymmetricAsymmetricImpl implements CryptoAsymmetricService {
      */
     @Override
     public CryptoAsymmetric createKeyModel(final CryptoAsymmetricType cryptoAsymmetricType){
+        AbstractAsymmetricCrypto<?> cryptoHandler =
+                this.createCryptoHandler(cryptoAsymmetricType);
         CryptoAsymmetric model = this.createNilModel();
-        model.setCryptoType(cryptoAsymmetricType);
-        switch (cryptoAsymmetricType){
-            case RSA:
-                RSA rsa = SecureUtil.rsa();
-                model.setPublicKey(rsa.getPublicKeyBase64());
-                model.setPrivateKey(rsa.getPrivateKeyBase64());
-                break;
-            case SM2:
-                SM2 sm2 = SmUtil.sm2();
-                model.setPublicKey(sm2.getPublicKeyBase64());
-                model.setPrivateKey(sm2.getPrivateKeyBase64());
-                break;
-            case ECIES:
-                ECIES ecies = new ECIES();
-                model.setPublicKey(ecies.getPublicKeyBase64());
-                model.setPrivateKey(ecies.getPrivateKeyBase64());
-                break;
-            default:
-                break;
+
+        if(cryptoHandler != null){
+            model.setCryptoType(cryptoAsymmetricType);
+            model.setPublicKey(cryptoHandler.getPublicKeyBase64());
+            model.setPrivateKey(cryptoHandler.getPrivateKeyBase64());
         }
         return model;
     }
@@ -90,14 +112,7 @@ public class CryptoAsymmetricAsymmetricImpl implements CryptoAsymmetricService {
     @Override
     public String encrypt(final CryptoAsymmetric model, final Object data){
         // 非法验证
-        if(model == null ||
-                model.getCryptoType() == null ||
-                StringUtils.isEmpty(model.getPrivateKey()) ||
-                StringUtils.isEmpty(model.getPublicKey())
-            ){
-            // 配置信息未初始化
-            throw new CryptoException(CryptoMsg.CRYPTO_EXCEPTION_MODEL_NULL);
-        }
+        this.verify(model);
 
         // 原始/加密 数据
         String encryptedStr;
@@ -105,7 +120,8 @@ public class CryptoAsymmetricAsymmetricImpl implements CryptoAsymmetricService {
             encryptedStr = JSONUtil.toJsonStr(data);
 
             // 创建执行器
-            AbstractAsymmetricCrypto<?> cryptoHandler = this.createCryptoHandler(model);
+            AbstractAsymmetricCrypto<?> cryptoHandler =
+                    this.createCryptoHandler(model);
             if(cryptoHandler == null){
                 // 无法获得加解密执行器
                 throw new CryptoException(CryptoMsg.CRYPTO_EXCEPTION_HANDLER_NULL);
@@ -138,7 +154,9 @@ public class CryptoAsymmetricAsymmetricImpl implements CryptoAsymmetricService {
     @Override
     public Object decryptToObj(final CryptoAsymmetric model, final String data){
         Object obj;
+        // 解密数据
         String decryptedData = decrypt(model, data);
+        // 反射对象
         try{
             obj = JSONUtil.parse(decryptedData);
         }catch (Exception e){
@@ -157,14 +175,7 @@ public class CryptoAsymmetricAsymmetricImpl implements CryptoAsymmetricService {
     @Override
     public String decrypt(final CryptoAsymmetric model, final String data){
         // 非法验证
-        if(model == null ||
-                model.getCryptoType() == null ||
-                StringUtils.isEmpty(model.getPrivateKey()) ||
-                StringUtils.isEmpty(model.getPublicKey())
-            ){
-            // 配置信息未初始化
-            throw new CryptoException(CryptoMsg.CRYPTO_EXCEPTION_MODEL_NULL);
-        }
+        this.verify(model);
 
         // 如果解密内容为空 则返回原内容
         if(StringUtils.isEmpty(data)){
@@ -174,7 +185,8 @@ public class CryptoAsymmetricAsymmetricImpl implements CryptoAsymmetricService {
         String decryptStr;
         try {
             // 创建执行器
-            AbstractAsymmetricCrypto<?> cryptoHandler = this.createCryptoHandler(model);
+            AbstractAsymmetricCrypto<?> cryptoHandler =
+                    this.createCryptoHandler(model);
             if(cryptoHandler == null){
                 // 无法获得加解密执行器
                 throw new CryptoException(CryptoMsg.CRYPTO_EXCEPTION_HANDLER_NULL);
@@ -195,31 +207,100 @@ public class CryptoAsymmetricAsymmetricImpl implements CryptoAsymmetricService {
         return decryptStr;
     }
 
+
+    /**
+     * 验证
+     * @param model 加解密模型
+     */
+    private void verify(CryptoAsymmetric model){
+        // 非法验证
+        if(model == null ||
+            model.getCryptoType() == null ||
+            StringUtils.isEmpty(model.getPrivateKey()) ||
+            StringUtils.isEmpty(model.getPublicKey())
+            ){
+            // 配置信息未初始化
+            throw new CryptoException(CryptoMsg.CRYPTO_EXCEPTION_MODEL_NULL);
+        }
+    }
+
     /**
      * 创建 加解密执行器
+     * 这里使用了缓存池 来防止对象被疯狂创建 减少服务压力
+     *
      * @param model 加解密模型
      * @return 执行器
      */
     private AbstractAsymmetricCrypto<?> createCryptoHandler(final CryptoAsymmetric model){
-        AbstractAsymmetricCrypto<?> encryptor = null;
-        switch (model.getCryptoType()){
-            // 注意 这里 switch 使用的是代码块 方法执行完毕后 直接回收对象
+        // 非法验证
+        if(model == null ||
+                model.getCryptoType() == null ||
+                StringUtils.isEmpty(model.getPrivateKey()) ||
+                StringUtils.isEmpty(model.getPublicKey())
+            ){
+            return null;
+        }
+
+        Cache<String, AbstractAsymmetricCrypto<?>> asymmetricCryptoCache =
+                LFU_CACHE_MAP.get(model.getCryptoType());
+
+
+        AbstractAsymmetricCrypto<?> cryptoHandler = null;
+        try {
+            // 查询并设置缓存
+            cryptoHandler = asymmetricCryptoCache.get(model.getPublicKey(), () -> {
+                AbstractAsymmetricCrypto<?> tmp = null;
+                switch (model.getCryptoType()) {
+                    case RSA: {
+                        tmp = SecureUtil.rsa(model.getPrivateKey(), model.getPublicKey());
+                        break;
+                    }
+                    case SM2: {
+                        tmp = SmUtil.sm2(model.getPrivateKey(), model.getPublicKey());
+                        break;
+                    }
+                    case ECIES: {
+                        tmp = new ECIES(model.getPrivateKey(), model.getPublicKey());
+                        break;
+                    }
+                    default:
+                        break;
+                }
+
+                return tmp;
+            });
+        }catch (ExecutionException e){
+            log.error(e.getMessage(), e);
+        }
+
+        return cryptoHandler;
+    }
+
+    /**
+     * 创建 加解密执行器
+     * @param cryptoAsymmetricType 枚举
+     * @return Model
+     */
+    private AbstractAsymmetricCrypto<?> createCryptoHandler(final CryptoAsymmetricType cryptoAsymmetricType){
+        AbstractAsymmetricCrypto<?> cryptoHandler = null;
+        switch (cryptoAsymmetricType){
             case RSA:{
-                encryptor = SecureUtil.rsa(model.getPrivateKey(), model.getPublicKey());
+                cryptoHandler = SecureUtil.rsa();
                 break;
             }
             case SM2:{
-                encryptor = SmUtil.sm2(model.getPrivateKey(), model.getPublicKey());
+                cryptoHandler = SmUtil.sm2();
                 break;
             }
             case ECIES:{
-                encryptor = new ECIES(model.getPrivateKey(), model.getPublicKey());
+                cryptoHandler = new ECIES();
                 break;
             }
             default:
                 break;
         }
-        return encryptor;
+
+        return cryptoHandler;
     }
 
 }
