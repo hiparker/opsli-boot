@@ -34,20 +34,15 @@ import java.util.Map;
 
 
 /**
- * @BelongsProject: opsli-boot
-
- * @BelongsPackage: org.opsli.api.web.system.options
-
- * @Author: Parker
- * @CreateTime: 2021-02-07 18:24:38
- * @Description: 系统参数
+ * 系统参数
  *
  * 对外 API 直接 暴露 @GetMapping 或者 @PostMapping
  * 对内也推荐 单机版 不需要设置 Mapping 但是调用方法得从Controller写起
  *
  * 这样写法虽然比较绕，但是当单体项目想要改造微服务架构时 时非常容易的
  *
- *
+ * @author Parker
+ * @date 2021-02-07 18:24:38
  */
 public interface OptionsApi {
 
@@ -179,6 +174,8 @@ public interface OptionsApi {
 
     /**
      * 系统参数 创建加密公私钥
+     *
+     * @param type 类型
      * @return ResultVo
      */
     @PostMapping("/createCrypto")

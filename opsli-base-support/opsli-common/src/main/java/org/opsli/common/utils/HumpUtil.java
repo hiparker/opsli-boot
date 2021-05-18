@@ -16,11 +16,10 @@
 package org.opsli.common.utils;
 
 /**
- * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.common.utils
- * @Author: Parker
- * @CreateTime: 2020-09-19 23:21
- * @Description: 驼峰转换
+ * 驼峰转换
+ *
+ * @author Parker
+ * @date 2020-09-19 23:21
  */
 public final class HumpUtil {
 
@@ -33,10 +32,9 @@ public final class HumpUtil {
     /***
      * 下划线命名转为驼峰命名
      *
-     * @param para
-     *        下划线命名的字符串
+     * @param para 下划线命名的字符串
+     * @return String
      */
-
     public static String underlineToHump(String para) {
         StringBuilder result = new StringBuilder();
         String[] a = para.split(UNDERLINE);
@@ -58,10 +56,9 @@ public final class HumpUtil {
     /***
      * 驼峰命名转为下划线命名
      *
-     * @param para
-     *        驼峰命名的字符串
+     * @param para 驼峰命名的字符串
+     * @return String
      */
-
     public static String humpToUnderline(String para) {
         StringBuilder sb = new StringBuilder(para);
         //定位
@@ -79,8 +76,8 @@ public final class HumpUtil {
 
     /**
      * 首字母大写
-     * @param str
-     * @return
+     * @param str 字符串
+     * @return String
      */
     public static String captureName(String str) {
         char[] cs = str.toCharArray();

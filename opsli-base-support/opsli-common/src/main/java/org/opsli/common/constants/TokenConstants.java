@@ -16,11 +16,10 @@
 package org.opsli.common.constants;
 
 /**
- * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.common.constants
- * @Author: Parker
- * @CreateTime: 2020-09-16 17:42
- * @Description: Token
+ * Token 常量类
+ *
+ * @author Parker
+ * @date 2020-09-16 17:42
  */
 public interface TokenConstants {
 

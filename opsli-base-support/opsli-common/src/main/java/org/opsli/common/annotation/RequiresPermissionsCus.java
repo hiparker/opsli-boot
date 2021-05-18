@@ -21,9 +21,10 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * @author Parker
- *
  * 自定义权限验证
+ *
+ * @author Parker
+ * @date 2020-09-22 17:07
  */
 @Target({ElementType.TYPE, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)

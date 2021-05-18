@@ -19,19 +19,18 @@ import com.alibaba.excel.annotation.ExcelProperty;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.opsli.api.base.warpper.ApiWrapper;
 import org.opsli.plugins.excel.annotation.ExcelInfo;
 
 /**
- * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.modulars.test.entity
- * @Author: Parker
- * @CreateTime: 2020-09-16 17:33
- * @Description: 测试类
- *
+ * 测试类
  * 测试导入导出
  *
+ * @author Parker
+ * @date 2020-09-16 17:33
  */
+@EqualsAndHashCode(callSuper = true)
 @ApiModel(value="测试接口返回Model",description="测试接口返回Model")
 @Data
 public class TestModel extends ApiWrapper {

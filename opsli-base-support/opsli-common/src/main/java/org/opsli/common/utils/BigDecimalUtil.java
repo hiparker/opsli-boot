@@ -18,11 +18,10 @@ package org.opsli.common.utils;
 import java.math.BigDecimal;
 
 /**
- * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.common.utils
- * @Author: Parker
- * @CreateTime: 2020-09-19 23:21
- * @Description: 小数精度处理工具类
+ * 小数精度处理工具类
+ *
+ * @author Parker
+ * @date 2020-09-19 23:21
  */
 public class BigDecimalUtil {
     /**

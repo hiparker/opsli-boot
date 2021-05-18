@@ -1,6 +1,5 @@
 package org.opsli.api.web.test;
 
-import io.swagger.annotations.ApiOperation;
 import org.opsli.api.base.result.ResultVo;
 import org.opsli.api.wrapper.test.TestModel;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,29 +13,30 @@ import java.util.List;
 
 
 /**
- * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.modulars.test.web
- * @Author: Parker
- * @CreateTime: 2020-09-13 17:40
- * @Description: 测试类
+ * 测试类
  *
  * 对外 API 直接 暴露 @GetMapping 或者 @PostMapping
  * 对内也推荐 单机版 不需要设置 Mapping 但是调用方法得从Controller写起
  *
  * 这样写法虽然比较绕，但是当单体项目想要改造微服务架构时 时非常容易的
  *
- *
+ * @author Parker
+ * @date 2020-09-13 17:40
  */
 public interface TestApi {
 
 
+    /**
+     * 发送邮件
+     * @return ResultVo
+     */
     @GetMapping("/sendMail")
     ResultVo<?> sendMail();
 
 
     /**
      * 发送 Redis 订阅消息
-     * @return
+     * @return ResultVo
      */
     @GetMapping("/sendMsg")
     ResultVo<?> sendMsg();
@@ -44,7 +44,7 @@ public interface TestApi {
 
     /**
      * 发送 Redis 订阅消息
-     * @return
+     * @return ResultVo
      */
     @GetMapping("/redisTest")
     ResultVo<?> redisTest();
@@ -52,21 +52,23 @@ public interface TestApi {
 
     /**
      * 发起 Redis 分布式锁
-     * @return
+     * @return ResultVo
      */
     @GetMapping("/testLock")
     ResultVo<?> testLock();
 
     /**
      * 新增数据
-     * @return
+     * @param entity entity
+     * @return ResultVo
      */
     @GetMapping("/insert")
     ResultVo<TestModel> insert(TestModel entity);
 
     /**
      * 修改数据
-     * @return
+     * @param entity entity
+     * @return ResultVo
      */
     @GetMapping("/update")
     ResultVo<TestModel> update(TestModel entity);
@@ -74,7 +76,8 @@ public interface TestApi {
 
     /**
      * 查看对象
-     * @return
+     * @param entity entity
+     * @return ResultVo
      */
     @GetMapping("/get")
     ResultVo<TestModel> get(TestModel entity);
@@ -82,7 +85,8 @@ public interface TestApi {
 
     /**
      * 删除对象
-     * @return
+     * @param id id
+     * @return ResultVo
      */
     @GetMapping("/del")
     ResultVo<?> del(String id);
@@ -90,7 +94,7 @@ public interface TestApi {
 
     /**
      * 删除全部对象
-     * @return
+     * @return ResultVo
      */
     @GetMapping("/delAll")
     ResultVo<?> delAll();
@@ -98,7 +102,8 @@ public interface TestApi {
 
     /**
      * 查找一个集合
-     * @return
+     * @param request request
+     * @return ResultVo
      */
     @GetMapping("/findList")
     ResultVo<List<TestModel>> findList(HttpServletRequest request);
@@ -106,7 +111,7 @@ public interface TestApi {
 
     /**
      * 查找一个全部集合
-     * @return
+     * @return ResultVo
      */
     @GetMapping("/findAllList")
     ResultVo<List<TestModel>> findAllList();
@@ -114,7 +119,11 @@ public interface TestApi {
 
     /**
      * 查找一个分页
-     * @return
+     *
+     * @param pageNo 当前页
+     * @param pageSize 每页条数
+     * @param request request
+     * @return ResultVo
      */
     @GetMapping("/findPage")
     ResultVo<?> findPage(
@@ -126,21 +135,26 @@ public interface TestApi {
 
     /**
      * Excel 导出
-     * @return
+     *
+     * @param request request
+     * @param response response
      */
     @GetMapping("/exportExcel")
     void exportExcel(HttpServletRequest request, HttpServletResponse response);
 
     /**
      * Excel 导入
-     * @return
+     *
+     * @param request request
+     * @return ResultVo
      */
     @PostMapping("/importExcel")
     ResultVo<?> importExcel(MultipartHttpServletRequest request);
 
     /**
      * Excel 下载导入模版
-     * @return
+     *
+     * @param response response
      */
     @GetMapping("/importExcel/template")
     void importTemplate(HttpServletResponse response);

@@ -29,11 +29,10 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import org.springframework.format.annotation.DateTimeFormat;
 
 /**
- * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.api.wrapper.testt
- * @Author: parker
- * @CreateTime: 2020-12-20 18:27:04
- * @Description: 测试3
+ * 测试3
+ *
+ * @author Parker
+ * @date 2020-12-20 18:27:04
  */
 @Data
 @EqualsAndHashCode(callSuper = false)

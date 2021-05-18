@@ -8,9 +8,10 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * @Author: 一枝花算不算浪漫
- * @CreateTime: 2020-10-08 10:24
- * @Description: 自定义线程有界队列 - 等待线程执行完毕不拒绝
+ * 自定义线程有界队列 - 等待线程执行完毕不拒绝
+ *
+ * @author 一枝花算不算浪漫
+ * @date 2020-10-08 10:24
  */
 @Slf4j
 public class AsyncProcessQueueWait {
@@ -55,8 +56,8 @@ public class AsyncProcessQueueWait {
     /**
      * 执行指定的任务
      *
-     * @param task
-     * @return
+     * @param task 任务
+     * @return boolean
      */
     public static boolean execute(final Runnable task, final AtomicInteger count, final CountDownLatch latch) {
         return AsyncProcessorWait.executeTask(new TaskWrapper(task, count, latch));

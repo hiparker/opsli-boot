@@ -27,11 +27,10 @@ import org.opsli.common.enums.ValiArgsType;
 import java.io.Serializable;
 
 /**
- * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.api.wrapper.system.menu
- * @Author: Parker
- * @CreateTime: 2020-09-16 17:33
- * @Description: 创建完整菜单
+ * 创建完整菜单
+ *
+ * @author Parker
+ * @date 2020-09-16 17:33
  */
 @Data
 @EqualsAndHashCode(callSuper = false)

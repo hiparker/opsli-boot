@@ -6,9 +6,10 @@ import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 import java.util.concurrent.*;
 
 /**
- * @Author: 一枝花算不算浪漫
- * @CreateTime: 2020-10-08 10:24
- * @Description: 自定义线程执行器 - 等待线程执行完毕不拒绝
+ * 自定义线程执行器 - 等待线程执行完毕不拒绝
+ *
+ * @author 一枝花算不算浪漫
+ * @date 2020-10-08 10:24
  */
 @Slf4j
 public class AsyncProcessorWait {

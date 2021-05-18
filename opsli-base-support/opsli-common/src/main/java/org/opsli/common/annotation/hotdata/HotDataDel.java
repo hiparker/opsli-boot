@@ -19,12 +19,6 @@ package org.opsli.common.annotation.hotdata;
 import java.lang.annotation.*;
 
 /**
- * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.common.annotation
- * @Author: Parker
- * @CreateTime: 2020-09-16 16:36
- * @Description: 热数据 - Get
- *
  * 添加在 Service get 方法上 ， 默认获得 传入对象 key为id的数据
  *
  * 调用 热点数据 不论增加缓存 还是 删除缓存
@@ -34,6 +28,8 @@ import java.lang.annotation.*;
  *
  * 并发更新 不建议使用 热数据 ☆☆☆☆☆
  *
+ * @author Parker
+ * @date 2020-09-16 16:36
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)

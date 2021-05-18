@@ -17,9 +17,10 @@ package org.opsli.common.enums;
 
 
 /**
- * @Author: Parker
- * @CreateTime: 2020-09-17 23:40
- * @Description: 字典
+ * 字典
+ *
+ * @author Parker
+ * @date 2020-09-16 17:42
  */
 public enum AlertType {
 

@@ -6,9 +6,10 @@ import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 import java.util.concurrent.*;
 
 /**
- * @Author: 一枝花算不算浪漫
- * @CreateTime: 2020-10-08 10:24
- * @Description: 自定义线程执行器 - 线程超时自动拒绝
+ * 自定义线程执行器 - 线程超时自动拒绝
+ *
+ * @author 一枝花算不算浪漫
+ * @date 2020-10-08 10:24
  */
 @Slf4j
 public class AsyncProcessorReFuse {
@@ -97,8 +98,8 @@ public class AsyncProcessorReFuse {
      * 执行任务，不管是否成功<br>
      * 其实也就是包装以后的 {@link } 方法
      *
-     * @param task
-     * @return
+     * @param task 任务
+     * @return boolean
      */
     public static boolean executeTask(Runnable task) {
         try {
@@ -114,8 +115,8 @@ public class AsyncProcessorReFuse {
      * 提交任务，并可以在稍后获取其执行情况<br>
      * 当提交失败时，会抛出 {@link }
      *
-     * @param task
-     * @return
+     * @param task 任务
+     * @return <T>
      */
     public static <T> Future<T> submitTask(Callable<T> task) {
         try {

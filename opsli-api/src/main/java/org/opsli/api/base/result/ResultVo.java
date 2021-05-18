@@ -11,15 +11,12 @@ import org.springframework.http.HttpStatus;
 import java.io.Serializable;
 
 /**
- * API 统一返回参数
+ *  API 统一返回参数
+ * 在 Feign 的调用过程中，无法直接序列化数据
+ * 所以要加上 泛型对象 @JsonProperty ，否者返回则为一个null
  *
  * @date 2020年5月15日10:40:54
  * @author Parker
- *
- * 在 Feign 的调用过程中，无法直接序列化数据
- *
- * 所以要加上 泛型对象 @JsonProperty ，否者返回则为一个null
- *
  */
 @Data
 @ApiModel(value="视图层返回Api对象",

@@ -19,11 +19,10 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 /**
- * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.modulars.test.entity
- * @Author: Parker
- * @CreateTime: 2020-09-16 17:33
- * @Description: 数据字典 - 工具类用
+ * 数据字典 - 工具类用
+ *
+ * @author Parker
+ * @date 2020-09-16 17:33
  */
 @Data
 @EqualsAndHashCode(callSuper = false)

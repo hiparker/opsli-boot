@@ -26,9 +26,8 @@ import java.util.Map;
 /**
  * Web统一返回参数
  *
- * @date 2020年5月15日10:40:54
  * @author Parker
- *
+ * @date 2020-09-22 17:07
  */
 public class ResultVoMap extends HashMap<String,Object> implements Serializable {
 

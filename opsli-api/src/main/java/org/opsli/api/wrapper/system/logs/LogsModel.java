@@ -22,11 +22,10 @@ import lombok.EqualsAndHashCode;
 import org.opsli.api.base.warpper.ApiWrapper;
 
 /**
- * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.modulars.test.entity
- * @Author: Parker
- * @CreateTime: 2020-09-16 17:33
- * @Description: 日志表
+ * 日志表
+ *
+ * @author Parker
+ * @date 2020-09-16 17:33
  */
 @Data
 @EqualsAndHashCode(callSuper = false)

@@ -28,11 +28,10 @@ import org.opsli.common.enums.ValiArgsType;
 import java.io.Serializable;
 
 /**
- * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.modulars.test.entity
- * @Author: Parker
- * @CreateTime: 2020-09-16 17:33
- * @Description: 用户 修改密码
+ * 用户 修改密码
+ *
+ * @author Parker
+ * @date 2020-09-16 17:33
  */
 @Data
 @EqualsAndHashCode(callSuper = false)

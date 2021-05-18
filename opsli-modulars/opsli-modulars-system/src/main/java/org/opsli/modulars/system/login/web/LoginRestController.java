@@ -140,7 +140,7 @@ public class LoginRestController {
             // 异步保存IP
             AsyncProcessQueueReFuse.execute(()->{
                 // 保存用户最后登录IP
-                String clientIpAddress = IPUtil.getMultistageReverseProxyIp(request);
+                String clientIpAddress = IPUtil.getClientIdBySingle(request);
                 user.setLoginIp(clientIpAddress);
                 iUserService.updateLoginIp(user);
             });

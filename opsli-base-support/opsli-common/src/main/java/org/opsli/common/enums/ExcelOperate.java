@@ -17,11 +17,10 @@ package org.opsli.common.enums;
 
 
 /**
- * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.common.enums
- * @Author: Parker
- * @CreateTime: 2020-09-17 23:40
- * @Description: Excel 操作类型
+ * Excel 操作类型
+ *
+ * @author Parker
+ * @date 2020-09-16 17:42
  */
 public enum ExcelOperate {
 

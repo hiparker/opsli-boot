@@ -24,6 +24,7 @@ import java.lang.annotation.Target;
 /**
  * 自定义操作日志注解
  * @author parker
+ * @date 2020-09-12
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)

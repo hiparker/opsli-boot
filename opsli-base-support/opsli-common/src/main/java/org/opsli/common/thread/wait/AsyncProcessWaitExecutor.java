@@ -24,12 +24,11 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * @Author: Parker
- * @CreateTime: 2020-12-10 10:36
- * @Description: 多线程锁执行器
- *
+ * 多线程锁执行器
  * 用于当前方法中复杂业务多线程处理，等待线程执行完毕后 获得统一结果
  *
+ * @author Parker
+ * @date 2020-12-10 10:36
  */
 @Slf4j
 public class AsyncProcessWaitExecutor {

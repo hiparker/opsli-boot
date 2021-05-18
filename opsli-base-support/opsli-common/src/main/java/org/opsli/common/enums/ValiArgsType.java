@@ -17,11 +17,10 @@ package org.opsli.common.enums;
 
 
 /**
- * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.common.enums
- * @Author: Parker
- * @CreateTime: 2020-09-17 23:40
- * @Description: 通过单例 模式 生成系统唯一标示
+ * 通过单例 模式 生成系统唯一标示
+ *
+ * @author Parker
+ * @date 2020-09-17 23:40
  */
 public enum ValiArgsType {
 

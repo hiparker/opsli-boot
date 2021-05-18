@@ -17,11 +17,10 @@ package org.opsli.common.exception;
 
 
 /**
- * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.common.base.excption
- * @Author: Parker
- * @CreateTime: 2020-09-13 19:41
- * @Description: 框架总异常
+ * 空异常
+ *
+ * @author Parker
+ * @date 2020-09-17 23:40
  */
 public class EmptyException extends ServiceException{
 

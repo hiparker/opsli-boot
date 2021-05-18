@@ -27,17 +27,14 @@ import org.opsli.common.enums.ValiArgsType;
 import org.opsli.plugins.excel.annotation.ExcelInfo;
 
 /**
- * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.modulars.test.entity
- * @Author: Parker
- * @CreateTime: 2020-09-16 17:33
- * @Description: 角色表
+ * 角色表
+ *
+ * @author 2020-09-16 17:33
+ * @date Parker
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
 public class RoleModel extends ApiWrapper {
-
-
 
     /** 角色编码 */
     @ApiModelProperty(value = "角色编码")

@@ -16,11 +16,10 @@
 package org.opsli.common.utils;
 
 /**
- * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.common.utils
- * @Author: Parker
- * @CreateTime: 2020-09-19 23:21
- * @Description: 驼峰转换
+ * 字节转换
+ *
+ * @author Parker
+ * @date 2020-09-19 23:21
  */
 public final class ConvertBytesUtil {
 

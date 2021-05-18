@@ -15,46 +15,24 @@
  */
 package org.opsli.common.utils;
 
+import cn.hutool.core.lang.Validator;
 import cn.hutool.core.net.NetUtil;
-
+import cn.hutool.core.util.StrUtil;
 import javax.servlet.http.HttpServletRequest;
 
 /**
- * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.common.utils
- * @Author: Parker
- * @CreateTime: 2020-10-08 10:24
- * @Description: IP 工具类
+ * IP 工具类
+ *
+ * @author Parker
+ * @date 2020-09-19 23:21
  */
 public final class IPUtil {
 
+    /** 排除结果 */
     private static final String UNKNOWN = "unknown";
-
-    /**
-     * 获取客户端ip地址(可以穿透代理)
-     *
-     * @param request
-     * @return
-     */
-    public static String getRemoteAddr(HttpServletRequest request) {
-        String ip = request.getHeader("X-Forwarded-For");
-        if (ip == null || ip.length() == 0 || UNKNOWN.equalsIgnoreCase(ip)) {
-            ip = request.getHeader("Proxy-Client-IP");
-        }
-        if (ip == null || ip.length() == 0 || UNKNOWN.equalsIgnoreCase(ip)) {
-            ip = request.getHeader("WL-Proxy-Client-IP");
-        }
-        if (ip == null || ip.length() == 0 || UNKNOWN.equalsIgnoreCase(ip)) {
-            ip = request.getHeader("HTTP_CLIENT_IP");
-        }
-        if (ip == null || ip.length() == 0 || UNKNOWN.equalsIgnoreCase(ip)) {
-            ip = request.getHeader("HTTP_X_FORWARDED_FOR");
-        }
-        if (ip == null || ip.length() == 0 || UNKNOWN.equalsIgnoreCase(ip)) {
-            ip = request.getRemoteAddr();
-        }
-        return ip;
-    }
+    /** 分割符 */
+    private static final String SPLIT = ",";
+    /** 尝试字段 */
     private static final String[] HEADERS_TO_TRY = {
             "X-Forwarded-For",
             "Proxy-Client-IP",
@@ -67,95 +45,69 @@ public final class IPUtil {
             "HTTP_FORWARDED",
             "HTTP_VIA",
             "REMOTE_ADDR",
-            "X-Real-IP"};
+            "X-Real-IP"
+    };
+
 
     /***
-     * 获取客户端ip地址(可以穿透代理)
-     * @param request
-     * @return
+     * 获取客户端地址
+     *
+     * @param request request
+     * @return String
      */
-    public static String getClientIpAddress(HttpServletRequest request) {
+    public static String getClientAddress(HttpServletRequest request) {
+        for (String header : HEADERS_TO_TRY) {
+            String address = request.getHeader(header);
+            if (StrUtil.isNotBlank(address)
+                    && !UNKNOWN.equalsIgnoreCase(address)) {
+                return address;
+            }
+        }
+        return request.getRemoteAddr();
+    }
+
+    /***
+     * 获取客户端地址 (多重代理只获得第一个)
+     *
+     * @param request request
+     * @return String
+     */
+    public static String getClientAddressBySingle(HttpServletRequest request) {
+        String clientAddress = getClientAddress(request);
+        return NetUtil.getMultistageReverseProxyIp(clientAddress);
+    }
+
+    /***
+     * 获取客户端IP
+     *
+     * @param request request
+     * @return String
+     */
+    public static String getClientId(HttpServletRequest request) {
         for (String header : HEADERS_TO_TRY) {
             String ip = request.getHeader(header);
-            if (ip != null && ip.length() != 0 && !UNKNOWN.equalsIgnoreCase(ip)) {
-                return ip;
+            if (StrUtil.isNotBlank(ip) && !UNKNOWN.equalsIgnoreCase(ip)) {
+                String reverseProxyIp = NetUtil.getMultistageReverseProxyIp(ip);
+                if(Validator.isIpv4(reverseProxyIp) || Validator.isIpv6(reverseProxyIp)){
+                    // 判断是否为IP 返回原始IP
+                    return ip;
+                }
             }
         }
-        return request.getRemoteAddr();
+        // 否则返回 空地址
+        return "";
     }
 
     /***
-     * 获取客户端ip地址(可以穿透代理)
-     * @param request
-     * @return
+     * 获取客户端IP (多重代理只获得第一个)
+     *
+     * @param request request
+     * @return String
      */
-    public static String getMultistageReverseProxyIp(HttpServletRequest request) {
-        String clientIpAddress = getClientIpAddress(request);
-        return NetUtil.getMultistageReverseProxyIp(clientIpAddress);
+    public static String getClientIdBySingle(HttpServletRequest request) {
+        String clientIp = getClientId(request);
+        return NetUtil.getMultistageReverseProxyIp(clientIp);
     }
-
-    /***
-     * 获取客户端ip地址(可以穿透代理)
-     * @param request
-     * @return
-     */
-    public static String getClientIpAddr(HttpServletRequest request) {
-        String ip = request.getHeader("X-Forwarded-For");
-        if (ip == null || ip.length() == 0 || UNKNOWN.equalsIgnoreCase(ip)) {
-            ip = request.getHeader("Proxy-Client-IP");
-        }
-        if (ip == null || ip.length() == 0 || UNKNOWN.equalsIgnoreCase(ip)) {
-            ip = request.getHeader("WL-Proxy-Client-IP");
-        }
-        if (ip == null || ip.length() == 0 || UNKNOWN.equalsIgnoreCase(ip)) {
-            ip = request.getHeader("HTTP_X_FORWARDED_FOR");
-        }
-        if (ip == null || ip.length() == 0 || UNKNOWN.equalsIgnoreCase(ip)) {
-            ip = request.getHeader("HTTP_X_FORWARDED");
-        }
-        if (ip == null || ip.length() == 0 || UNKNOWN.equalsIgnoreCase(ip)) {
-            ip = request.getHeader("HTTP_X_CLUSTER_CLIENT_IP");
-        }
-        if (ip == null || ip.length() == 0 || UNKNOWN.equalsIgnoreCase(ip)) {
-            ip = request.getHeader("HTTP_CLIENT_IP");
-        }
-        if (ip == null || ip.length() == 0 || UNKNOWN.equalsIgnoreCase(ip)) {
-            ip = request.getHeader("HTTP_FORWARDED_FOR");
-        }
-        if (ip == null || ip.length() == 0 || UNKNOWN.equalsIgnoreCase(ip)) {
-            ip = request.getHeader("HTTP_FORWARDED");
-        }
-        if (ip == null || ip.length() == 0 || UNKNOWN.equalsIgnoreCase(ip)) {
-            ip = request.getHeader("HTTP_VIA");
-        }
-        if (ip == null || ip.length() == 0 || UNKNOWN.equalsIgnoreCase(ip)) {
-            ip = request.getHeader("REMOTE_ADDR");
-        }
-        if (ip == null || ip.length() == 0 || UNKNOWN.equalsIgnoreCase(ip)) {
-            ip = request.getRemoteAddr();
-        }
-        return ip;
-    }
-    public static String getIpAddr(HttpServletRequest request) {
-        String ip = request.getHeader("X-Real-IP");
-        if (null != ip && !"".equals(ip.trim())
-                && !UNKNOWN.equalsIgnoreCase(ip)) {
-            return ip;
-        }
-        ip = request.getHeader("X-Forwarded-For");
-        if (null != ip && !"".equals(ip.trim())
-                && !UNKNOWN.equalsIgnoreCase(ip)) {
-            // get first ip from proxy ip
-            int index = ip.indexOf(',');
-            if (index != -1) {
-                return ip.substring(0, index);
-            } else {
-                return ip;
-            }
-        }
-        return request.getRemoteAddr();
-    }
-
 
     // ===============
 

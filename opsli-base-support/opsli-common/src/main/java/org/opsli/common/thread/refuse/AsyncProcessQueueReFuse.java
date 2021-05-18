@@ -5,9 +5,10 @@ import cn.hutool.core.util.StrUtil;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * @Author: 一枝花算不算浪漫
- * @CreateTime: 2020-10-08 10:24
- * @Description: 自定义线程有界队列
+ * 自定义线程有界队列
+ *
+ * @author 一枝花算不算浪漫
+ * @date 2020-10-08 10:24
  */
 @Slf4j
 public class AsyncProcessQueueReFuse {
@@ -44,8 +45,8 @@ public class AsyncProcessQueueReFuse {
     /**
      * 执行指定的任务
      *
-     * @param task
-     * @return
+     * @param task 任务
+     * @return boolean
      */
     public static boolean execute(final Runnable task) {
         return AsyncProcessorReFuse.executeTask(new TaskWrapper(task));

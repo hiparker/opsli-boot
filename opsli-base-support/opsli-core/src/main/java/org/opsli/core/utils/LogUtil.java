@@ -92,7 +92,7 @@ public final class LogUtil {
             // 操作方法
             String methodName = request.getMethod();
             // 获得IP
-            String clientIpAddress = IPUtil.getMultistageReverseProxyIp(request);
+            String clientIpAddress = IPUtil.getClientIdBySingle(request);
 
             // 设置标题
             setTitle(point, method, logsModel, user);

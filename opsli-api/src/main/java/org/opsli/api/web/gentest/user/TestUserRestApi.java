@@ -28,18 +28,15 @@ import org.opsli.api.wrapper.gentest.user.TestUserModel;
 
 
 /**
- * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.api.web.gentest.user
- * @Author: 周鹏程
- * @CreateTime: 2020-11-22 12:12:05
- * @Description: 某系统用户
+ * 测试用户
  *
  * 对外 API 直接 暴露 @GetMapping 或者 @PostMapping
  * 对内也推荐 单机版 不需要设置 Mapping 但是调用方法得从Controller写起
  *
  * 这样写法虽然比较绕，但是当单体项目想要改造微服务架构时 时非常容易的
  *
- *
+ * @author Parker
+ * @date 2020-11-22 12:12:05
  */
 public interface TestUserRestApi {
 
@@ -106,7 +103,6 @@ public interface TestUserRestApi {
     * 某系统用户 Excel 导出
     * @param request request
     * @param response response
-    * @return ResultVo
     */
     @GetMapping("/exportExcel")
     void exportExcel(HttpServletRequest request, HttpServletResponse response);
@@ -122,7 +118,6 @@ public interface TestUserRestApi {
     /**
     * 某系统用户 Excel 下载导入模版
     * @param response response
-    * @return ResultVo
     */
     @GetMapping("/importExcel/template")
     void importTemplate(HttpServletResponse response);

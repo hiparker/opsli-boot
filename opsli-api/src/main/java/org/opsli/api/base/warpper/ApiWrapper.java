@@ -48,7 +48,6 @@ import java.util.Date;
  *
  * @author Parker
  * @date 2019-05-11
- *
  */
 @Data
 @Accessors(chain = true)

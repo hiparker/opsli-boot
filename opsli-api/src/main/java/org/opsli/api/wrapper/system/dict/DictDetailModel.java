@@ -27,11 +27,10 @@ import org.opsli.common.enums.ValiArgsType;
 import org.opsli.plugins.excel.annotation.ExcelInfo;
 
 /**
- * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.modulars.test.entity
- * @Author: Parker
- * @CreateTime: 2020-09-16 17:33
- * @Description: 数据字典 - 明细
+ * 数据字典 - 明细
+ *
+ * @author Parker
+ * @date 2020-09-16 17:33
  */
 @Data
 @EqualsAndHashCode(callSuper = false)

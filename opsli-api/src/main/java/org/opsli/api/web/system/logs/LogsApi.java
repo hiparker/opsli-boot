@@ -17,28 +17,23 @@ package org.opsli.api.web.system.logs;
 
 import org.opsli.api.base.result.ResultVo;
 import org.opsli.api.wrapper.system.logs.LogsModel;
-import org.opsli.api.wrapper.system.menu.MenuModel;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.HttpServletRequest;
 
 
 /**
- * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.modulars.test.web
- * @Author: Parker
- * @CreateTime: 2020-09-13 17:40
- * @Description: 日志 API
+ * 日志 API
  *
  * 对外 API 直接 暴露 @GetMapping 或者 @PostMapping
  * 对内也推荐 单机版 不需要设置 Mapping 但是调用方法得从Controller写起
  *
  * 这样写法虽然比较绕，但是当单体项目想要改造微服务架构时 时非常容易的
  *
- *
+ * @author Parker
+ * @date 2020-09-13 17:40
  */
 public interface LogsApi {
 

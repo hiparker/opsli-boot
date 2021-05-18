@@ -18,11 +18,10 @@ package org.opsli.common.exception;
 import org.opsli.common.base.msg.BaseMsg;
 
 /**
- * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.common.base.excption
- * @Author: Parker
- * @CreateTime: 2020-09-13 19:41
- * @Description: 框架总异常
+ * 框架服务异常
+ *
+ * @author Parker
+ * @date 2020-09-13 19:41
  */
 public class ServiceException extends RuntimeException{
 

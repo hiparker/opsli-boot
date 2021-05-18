@@ -26,13 +26,12 @@ import java.util.Map;
 /**
  * 统一返回参数
  *
- * @date 2020年5月15日10:40:54
- * @author Parker
- *
  * 在 Feign 的调用过程中，无法直接序列化数据
  *
  * 所以要加上 @JsonProperty ，否者返回则为一个null
  *
+ * @author Parker
+ * @date 2020-09-22 17:07
  */
 public class ResultDto<T> implements Serializable {
 

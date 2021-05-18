@@ -16,11 +16,10 @@
 package org.opsli.common.constants;
 
 /**
- * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.common.constants
- * @Author: Parker
- * @CreateTime: 2020-09-16 17:42
- * @Description: 字典缓存 常量
+ * 字典缓存 常量
+ *
+ * @author Parker
+ * @date 2020-09-16 17:42
  */
 public interface DictConstants {
 

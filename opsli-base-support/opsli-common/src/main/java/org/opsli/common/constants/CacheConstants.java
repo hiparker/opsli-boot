@@ -16,11 +16,10 @@
 package org.opsli.common.constants;
 
 /**
- * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.common.constants
- * @Author: Parker
- * @CreateTime: 2020-09-16 17:42
- * @Description: 缓存 常量
+ * 缓存 常量
+ *
+ * @author Parker
+ * @date 2020-09-22 17:07
  */
 public interface CacheConstants {
 

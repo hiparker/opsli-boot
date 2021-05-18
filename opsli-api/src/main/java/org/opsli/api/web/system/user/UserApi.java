@@ -33,18 +33,15 @@ import java.util.List;
 
 
 /**
- * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.modulars.test.web
- * @Author: Parker
- * @CreateTime: 2020-09-13 17:40
- * @Description: 用户信息 API
+ * 用户信息 API
  *
  * 对外 API 直接 暴露 @GetMapping 或者 @PostMapping
  * 对内也推荐 单机版 不需要设置 Mapping 但是调用方法得从Controller写起
  *
  * 这样写法虽然比较绕，但是当单体项目想要改造微服务架构时 时非常容易的
  *
- *
+ * @author Parker
+ * @date 2020-09-13 17:40
  */
 public interface UserApi {
 
@@ -55,6 +52,7 @@ public interface UserApi {
 
     /**
      * 当前登陆用户信息
+     * @param request request
      * @return ResultVo
      */
     @GetMapping("/getInfo")
@@ -62,10 +60,12 @@ public interface UserApi {
 
     /**
      * 当前登陆用户信息
+     *
+     * @param userId 用户ID
      * @return ResultVo
      */
     @GetMapping("/getInfoById")
-    ResultVo<UserInfo> getInfoById(@RequestParam(name = "userId") String userId);
+    ResultVo<UserInfo> getInfoById(String userId);
 
     /**
      * 当前登陆用户信息
@@ -76,10 +76,12 @@ public interface UserApi {
 
     /**
      * 当前登陆用户信息
+     *
+     * @param userId 用户ID
      * @return ResultVo
      */
     @GetMapping("/getOrgByUserId")
-    ResultVo<UserOrgRefModel> getOrgByUserId(@RequestParam(name = "userId") String userId);
+    ResultVo<UserOrgRefModel> getOrgByUserId(String userId);
 
     /**
      * 根据 userId 获得用户角色Id集合
@@ -99,6 +101,8 @@ public interface UserApi {
 
     /**
      * 修改密码 ID
+     *
+     * @param userPassword 密码类
      * @return ResultVo
      */
     @PostMapping("/updatePasswordById")
@@ -106,6 +110,8 @@ public interface UserApi {
 
     /**
      * 重置密码 ID
+     *
+     * @param userId 用户ID
      * @return ResultVo
      */
     @PostMapping("/resetPasswordById")
@@ -142,6 +148,7 @@ public interface UserApi {
      * 用户信息 查询分页
      * @param pageNo 当前页
      * @param pageSize 每页条数
+     * @param org 组织
      * @param request request
      * @return ResultVo
      */
@@ -198,7 +205,6 @@ public interface UserApi {
      * 用户信息 Excel 导出
      * @param request request
      * @param response response
-     * @return ResultVo
      */
     @GetMapping("/exportExcel")
     void exportExcel(HttpServletRequest request, HttpServletResponse response);
@@ -215,7 +221,6 @@ public interface UserApi {
     /**
      * 用户信息 Excel 下载导入模版
      * @param response response
-     * @return ResultVo
      */
     @GetMapping("/importExcel/template")
     void importTemplate(HttpServletResponse response);
@@ -256,6 +261,8 @@ public interface UserApi {
 
     /**
      * 当前登陆用户信息
+     *
+     * @param userId 用户ID
      * @return ResultVo
      */
     ResultVo<UserOrgRefModel> getOrgInfoByUserId(String userId);

@@ -16,15 +16,11 @@
 package org.opsli.common.base.msg;
 
 /**
- * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.common.base.msg
- * @Author: Parker
- * @CreateTime: 2020-09-13 19:34
- * @Description: 总消息类
- *
- * 消息类 用来存放消息
+ * 总消息类 用来存放消息
  * opsli将消息全部提取出至一个总文件
  *
+ * @author Parker
+ * @date 2020-09-22 17:07
  */
 public interface BaseMsg {
 

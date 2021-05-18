@@ -57,7 +57,7 @@ public final class RateLimiterUtil {
      */
     public static boolean enter(HttpServletRequest request) {
         // 获得IP
-        String clientIpAddress = IPUtil.getClientIpAddress(request);
+        String clientIpAddress = IPUtil.getClientIdBySingle(request);
         // 获得URI
         String clientUri = request.getRequestURI();
         return RateLimiterUtil.enter(clientIpAddress, clientUri);
@@ -70,7 +70,7 @@ public final class RateLimiterUtil {
      */
     public static boolean enter(HttpServletRequest request, Double dfQps) {
         // 获得IP
-        String clientIpAddress = IPUtil.getClientIpAddress(request);
+        String clientIpAddress = IPUtil.getClientIdBySingle(request);
         // 获得URI
         String clientUri = request.getRequestURI();
         return RateLimiterUtil.enter(clientIpAddress, clientUri, dfQps);

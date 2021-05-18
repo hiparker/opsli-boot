@@ -1,9 +1,10 @@
 package org.opsli.common.constants;
 
 /**
- * @Author: 周鹏程
- * @CreateTime: 2020-09-16 17:42
- * @Description: Token类型
+ * Token类型
+ *
+ * @author Parker
+ * @date 2020-09-16 17:42
  */
 public interface TokenTypeConstants {
 

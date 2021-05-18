@@ -16,9 +16,10 @@
 package org.opsli.common.constants;
 
 /**
- * Order
- * @author parker
- * @date 2020-09-16
+ * Order 排序
+ *
+ * @author Parker
+ * @date 2020-09-16 17:42
  */
 public interface OrderConstants {
 
