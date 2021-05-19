@@ -28,19 +28,16 @@ import org.springframework.format.annotation.DateTimeFormat;
 import java.util.Date;
 
 /**
- * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.modulars.test.entity
- * @Author: Parker
- * @CreateTime: 2020-09-16 17:33
- * @Description: 日志表
+ * 日志表
+ *
+ * @author Parker
+ * @date 2020-11-28 18:59:59
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
 public class SysLogs extends BaseEntity {
 
-
     private static final long serialVersionUID = 1L;
-
 
 
     /** 日志类型（1：接入日志；2：错误日志） */

@@ -47,12 +47,11 @@ import java.util.Set;
 
 
 /**
-* @BelongsProject: opsli-boot
-* @BelongsPackage: org.opsli.modulars.system.org.service.impl
-* @Author: Parker
-* @CreateTime: 2020-11-28 18:59:59
-* @Description: 组织机构表 Service Impl
-*/
+ * 组织机构 Service Impl
+ *
+ * @author Parker
+ * @date 2021-02-07 18:24:38
+ */
 @Service
 public class SysOrgServiceImpl extends CrudServiceImpl<SysOrgMapper, SysOrg, SysOrgModel>
     implements ISysOrgService {
@@ -152,7 +151,6 @@ public class SysOrgServiceImpl extends CrudServiceImpl<SysOrgMapper, SysOrg, Sys
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean deleteAll(String[] ids) {
-        boolean ret;
         if(ArrayUtils.isEmpty(ids)){
             return false;
         }
@@ -170,8 +168,7 @@ public class SysOrgServiceImpl extends CrudServiceImpl<SysOrgMapper, SysOrg, Sys
 
     /**
      * 逐级修改机构下租户
-     * @param parentId
-     * @return
+     * @param parentId 父级ID
      */
     @Transactional(rollbackFor = Exception.class)
     public void updateTenantByParentId(String parentId, String tenantId) {
@@ -189,8 +186,7 @@ public class SysOrgServiceImpl extends CrudServiceImpl<SysOrgMapper, SysOrg, Sys
 
     /**
      * 逐级删除子数据
-     * @param parentId
-     * @return
+     * @param parentId 父级ID
      */
     @Transactional(rollbackFor = Exception.class)
     public void deleteByParentId(String parentId) {
@@ -207,8 +203,8 @@ public class SysOrgServiceImpl extends CrudServiceImpl<SysOrgMapper, SysOrg, Sys
 
     /**
      * 唯一验证
-     * @param model
-     * @return
+     * @param model 模型
+     * @return Integer
      */
     @Transactional(readOnly = true)
     public Integer uniqueVerificationByCode(SysOrgModel model){
@@ -233,8 +229,8 @@ public class SysOrgServiceImpl extends CrudServiceImpl<SysOrgMapper, SysOrg, Sys
 
     /**
      * 是否有下级
-     * @param parentIds
-     * @return
+     * @param parentIds 父级ID 集合
+     * @return List
      */
     @Override
     @Transactional(readOnly = true)

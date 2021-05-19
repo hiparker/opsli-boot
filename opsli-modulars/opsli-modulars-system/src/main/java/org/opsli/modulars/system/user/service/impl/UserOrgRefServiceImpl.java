@@ -37,11 +37,10 @@ import java.util.List;
 
 
 /**
- * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.modulars.test.service
- * @Author: Parker
- * @CreateTime: 2020-09-16 17:34
- * @Description: 角色 接口实现类
+ * 用户-组织 Service Impl
+ *
+ * @author Parker
+ * @date 2020-09-16 17:33
  */
 @Service
 public class UserOrgRefServiceImpl extends ServiceImpl<UserOrgRefMapper, SysUserOrgRef> implements IUserOrgRefService {
@@ -107,7 +106,7 @@ public class UserOrgRefServiceImpl extends ServiceImpl<UserOrgRefMapper, SysUser
 
     /**
      * 清除缓存
-     * @param userIds
+     * @param userIds 用户ID 集合
      */
     private void clearCache(List<String> userIds){
         // 清空缓存

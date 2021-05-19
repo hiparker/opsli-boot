@@ -28,17 +28,16 @@ import java.util.Map;
 
 
 /**
-* @BelongsProject: opsli-boot
-* @BelongsPackage: org.opsli.modulars.system.options.service
-* @Author: Parker
-* @CreateTime: 2021-02-07 18:24:38
-* @Description: 系统参数 Service
-*/
+ * 系统参数 Service
+ *
+ * @author Parker
+ * @date 2021-02-07 18:24:38
+ */
 public interface ISysOptionsService extends CrudServiceInterface<SysOptions, OptionsModel> {
 
     /**
      * 更新参数
-     * @param params
+     * @param params 参数
      */
     void updateOptions(Map<String, String> params);
 

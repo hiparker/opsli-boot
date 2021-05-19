@@ -44,11 +44,10 @@ import java.util.*;
 
 
 /**
- * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.modulars.test.service
- * @Author: Parker
- * @CreateTime: 2020-09-16 17:34
- * @Description: 数据字典 明细 接口实现类
+ * 数据字典 明细 接口实现类
+ *
+ * @author Parker
+ * @date 2020-09-16 17:33
  */
 @Service
 public class DictDetailServiceImpl extends CrudServiceImpl<DictDetailMapper, SysDictDetail, DictDetailModel> implements IDictDetailService {
@@ -61,7 +60,7 @@ public class DictDetailServiceImpl extends CrudServiceImpl<DictDetailMapper, Sys
     /**
      * 新增
      * @param model model 数据模型
-     * @return
+     * @return DictDetailModel
      */
     @Transactional(rollbackFor = Exception.class)
     @Override
@@ -91,7 +90,7 @@ public class DictDetailServiceImpl extends CrudServiceImpl<DictDetailMapper, Sys
     /**
      * 修改
      * @param model model 数据模型
-     * @return
+     * @return DictDetailModel
      */
     @Transactional(rollbackFor = Exception.class)
     @Override
@@ -125,7 +124,7 @@ public class DictDetailServiceImpl extends CrudServiceImpl<DictDetailMapper, Sys
     /**
      * 删除
      * @param id ID
-     * @return
+     * @return boolean
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -144,7 +143,7 @@ public class DictDetailServiceImpl extends CrudServiceImpl<DictDetailMapper, Sys
     /**
      * 删除
      * @param model 数据模型
-     * @return
+     * @return boolean
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -163,7 +162,7 @@ public class DictDetailServiceImpl extends CrudServiceImpl<DictDetailMapper, Sys
     /**
      * 删除 - 多个
      * @param ids id数组
-     * @return
+     * @return boolean
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -196,7 +195,7 @@ public class DictDetailServiceImpl extends CrudServiceImpl<DictDetailMapper, Sys
     /**
      * 删除 - 多个
      * @param models 封装模型
-     * @return
+     * @return boolean
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -236,7 +235,7 @@ public class DictDetailServiceImpl extends CrudServiceImpl<DictDetailMapper, Sys
     /**
      * 根据 父类ID 全部删除
      * @param parentId 父类ID
-     * @return
+     * @return boolean
      */
     @Transactional(rollbackFor = Exception.class)
     @Override
@@ -266,7 +265,7 @@ public class DictDetailServiceImpl extends CrudServiceImpl<DictDetailMapper, Sys
      * 根据字典编号 查询出所有字典
      *
      * @param typeCode 字典编号
-     * @return
+     * @return List
      */
     @Override
     public List<DictDetailModel> findListByTypeCode(String typeCode) {
@@ -321,7 +320,7 @@ public class DictDetailServiceImpl extends CrudServiceImpl<DictDetailMapper, Sys
 
     /**
      * 清除缓存
-     * @param typeCodeList
+     * @param typeCodeList 类型编号集合
      */
     private void clearCache(List<String> typeCodeList) {
         // 删除缓存

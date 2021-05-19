@@ -22,11 +22,10 @@ import org.opsli.modulars.system.tenant.entity.SysTenant;
 
 
 /**
- * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.modulars.test.mapper
- * @Author: Parker
- * @CreateTime: 2020-09-17 13:01
- * @Description: 租户 Mapper
+ * 租户 Mapper
+ *
+ * @author Parker
+ * @date 2020-09-16 17:33
  */
 @Mapper
 public interface TenantMapper extends BaseMapper<SysTenant> {

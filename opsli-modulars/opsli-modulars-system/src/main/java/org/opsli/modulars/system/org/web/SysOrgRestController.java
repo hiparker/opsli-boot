@@ -57,12 +57,11 @@ import java.util.Map;
 import java.util.Set;
 
 /**
-* @BelongsProject: opsli-boot
-* @BelongsPackage: org.opsli.modulars.system.org.web
-* @Author: Parker
-* @CreateTime: 2020-11-28 18:59:59
-* @Description: 组织机构表 Controller
-*/
+ * 组织机构 Controller
+ *
+ * @author Parker
+ * @date 2021-02-07 18:24:38
+ */
 @Api(tags = SysOrgRestApi.TITLE)
 @Slf4j
 @ApiRestController("/system/org")
@@ -306,7 +305,6 @@ public class SysOrgRestController extends BaseRestController<SysOrg, SysOrgModel
     * 组织机构 Excel 导出
     * @param request request
     * @param response response
-    * @return ResultVo
     */
     @ApiOperation(value = "导出Excel", notes = "导出Excel")
     @RequiresPermissionsCus("system_org_export")
@@ -335,7 +333,6 @@ public class SysOrgRestController extends BaseRestController<SysOrg, SysOrgModel
     /**
     * 组织机构 Excel 下载导入模版
     * @param response response
-    * @return ResultVo
     */
     @ApiOperation(value = "导出Excel模版", notes = "导出Excel模版")
     @RequiresPermissionsCus("system_org_import")

@@ -26,11 +26,10 @@ import org.opsli.api.wrapper.system.user.UserOrgRefModel;
 import org.opsli.core.base.entity.BaseEntity;
 
 /**
- * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.modulars.test.entity
- * @Author: Parker
- * @CreateTime: 2020-09-16 17:33
- * @Description: 用户信息表
+ * 用户信息 - 组织机构
+ *
+ * @author Parker
+ * @date 2020-09-16 17:33
  */
 @Data
 @EqualsAndHashCode(callSuper = false)

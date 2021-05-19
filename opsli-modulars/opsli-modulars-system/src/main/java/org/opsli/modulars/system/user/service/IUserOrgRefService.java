@@ -20,19 +20,18 @@ import org.opsli.api.wrapper.system.user.UserOrgRefModel;
 import java.util.List;
 
 /**
- * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.modulars.test.service
- * @Author: Parker
- * @CreateTime: 2020-09-17 13:07
- * @Description: 用户-组织 接口
+ * 用户-组织 Service
+ *
+ * @author Parker
+ * @date 2020-09-16 17:33
  */
 public interface IUserOrgRefService {
 
 
     /**
      * 保存组织
-     * @param model
-     * @return
+     * @param model 模型
+     * @return boolean
      */
     boolean setOrg(UserOrgRefModel model);
 

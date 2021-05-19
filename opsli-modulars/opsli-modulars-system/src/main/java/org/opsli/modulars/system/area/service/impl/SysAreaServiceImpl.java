@@ -47,6 +47,13 @@ import java.util.Set;
 * @CreateTime: 2020-11-28 18:59:59
 * @Description: 地域表 Service Impl
 */
+
+/**
+ * 地域表 Service Impl
+ *
+ * @author Parker
+ * @date 2020-11-28 18:59:59
+ */
 @Service
 public class SysAreaServiceImpl extends CrudServiceImpl<SysAreaMapper, SysArea, SysAreaModel>
     implements ISysAreaService {
@@ -117,8 +124,8 @@ public class SysAreaServiceImpl extends CrudServiceImpl<SysAreaMapper, SysArea, 
 
     /**
      * 逐级删除子数据
-     * @param parentId
-     * @return
+     * @param parentId 父级节点
+     * @return boolean
      */
     @Transactional(rollbackFor = Exception.class)
     public boolean deleteByParentId(String parentId) {
@@ -161,11 +168,10 @@ public class SysAreaServiceImpl extends CrudServiceImpl<SysAreaMapper, SysArea, 
     }
 
 
-
     /**
      * 是否有下级
-     * @param parentIds
-     * @return
+     * @param parentIds 父级节点集合
+     * @return List
      */
     @Override
     @Transactional(readOnly = true)

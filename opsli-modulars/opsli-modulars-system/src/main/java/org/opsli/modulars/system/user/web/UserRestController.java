@@ -75,11 +75,10 @@ import java.util.Map;
 
 
 /**
- * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.modulars.test.web
- * @Author: Parker
- * @CreateTime: 2020-09-13 17:40
- * @Description: 用户信息
+ * 用户管理 Controller
+ *
+ * @author Parker
+ * @date 2020-09-16 17:33
  */
 @Api(tags = UserApi.TITLE)
 @Slf4j

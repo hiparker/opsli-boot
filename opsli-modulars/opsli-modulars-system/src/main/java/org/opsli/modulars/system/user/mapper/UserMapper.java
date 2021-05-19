@@ -28,11 +28,10 @@ import org.opsli.modulars.system.user.entity.SysUserAndOrg;
 import java.util.List;
 
 /**
- * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.modulars.test.mapper
- * @Author: Parker
- * @CreateTime: 2020-09-17 13:01
- * @Description: 用户 Mapper
+ * 用户信息 Mapper
+ *
+ * @author Parker
+ * @date 2020-09-16 17:33
  */
 @Mapper
 public interface UserMapper extends BaseMapper<SysUser> {
@@ -40,64 +39,65 @@ public interface UserMapper extends BaseMapper<SysUser> {
 
     /**
      * 根据用户ID 获得当前角色编码集合
-     * @param userId
-     * @return
+     * @param userId 用户ID
+     * @return List
      */
     List<String> getRoleCodeList(String userId);
 
     /**
      * 根据用户ID 获得当前角色Id集合
-     * @param userId
-     * @return
+     * @param userId 用户ID
+     * @return List
      */
     List<String> getRoleIdList(String userId);
 
     /**
      * 根据用户ID 获得权限
-     * @param userId
-     * @return
+     * @param userId 用户ID
+     * @return List
      */
     List<String> queryAllPerms(String userId);
 
     /**
      * 根据用户ID 获得菜单集合
-     * @param userId
-     * @return
+     * @param userId 用户ID
+     * @return List
      */
     List<SysMenu> findMenuListByUserId(String userId);
 
     /**
      * 根据用户ID 获得全部菜单集合
-     * @param userId
-     * @return
+     * @param userId 用户ID
+     * @return List
      */
     List<SysMenu> findMenuAllListByUserId(String userId);
 
     /**
      * 修改密码
-     * @param userPassword
-     * @return
+     * @param userPassword 账号密码
+     * @return boolean
      */
     boolean updatePassword(UserPassword userPassword);
 
     /**
      * 更新用户最后登录IP
-     * @param entity
-     * @return
+     * @param entity Entity
+     * @return boolean
      */
     boolean updateLoginIp(SysUser entity);
 
     /**
      * 更新用户头像
-     * @param entity
-     * @return
+     * @param entity Entity
+     * @return boolean
      */
     boolean updateAvatar(SysUser entity);
 
 
     /**
      * 查询集合
-     * @return
+     * @param wrapper 条件查询器
+     * @return List
      */
-    List<SysUserAndOrg> findList(@Param(Constants.WRAPPER) Wrapper wrapper);
+    List<SysUserAndOrg> findList(@Param(Constants.WRAPPER) Wrapper<?> wrapper);
 }

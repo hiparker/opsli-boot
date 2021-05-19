@@ -6,11 +6,10 @@ import org.opsli.common.annotation.ApiRestController;
 
 
 /**
- * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.plugins.oss.web
- * @Author: Parker
- * @CreateTime: 2020-09-13 17:40
- * @Description: 文件管理类 Controller
+ * 文件管理 Controller
+ *
+ * @author Parker
+ * @date 2020-09-13 17:40
  */
 @Api(tags = "文件管理类")
 @Slf4j

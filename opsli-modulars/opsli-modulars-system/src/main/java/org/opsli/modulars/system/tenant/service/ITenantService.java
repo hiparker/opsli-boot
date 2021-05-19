@@ -21,11 +21,10 @@ import org.opsli.modulars.system.tenant.entity.SysTenant;
 
 
 /**
- * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.modulars.system.service
- * @Author: Parker
- * @CreateTime: 2020-09-17 13:07
- * @Description: 租户 接口
+ * 租户 Service
+ *
+ * @author Parker
+ * @date 2020-09-16 17:33
  */
 public interface ITenantService extends CrudServiceInterface<SysTenant, TenantModel> {
 

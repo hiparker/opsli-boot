@@ -20,11 +20,10 @@ import org.apache.ibatis.annotations.Mapper;
 import org.opsli.modulars.system.dict.entity.SysDictDetail;
 
 /**
- * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.modulars.test.mapper
- * @Author: Parker
- * @CreateTime: 2020-09-17 13:01
- * @Description: 数据字典 明细 Mapper
+ * 数据字典 明细 Mapper
+ *
+ * @author Parker
+ * @date 2020-09-16 17:33
  */
 @Mapper
 public interface DictDetailMapper extends BaseMapper<SysDictDetail> {

@@ -39,7 +39,6 @@ import org.opsli.modulars.system.menu.entity.SysMenu;
 import org.opsli.modulars.system.menu.factory.MenuFactory;
 import org.opsli.modulars.system.menu.mapper.MenuMapper;
 import org.opsli.modulars.system.menu.service.IMenuService;
-import org.opsli.modulars.system.org.entity.SysOrg;
 import org.opsli.modulars.system.role.service.IRoleMenuRefService;
 import org.opsli.modulars.system.user.service.IUserRoleRefService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,11 +50,10 @@ import java.util.Set;
 
 
 /**
- * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.modulars.test.service
- * @Author: Parker
- * @CreateTime: 2020-09-16 17:34
- * @Description: 角色 接口实现类
+ * 菜单表 Service Impl
+ *
+ * @author Parker
+ * @date 2020-09-16 17:33
  */
 @Service
 public class MenuServiceImpl extends CrudServiceImpl<MenuMapper, SysMenu, MenuModel> implements IMenuService {
@@ -268,8 +266,8 @@ public class MenuServiceImpl extends CrudServiceImpl<MenuMapper, SysMenu, MenuMo
 
     /**
      * 逐级删除子数据
-     * @param parentId
-     * @return
+     * @param parentId 父级ID
+     * @return boolean
      */
     @Transactional(rollbackFor = Exception.class)
     public boolean deleteByParentId(String parentId) {
@@ -291,8 +289,8 @@ public class MenuServiceImpl extends CrudServiceImpl<MenuMapper, SysMenu, MenuMo
 
     /**
      * 是否有下级
-     * @param parentIds
-     * @return
+     * @param parentIds 父级ID 集合
+     * @return List
      */
     @Override
     @Transactional(readOnly = true)
@@ -310,8 +308,8 @@ public class MenuServiceImpl extends CrudServiceImpl<MenuMapper, SysMenu, MenuMo
 
     /**
      * 是否有下级
-     * @param parentIds
-     * @return
+     * @param parentIds 父级ID 集合
+     * @return List
      */
     @Override
     @Transactional(readOnly = true)
@@ -361,7 +359,7 @@ public class MenuServiceImpl extends CrudServiceImpl<MenuMapper, SysMenu, MenuMo
 
     /**
      * 清除缓存
-     * @param menuModel
+     * @param menuModel 模型
      */
     private void clearCache(MenuModel menuModel){
         boolean cacheRet;

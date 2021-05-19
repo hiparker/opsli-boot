@@ -26,11 +26,10 @@ import org.opsli.modulars.system.menu.entity.SysMenu;
 import java.util.List;
 
 /**
- * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.modulars.test.mapper
- * @Author: Parker
- * @CreateTime: 2020-09-17 13:01
- * @Description: 角色 Mapper
+ * 菜单表 Mapper
+ *
+ * @author Parker
+ * @date 2020-09-16 17:33
  */
 @Mapper
 public interface MenuMapper extends BaseMapper<SysMenu> {
@@ -40,7 +39,7 @@ public interface MenuMapper extends BaseMapper<SysMenu> {
      * @param wrapper 条件查询器
      * @return List
      */
-    List<HasChildren> hasChildren(@Param(Constants.WRAPPER) Wrapper wrapper);
+    List<HasChildren> hasChildren(@Param(Constants.WRAPPER) Wrapper<?> wrapper);
 
 
 

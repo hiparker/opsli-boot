@@ -21,17 +21,16 @@ import org.opsli.modulars.system.logs.entity.SysLogs;
 
 
 /**
- * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.modulars.test.service
- * @Author: Parker
- * @CreateTime: 2020-09-17 13:07
- * @Description: 角色 接口
+ * 日志 Service
+ *
+ * @author Parker
+ * @date 2020-11-28 18:59:59
  */
 public interface ILogsService extends CrudServiceInterface<SysLogs, LogsModel> {
 
     /**
      * 清空一个月之前的数据
-     * @return
+     * @return boolean
      */
     boolean emptyByOneMonth();
 

@@ -42,11 +42,10 @@ import java.util.List;
 
 
 /**
- * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.modulars.test.service
- * @Author: Parker
- * @CreateTime: 2020-09-16 17:34
- * @Description: 角色 接口实现类
+ * 角色 Service Impl
+ *
+ * @author Parker
+ * @date 2020-09-17 13:07
  */
 @Service
 public class RoleServiceImpl extends CrudServiceImpl<RoleMapper, SysRole, RoleModel> implements IRoleService {

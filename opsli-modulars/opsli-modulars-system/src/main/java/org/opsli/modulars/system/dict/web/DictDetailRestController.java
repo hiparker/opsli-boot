@@ -48,13 +48,11 @@ import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Method;
 import java.util.List;
 
-
 /**
- * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.modulars.test.web
- * @Author: Parker
- * @CreateTime: 2020-09-13 17:40
- * @Description: 数据字典明细
+ * 数据字典明细 Controller
+ *
+ * @author Parker
+ * @date 2020-09-16 17:33
  */
 @Api(tags = DictDetailApi.TITLE)
 @Slf4j
@@ -208,7 +206,6 @@ public class DictDetailRestController extends BaseRestController<SysDictDetail, 
      * 数据字典 Excel 导出
      * @param request request
      * @param response response
-     * @return ResultVo
      */
     @ApiOperation(value = "导出Excel", notes = "导出Excel")
     @RequiresPermissionsCus("system_dict_export")
@@ -237,7 +234,6 @@ public class DictDetailRestController extends BaseRestController<SysDictDetail, 
     /**
      * 数据字典 Excel 下载导入模版
      * @param response response
-     * @return ResultVo
      */
     @ApiOperation(value = "导出Excel模版", notes = "导出Excel模版")
     @RequiresPermissionsCus("system_dict_import")
@@ -252,10 +248,9 @@ public class DictDetailRestController extends BaseRestController<SysDictDetail, 
      * 根据字典类型编号 查询出所有字典
      *
      * @param typeCode 字典类型编号
-     * @return
+     * @return ResultVo
      */
     @ApiOperation(value = "根据字典类型编号 查询出所有字典", notes = "根据字典类型编号 查询出所有字典")
-    // 权限
     @Override
     public ResultVo<List<DictDetailModel>> findListByTypeCode(String typeCode) {
         return ResultVo.success(IService.findListByTypeCode(typeCode));

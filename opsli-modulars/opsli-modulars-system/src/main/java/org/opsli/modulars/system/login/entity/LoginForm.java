@@ -27,8 +27,8 @@ import org.opsli.common.enums.ValiArgsType;
 /**
  * 登录表单
  *
- * @author liuzp
- * @since 2.0.0 2018-01-25
+ * @author Parker
+ * @date 2020-11-28 18:59:59
  */
 @Data
 @EqualsAndHashCode(callSuper = false)

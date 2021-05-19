@@ -32,13 +32,11 @@ import org.opsli.modulars.system.SystemMsg;
 import org.opsli.modulars.system.user.service.IUserOrgRefService;
 import org.springframework.beans.factory.annotation.Autowired;
 
-
 /**
- * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.modulars.test.web
- * @Author: Parker
- * @CreateTime: 2020-09-13 17:40
- * @Description: 用户组织
+ * 用户-组织 Controller
+ *
+ * @author Parker
+ * @date 2020-09-16 17:33
  */
 @Api(tags = UserOrgRefApi.TITLE)
 @Slf4j
@@ -55,7 +53,7 @@ public class UserOrgRefRestController implements UserOrgRefApi {
 
     /**
      * 设置组织
-     * @param model
+     * @param model 模型
      * @return ResultVo
      */
     @Override

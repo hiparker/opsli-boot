@@ -26,11 +26,10 @@ import java.util.Set;
 
 
 /**
- * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.modulars.test.service
- * @Author: Parker
- * @CreateTime: 2020-09-17 13:07
- * @Description: 角色 接口
+ * 菜单表 Service
+ *
+ * @author Parker
+ * @date 2020-09-16 17:33
  */
 public interface IMenuService extends CrudServiceInterface<SysMenu, MenuModel> {
 
@@ -60,7 +59,6 @@ public interface IMenuService extends CrudServiceInterface<SysMenu, MenuModel> {
     /**
      * 保存完成菜单
      * @param menu 菜单
-     * @return boolean
      */
     void saveMenuByFull(MenuFullModel menu);
 

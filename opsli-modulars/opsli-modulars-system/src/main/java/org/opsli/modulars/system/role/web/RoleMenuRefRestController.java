@@ -43,11 +43,10 @@ import java.util.stream.Collectors;
 
 
 /**
- * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.modulars.test.web
- * @Author: Parker
- * @CreateTime: 2020-09-13 17:40
- * @Description: 角色权限
+ * 角色权限 Controller
+ *
+ * @author Parker
+ * @date 2020-09-16 17:33
  */
 @Api(tags = RoleMenuRefApi.TITLE)
 @Slf4j
@@ -101,8 +100,7 @@ public class RoleMenuRefRestController implements RoleMenuRefApi {
 
     /**
      * 设置权限
-     * @param model roleId 角色Id
-     * @param model permsIds 权限Id 数组
+     * @param model 模型
      * @return ResultVo
      */
     @RequiresPermissions("system_role_setPerms")

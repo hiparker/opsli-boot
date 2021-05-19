@@ -70,11 +70,10 @@ import java.util.Set;
 
 
 /**
- * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.modulars.test.web
- * @Author: Parker
- * @CreateTime: 2020-09-13 17:40
- * @Description: 菜单管理
+ * 菜单管理 Controller
+ *
+ * @author Parker
+ * @date 2020-09-16 17:33
  */
 @Api(tags = MenuApi.TITLE)
 @Slf4j
@@ -419,7 +418,6 @@ public class MenuRestController extends BaseRestController<SysMenu, MenuModel, I
      * 菜单 Excel 导出
      * @param request request
      * @param response response
-     * @return ResultVo
      */
     @ApiOperation(value = "导出Excel", notes = "导出Excel")
     @RequiresPermissionsCus("system_menu_export")
@@ -448,7 +446,6 @@ public class MenuRestController extends BaseRestController<SysMenu, MenuModel, I
     /**
      * 菜单 Excel 下载导入模版
      * @param response response
-     * @return ResultVo
      */
     @ApiOperation(value = "导出Excel模版", notes = "导出Excel模版")
     @RequiresPermissionsCus("system_menu_import")

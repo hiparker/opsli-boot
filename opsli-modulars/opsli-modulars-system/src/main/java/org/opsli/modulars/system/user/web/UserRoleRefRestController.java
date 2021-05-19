@@ -34,11 +34,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 
 /**
- * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.modulars.test.web
- * @Author: Parker
- * @CreateTime: 2020-09-13 17:40
- * @Description: 用户角色
+ * 用户-角色 Controller
+ *
+ * @author Parker
+ * @date 2020-09-16 17:33
  */
 @Api(tags = UserRoleRefApi.TITLE)
 @Slf4j
@@ -55,8 +54,7 @@ public class UserRoleRefRestController implements UserRoleRefApi {
 
     /**
      * 设置角色
-     * @param model userId 用户Id
-     * @param model roleIds 角色Id 数组
+     * @param model 模型
      * @return ResultVo
      */
     @Override

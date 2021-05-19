@@ -52,12 +52,10 @@ import java.util.Map;
 
 /**
  * 登陆 / 登出 / 验证码
+ * 不需要继承 api 接口
  *
  * @author parker
  * @date 2020-05-23 13:30
- *
- * 不需要继承 api 接口
- *
  */
 @Api(tags = "登录相关")
 @Slf4j

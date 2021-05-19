@@ -23,11 +23,10 @@ import org.opsli.modulars.system.role.entity.SysRole;
 
 
 /**
- * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.modulars.test.mapper
- * @Author: Parker
- * @CreateTime: 2020-09-17 13:01
- * @Description: 角色 Mapper
+ * 角色 Mapper
+ *
+ * @author Parker
+ * @date 2020-09-16 17:33
  */
 @Mapper
 public interface RoleMapper extends BaseMapper<SysRole> {

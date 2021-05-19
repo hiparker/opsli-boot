@@ -29,11 +29,10 @@ import java.util.Date;
 
 
 /**
- * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.modulars.test.service
- * @Author: Parker
- * @CreateTime: 2020-09-16 17:34
- * @Description: 日志 接口实现类
+ * 日志 Service Impl
+ *
+ * @author Parker
+ * @date 2020-11-28 18:59:59
  */
 @Service
 public class LogsServiceImpl extends CrudServiceImpl<LogsMapper, SysLogs, LogsModel> implements ILogsService {

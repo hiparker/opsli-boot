@@ -35,11 +35,10 @@ import javax.servlet.http.HttpServletRequest;
 
 
 /**
- * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.modulars.test.web
- * @Author: Parker
- * @CreateTime: 2020-09-13 17:40
- * @Description: 系统日志
+ * 日志 Controller
+ *
+ * @author Parker
+ * @date 2020-11-28 18:59:59
  */
 @Api(tags = LogsApi.TITLE)
 @Slf4j

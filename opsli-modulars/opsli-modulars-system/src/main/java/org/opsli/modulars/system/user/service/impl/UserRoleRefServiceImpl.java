@@ -35,13 +35,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-
 /**
- * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.modulars.test.service
- * @Author: Parker
- * @CreateTime: 2020-09-16 17:34
- * @Description: 角色 接口实现类
+ * 用户-角色 Service Impl
+ *
+ * @author Parker
+ * @date 2020-09-16 17:33
  */
 @Service
 public class UserRoleRefServiceImpl extends ServiceImpl<UserRoleRefMapper, SysUserRoleRef> implements IUserRoleRefService {
@@ -107,7 +105,7 @@ public class UserRoleRefServiceImpl extends ServiceImpl<UserRoleRefMapper, SysUs
 
     /**
      * 清除缓存
-     * @param userId
+     * @param userId 用户ID
      */
     private void clearCache(String userId) {
         int cacheCount = 3;

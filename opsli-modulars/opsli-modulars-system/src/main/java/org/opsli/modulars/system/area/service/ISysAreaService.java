@@ -24,18 +24,18 @@ import java.util.List;
 import java.util.Set;
 
 /**
-* @BelongsProject: opsli-boot
-* @BelongsPackage: org.opsli.modulars.system.area.service
-* @Author: Parker
-* @CreateTime: 2020-11-28 18:59:59
-* @Description: 地域表 Service
-*/
+ * 地域表 Service
+ *
+ * @author Parker
+ * @date 2020-11-28 18:59:59
+ */
 public interface ISysAreaService extends CrudServiceInterface<SysArea, SysAreaModel> {
 
 
     /**
      * 是否有下级
-     * @return
+     * @param parentIds 父级节点集合
+     * @return List
      */
     List<HasChildren> hasChildren(Set<String> parentIds);
 

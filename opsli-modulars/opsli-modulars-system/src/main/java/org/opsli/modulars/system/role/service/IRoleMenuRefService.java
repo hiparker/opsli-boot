@@ -20,26 +20,25 @@ import org.opsli.modulars.system.menu.entity.SysMenu;
 import java.util.List;
 
 /**
- * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.modulars.test.service
- * @Author: Parker
- * @CreateTime: 2020-09-17 13:07
- * @Description: 角色-菜单 接口
+ * 角色-菜单 Service
+ *
+ * @author Parker
+ * @date 2020-09-17 13:07
  */
 public interface IRoleMenuRefService {
 
     /**
      * 根据角色ID 获得权限（包含菜单）
-     * @param roleId
-     * @return
+     * @param roleId 角色ID
+     * @return List
      */
     List<SysMenu> getPerms(String roleId);
 
     /**
      * 保存权限
-     * @param roleId
-     * @param permsIds
-     * @return
+     * @param roleId 角色ID
+     * @param permsIds 权限集合
+     * @return boolean
      */
     boolean setPerms(String roleId,String[] permsIds);
 

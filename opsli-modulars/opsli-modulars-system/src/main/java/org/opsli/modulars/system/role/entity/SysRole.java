@@ -23,16 +23,14 @@ import lombok.EqualsAndHashCode;
 import org.opsli.core.base.entity.BaseEntity;
 
 /**
- * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.modulars.test.entity
- * @Author: Parker
- * @CreateTime: 2020-09-16 17:33
- * @Description: 角色表
+ * 角色表
+ *
+ * @author Parker
+ * @date 2020-09-16 17:33
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
 public class SysRole extends BaseEntity {
-
 
 
     /** 角色编码 */

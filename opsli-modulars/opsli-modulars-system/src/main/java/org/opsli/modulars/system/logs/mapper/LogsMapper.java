@@ -23,18 +23,18 @@ import java.util.Date;
 
 
 /**
- * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.modulars.test.mapper
- * @Author: Parker
- * @CreateTime: 2020-09-17 13:01
- * @Description: 日志 Mapper
+ * 日志 Mapper
+ *
+ * @author Parker
+ * @date 2020-11-28 18:59:59
  */
 @Mapper
 public interface LogsMapper extends BaseMapper<SysLogs> {
 
     /**
      * 清空一个月之前的数据
-     * @return
+     * @param date 日期
+     * @return boolean
      */
     boolean emptyByOneMonth(Date date);
 

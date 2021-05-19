@@ -33,7 +33,6 @@ import java.util.Set;
  *
  * @author parker
  * @date 2020-05-23 13:30
- **
  */
 @Api(tags = "搜索历史记录")
 @Slf4j

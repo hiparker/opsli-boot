@@ -65,12 +65,11 @@ import java.util.Map;
 import java.util.Set;
 
 /**
-* @BelongsProject: opsli-boot
-* @BelongsPackage: org.opsli.modulars.system.area.web
-* @Author: Parker
-* @CreateTime: 2020-11-28 18:59:59
-* @Description: 地域表 Controller
-*/
+ * 地域表 Controller
+ *
+ * @author Parker
+ * @date 2020-11-28 18:59:59
+ */
 @Api(tags = SysAreaRestApi.TITLE)
 @Slf4j
 @ApiRestController("/system/area")
@@ -242,7 +241,6 @@ public class SysAreaRestController extends BaseRestController<SysArea, SysAreaMo
     * 地域 Excel 导出
     * @param request request
     * @param response response
-    * @return ResultVo
     */
     @ApiOperation(value = "导出Excel", notes = "导出Excel")
     @RequiresPermissionsCus("system_area_export")
@@ -271,7 +269,6 @@ public class SysAreaRestController extends BaseRestController<SysArea, SysAreaMo
     /**
     * 地域 Excel 下载导入模版
     * @param response response
-    * @return ResultVo
     */
     @ApiOperation(value = "导出Excel模版", notes = "导出Excel模版")
     @RequiresPermissionsCus("system_area_import")

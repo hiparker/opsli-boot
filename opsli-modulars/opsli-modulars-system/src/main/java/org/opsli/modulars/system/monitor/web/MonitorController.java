@@ -31,6 +31,7 @@ import java.util.Map;
  * 系统监控
  *
  * @author 薛佳琪
+ * @date 2020-09-16 17:33
  */
 @Api(tags = "系统监控")
 @Slf4j
@@ -90,7 +91,7 @@ public class MonitorController {
     @RequiresPermissions("devops_sysmonitor_select")
     @GetMapping("/getJVMInfo")
     @ApiOperation(value = "当前JVM信息", notes = "当前JVM信息")
-    public ResultVo<?> getJVMInfo() {
+    public ResultVo<?> getJvmInfo() {
         return ResultVo.success(
                 SystemInfoUtil.INSTANCE.getJvmInfo());
     }

@@ -26,12 +26,11 @@ import org.opsli.modulars.system.org.entity.SysOrg;
 import java.util.List;
 
 /**
-* @BelongsProject: opsli-boot
-* @BelongsPackage: org.opsli.modulars.system.org.mapper
-* @Author: Parker
-* @CreateTime: 2020-11-28 18:59:59
-* @Description: 组织机构表 Mapper
-*/
+ * 组织机构 Mapper
+ *
+ * @author Parker
+ * @date 2021-02-07 18:24:38
+ */
 @Mapper
 public interface SysOrgMapper extends BaseMapper<SysOrg> {
 
@@ -41,13 +40,14 @@ public interface SysOrgMapper extends BaseMapper<SysOrg> {
      * @param wrapper 条件查询器
      * @return List
      */
-    List<HasChildren> hasChildren(@Param(Constants.WRAPPER) Wrapper wrapper);
+    List<HasChildren> hasChildren(@Param(Constants.WRAPPER) Wrapper<?> wrapper);
 
 
     /**
      * 是否被引用
+     * @param wrapper 条件查询器
      * @return Integer
      */
-    Integer hasUse(@Param(Constants.WRAPPER) Wrapper wrapper);
+    Integer hasUse(@Param(Constants.WRAPPER) Wrapper<?> wrapper);
 
 }

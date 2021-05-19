@@ -66,11 +66,10 @@ import java.util.List;
 
 
 /**
- * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.modulars.test.service
- * @Author: Parker
- * @CreateTime: 2020-09-16 17:34
- * @Description: 角色 接口实现类
+ * 用户信息 Service Impl
+ *
+ * @author Parker
+ * @date 2020-09-16 17:33
  */
 @Service
 public class UserServiceImpl extends CrudServiceImpl<UserMapper, SysUser, UserModel> implements IUserService {
@@ -653,8 +652,8 @@ public class UserServiceImpl extends CrudServiceImpl<UserMapper, SysUser, UserMo
 
     /**
      * 更新用户最后登录IP
-     * @param model
-     * @return
+     * @param model 模型
+     * @return boolean
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -673,8 +672,8 @@ public class UserServiceImpl extends CrudServiceImpl<UserMapper, SysUser, UserMo
 
     /**
      * 更新用户头像
-     * @param model
-     * @return
+     * @param model 模型
+     * @return boolean
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -782,7 +781,7 @@ public class UserServiceImpl extends CrudServiceImpl<UserMapper, SysUser, UserMo
 
     /**
      * 清除缓存
-     * @param list
+     * @param list 用户集合
      */
     private void clearCache(List<UserModel> list){
         if(CollUtil.isNotEmpty(list)){

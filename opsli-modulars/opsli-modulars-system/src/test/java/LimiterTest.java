@@ -6,11 +6,10 @@ import org.opsli.common.thread.refuse.AsyncProcessQueueReFuse;
 import java.util.Map;
 
 /**
- * @BelongsProject: think-bboss-parent
- * @BelongsPackage: PACKAGE_NAME
- * @Author: Parker
- * @CreateTime: 2021-01-05 17:17
- * @Description: 限流器测试
+ * 限流器测试
+ *
+ * @author Parker
+ * @date 2021-01-05 17:17
  */
 public class LimiterTest {
 

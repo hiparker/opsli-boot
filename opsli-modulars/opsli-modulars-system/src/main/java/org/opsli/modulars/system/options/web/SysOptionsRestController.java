@@ -53,13 +53,11 @@ import java.util.Map;
 
 
 /**
-* @BelongsProject: opsli-boot
-* @BelongsPackage: org.opsli.modulars.system.options.web
-* @CreateTime: 2021-02-07 18:24:38
-* @Description: 系统参数 Controller
-*
-* @author Parker
-*/
+ * 系统参数 Controller
+ *
+ * @author Parker
+ * @date 2021-02-07 18:24:38
+ */
 @Api(tags = OptionsApi.TITLE)
 @Slf4j
 @ApiRestController("/system/options")
@@ -257,7 +255,6 @@ public class SysOptionsRestController extends BaseRestController<SysOptions, Opt
     /**
      * 根据编号 获得参数配置
      * @param optionCode 参数编号
-     * @return
      */
     @Override
     public ResultVo<OptionsModel> getByCode(String optionCode) {

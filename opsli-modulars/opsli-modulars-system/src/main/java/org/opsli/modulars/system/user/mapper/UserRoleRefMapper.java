@@ -22,26 +22,25 @@ import org.opsli.modulars.system.user.entity.SysUserRoleRef;
 import java.util.List;
 
 /**
- * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.modulars.test.mapper
- * @Author: Parker
- * @CreateTime: 2020-09-17 13:01
- * @Description: 用户角色 Mapper
+ * 用户角色 Mapper
+ *
+ * @author Parker
+ * @date 2020-09-16 17:33
  */
 @Mapper
 public interface UserRoleRefMapper extends BaseMapper<SysUserRoleRef> {
 
     /**
      * 根据角色ID 获得当前用户Id集合
-     * @param roleId
-     * @return
+     * @param roleId 角色ID
+     * @return List
      */
     List<String> getUserIdListByRoleId(String roleId);
 
     /**
      * 根据菜单ID 获得当前用户Id集合
-     * @param menuId
-     * @return
+     * @param menuId 菜单ID
+     * @return List
      */
     List<String> getUserIdListByMenuId(String menuId);
 }

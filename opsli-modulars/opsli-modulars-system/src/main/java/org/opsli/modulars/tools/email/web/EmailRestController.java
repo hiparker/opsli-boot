@@ -13,11 +13,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 
 /**
- * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.plugins.email.web
- * @Author: Parker
- * @CreateTime: 2020-09-13 17:40
- * @Description: 邮件 Controller
+ * 邮件 Controller
+ *
+ * @author Parker
+ * @date 2020-09-13 17:40
  */
 @Api(tags = "邮件类")
 @Slf4j

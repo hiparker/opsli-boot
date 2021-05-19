@@ -21,11 +21,10 @@ import org.opsli.modulars.system.user.entity.SysUserOrgRef;
 
 
 /**
- * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.modulars.test.mapper
- * @Author: Parker
- * @CreateTime: 2020-09-17 13:01
- * @Description: 用户组织 Mapper
+ * 用户组织 Mapper
+ *
+ * @author Parker
+ * @date 2020-09-16 17:33
  */
 @Mapper
 public interface UserOrgRefMapper extends BaseMapper<SysUserOrgRef> {

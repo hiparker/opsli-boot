@@ -48,11 +48,10 @@ import java.lang.reflect.Method;
 
 
 /**
- * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.modulars.system.web
- * @Author: Parker
- * @CreateTime: 2020-09-13 17:40
- * @Description: 租户管理
+ * 租户管理 Controller
+ *
+ * @author Parker
+ * @date 2020-09-16 17:33
  */
 @Api(tags = TenantApi.TITLE)
 @Slf4j
@@ -192,7 +191,6 @@ public class TenantRestController extends BaseRestController<SysTenant, TenantMo
      * 租户 Excel 导出
      * @param request request
      * @param response response
-     * @return ResultVo
      */
     @ApiOperation(value = "导出Excel", notes = "导出Excel")
     @RequiresPermissionsCus("system_tenant_export")
@@ -221,7 +219,6 @@ public class TenantRestController extends BaseRestController<SysTenant, TenantMo
     /**
      * 租户 Excel 下载导入模版
      * @param response response
-     * @return ResultVo
      */
     @ApiOperation(value = "导出Excel模版", notes = "导出Excel模版")
     @RequiresPermissionsCus("system_tenant_import")

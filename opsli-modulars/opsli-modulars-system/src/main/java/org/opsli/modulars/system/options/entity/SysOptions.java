@@ -26,11 +26,10 @@ import lombok.EqualsAndHashCode;
 import org.opsli.core.base.entity.BaseEntity;
 
 /**
- * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.modulars.system.options.entity
- * @Author: Parker
- * @CreateTime: 2021-02-07 18:24:38
- * @Description: 系统参数
+ * 系统参数
+ *
+ * @author Parker
+ * @date 2021-02-07 18:24:38
  */
 @Data
 @EqualsAndHashCode(callSuper = false)

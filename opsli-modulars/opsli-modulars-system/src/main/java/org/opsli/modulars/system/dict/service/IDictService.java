@@ -21,11 +21,10 @@ import org.opsli.modulars.system.dict.entity.SysDict;
 
 
 /**
- * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.modulars.test.service
- * @Author: Parker
- * @CreateTime: 2020-09-17 13:07
- * @Description: 数据字典 接口
+ * 数据字典 接口
+ *
+ * @author Parker
+ * @date 2020-09-16 17:33
  */
 public interface IDictService extends CrudServiceInterface<SysDict, DictModel> {
 

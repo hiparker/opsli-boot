@@ -43,14 +43,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-
 /**
-* @BelongsProject: opsli-boot
-* @BelongsPackage: org.opsli.modulars.system.options.service.impl
-* @Author: Parker
-* @CreateTime: 2021-02-07 18:24:38
-* @Description: 系统参数 Service Impl
-*/
+ * 系统参数 Service Impl
+ *
+ * @author Parker
+ * @date 2021-02-07 18:24:38
+ */
 @Service
 public class SysOptionsServiceImpl extends CrudServiceImpl<SysOptionsMapper, SysOptions, OptionsModel>
     implements ISysOptionsService {
@@ -268,7 +266,7 @@ public class SysOptionsServiceImpl extends CrudServiceImpl<SysOptionsMapper, Sys
 
     /**
      * 清除缓存
-     * @param optionList
+     * @param optionList 参数集合
      */
     private void clearCache(List<OptionsModel> optionList){
         // 清空缓存

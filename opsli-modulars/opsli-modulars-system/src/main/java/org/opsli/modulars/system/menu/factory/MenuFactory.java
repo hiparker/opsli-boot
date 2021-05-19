@@ -15,7 +15,7 @@ import java.util.List;
  * 菜单生成工厂
  *
  * @author 周鹏程
- * @date 2021-05-04 7:15 下午
+ * @date 2021-05-04 7:15
  **/
 public enum MenuFactory {
 

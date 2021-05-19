@@ -26,12 +26,11 @@ import java.util.List;
 import java.util.Set;
 
 /**
-* @BelongsProject: opsli-boot
-* @BelongsPackage: org.opsli.modulars.system.org.service
-* @Author: Parker
-* @CreateTime: 2020-11-28 18:59:59
-* @Description: 组织机构表 Service
-*/
+ * 组织机构 Service
+ *
+ * @author Parker
+ * @date 2021-02-07 18:24:38
+ */
 public interface ISysOrgService extends CrudServiceInterface<SysOrg, SysOrgModel> {
 
     /**

@@ -38,11 +38,10 @@ import java.util.List;
 
 
 /**
- * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.modulars.test.service
- * @Author: Parker
- * @CreateTime: 2020-09-16 17:34
- * @Description: 角色 接口实现类
+ * 角色 - 菜单 Service Impl
+ *
+ * @author Parker
+ * @date 2020-09-17 13:07
  */
 @Service
 public class RoleMenuRefServiceImpl extends ServiceImpl<RoleMenuRefMapper,SysRoleMenuRef> implements IRoleMenuRefService {
@@ -106,7 +105,7 @@ public class RoleMenuRefServiceImpl extends ServiceImpl<RoleMenuRefMapper,SysRol
 
     /**
      * 清除缓存
-     * @param roleId
+     * @param roleId 角色ID
      */
     private void clearCache(String roleId){
         // 清空该角色下 用户缓存

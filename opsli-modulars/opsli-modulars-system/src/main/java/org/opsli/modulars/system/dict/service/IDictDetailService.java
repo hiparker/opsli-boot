@@ -22,18 +22,17 @@ import org.opsli.modulars.system.dict.entity.SysDictDetail;
 import java.util.List;
 
 /**
- * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.modulars.test.service
- * @Author: Parker
- * @CreateTime: 2020-09-17 13:07
- * @Description: 数据字典 明细 接口
+ * 数据字典 明细 接口
+ *
+ * @author Parker
+ * @date 2020-09-16 17:33
  */
 public interface IDictDetailService extends CrudServiceInterface<SysDictDetail, DictDetailModel> {
 
     /**
      * 根据父类ID 删除
      * @param parentId 父类ID
-     * @return
+     * @return boolean
      */
     boolean delByParent(String parentId);
 
@@ -41,7 +40,7 @@ public interface IDictDetailService extends CrudServiceInterface<SysDictDetail, 
      * 根据字典类型编号 查询出所有字典
      *
      * @param typeCode 字典类型编号
-     * @return
+     * @return List
      */
     List<DictDetailModel> findListByTypeCode(String typeCode);
 

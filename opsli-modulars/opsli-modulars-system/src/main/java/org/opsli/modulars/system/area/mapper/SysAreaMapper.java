@@ -18,6 +18,7 @@ package org.opsli.modulars.system.area.mapper;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.toolkit.Constants;
+import lombok.Data;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.opsli.core.base.entity.HasChildren;
@@ -26,20 +27,20 @@ import org.opsli.modulars.system.area.entity.SysArea;
 import java.util.List;
 
 /**
-* @BelongsProject: opsli-boot
-* @BelongsPackage: org.opsli.modulars.system.area.mapper
-* @Author: Parker
-* @CreateTime: 2020-11-28 18:59:59
-* @Description: 地域表 Mapper
-*/
+ * 地域表 Mapper
+ *
+ * @author Parker
+ * @date 2020-11-28 18:59:59
+ */
 @Mapper
 public interface SysAreaMapper extends BaseMapper<SysArea> {
 
 
     /**
      * 是否有下级
+     * @param wrapper 查询器
      * @return List
      */
-    List<HasChildren> hasChildren(@Param(Constants.WRAPPER) Wrapper wrapper);
+    List<HasChildren> hasChildren(@Param(Constants.WRAPPER) Wrapper<?> wrapper);
 
 }

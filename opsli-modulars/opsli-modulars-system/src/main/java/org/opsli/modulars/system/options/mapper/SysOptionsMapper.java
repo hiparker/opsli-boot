@@ -25,12 +25,11 @@ import org.opsli.modulars.system.options.entity.SysOptions;
 
 
 /**
-* @BelongsProject: opsli-boot
-* @BelongsPackage: org.opsli.modulars.system.options.mapper
-* @Author: Parker
-* @CreateTime: 2021-02-07 18:24:38
-* @Description: 系统参数 Mapper
-*/
+ * 系统参数 Mapper
+ *
+ * @author Parker
+ * @date 2021-02-07 18:24:38
+ */
 @Mapper
 public interface SysOptionsMapper extends BaseMapper<SysOptions> {
 

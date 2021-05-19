@@ -18,33 +18,32 @@ package org.opsli.modulars.system.user.service;
 import java.util.List;
 
 /**
- * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.modulars.test.service
- * @Author: Parker
- * @CreateTime: 2020-09-17 13:07
- * @Description: 用户-角色 接口
+ * 用户-角色 Service
+ *
+ * @author Parker
+ * @date 2020-09-16 17:33
  */
 public interface IUserRoleRefService {
 
     /**
      * 根据角色ID 获得当前用户Id集合
-     * @param roleId
-     * @return
+     * @param roleId 角色ID
+     * @return List
      */
     List<String> getUserIdListByRoleId(String roleId);
 
     /**
      * 根据菜单ID 获得当前用户Id集合
-     * @param roleId
-     * @return
+     * @param roleId 角色ID
+     * @return List
      */
     List<String> getUserIdListByMenuId(String roleId);
 
     /**
      * 保存角色
-     * @param userId
-     * @param roleIds
-     * @return
+     * @param userId 用户ID
+     * @param roleIds 角色ID 集合
+     * @return boolean
      */
     boolean setRoles(String userId,String[] roleIds);
 

@@ -37,11 +37,10 @@ import java.util.List;
 
 
 /**
- * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.modulars.test.service
- * @Author: Parker
- * @CreateTime: 2020-09-16 17:34
- * @Description: 数据字典 接口实现类
+ * 数据字典 接口实现类
+ *
+ * @author Parker
+ * @date 2020-09-16 17:33
  */
 @Service
 public class DictServiceImpl extends CrudServiceImpl<DictMapper, SysDict, DictModel> implements IDictService {

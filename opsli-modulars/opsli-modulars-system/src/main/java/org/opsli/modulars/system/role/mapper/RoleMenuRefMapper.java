@@ -23,19 +23,18 @@ import org.opsli.modulars.system.role.entity.SysRoleMenuRef;
 import java.util.List;
 
 /**
- * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.modulars.test.mapper
- * @Author: Parker
- * @CreateTime: 2020-09-17 13:01
- * @Description: 角色 Mapper
+ * 角色 - 菜单 Mapper
+ *
+ * @author Parker
+ * @date 2020-09-16 17:33
  */
 @Mapper
 public interface RoleMenuRefMapper extends BaseMapper<SysRoleMenuRef> {
 
     /**
      * 根据角色ID 获得权限（包含菜单）
-     * @param roleId
-     * @return
+     * @param roleId 角色ID
+     * @return List
      */
     List<SysMenu> queryAllPerms(String roleId);
 

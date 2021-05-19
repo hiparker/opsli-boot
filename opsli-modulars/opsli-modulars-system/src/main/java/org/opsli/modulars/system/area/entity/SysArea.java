@@ -24,11 +24,10 @@ import lombok.EqualsAndHashCode;
 import org.opsli.core.base.entity.BaseEntity;
 
 /**
- * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.modulars.system.area.entity
- * @Author: Parker
- * @CreateTime: 2020-11-28 18:59:59
- * @Description: 地域表
+ * 地域表
+ *
+ * @author Parker
+ * @date 2020-11-28 18:59:59
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
