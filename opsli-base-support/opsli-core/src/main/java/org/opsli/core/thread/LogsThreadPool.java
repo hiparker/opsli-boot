@@ -24,7 +24,7 @@ public class LogsThreadPool {
 
     /**
      * 执行
-     * @param logsModel
+     * @param logsModel 日志模型
      */
     public static void process(LogsModel logsModel){
         if(logsModel == null){
