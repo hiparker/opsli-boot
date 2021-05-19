@@ -23,10 +23,10 @@ import java.util.List;
 
 
 /**
- * @BelongsProject: opsli-boot
- * @Author: Parker
- * @CreateTime: 2020-09-17 13:01
- * @Description: 代码生成器 - 表 Mapper
+ * 代码生成器 - 表 Mapper
+ *
+ * @author parker
+ * @date 2020-09-16 17:34
  */
 @Mapper
 public interface TableMapper extends BaseMapper<CreaterTable> {
@@ -34,13 +34,13 @@ public interface TableMapper extends BaseMapper<CreaterTable> {
 
     /**
      * 更新同步状态 为 已同步
-     * @param id
+     * @param id ID
      */
     void renewSyncState(String id);
 
     /**
      * 获得当前 生成器中所有表名
-     * @return
+     * @return List
      */
     List<String> findAllByTableName();
 

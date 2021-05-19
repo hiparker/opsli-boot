@@ -36,11 +36,10 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 /**
- * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.modulars.creater.strategy.sync
- * @Author: Parker
- * @CreateTime: 2020-11-18 13:21
- * @Description: MySQL 同步构建器
+ * MySQL 同步构建器
+ *
+ * @author parker
+ * @date 2020-09-13 19:36
  */
 @Service
 @Transactional(readOnly = true)
@@ -107,7 +106,7 @@ public class MySQLSyncBuilder implements SyncStrategy {
 
     /**
      * 生成删除表SQL
-     * @param tableName
+     * @param tableName 表名
      * @return sql
      */
     private String genDropTableSQL(String tableName) {
@@ -116,7 +115,7 @@ public class MySQLSyncBuilder implements SyncStrategy {
 
     /**
      * 生成创建表SQL
-     * @param model
+     * @param model 模型
      * @return sql
      */
     private String genCreateTableSQL(CreaterTableAndColumnModel model){

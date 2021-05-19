@@ -31,15 +31,10 @@ import #(apiPath).wrapper.#(data.moduleName).#(data.model.tableName)Model;
 #end
 
 /**
-* @BelongsProject: opsli-boot
-#if(data.subModuleName != null && data.subModuleName != "")
-* @BelongsPackage: #(data.packageName+"."+data.moduleName+"."+data.subModuleName).service
-#else
-* @BelongsPackage: #(data.packageName+"."+data.moduleName).service
-#end
-* @Author: #(data.authorName)
-* @CreateTime: #(currTime)
-* @Description: #(data.codeTitle) Service
+* #(data.codeTitle) Service
+*
+* @author #(data.authorName)
+* @date #(currTime)
 */
 public interface I#(data.model.tableName)Service extends CrudServiceInterface<#(data.model.tableName), #(data.model.tableName)Model> {
 

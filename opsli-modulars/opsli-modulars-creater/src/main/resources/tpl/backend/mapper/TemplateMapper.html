@@ -29,15 +29,10 @@ import #(data.packageName+"."+data.moduleName).entity.#(data.model.tableName);
 #end
 
 /**
-* @BelongsProject: opsli-boot
-#if(data.subModuleName != null && data.subModuleName != "")
-* @BelongsPackage: #(data.packageName+"."+data.moduleName+"."+data.subModuleName).mapper
-#else
-* @BelongsPackage: #(data.packageName+"."+data.moduleName).mapper
-#end
-* @Author: #(data.authorName)
-* @CreateTime: #(currTime)
-* @Description: #(data.codeTitle) Mapper
+* #(data.codeTitle) Mapper
+*
+* @author #(data.authorName)
+* @date #(currTime)
 */
 @Mapper
 public interface #(data.model.tableName)Mapper extends BaseMapper<#(data.model.tableName)> {

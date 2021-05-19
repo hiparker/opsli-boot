@@ -20,10 +20,10 @@ import org.apache.ibatis.annotations.Update;
 
 
 /**
- * @BelongsProject: opsli-boot
- * @Author: Parker
- * @CreateTime: 2020-09-17 13:01
- * @Description: 代码生成器 - SQL 执行器
+ * 代码生成器 - SQL 执行器
+ *
+ * @author parker
+ * @date 2020-09-16 17:34
  */
 @Mapper
 public interface SQLActuator {

@@ -39,15 +39,10 @@ import #(data.packageName+"."+data.moduleName).mapper.#(data.model.tableName)Map
 
 
 /**
-* @BelongsProject: opsli-boot
-#if(data.subModuleName != null && data.subModuleName != "")
-* @BelongsPackage: #(data.packageName+"."+data.moduleName+"."+data.subModuleName).service.impl
-#else
-* @BelongsPackage: #(data.packageName+"."+data.moduleName).service.impl
-#end
-* @Author: #(data.authorName)
-* @CreateTime: #(currTime)
-* @Description: #(data.codeTitle) Service Impl
+* #(data.codeTitle) Service Impl
+*
+* @author #(data.authorName)
+* @date #(currTime)
 */
 @Service
 public class #(data.model.tableName)ServiceImpl extends CrudServiceImpl<#(data.model.tableName)Mapper, #(data.model.tableName), #(data.model.tableName)Model>

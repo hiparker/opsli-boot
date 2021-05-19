@@ -32,11 +32,10 @@ import org.opsli.modulars.creater.createrlogs.wrapper.CreaterBuilderModel;
 import java.util.*;
 
 /**
- * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.core.creater.strategy.create.backend
- * @Author: Parker
- * @CreateTime: 2020-11-20 17:30
- * @Description: Vue代码构建器
+ * Vue代码构建器
+ *
+ * @author parker
+ * @date 2020-09-13 19:36
  */
 public enum VueCodeBuilder {
 
@@ -52,8 +51,9 @@ public enum VueCodeBuilder {
 
     /**
      * 生成 Index
-     * @param builderModelTmp
-     * @return
+     * @param builderModelTmp Build 模型
+     * @param dataStr 数据字符串
+     * @return Map
      */
     public Map<String,String> createIndex(CreaterBuilderModel builderModelTmp, String dataStr){
         CreaterBuilderModel builderModel =
@@ -119,9 +119,10 @@ public enum VueCodeBuilder {
 
 
     /**
-     * 生成 Index
-     * @param builderModelTmp
-     * @return
+     * 生成 Edit
+     * @param builderModelTmp Build 模型
+     * @param dataStr 数据字符串
+     * @return Map
      */
     public Map<String,String> createEdit(CreaterBuilderModel builderModelTmp, String dataStr){
         CreaterBuilderModel builderModel =
@@ -225,8 +226,9 @@ public enum VueCodeBuilder {
 
     /**
      * 生成 Import
-     * @param builderModelTmp
-     * @return
+     * @param builderModelTmp Build 模型
+     * @param dataStr 数据字符串
+     * @return Map
      */
     public Map<String,String> createImport(CreaterBuilderModel builderModelTmp, String dataStr){
         CreaterBuilderModel builderModel =
@@ -270,8 +272,9 @@ public enum VueCodeBuilder {
 
     /**
      * 生成 Api
-     * @param builderModelTmp
-     * @return
+     * @param builderModelTmp Build 模型
+     * @param dataStr 数据字符串
+     * @return Map
      */
     public Map<String,String> createApi(CreaterBuilderModel builderModelTmp, String dataStr){
         CreaterBuilderModel builderModel =
@@ -313,8 +316,8 @@ public enum VueCodeBuilder {
 
     /**
      * 创建 Kv
-     * @param builderModel
-     * @return
+     * @param builderModel Build 模型
+     * @return Kv
      */
     private Kv createKv(CreaterBuilderModel builderModel){
         return Kv.by("data", builderModel)

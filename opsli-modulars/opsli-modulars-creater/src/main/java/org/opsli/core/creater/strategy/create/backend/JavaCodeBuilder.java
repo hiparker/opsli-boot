@@ -33,11 +33,10 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.core.creater.strategy.create.backend
- * @Author: Parker
- * @CreateTime: 2020-11-20 17:30
- * @Description: Java代码构建器
+ * Java代码构建器
+ *
+ * @author parker
+ * @date 2020-09-13 19:36
  */
 public enum JavaCodeBuilder {
 
@@ -46,8 +45,9 @@ public enum JavaCodeBuilder {
 
     /**
      * 生成Entity
-     * @param builderModelTmp
-     * @return
+     * @param builderModelTmp Build 模型
+     * @param dataStr 数据字符串
+     * @return Map
      */
     public Map<String,String> createEntity(CreaterBuilderModel builderModelTmp, String dataStr){
         CreaterBuilderModel builderModel =
@@ -90,8 +90,9 @@ public enum JavaCodeBuilder {
 
     /**
      * 生成Mapper
-     * @param builderModelTmp
-     * @return
+     * @param builderModelTmp Build 模型
+     * @param dataStr 数据字符串
+     * @return Map
      */
     public Map<String,String> createMapper(CreaterBuilderModel builderModelTmp, String dataStr){
         CreaterBuilderModel builderModel =
@@ -123,8 +124,9 @@ public enum JavaCodeBuilder {
 
     /**
      * 生成MapperXML
-     * @param builderModelTmp
-     * @return
+     * @param builderModelTmp Build 模型
+     * @param dataStr 数据字符串
+     * @return Map
      */
     public Map<String,String> createMapperXML(CreaterBuilderModel builderModelTmp, String dataStr){
         CreaterBuilderModel builderModel =
@@ -158,8 +160,9 @@ public enum JavaCodeBuilder {
 
     /**
      * 生成Service
-     * @param builderModelTmp
-     * @return
+     * @param builderModelTmp Build 模型
+     * @param dataStr 数据字符串
+     * @return Map
      */
     public Map<String,String> createService(CreaterBuilderModel builderModelTmp, String dataStr){
         CreaterBuilderModel builderModel =
@@ -192,8 +195,9 @@ public enum JavaCodeBuilder {
 
     /**
      * 生成 Service Impl
-     * @param builderModelTmp
-     * @return
+     * @param builderModelTmp Build 模型
+     * @param dataStr 数据字符串
+     * @return Map
      */
     public Map<String,String> createServiceImpl(CreaterBuilderModel builderModelTmp, String dataStr){
         CreaterBuilderModel builderModel =
@@ -227,8 +231,9 @@ public enum JavaCodeBuilder {
 
     /**
      * 生成 Web
-     * @param builderModelTmp
-     * @return
+     * @param builderModelTmp Build 模型
+     * @param dataStr 数据字符串
+     * @return Map
      */
     public Map<String,String> createWeb(CreaterBuilderModel builderModelTmp, String dataStr){
         CreaterBuilderModel builderModel =
@@ -261,8 +266,9 @@ public enum JavaCodeBuilder {
 
     /**
      * 生成Model
-     * @param builderModelTmp
-     * @return
+     * @param builderModelTmp Build 模型
+     * @param dataStr 数据字符串
+     * @return Map
      */
     public Map<String,String> createModel(CreaterBuilderModel builderModelTmp, String dataStr){
         CreaterBuilderModel builderModel =
@@ -334,8 +340,9 @@ public enum JavaCodeBuilder {
 
     /**
      * 生成RestApi
-     * @param builderModelTmp
-     * @return
+     * @param builderModelTmp Build 模型
+     * @param dataStr 数据字符串
+     * @return Map
      */
     public Map<String,String> createRestApi(CreaterBuilderModel builderModelTmp, String dataStr){
         CreaterBuilderModel builderModel =
@@ -367,8 +374,8 @@ public enum JavaCodeBuilder {
 
     /**
      * 创建 Kv
-     * @param builderModel
-     * @return
+     * @param builderModel Build 模型
+     * @return Kv
      */
     private Kv createKv(CreaterBuilderModel builderModel){
         return Kv.by("data", builderModel)

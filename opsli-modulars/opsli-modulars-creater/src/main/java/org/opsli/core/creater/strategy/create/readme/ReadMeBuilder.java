@@ -31,11 +31,10 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.core.creater.strategy.create.backend
- * @Author: Parker
- * @CreateTime: 2020-11-20 17:30
- * @Description: ReadMe 构建器
+ * ReadMe 构建器
+ *
+ * @author parker
+ * @date 2020-09-13 19:36
  */
 public enum ReadMeBuilder {
 
@@ -44,8 +43,9 @@ public enum ReadMeBuilder {
 
     /**
      * 生成 ReadMe
-     * @param builderModelTmp
-     * @return
+     * @param builderModelTmp Build 模型
+     * @param dataStr 数据字符串
+     * @return Map
      */
     public Map<String,String> createReadMe(CreaterBuilderModel builderModelTmp, String dataStr){
         CreaterBuilderModel builderModel =
@@ -64,8 +64,8 @@ public enum ReadMeBuilder {
 
     /**
      * 创建 Kv
-     * @param builderModel
-     * @return
+     * @param builderModel Build 模型
+     * @return Kv
      */
     private Kv createKv(CreaterBuilderModel builderModel){
         return Kv.by("data", builderModel)

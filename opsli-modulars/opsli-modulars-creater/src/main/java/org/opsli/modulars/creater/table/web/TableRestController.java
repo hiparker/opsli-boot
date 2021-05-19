@@ -48,10 +48,10 @@ import java.util.List;
 
 
 /**
- * @BelongsProject: opsli-boot
- * @Author: Parker
- * @CreateTime: 2020-09-13 17:40
- * @Description: 代码生成器 - 表
+ * 代码生成器 - 表
+ *
+ * @author parker
+ * @date 2020-09-16 17:34
  */
 @Api(tags = TableApi.TITLE)
 @Slf4j

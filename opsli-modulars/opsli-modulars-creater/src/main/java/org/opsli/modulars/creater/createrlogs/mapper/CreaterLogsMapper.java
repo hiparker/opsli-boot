@@ -21,10 +21,10 @@ import org.opsli.modulars.creater.createrlogs.entity.CreaterLogs;
 
 
 /**
- * @BelongsProject: opsli-boot
- * @Author: Parker
- * @CreateTime: 2020-09-17 13:01
- * @Description: 代码生成器 - 生成日志 Mapper
+ * 代码生成器 - 生成日志 Mapper
+ *
+ * @author parker
+ * @date 2020-09-16 17:34
  */
 @Mapper
 public interface CreaterLogsMapper extends BaseMapper<CreaterLogs> {

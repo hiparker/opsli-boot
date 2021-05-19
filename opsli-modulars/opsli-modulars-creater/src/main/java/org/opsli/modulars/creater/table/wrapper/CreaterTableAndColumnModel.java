@@ -30,11 +30,10 @@ import org.opsli.plugins.excel.annotation.ExcelInfo;
 import java.util.List;
 
 /**
- * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.modulars.test.entity
- * @Author: Parker
- * @CreateTime: 2020-09-16 17:33
- * @Description: 代码生成器 - 表和表结构
+ * 代码生成器 - 表和表结构
+ *
+ * @author parker
+ * @date 2020-09-16 17:34
  */
 @Data
 @EqualsAndHashCode(callSuper = false)

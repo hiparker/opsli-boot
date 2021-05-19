@@ -19,11 +19,10 @@ import org.opsli.common.base.msg.BaseMsg;
 import org.opsli.common.exception.ServiceException;
 
 /**
- * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.core.creater.exception
- * @Author: Parker
- * @CreateTime: 2020-09-14 18:44
- * @Description: 代码生成器 异常
+ * 代码生成器 异常类
+ *
+ * @author parker
+ * @date 2020-09-22 11:17
  */
 public class CreaterException extends ServiceException {
 

@@ -28,16 +28,11 @@ import lombok.EqualsAndHashCode;
 import org.opsli.core.base.entity.BaseEntity;
 
 /**
- * @BelongsProject: opsli-boot
-#if(data.subModuleName != null && data.subModuleName != "")
- * @BelongsPackage: #(data.packageName+"."+data.moduleName+"."+data.subModuleName).entity
-#else
- * @BelongsPackage: #(data.packageName+"."+data.moduleName).entity
-#end
- * @Author: #(data.authorName)
- * @CreateTime: #(currTime)
- * @Description: #(data.codeTitle)
- */
+* #(data.codeTitle) Entity
+*
+* @author #(data.authorName)
+* @date #(currTime)
+*/
 @Data
 @EqualsAndHashCode(callSuper = false)
 public class #(data.model.tableName) extends BaseEntity {

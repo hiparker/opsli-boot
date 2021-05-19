@@ -33,16 +33,11 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import org.springframework.format.annotation.DateTimeFormat;
 
 /**
- * @BelongsProject: opsli-boot
-#if(data.subModuleName != null && data.subModuleName != "")
- * @BelongsPackage: #(apiPath).wrapper.#(data.moduleName+"."+data.subModuleName)
-#else
- * @BelongsPackage: #(apiPath).wrapper.#(data.moduleName)
-#end
- * @Author: #(data.authorName)
- * @CreateTime: #(currTime)
- * @Description: #(data.codeTitle)
- */
+* #(data.codeTitle) Model
+*
+* @author #(data.authorName)
+* @date #(currTime)
+*/
 @Data
 @EqualsAndHashCode(callSuper = false)
 public class #(data.model.tableName)Model extends ApiWrapper {

@@ -52,15 +52,10 @@ import #(apiPath).web.#(data.moduleName).#(data.model.tableName)RestApi;
 #end
 
 /**
-* @BelongsProject: opsli-boot
-#if(data.subModuleName != null && data.subModuleName != "")
-* @BelongsPackage: #(data.packageName+"."+data.moduleName+"."+data.subModuleName).web
-#else
-* @BelongsPackage: #(data.packageName+"."+data.moduleName).web
-#end
-* @Author: #(data.authorName)
-* @CreateTime: #(currTime)
-* @Description: #(data.codeTitle) Controller
+* #(data.codeTitle) Controller
+*
+* @author #(data.authorName)
+* @date #(currTime)
 */
 @Api(tags = #(data.model.tableName)RestApi.TITLE)
 @Slf4j

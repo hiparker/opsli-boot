@@ -39,11 +39,10 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.core.creater.strategy.create.backend
- * @Author: Parker
- * @CreateTime: 2020-11-20 17:30
- * @Description: Java代码构建器
+ * Java代码构建器
+ *
+ * @author parker
+ * @date 2020-09-13 19:36
  */
 @Slf4j
 public enum CodeBuilder {

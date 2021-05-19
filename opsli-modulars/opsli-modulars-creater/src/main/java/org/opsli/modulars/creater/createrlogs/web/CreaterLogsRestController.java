@@ -34,10 +34,10 @@ import javax.servlet.http.HttpServletResponse;
 
 
 /**
- * @BelongsProject: opsli-boot
- * @Author: Parker
- * @CreateTime: 2020-09-13 17:40
- * @Description: 代码生成器日志
+ * 代码生成器日志
+ *
+ * @author parker
+ * @date 2020-09-16 17:34
  */
 @Api(tags = CreaterLogsApi.TITLE)
 @Slf4j
@@ -56,16 +56,12 @@ public class CreaterLogsRestController extends BaseRestController<CreaterLogs, C
     /**
      * 代码生成 修改
      * @param model 模型
-     * @return ResultVo
      */
     @ApiOperation(value = "代码生成", notes = "代码生成")
     @RequiresPermissions("deve_creater_create")
     @EnableLog
     @Override
     public void create(CreaterLogsModel model, HttpServletResponse response) {
-        // 演示模式 不允许操作
-        // super.demoError();
-
         // 调用生成方法
         IService.create(model, response);
 

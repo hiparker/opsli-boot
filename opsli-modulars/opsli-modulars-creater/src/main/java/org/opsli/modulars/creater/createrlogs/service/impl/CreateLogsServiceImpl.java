@@ -48,10 +48,10 @@ import java.util.List;
 
 
 /**
- * @BelongsProject: opsli-boot
- * @Author: Parker
- * @CreateTime: 2020-09-16 17:34
- * @Description: 代码生成器 - 表 接口实现类
+ * 代码生成器 - 日志 接口实现类
+ *
+ * @author parker
+ * @date 2020-09-16 17:34
  */
 @Service
 public class CreateLogsServiceImpl extends CrudServiceImpl<CreaterLogsMapper, CreaterLogs, CreaterLogsModel>

@@ -23,38 +23,39 @@ import java.util.List;
 
 
 /**
- * @BelongsProject: opsli-boot
- * @Author: Parker
- * @CreateTime: 2020-09-17 13:07
- * @Description: 代码生成器 - 数据库表
+ * 代码生成器 - 数据库表
+ *
+ * @author parker
+ * @date 2020-09-16 17:34
  */
 public interface DatabaseTableService {
 
     /**
      * 获得类型
-     * @return
+     * @return 类型
      */
     DataBaseType getType();
 
     /**
-     * 获得当前库中 所有表
-     * @param dbName
-     * @return
+     * 获得当前库中 数据库名
+     * @param dbName 表名
+     * @return List
      */
     List<DatabaseTable> findTables(String dbName);
 
     /**
      * 获得当前库中 所有表
-     * @param dbName
-     * @return
+     * @param dbName 数据库名
+     * @param tableName 表名
+     * @return List
      */
     List<DatabaseTable> findTables(String dbName, String tableName);
 
     /**
      * 获得当前表中 所有字段
-     * @param dbName
-     * @param tableName
-     * @return
+     * @param dbName 数据库名
+     * @param tableName 表名
+     * @return List
      */
     List<DatabaseColumn> findColumns(String dbName, String tableName);
 

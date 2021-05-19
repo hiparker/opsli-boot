@@ -30,12 +30,10 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 /**
- * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.core.creater.strategy.sync.util
- * @Author: Parker
- * @CreateTime: 2020-09-15 14:50
- * @Description: 数据库同步策略 工具类
+ * 数据库同步策略 工具类
  *
+ * @author parker
+ * @date 2020-09-15 14:50
  */
 @Slf4j
 @Configuration
@@ -68,7 +66,7 @@ public class SqlSyncUtil {
 
     /**
      * 执行
-     * @param model
+     * @param model 模型
      */
     public static void execute(CreaterTableAndColumnModel model){
         if(model == null){

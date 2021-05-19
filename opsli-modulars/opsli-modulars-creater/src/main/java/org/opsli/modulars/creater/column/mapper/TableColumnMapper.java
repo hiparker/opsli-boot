@@ -21,10 +21,10 @@ import org.opsli.modulars.creater.column.entity.CreaterTableColumn;
 
 
 /**
- * @BelongsProject: opsli-boot
- * @Author: Parker
- * @CreateTime: 2020-09-17 13:01
- * @Description: 代码生成器 - 表结构 Mapper
+ * 代码生成器 - 表结构 Mapper
+ *
+ * @author parker
+ * @date 2020-09-16 17:34
  */
 @Mapper
 public interface TableColumnMapper extends BaseMapper<CreaterTableColumn> {

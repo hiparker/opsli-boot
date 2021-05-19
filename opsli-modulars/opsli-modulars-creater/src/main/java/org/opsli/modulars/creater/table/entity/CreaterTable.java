@@ -23,10 +23,10 @@ import lombok.EqualsAndHashCode;
 import org.opsli.core.base.entity.BaseEntity;
 
 /**
- * @BelongsProject: opsli-boot
- * @Author: Parker
- * @CreateTime: 2020-11-15 17:33
- * @Description: 代码生成器 - 表
+ * 代码生成器 - 表
+ *
+ * @author parker
+ * @date 2020-09-16 17:34
  */
 @Data
 @EqualsAndHashCode(callSuper = false)

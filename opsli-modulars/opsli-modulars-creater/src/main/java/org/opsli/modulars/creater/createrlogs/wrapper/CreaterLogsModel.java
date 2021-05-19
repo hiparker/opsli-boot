@@ -25,11 +25,10 @@ import org.opsli.common.annotation.validation.ValidationArgsLenMax;
 import org.opsli.common.enums.ValiArgsType;
 
 /**
- * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.modulars.creater.createrlogs.wrapper
- * @Author: Parker
- * @CreateTime: 2020-09-16 17:33
- * @Description: 代码生成器 - 生成日志 （便于二次生成时查看）
+ * 代码生成器 - 生成日志 模型
+ *
+ * @author parker
+ * @date 2020-09-16 17:34
  */
 @Data
 @EqualsAndHashCode(callSuper = false)

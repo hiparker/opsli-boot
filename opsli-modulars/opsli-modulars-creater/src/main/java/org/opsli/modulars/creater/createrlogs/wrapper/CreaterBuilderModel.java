@@ -26,11 +26,10 @@ import org.opsli.common.enums.ValiArgsType;
 import org.opsli.modulars.creater.table.wrapper.CreaterTableAndColumnModel;
 
 /**
- * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.modulars.creater.createrlogs.wrapper
- * @Author: Parker
- * @CreateTime: 2020-09-16 17:33
- * @Description: 代码生成器 - 生成日志+代码模型
+ * 代码生成器 - 生成日志+代码模型
+ *
+ * @author parker
+ * @date 2020-09-16 17:34
  */
 @Data
 @EqualsAndHashCode(callSuper = false)

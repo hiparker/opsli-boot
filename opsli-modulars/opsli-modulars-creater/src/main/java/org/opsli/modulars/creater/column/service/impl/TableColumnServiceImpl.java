@@ -36,10 +36,10 @@ import java.util.List;
 
 
 /**
- * @BelongsProject: opsli-boot
- * @Author: Parker
- * @CreateTime: 2020-09-16 17:34
- * @Description: 代码生成器 - 表结构 接口实现类
+ * 代码生成器 - 表结构 接口实现类
+ *
+ * @author parker
+ * @date 2020-09-16 17:34
  */
 @Service
 public class TableColumnServiceImpl extends CrudServiceImpl<TableColumnMapper, CreaterTableColumn, CreaterTableColumnModel>
@@ -71,7 +71,7 @@ public class TableColumnServiceImpl extends CrudServiceImpl<TableColumnMapper, C
     /**
      * 批量新增
      * @param models model 数据模型
-     * @return
+     * @return boolean
      */
     @Override
     @Transactional(rollbackFor = Exception.class)

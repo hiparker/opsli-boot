@@ -39,11 +39,10 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 /**
- * @BelongsProject: opsli-boot
- * @Author: Parker
- * @CreateTime: 2020-09-15 14:50
- * @Description: 数据库同步策略 工具类
+ * 数据库同步策略 工具类
  *
+ * @author parker
+ * @date 2020-09-16 17:34
  */
 @Slf4j
 @Configuration

@@ -23,32 +23,30 @@ import java.util.List;
 
 
 /**
- * @BelongsProject: opsli-boot
- * @Author: Parker
- * @CreateTime: 2020-09-17 13:07
- * @Description: 代码生成器 - 表结构 接口
+ * 代码生成器 - 表结构 接口
+ *
+ * @author parker
+ * @date 2020-09-16 17:34
  */
 public interface ITableColumnService extends CrudServiceInterface<CreaterTableColumn, CreaterTableColumnModel> {
 
     /**
      * 根据表ID 获得数据
-     * @param tableId
-     * @return
+     * @param tableId 表ID
+     * @return List
      */
     List<CreaterTableColumnModel> getByTableId(String tableId);
 
 
     /**
      * 根据表ID 删除数据
-     * @param tableId
-     * @return
+     * @param tableId 表ID
      */
     void delByTableId(String tableId);
 
     /**
      * 根据表ID 删除数据
-     * @param tableIds
-     * @return
+     * @param tableIds 表ID数组
      */
     void delByTableIds(String[] tableIds);
 }

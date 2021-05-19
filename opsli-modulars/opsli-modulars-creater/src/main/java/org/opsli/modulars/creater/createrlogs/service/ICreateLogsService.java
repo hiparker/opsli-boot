@@ -23,28 +23,29 @@ import javax.servlet.http.HttpServletResponse;
 
 
 /**
- * @BelongsProject: opsli-boot
- * @Author: Parker
- * @CreateTime: 2020-09-17 13:07
- * @Description: 代码生成器 - 表 接口
+ * 代码生成器 - 日志 接口
+ *
+ * @author parker
+ * @date 2020-09-16 17:34
  */
 public interface ICreateLogsService extends CrudServiceInterface<CreaterLogs, CreaterLogsModel> {
 
     /**
      * 根据表Id 删除
-     * @param tableId
+     * @param tableId 表ID
      */
     void delByTableId(String tableId);
 
     /**
      * 根据表Id 批量删除
-     * @param tableIds
+     * @param tableIds 表ID 数组
      */
     void delByTableIds(String[] tableIds);
 
     /**
      * 根据表Id 查询
      * @param tableId 表ID
+     * @return Model
      */
     CreaterLogsModel getByTableId(String tableId);
 

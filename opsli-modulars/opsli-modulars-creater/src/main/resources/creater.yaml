@@ -19,7 +19,6 @@ opsli:
     - sys_org
     - sys_options
 
-
   # 排除字段
   exclude-fields:
     - id

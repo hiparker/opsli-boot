@@ -27,18 +27,15 @@ import javax.servlet.http.HttpServletResponse;
 
 
 /**
- * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.modulars.test.web
- * @Author: Parker
- * @CreateTime: 2020-09-13 17:40
- * @Description: 代码生成器 - 生成记录 API
+ * 代码生成器 - 生成记录 API
  *
  * 对外 API 直接 暴露 @GetMapping 或者 @PostMapping
  * 对内也推荐 单机版 不需要设置 Mapping 但是调用方法得从Controller写起
  *
  * 这样写法虽然比较绕，但是当单体项目想要改造微服务架构时 时非常容易的
  *
- *
+ * @author parker
+ * @date 2020-09-16 17:34
  */
 public interface CreaterLogsApi {
 
@@ -58,7 +55,6 @@ public interface CreaterLogsApi {
     /**
      * 代码生成 修改
      * @param model 模型
-     * @return ResultVo
      */
     @GetMapping("/create")
     void create(CreaterLogsModel model, HttpServletResponse response);

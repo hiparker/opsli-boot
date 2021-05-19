@@ -16,32 +16,25 @@
 package org.opsli.modulars.creater.table.api;
 
 import org.opsli.api.base.result.ResultVo;
-import org.opsli.api.wrapper.system.tenant.TenantModel;
 import org.opsli.modulars.creater.table.wrapper.CreaterTableAndColumnModel;
 import org.opsli.modulars.creater.table.wrapper.CreaterTableModel;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 
 /**
- * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.modulars.test.web
- * @Author: Parker
- * @CreateTime: 2020-09-13 17:40
- * @Description: 代码生成器 - 表 API
+ * 代码生成器 - 表 API
  *
  * 对外 API 直接 暴露 @GetMapping 或者 @PostMapping
  * 对内也推荐 单机版 不需要设置 Mapping 但是调用方法得从Controller写起
  *
  * 这样写法虽然比较绕，但是当单体项目想要改造微服务架构时 时非常容易的
  *
- *
+ * @author parker
+ * @date 2020-09-16 17:34
  */
 public interface TableApi {
 
@@ -121,6 +114,8 @@ public interface TableApi {
 
     /**
      * 导入选中表
+     *
+     * @param tableNames 表名集合
      * @return ResultVo
      */
     @PostMapping("/importTables")
