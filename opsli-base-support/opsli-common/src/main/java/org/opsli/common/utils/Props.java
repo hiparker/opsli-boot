@@ -44,10 +44,10 @@ import java.util.concurrent.ConcurrentHashMap;
  *       <version>1.8.3</version>
  *  </dependency>
  *
- *使用方法
- *eg:
- *  opsli:
- *   config:
+ * 使用方法
+ * eg:
+ *   opsli:
+ *    config:
  *       key: value
  *       list:
  *         - 张三
@@ -58,15 +58,18 @@ import java.util.concurrent.ConcurrentHashMap;
  *         - name: 李四map
  *           age: 121
  *
- *支持获取指定层级之后的数据,如"opsli.config" : new ConfigBean().prefix("opsli.config").getObj()
+ * 支持获取指定层级之后的数据,如"opsli.config" : new ConfigBean().prefix("opsli.config").getObj()
  *
- *支持获取list中指定数据,如"opsli.config.list.1" : new ConfigBean().prefix("opsli.config.list.1").getObj()
+ * 支持获取list中指定数据,如"opsli.config.list.1" : new ConfigBean().prefix("opsli.config.list.1").getObj()
  *
- *支持获取list中指定数据之后的数据,如"opsli.config.map.1.name" :new ConfigBean().prefix("opsli.config.list.1").getString()
+ * 支持获取list中指定数据之后的数据,如"opsli.config.map.1.name" :new ConfigBean().prefix("opsli.config.list.1").getString()
  *
  *
  * 针对 hutool 工具类 Props不是很有好， 重新写了自定义Yaml工具类
+ *
+ *
  * @author Parker
+ * @date 2021-01-05 14:26
  */
 @Slf4j
 public class Props {
@@ -117,7 +120,7 @@ public class Props {
 
     /**
      * 获得 Obj对象
-     * @return
+     * @return Object
      */
     public Object getObj(String key){
         return this.getObj(key, null);
@@ -125,7 +128,7 @@ public class Props {
 
     /**
      * 获得 Obj对象
-     * @return
+     * @return Object
      */
     public Object getObj(String key, Object def){
         if(key == null || "".equals(key) ){
@@ -146,7 +149,7 @@ public class Props {
 
     /**
      * 获得 字符串类型对象
-     * @return
+     * @return String
      */
     public String getStr(String key){
         return this.getStr(key, null);
@@ -154,7 +157,9 @@ public class Props {
 
     /**
      * 获得 字符串类型对象
-     * @return
+     * @param key 主键
+     * @param def 默认
+     * @return String
      */
     public String getStr(String key, String def){
         if(key == null || "".equals(key) ){
@@ -171,7 +176,8 @@ public class Props {
 
     /**
      * 获得 Int 类型对象
-     * @return
+     * @param key 主键
+     * @return Integer
      */
     public Integer getInt(String key){
         return this.getInt(key, null);
@@ -179,7 +185,9 @@ public class Props {
 
     /**
      * 获得 Int 类型对象
-     * @return
+     * @param key 主键
+     * @param def 默认
+     * @return Integer
      */
     public Integer getInt(String key, Integer def){
         if(key == null || "".equals(key) ){
@@ -196,7 +204,8 @@ public class Props {
 
     /**
      * 获得 Long 类型对象
-     * @return
+     * @param key 主键
+     * @return Long
      */
     public Long getLong(String key){
         return this.getLong(key, null);
@@ -204,7 +213,9 @@ public class Props {
 
     /**
      * 获得 Long 类型对象
-     * @return
+     * @param key 主键
+     * @param def 默认
+     * @return Long
      */
     public Long getLong(String key, Long def){
         if(key == null || "".equals(key) ){
@@ -222,7 +233,8 @@ public class Props {
 
     /**
      * 获得 Double 类型对象
-     * @return
+     * @param key 主键
+     * @return Double
      */
     public Double getDouble(String key){
         return this.getDouble(key, null);
@@ -230,7 +242,9 @@ public class Props {
 
     /**
      * 获得 Double 类型对象
-     * @return
+     * @param key 主键
+     * @param def 默认
+     * @return Double
      */
     public Double getDouble(String key, Double def){
         if(key == null || "".equals(key) ){
@@ -249,7 +263,8 @@ public class Props {
 
     /**
      * 获得 Float 类型对象
-     * @return
+     * @param key 主键
+     * @return Float
      */
     public Float getFloat(String key){
         return this.getFloat(key, null);
@@ -257,7 +272,9 @@ public class Props {
 
     /**
      * 获得 Float 类型对象
-     * @return
+     * @param key 主键
+     * @param def 默认
+     * @return Float
      */
     public Float getFloat(String key, Float def){
         if(key == null || "".equals(key) ){
@@ -275,7 +292,8 @@ public class Props {
 
     /**
      * 获得 Char 类型对象
-     * @return
+     * @param key 主键
+     * @return Character
      */
     public Character getChar(String key){
         return this.getChar(key, null);
@@ -283,7 +301,9 @@ public class Props {
 
     /**
      * 获得 Char 类型对象
-     * @return
+     * @param key 主键
+     * @param def 默认
+     * @return Character
      */
     public Character getChar(String key, Character def){
         if(key == null || "".equals(key) ){
@@ -300,7 +320,8 @@ public class Props {
 
     /**
      * 获得 布尔类型对象
-     * @return
+     * @param key 主键
+     * @return Boolean
      */
     public Boolean getBool(String key){
         return this.getBool(key, null);
@@ -308,7 +329,9 @@ public class Props {
 
     /**
      * 获得 布尔类型对象
-     * @return
+     * @param key 主键
+     * @param def 默认
+     * @return Boolean
      */
     public Boolean getBool(String key, Boolean def){
         if(key == null || "".equals(key) ){
@@ -324,16 +347,19 @@ public class Props {
     }
 
     /**
-     * 获得 布尔类型对象
-     * @return
+     * 获得 List对象
+     * @param key 主键
+     * @return List
      */
     public List<String> getList(String key){
         return this.getList(key, null);
     }
 
     /**
-     * 获得 布尔类型对象
-     * @return
+     * 获得 List对象
+     * @param key 主键
+     * @param def 默认
+     * @return List
      */
     public List<String> getList(String key, List<String> def){
         if(key == null || "".equals(key) ){
@@ -354,8 +380,8 @@ public class Props {
 
     /**
      * 获得对象
-     * @param keys
-     * @return
+     * @param keys 主键数组
+     * @return Object
      */
     private Object getObject(String[] keys){
         // 循环查找

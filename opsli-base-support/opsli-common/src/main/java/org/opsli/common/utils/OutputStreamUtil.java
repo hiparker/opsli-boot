@@ -12,11 +12,10 @@ import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 
 /**
- * @BelongsProject: think-bboss-parent
- * @BelongsPackage: com.think.bboss.common.utils
- * @Author: Parker
- * @CreateTime: 2021-01-05 14:26
- * @Description: OutputStream 处理
+ * OutputStream 处理
+ *
+ * @author Parker
+ * @date 2021-01-05 14:26
  */
 @Slf4j
 public final class OutputStreamUtil {

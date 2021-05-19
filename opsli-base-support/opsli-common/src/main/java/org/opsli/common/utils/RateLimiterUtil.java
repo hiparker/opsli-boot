@@ -15,11 +15,10 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 /**
- * @BelongsProject: think-bboss-parent
- * @BelongsPackage: com.think.bboss.common.utils
- * @Author: Parker
- * @CreateTime: 2021-01-05 16:06
- * @Description: 单机限流
+ * 单机限流
+ *
+ * @author Parker
+ * @date 2021-01-05 16:06
  */
 @Slf4j
 public final class RateLimiterUtil {
@@ -44,7 +43,7 @@ public final class RateLimiterUtil {
 
     /**
      * 删除IP
-     * @param ip
+     * @param ip IP
      */
     public static void removeIp(String ip) {
         LFU_CACHE.invalidate(ip);
@@ -52,8 +51,8 @@ public final class RateLimiterUtil {
 
     /**
      * 方法进入
-     * @param request
-     * @return
+     * @param request request
+     * @return boolean
      */
     public static boolean enter(HttpServletRequest request) {
         // 获得IP
@@ -65,8 +64,8 @@ public final class RateLimiterUtil {
 
     /**
      * 方法进入
-     * @param request
-     * @return
+     * @param request request
+     * @return boolean
      */
     public static boolean enter(HttpServletRequest request, Double dfQps) {
         // 获得IP
@@ -79,7 +78,7 @@ public final class RateLimiterUtil {
     /**
      * 方法进入
      * @param clientIpAddress IP
-     * @return
+     * @return boolean
      */
     public static boolean enter(String clientIpAddress, String resource) {
         return RateLimiterUtil.enter(clientIpAddress, resource, null);
@@ -89,8 +88,9 @@ public final class RateLimiterUtil {
      * 方法进入
      * @param clientIpAddress IP
      * @param dfQps 手动指派QPS
-     * @return
+     * @return boolean
      */
+    @SuppressWarnings("UnstableApiUsage")
     public static boolean enter(String clientIpAddress, String resource, Double dfQps) {
         // 计时器
         long t1 = System.currentTimeMillis();
@@ -151,6 +151,7 @@ public final class RateLimiterUtil {
      * 限流器
      */
     @Data
+    @SuppressWarnings("UnstableApiUsage")
     public static class RateLimiterInner {
 
         /** qps */
@@ -166,9 +167,9 @@ public final class RateLimiterUtil {
 
 
     public static void main(String[] args) {
+        int count = 500;
         RateLimiterUtil.removeIp("127.0.0.1");
-        for (int i = 0; i < 500; i++) {
-            int j = i;
+        for (int i = 0; i < count; i++) {
             AsyncProcessQueueReFuse.execute(()->{
                 boolean enter = RateLimiterUtil.enter("127.0.0.1","/api/v1", 2d);
                 System.out.println(enter);

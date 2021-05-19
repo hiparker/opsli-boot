@@ -26,14 +26,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.common.utils
- * @Author: Parker
- * @CreateTime: 2020-09-19 00:08
- * @Description: 转化对象工具类
- *
+ * 转化对象工具类
  * 用于 Wrapper 对象 转化为本地对象，或者本地对象转化为Wrapper对象
  *
+ * @author Parker
+ * @date 2020-09-19 00:08
  */
 @Slf4j
 public final class WrapperUtil {
@@ -96,7 +93,7 @@ public final class WrapperUtil {
      * @param source 源数据
      * @param target 目标
      * @param isClone 是否克隆
-     * @param <M>
+     * @param <M> M
      * @return List<M>
      */
     public static <T,M> List<M> transformInstance(Collection<T> source, Class<M> target, boolean isClone){

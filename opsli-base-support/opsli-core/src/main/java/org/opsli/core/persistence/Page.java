@@ -153,7 +153,7 @@ public class Page<T extends BaseEntity,E extends ApiWrapper> extends PageSeriali
         private Long total;
 
         /** 行 */
-        private List rows;
+        private List<?> rows;
 
     }
 

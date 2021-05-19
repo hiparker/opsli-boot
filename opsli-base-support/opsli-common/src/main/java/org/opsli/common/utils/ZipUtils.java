@@ -25,10 +25,10 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 /**
+ * 文件流转压缩包工具类
+ *
  * @author Parker
  * @date 2020-01-07
- * <p>
- * 文件流转压缩包工具类
  */
 public class ZipUtils {
     /**
@@ -90,10 +90,10 @@ public class ZipUtils {
 
     public static void main(String[] args) throws Exception {
         List<Map<String, String>> list = new ArrayList<>();
-        OutputStream outputStream = new FileOutputStream(new File("/Users/system/Documents/脚本/opsli/test.zip"));
-        Map<String,String> m1 = new HashMap<String,String>(){{put("path","/f1/f2/f3/");put("name","1.txt");put("data","abcdefg");}};
-        Map<String,String> m2 = new HashMap<String,String>(){{put("path","/f1/f2/f3/f4/");put("name","2.txt");put("data","abcdefg");}};
-        Map<String,String> m3 = new HashMap<String,String>(){{put("path","");put("name","3.txt");put("data","abcdefg");}};
+        OutputStream outputStream = new FileOutputStream("/Users/system/Documents/脚本/opsli/test.zip");
+        Map<String,String> m1 = new HashMap<String,String>(10){{put("path","/f1/f2/f3/");put("name","1.txt");put("data","abcdefg");}};
+        Map<String,String> m2 = new HashMap<String,String>(10){{put("path","/f1/f2/f3/f4/");put("name","2.txt");put("data","abcdefg");}};
+        Map<String,String> m3 = new HashMap<String,String>(10){{put("path","");put("name","3.txt");put("data","abcdefg");}};
 
         list.add(m1);
         list.add(m2);

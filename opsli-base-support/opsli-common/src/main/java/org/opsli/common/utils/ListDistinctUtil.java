@@ -11,11 +11,10 @@ import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 /**
- * @BelongsProject: think-bboss-parent
- * @BelongsPackage: com.think.bboss.common.utils
- * @Author: Parker
- * @CreateTime: 2021-01-05 14:26
- * @Description: List 去重
+ * List 去重
+ *
+ * @author Parker
+ * @date 2021-01-05 14:26
  */
 @Slf4j
 public final class ListDistinctUtil {

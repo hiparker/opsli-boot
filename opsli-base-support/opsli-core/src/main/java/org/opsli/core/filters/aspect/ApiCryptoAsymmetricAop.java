@@ -64,7 +64,6 @@ public class ApiCryptoAsymmetricAop {
      * 切如 post 请求
      * @param point point
      */
-    @SuppressWarnings("unchecked")
     @Around("encryptAndDecrypt()")
     public Object encryptAndDecryptHandle(ProceedingJoinPoint point) throws Throwable {
         // 获得请求参数
@@ -158,6 +157,7 @@ public class ApiCryptoAsymmetricAop {
      * @param cryptoModel 非对称加解密模型
      * @return Object
      */
+    @SuppressWarnings("unchecked")
     private Object resultEncrypt(Object returnValue, CryptoAsymmetricService asymmetric, CryptoAsymmetric cryptoModel) {
         if(returnValue != null){
             try {
@@ -168,7 +168,6 @@ public class ApiCryptoAsymmetricAop {
                     ret.setData(
                             asymmetric.encrypt(cryptoModel, ret.getData())
                     );
-                    returnValue = ret;
                 }else {
                     returnValue = asymmetric.encrypt(cryptoModel, returnValue);
                 }
