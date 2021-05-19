@@ -17,6 +17,7 @@ package opsli.plugins.crypto.model;
 
 import lombok.Data;
 import opsli.plugins.crypto.enums.CryptoSymmetricType;
+import org.opsli.common.annotation.OptionDict;
 
 /**
  * 对称加密
@@ -28,9 +29,11 @@ import opsli.plugins.crypto.enums.CryptoSymmetricType;
 public class CryptoSymmetric {
 
     /** 加解密类别 */
+    @OptionDict("crypto_symmetric")
     private CryptoSymmetricType cryptoType;
 
     /** 私钥 */
+    @OptionDict("crypto_symmetric_private_key")
     private String privateKey;
 
 }

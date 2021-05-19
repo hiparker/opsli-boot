@@ -39,4 +39,5 @@ public class CryptoAsymmetric {
     /** 私钥 */
     @OptionDict("crypto_asymmetric_private_key")
     private String privateKey;
+
 }
