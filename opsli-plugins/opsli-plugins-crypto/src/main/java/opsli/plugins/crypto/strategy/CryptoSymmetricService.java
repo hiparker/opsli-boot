@@ -16,28 +16,30 @@
 package opsli.plugins.crypto.strategy;
 
 import opsli.plugins.crypto.enums.CryptoAsymmetricType;
+import opsli.plugins.crypto.enums.CryptoSymmetricType;
 import opsli.plugins.crypto.model.CryptoAsymmetric;
+import opsli.plugins.crypto.model.CryptoSymmetric;
 
 /**
- * 非对称 加解密策略接口
+ * 对称 加解密策略接口
  *
  * @author Parker
  * @date 2021年5月17日15:49:15
  */
-public interface CryptoAsymmetricService {
+public interface CryptoSymmetricService {
 
     /**
      * 创建空模型
      * @return Model
      */
-    CryptoAsymmetric createNilModel();
+    CryptoSymmetric createNilModel();
 
     /**
      * 创建公私钥
-     * @param cryptoAsymmetricType 枚举
+     * @param cryptoSymmetricType 枚举
      * @return Model
      */
-    CryptoAsymmetric createKeyModel(final CryptoAsymmetricType cryptoAsymmetricType);
+    CryptoSymmetric createKeyModel(final CryptoSymmetricType cryptoSymmetricType);
 
     /**
      * 加密数据
@@ -45,7 +47,7 @@ public interface CryptoAsymmetricService {
      * @param data 数据
      * @return String
      */
-    String encrypt(final CryptoAsymmetric model, final Object data);
+    String encrypt(final CryptoSymmetric model, final Object data);
 
     /**
      * 解密数据
@@ -53,7 +55,7 @@ public interface CryptoAsymmetricService {
      * @param data 数据
      * @return Object
      */
-    Object decryptToObj(final CryptoAsymmetric model, final String data);
+    Object decryptToObj(final CryptoSymmetric model, final String data);
 
     /**
      * 解密数据
@@ -61,7 +63,7 @@ public interface CryptoAsymmetricService {
      * @param data 数据
      * @return String
      */
-    String decrypt(final CryptoAsymmetric model, final String data);
+    String decrypt(final CryptoSymmetric model, final String data);
 
 
 }

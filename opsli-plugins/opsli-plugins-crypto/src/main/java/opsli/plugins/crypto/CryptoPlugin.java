@@ -17,7 +17,7 @@ package opsli.plugins.crypto;
 
 import lombok.extern.slf4j.Slf4j;
 import opsli.plugins.crypto.strategy.CryptoAsymmetricService;
-import opsli.plugins.crypto.strategy.impl.CryptoAsymmetricAsymmetricImpl;
+import opsli.plugins.crypto.strategy.impl.CryptoAsymmetricServiceImpl;
 
 /**
  * @BelongsProject: opsli-boot
@@ -30,7 +30,7 @@ import opsli.plugins.crypto.strategy.impl.CryptoAsymmetricAsymmetricImpl;
 public class CryptoPlugin {
 
     /** 非对称加密 */
-    private static final CryptoAsymmetricService CRYPTO_ASYMMETRIC = new CryptoAsymmetricAsymmetricImpl();
+    private static final CryptoAsymmetricService CRYPTO_ASYMMETRIC = new CryptoAsymmetricServiceImpl();
 
     /**
      * 获得非对称加密
