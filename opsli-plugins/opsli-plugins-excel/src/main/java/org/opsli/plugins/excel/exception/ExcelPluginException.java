@@ -19,10 +19,10 @@ import org.opsli.common.base.msg.BaseMsg;
 import org.opsli.common.exception.ServiceException;
 
 /**
- * Created Date by 2020/5/9 0009.
- *
  * Excel 异常类
+ *
  * @author Parker
+ * @date 2020-09-16 11:47
  */
 public class ExcelPluginException extends ServiceException {
 

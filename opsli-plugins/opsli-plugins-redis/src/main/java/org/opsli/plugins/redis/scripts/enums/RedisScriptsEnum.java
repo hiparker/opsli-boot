@@ -17,11 +17,10 @@ package org.opsli.plugins.redis.scripts.enums;
 
 
 /**
- * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.plugins.redis.enums
- * @Author: Parker
- * @CreateTime: 2020-09-14 21:56
- * @Description: Redis 脚本枚举
+ * Redis 脚本枚举
+ *
+ * @author Parker
+ * @date 2020-09-16 11:47
  */
 public enum RedisScriptsEnum {
 

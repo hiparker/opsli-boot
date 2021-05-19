@@ -19,11 +19,10 @@ import org.opsli.common.base.msg.BaseMsg;
 import org.opsli.common.exception.ServiceException;
 
 /**
- * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.plugins.mail.exception
- * @Author: Parker
- * @CreateTime: 2020-09-14 18:44
- * @Description: Redis 异常
+ * Redis 异常
+ *
+ * @author Parker
+ * @date 2020-09-16 11:47
  */
 public class RedisPluginException extends ServiceException {
 

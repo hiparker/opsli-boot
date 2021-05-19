@@ -18,11 +18,10 @@ package org.opsli.plugins.waf.msg;
 import org.opsli.common.base.msg.BaseMsg;
 
 /**
- * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.plugins.mail.msg
- * @Author: Parker
- * @CreateTime: 2020-09-13 19:54
- * @Description: Excel 消息
+ * 防火墙 消息
+ *
+ * @author Parker
+ * @date 2020-09-16
  */
 public enum WafMsg implements BaseMsg {
 

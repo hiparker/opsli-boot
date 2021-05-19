@@ -27,11 +27,10 @@ import org.springframework.stereotype.Service;
 
 
 /**
- * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.plugins.cache.service
- * @Author: Parker
- * @CreateTime: 2020-09-16 21:08
- * @Description: EhCachePlugin 实现类
+ * EhCachePlugin 实现类
+ *
+ * @author Parker
+ * @date 2020-09-16 11:47
  */
 @Slf4j
 @Service

@@ -19,11 +19,10 @@ package org.opsli.plugins.redis.lock;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.plugins.redis.lock
- * @Author: Parker
- * @CreateTime: 2020-09-16 00:51
- * @Description: Redis 锁
+ * Redis 锁
+ *
+ * @author Parker
+ * @date 2020-09-16 11:47
  */
 public class RedisLock {
 

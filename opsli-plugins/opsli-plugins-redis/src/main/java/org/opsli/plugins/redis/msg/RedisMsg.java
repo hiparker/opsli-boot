@@ -18,11 +18,10 @@ package org.opsli.plugins.redis.msg;
 import org.opsli.common.base.msg.BaseMsg;
 
 /**
- * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.plugins.mail.msg
- * @Author: Parker
- * @CreateTime: 2020-09-13 19:54
- * @Description: Redis消息
+ * Redis消息
+ *
+ * @author Parker
+ * @date 2020-09-16 11:47
  */
 public enum RedisMsg implements BaseMsg {
 

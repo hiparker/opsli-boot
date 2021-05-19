@@ -28,11 +28,7 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.plugins.redis.lock
- * @Author: Parker
- * @CreateTime: 2020-09-16 11:49
- * @Description: Redis 锁实现
+ * Redis 锁实现
  *
  * ===================== Redis 锁相关 =====================
  *
@@ -47,6 +43,8 @@ import java.util.List;
  * 2、这把锁只能是非阻塞的，无论成功还是失败都直接返回。
  * 3、这把锁是非重入的，一个线程获得锁之后，在释放锁之前，无法再次获得该锁，因为使用到的key在tair中已经存在。无法再执行put操作。
  *
+ * @author Parker
+ * @date 2020-09-16 11:47
  */
 @Slf4j
 @Service

@@ -21,13 +21,12 @@ import lombok.experimental.Accessors;
 import org.opsli.common.enums.SystemInfo;
 
 /**
- * @author parker
- * @date 2020-09-13
- *
  * 广播消息时，不会处理 自身的数据，如果要处理请预先处理
  *
  * 防止广播数据处理到自身时出现延迟问题
  *
+ * @author Parker
+ * @date 2020-09-16 11:47
  */
 @Data
 @Accessors(chain = true)

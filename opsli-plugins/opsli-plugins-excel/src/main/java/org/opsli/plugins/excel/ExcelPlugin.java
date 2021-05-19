@@ -44,7 +44,9 @@ import java.util.List;
  * 基于easyExcel的开源框架，poi版本3.17
  * BeanCopy ExcelException 属于自定义数据，属于可自定义依赖
  * 工具类尽可能还是需要减少对其他java的包的依赖
- * @author parker
+ *
+ * @author Parker
+ * @date 2020-09-16 11:47
  */
 @Slf4j
 public class ExcelPlugin {
@@ -249,7 +251,7 @@ public class ExcelPlugin {
      * @param excelListener new ExcelListener()
      */
     private ExcelReader getReader(MultipartFile excel,
-                                         ExcelListener excelListener) throws ExcelPluginException{
+                                         ExcelListener<?> excelListener) throws ExcelPluginException{
         String fileName = excel.getOriginalFilename();
         if (fileName == null ) {
             // 文件格式错误

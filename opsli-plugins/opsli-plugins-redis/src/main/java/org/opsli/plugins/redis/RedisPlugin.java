@@ -37,6 +37,7 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * Redis 插件类
+ *
  * @author parker
  * @date 2020-09-14
  */
@@ -56,11 +57,11 @@ public class RedisPlugin {
 	/**
 	 * 判断key是否存在
 	 *
-	 * @param key Redis键
+	 * @param key 主键
 	 * @return boolean
 	 */
 	public boolean hasKey(String key) {
-		Boolean ret = null;
+		Boolean ret;
 		try {
 			ret = redisTemplate.hasKey(key);
 		} catch (Exception e) {
@@ -73,7 +74,7 @@ public class RedisPlugin {
 	/**
 	 * 删除1个key
 	 *
-	 * @param key Redis键
+	 * @param key 主键
 	 * @return 成功删除的个数
 	 */
 	public boolean del(String key) {
@@ -83,7 +84,7 @@ public class RedisPlugin {
 	/**
 	 * 删除多个key
 	 *
-	 * @param keys Redis键集合
+	 * @param keys 主键集合
 	 * @return 成功删除的个数
 	 */
 	public Long del(Collection<String> keys) {
@@ -120,7 +121,7 @@ public class RedisPlugin {
 	/**
 	 * 指定缓存有效时间
 	 *
-	 * @param key Redis键
+	 * @param key 主键
 	 * @param timeout 超时时间(秒)
 	 * @return boolean
 	 */
@@ -131,7 +132,7 @@ public class RedisPlugin {
 	/**
 	 * 设置缓存有效时间
 	 *
-	 * @param key Redis键
+	 * @param key 主键
 	 * @param timeout 超时时间
 	 * @param unit 时间单位
 	 * @return boolean
@@ -151,7 +152,7 @@ public class RedisPlugin {
 	/**
 	 * 获得缓存有效时间
 	 *
-	 * @param key Redis键
+	 * @param key 主键
 	 * @return 超时时间(秒) 0 则表示永久有效
 	 */
 	public Long getExpire(String key) {
@@ -161,7 +162,7 @@ public class RedisPlugin {
 	/**
 	 * 获得缓存有效时间
 	 *
-	 * @param key Redis键
+	 * @param key 主键
 	 * @param unit 时间单位
 	 * @return 超时时间 0 则表示永久有效
 	 */
@@ -179,7 +180,7 @@ public class RedisPlugin {
 	/**
 	 * 获取普通对象
 	 *
-	 * @param key Redis键
+	 * @param key 主键
 	 * @return 对象
 	 */
 	public Object get(String key) {
@@ -192,7 +193,7 @@ public class RedisPlugin {
 	/**
 	 * 获取普通对象 - 批量获取
 	 *
-	 * @param keys Redis键
+	 * @param keys 主键
 	 * @return 对象
 	 */
 	public List<Object> getAll(Collection<String> keys) {
@@ -208,7 +209,7 @@ public class RedisPlugin {
 	 * 存入普通对象
 	 * 	无时间限制
 	 *
-	 * @param key   Redis键
+	 * @param key   主键
 	 * @param value 值
 	 * @return boolean
 	 */
@@ -227,7 +228,7 @@ public class RedisPlugin {
 	 * 存入普通对象
 	 *	有时间限制
 	 *
-	 * @param key Redis键
+	 * @param key 主键
 	 * @param value 值
 	 * @param timeout 有效期，单位秒
 	 * @return boolean
@@ -240,7 +241,7 @@ public class RedisPlugin {
 	 * 存入普通对象
 	 *	有时间限制
 	 *
-	 * @param key Redis键
+	 * @param key 主键
 	 * @param value 值
 	 * @param timeout 有效期，单位秒
 	 * @param unit 时间单位
@@ -265,8 +266,8 @@ public class RedisPlugin {
 	/**
 	 * 递增 原子性++ increment
 	 *
-	 * @param key Redis键
-	 * @return
+	 * @param key 主键
+	 * @return Long
 	 */
 	public Long increment(String key) {
 		return this.increment(key,1);
@@ -275,9 +276,9 @@ public class RedisPlugin {
 	/**
 	 * 递增 原子性++ increment
 	 *
-	 * @param key Redis键
+	 * @param key 主键
 	 * @param by  增加 i
-	 * @return
+	 * @return Long
 	 */
 	public Long increment(String key, long by) {
 		if(key == null || "".equals(key)){
@@ -292,8 +293,8 @@ public class RedisPlugin {
 	/**
 	 * 递减 原子性 -- decrement
 	 *
-	 * @param key Redis键
-	 * @return
+	 * @param key 主键
+	 * @return Long
 	 */
 	public Long decrement(String key) {
 		return this.decrement(key,1);
@@ -302,9 +303,9 @@ public class RedisPlugin {
 	/**
 	 * 递减 原子性 -- decrement
 	 *
-	 * @param key Redis键
+	 * @param key 主键
 	 * @param by  减少 i
-	 * @return
+	 * @return Long
 	 */
 	public Long decrement(String key, long by) {
 		if(key == null || "".equals(key)){
@@ -323,7 +324,7 @@ public class RedisPlugin {
 
 	/**
 	 * 设置二进制位图
-	 * @param key Redis键
+	 * @param key 主键
 	 * @param offset 偏移量
 	 * @param value 0：false  1：true
 	 * @return boolean
@@ -335,7 +336,7 @@ public class RedisPlugin {
 
 	/**
 	 * 获得二进制位图 对应偏移量的值
-	 * @param key Redis键
+	 * @param key 主键
 	 * @param offset 偏移量
 	 * @return boolean
 	 */
@@ -408,9 +409,9 @@ public class RedisPlugin {
 	/**
 	 * 获取存储在哈希表中指定字段的值
 	 *
-	 * @param key
-	 * @param field
-	 * @return
+	 * @param key 主键
+	 * @param field 字段
+	 * @return Object
 	 */
 	public Object hGet(String key, String field) {
 		return redisTemplate.opsForHash().get(key, field);
@@ -419,8 +420,8 @@ public class RedisPlugin {
 	/**
 	 * 获取所有给定字段的值
 	 *
-	 * @param key
-	 * @return
+	 * @param key 主键
+	 * @return Map
 	 */
 	public Map<Object, Object> hGetAll(String key) {
 		return redisTemplate.opsForHash().entries(key);
@@ -429,9 +430,9 @@ public class RedisPlugin {
 	/**
 	 * 获取所有给定字段的值
 	 *
-	 * @param key
-	 * @param fields
-	 * @return
+	 * @param key 主键
+	 * @param fields 字段
+	 * @return List
 	 */
 	public List<Object> hMultiGet(String key, Collection<Object> fields) {
 		return redisTemplate.opsForHash().multiGet(key, fields);
@@ -439,10 +440,10 @@ public class RedisPlugin {
 
 	/**
 	 * 添加一个Hash 数据
-	 * @param key
-	 * @param field
-	 * @param value
-	 * @return
+	 * @param key 主键
+	 * @param field 字段
+	 * @param value 值
+	 * @return boolean
 	 */
 	public boolean hPut(String key, String field, Object value) {
 		return this.hPut(key, field, value, -1, TimeUnit.SECONDS);
@@ -450,10 +451,10 @@ public class RedisPlugin {
 
 	/**
 	 * 添加一个Hash 数据
-	 * @param key
-	 * @param field
-	 * @param value
-	 * @return
+	 * @param key 主键
+	 * @param field 字段
+	 * @param value 值
+	 * @return boolean
 	 */
 	public boolean hPut(String key, String field, Object value, long timeout) {
 		return this.hPut(key, field, value, timeout, TimeUnit.SECONDS);
@@ -463,8 +464,8 @@ public class RedisPlugin {
 	 * 存入普通对象
 	 *	有时间限制
 	 *
-	 * @param key Redis键
-	 * @param field
+	 * @param key 主键
+	 * @param field 字段
 	 * @param value 值
 	 * @param timeout 有效期，单位秒
 	 * @param unit 时间单位
@@ -487,9 +488,9 @@ public class RedisPlugin {
 
 	/**
 	 * 添加一组Hash数据
-	 * @param key
-	 * @param maps
-	 * @return
+	 * @param key 主键
+	 * @param maps Map
+	 * @return boolean
 	 */
 	public boolean hPutAll(String key, Map<String, Object> maps) {
 		boolean ret = false;
@@ -506,10 +507,10 @@ public class RedisPlugin {
 	/**
 	 * 仅当hashKey不存在时才设置
 	 *
-	 * @param key
-	 * @param field
-	 * @param value
-	 * @return
+	 * @param key 主键
+	 * @param field 字段
+	 * @param value 值
+	 * @return boolean
 	 */
 	public boolean hPutIfAbsent(String key, String field, Object value) {
 		Boolean ret = null;
@@ -524,9 +525,9 @@ public class RedisPlugin {
 	/**
 	 * 删除一个或多个哈希表字段
 	 *
-	 * @param key
-	 * @param fields
-	 * @return
+	 * @param key 主键
+	 * @param fields 字段（可持续增加）
+	 * @return boolean
 	 */
 	public Long hDelete(String key, Object... fields) {
 		return redisTemplate.opsForHash().delete(key, fields);
@@ -536,9 +537,9 @@ public class RedisPlugin {
 	/**
 	 * 删除一个或多个哈希表字段
 	 *
-	 * @param key
-	 * @param fields
-	 * @return
+	 * @param key 主键
+	 * @param fields 字段集合
+	 * @return boolean
 	 */
 	public Long hDelete(String key, Collection<Object> fields) {
 		return redisTemplate.opsForHash().delete(key, fields);
@@ -547,9 +548,9 @@ public class RedisPlugin {
 	/**
 	 * 查看哈希表 key 中，指定的字段是否存在
 	 *
-	 * @param key
-	 * @param field
-	 * @return
+	 * @param key 主键
+	 * @param field 字段
+	 * @return boolean
 	 */
 	public boolean hHashKey(String key, String field) {
 		Boolean ret = null;
@@ -564,10 +565,10 @@ public class RedisPlugin {
 	/**
 	 * 为哈希表 key 中的指定字段的整数值加上增量 increment
 	 *
-	 * @param key
-	 * @param field
-	 * @param increment
-	 * @return
+	 * @param key 主键
+	 * @param field 字段
+	 * @param increment 自增数
+	 * @return Long
 	 */
 	public Long hIncrBy(String key, Object field, long increment) {
 		return redisTemplate.opsForHash().increment(key, field, increment);
@@ -576,10 +577,10 @@ public class RedisPlugin {
 	/**
 	 * 为哈希表 key 中的指定字段的整数值加上增量 increment
 	 *
-	 * @param key
-	 * @param field
-	 * @param delta
-	 * @return
+	 * @param key 主键
+	 * @param field 字段
+	 * @param delta 自增浮点数
+	 * @return Double
 	 */
 	public Double hIncrByFloat(String key, Object field, double delta) {
 		return redisTemplate.opsForHash().increment(key, field, delta);
@@ -588,8 +589,8 @@ public class RedisPlugin {
 	/**
 	 * 获取所有哈希表中的字段
 	 *
-	 * @param key
-	 * @return
+	 * @param key 主键
+	 * @return Set 集合
 	 */
 	public Set<Object> hKeys(String key) {
 		return redisTemplate.opsForHash().keys(key);
@@ -598,8 +599,8 @@ public class RedisPlugin {
 	/**
 	 * 获取哈希表中字段的数量
 	 *
-	 * @param key
-	 * @return
+	 * @param key 主键
+	 * @return Long
 	 */
 	public Long hSize(String key) {
 		return redisTemplate.opsForHash().size(key);
@@ -608,8 +609,8 @@ public class RedisPlugin {
 	/**
 	 * 获取哈希表中所有值
 	 *
-	 * @param key
-	 * @return
+	 * @param key 主键
+	 * @return List
 	 */
 	public List<Object> hValues(String key) {
 		return redisTemplate.opsForHash().values(key);
@@ -620,8 +621,8 @@ public class RedisPlugin {
 	/**
 	 * 通过索引获取列表中的元素
 	 *
-	 * @param key
-	 * @param index
+	 * @param key 主键
+	 * @param index 下标位
 	 * @return
 	 */
 	public Object lIndex(String key, long index) {
@@ -631,12 +632,10 @@ public class RedisPlugin {
 	/**
 	 * 获取列表指定范围内的元素
 	 *
-	 * @param key
-	 * @param start
-	 *            开始位置, 0是开始位置
-	 * @param end
-	 *            结束位置, -1返回所有
-	 * @return
+	 * @param key 主键
+	 * @param start 开始位置, 0是开始位置
+	 * @param end 结束位置, -1返回所有
+	 * @return List
 	 */
 	public List<Object> lRange(String key, long start, long end) {
 		return redisTemplate.opsForList().range(key, start, end);
@@ -645,9 +644,9 @@ public class RedisPlugin {
 	/**
 	 * 存储在list头部
 	 *
-	 * @param key
-	 * @param value
-	 * @return
+	 * @param key 主键
+	 * @param value 值
+	 * @return Long
 	 */
 	public Long lLeftPush(String key, String value) {
 		return redisTemplate.opsForList().leftPush(key, value);
@@ -656,9 +655,9 @@ public class RedisPlugin {
 	/**
 	 * 存储在list头部
 	 *
-	 * @param key
-	 * @param value
-	 * @return
+	 * @param key 主键
+	 * @param value 值
+	 * @return Long
 	 */
 	public Long lLeftPushAll(String key, String... value) {
 		return redisTemplate.opsForList().leftPushAll(key, value);
@@ -667,9 +666,9 @@ public class RedisPlugin {
 	/**
 	 * 存储在list头部
 	 *
-	 * @param key
-	 * @param value
-	 * @return
+	 * @param key 主键
+	 * @param value 值
+	 * @return Long
 	 */
 	public Long lLeftPushAll(String key, Collection<String> value) {
 		return redisTemplate.opsForList().leftPushAll(key, value);
@@ -679,9 +678,9 @@ public class RedisPlugin {
 	 * 存储在list头部
 	 * 当list存在的时候才加入
 	 *
-	 * @param key
-	 * @param value
-	 * @return
+	 * @param key 主键
+	 * @param value 值
+	 * @return Long
 	 */
 	public Long lLeftPushIfPresent(String key, String value) {
 		return redisTemplate.opsForList().leftPushIfPresent(key, value);
@@ -691,10 +690,10 @@ public class RedisPlugin {
 	 * 存储在list头部
 	 * 如果pivot存在,再pivot前面添加
 	 *
-	 * @param key
-	 * @param pivot
-	 * @param value
-	 * @return
+	 * @param key 主键
+	 * @param pivot 验证值
+	 * @param value 值
+	 * @return Long
 	 */
 	public Long lLeftPush(String key, String pivot, String value) {
 		return redisTemplate.opsForList().leftPush(key, pivot, value);
@@ -703,9 +702,9 @@ public class RedisPlugin {
 	/**
 	 * 存储在list尾部
 	 *
-	 * @param key
-	 * @param value
-	 * @return
+	 * @param key 主键
+	 * @param value 值
+	 * @return Long
 	 */
 	public Long lRightPush(String key, String value) {
 		return redisTemplate.opsForList().rightPush(key, value);
@@ -714,9 +713,9 @@ public class RedisPlugin {
 	/**
 	 * 存储在list尾部
 	 *
-	 * @param key
-	 * @param value
-	 * @return
+	 * @param key 主键
+	 * @param value 值
+	 * @return Long
 	 */
 	public Long lRightPushAll(String key, String... value) {
 		return redisTemplate.opsForList().rightPushAll(key, value);
@@ -725,9 +724,9 @@ public class RedisPlugin {
 	/**
 	 * 存储在list尾部
 	 *
-	 * @param key
-	 * @param value
-	 * @return
+	 * @param key 主键
+	 * @param value 值
+	 * @return Long
 	 */
 	public Long lRightPushAll(String key, Collection<String> value) {
 		return redisTemplate.opsForList().rightPushAll(key, value);
@@ -737,9 +736,9 @@ public class RedisPlugin {
 	 * 存储在list尾部
 	 * 为已存在的列表添加值
 	 *
-	 * @param key
-	 * @param value
-	 * @return
+	 * @param key 主键
+	 * @param value 值
+	 * @return Long
 	 */
 	public Long lRightPushIfPresent(String key, String value) {
 		return redisTemplate.opsForList().rightPushIfPresent(key, value);
@@ -749,10 +748,10 @@ public class RedisPlugin {
 	 * 存储在list尾部
 	 * 在pivot元素的右边添加值
 	 *
-	 * @param key
-	 * @param pivot
-	 * @param value
-	 * @return
+	 * @param key 主键
+	 * @param pivot 验证值
+	 * @param value 值
+	 * @return Long
 	 */
 	public Long lRightPush(String key, String pivot, String value) {
 		return redisTemplate.opsForList().rightPush(key, pivot, value);
@@ -761,10 +760,10 @@ public class RedisPlugin {
 	/**
 	 * 通过索引设置列表元素的值
 	 *
-	 * @param key
-	 * @param index
-	 *            位置
-	 * @param value
+	 * @param key 主键
+	 * @param index 下标位置
+	 * @param value 值
+	 * @return boolean
 	 */
 	public boolean lSet(String key, long index, String value) {
 		boolean ret = false;
@@ -780,7 +779,7 @@ public class RedisPlugin {
 	/**
 	 * 移出并获取列表的第一个元素
 	 *
-	 * @param key
+	 * @param key 主键
 	 * @return 删除的元素
 	 */
 	public Object lLeftPop(String key) {
@@ -790,12 +789,10 @@ public class RedisPlugin {
 	/**
 	 * 移出并获取列表的第一个元素， 如果列表没有元素会阻塞列表直到等待超时或发现可弹出元素为止
 	 *
-	 * @param key
-	 * @param timeout
-	 *            等待时间
-	 * @param unit
-	 *            时间单位
-	 * @return
+	 * @param key 主键
+	 * @param timeout 等待时间
+	 * @param unit 时间单位
+	 * @return Object
 	 */
 	public Object lBLeftPop(String key, long timeout, TimeUnit unit) {
 		return redisTemplate.opsForList().leftPop(key, timeout, unit);
@@ -804,7 +801,7 @@ public class RedisPlugin {
 	/**
 	 * 移除并获取列表最后一个元素
 	 *
-	 * @param key
+	 * @param key 主键
 	 * @return 删除的元素
 	 */
 	public Object lRightPop(String key) {
@@ -814,12 +811,10 @@ public class RedisPlugin {
 	/**
 	 * 移出并获取列表的最后一个元素， 如果列表没有元素会阻塞列表直到等待超时或发现可弹出元素为止
 	 *
-	 * @param key
-	 * @param timeout
-	 *            等待时间
-	 * @param unit
-	 *            时间单位
-	 * @return
+	 * @param key 主键
+	 * @param timeout 等待时间
+	 * @param unit 时间单位
+	 * @return Object
 	 */
 	public Object lBRightPop(String key, long timeout, TimeUnit unit) {
 		return redisTemplate.opsForList().rightPop(key, timeout, unit);
@@ -828,9 +823,9 @@ public class RedisPlugin {
 	/**
 	 * 移除列表的最后一个元素，并将该元素添加到另一个列表并返回
 	 *
-	 * @param sourceKey
-	 * @param destinationKey
-	 * @return
+	 * @param sourceKey 源主键
+	 * @param destinationKey 目标主键
+	 * @return Object
 	 */
 	public Object lRightPopAndLeftPush(String sourceKey, String destinationKey) {
 		return redisTemplate.opsForList().rightPopAndLeftPush(sourceKey,
@@ -840,11 +835,11 @@ public class RedisPlugin {
 	/**
 	 * 从列表中弹出一个值，将弹出的元素插入到另外一个列表中并返回它； 如果列表没有元素会阻塞列表直到等待超时或发现可弹出元素为止
 	 *
-	 * @param sourceKey
-	 * @param destinationKey
-	 * @param timeout
-	 * @param unit
-	 * @return
+	 * @param sourceKey 源主键
+	 * @param destinationKey 目标主键
+	 * @param timeout 等待时间
+	 * @param unit 单位
+	 * @return Object
 	 */
 	public Object lBRightPopAndLeftPush(String sourceKey, String destinationKey,
 										long timeout, TimeUnit unit) {
@@ -855,12 +850,12 @@ public class RedisPlugin {
 	/**
 	 * 删除集合中值等于value得元素
 	 *
-	 * @param key
+	 * @param key 主键
 	 * @param index
 	 *            index=0, 删除所有值等于value的元素; index>0, 从头部开始删除第一个值等于value的元素;
 	 *            index<0, 从尾部开始删除第一个值等于value的元素;
-	 * @param value
-	 * @return
+	 * @param value 值
+	 * @return Long
 	 */
 	public Long lRemove(String key, long index, String value) {
 		return redisTemplate.opsForList().remove(key, index, value);
@@ -869,9 +864,9 @@ public class RedisPlugin {
 	/**
 	 * 裁剪list
 	 *
-	 * @param key
-	 * @param start
-	 * @param end
+	 * @param key 主键
+	 * @param start 开始位置
+	 * @param end 结束位置
 	 */
 	public boolean lTrim(String key, long start, long end) {
 		boolean ret = false;
@@ -887,8 +882,8 @@ public class RedisPlugin {
 	/**
 	 * 获取列表长度
 	 *
-	 * @param key
-	 * @return
+	 * @param key 主键
+	 * @return Long
 	 */
 	public Long lLen(String key) {
 		return redisTemplate.opsForList().size(key);
@@ -899,9 +894,9 @@ public class RedisPlugin {
 	/**
 	 * 判断集合是否包含value
 	 *
-	 * @param key
-	 * @param value
-	 * @return
+	 * @param key 主键
+	 * @param value 值
+	 * @return boolean
 	 */
 	public boolean sHashKey(String key, Object value) {
 		Boolean ret = null;
@@ -916,9 +911,9 @@ public class RedisPlugin {
 	/**
 	 * set添加元素
 	 *
-	 * @param key
-	 * @param values
-	 * @return
+	 * @param key 主键
+	 * @param values 值集合
+	 * @return Long
 	 */
 	public Long sPut(String key, String... values) {
 		return redisTemplate.opsForSet().add(key, values);
@@ -927,9 +922,9 @@ public class RedisPlugin {
 	/**
 	 * set添加元素
 	 *
-	 * @param key
-	 * @param values
-	 * @return
+	 * @param key 主键
+	 * @param values 值集合
+	 * @return Long
 	 */
 	public Long sPutAll(String key, Collection<Object> values) {
 		Object[] objects = {};
@@ -942,9 +937,9 @@ public class RedisPlugin {
 	/**
 	 * set移除元素
 	 *
-	 * @param key
-	 * @param values
-	 * @return
+	 * @param key 主键
+	 * @param values 值集合
+	 * @return Long
 	 */
 	public Long sRemove(String key, Object... values) {
 		return redisTemplate.opsForSet().remove(key, values);
@@ -953,9 +948,9 @@ public class RedisPlugin {
 	/**
 	 * set移除元素
 	 *
-	 * @param key
-	 * @param values
-	 * @return
+	 * @param key 主键
+	 * @param values 值集合
+	 * @return Long
 	 */
 	public Long sRemoveList(String key, Collection<Object> values) {
 		Object[] objects = {};
@@ -969,8 +964,8 @@ public class RedisPlugin {
 	/**
 	 * 移除并返回集合的一个随机元素
 	 *
-	 * @param key
-	 * @return
+	 * @param key 主键
+	 * @return Object
 	 */
 	public Object sPop(String key) {
 		return redisTemplate.opsForSet().pop(key);
@@ -979,10 +974,10 @@ public class RedisPlugin {
 	/**
 	 * 将元素value从一个集合移到另一个集合
 	 *
-	 * @param key
-	 * @param value
-	 * @param destKey
-	 * @return
+	 * @param key 主键
+	 * @param value 值
+	 * @param destKey 目标主键
+	 * @return boolean
 	 */
 	public boolean sMove(String key, String value, String destKey) {
 		Boolean ret = null;
@@ -997,8 +992,8 @@ public class RedisPlugin {
 	/**
 	 * 获取集合的大小
 	 *
-	 * @param key
-	 * @return
+	 * @param key 主键
+	 * @return Long
 	 */
 	public Long sSize(String key) {
 		return redisTemplate.opsForSet().size(key);
@@ -1007,9 +1002,9 @@ public class RedisPlugin {
 	/**
 	 * 获取两个集合的交集
 	 *
-	 * @param key
-	 * @param otherKey
-	 * @return
+	 * @param key 主键
+	 * @param otherKey 其他主键
+	 * @return Set
 	 */
 	public Set<Object> sIntersect(String key, String otherKey) {
 		return redisTemplate.opsForSet().intersect(key, otherKey);
@@ -1018,9 +1013,9 @@ public class RedisPlugin {
 	/**
 	 * 获取key集合与多个集合的交集
 	 *
-	 * @param key
-	 * @param otherKeys
-	 * @return
+	 * @param key 主键
+	 * @param otherKeys 其他主键集合
+	 * @return Set
 	 */
 	public Set<Object> sIntersect(String key, Collection<String> otherKeys) {
 		return redisTemplate.opsForSet().intersect(key, otherKeys);
@@ -1029,10 +1024,10 @@ public class RedisPlugin {
 	/**
 	 * key集合与otherKey集合的交集存储到destKey集合中
 	 *
-	 * @param key
-	 * @param otherKey
-	 * @param destKey
-	 * @return
+	 * @param key 主键
+	 * @param otherKey 其他主键
+	 * @param destKey 目标主键
+	 * @return Long
 	 */
 	public Long sIntersectAndStore(String key, String otherKey, String destKey) {
 		return redisTemplate.opsForSet().intersectAndStore(key, otherKey,
@@ -1042,10 +1037,10 @@ public class RedisPlugin {
 	/**
 	 * key集合与多个集合的交集存储到destKey集合中
 	 *
-	 * @param key
-	 * @param otherKeys
-	 * @param destKey
-	 * @return
+	 * @param key 主键
+	 * @param otherKeys 其他主键集合
+	 * @param destKey 目标主键
+	 * @return Long
 	 */
 	public Long sIntersectAndStore(String key, Collection<String> otherKeys,
 								   String destKey) {
@@ -1056,9 +1051,9 @@ public class RedisPlugin {
 	/**
 	 * 获取两个集合的并集
 	 *
-	 * @param key
-	 * @param otherKeys
-	 * @return
+	 * @param key 主键
+	 * @param otherKeys 其他主键
+	 * @return Set
 	 */
 	public Set<Object> sUnion(String key, String otherKeys) {
 		return redisTemplate.opsForSet().union(key, otherKeys);
@@ -1067,9 +1062,9 @@ public class RedisPlugin {
 	/**
 	 * 获取key集合与多个集合的并集
 	 *
-	 * @param key
-	 * @param otherKeys
-	 * @return
+	 * @param key 主键
+	 * @param otherKeys 其他主键
+	 * @return Set
 	 */
 	public Set<Object> sUnion(String key, Collection<String> otherKeys) {
 		return redisTemplate.opsForSet().union(key, otherKeys);
@@ -1078,10 +1073,10 @@ public class RedisPlugin {
 	/**
 	 * key集合与otherKey集合的并集存储到destKey中
 	 *
-	 * @param key
-	 * @param otherKey
-	 * @param destKey
-	 * @return
+	 * @param key 主键
+	 * @param otherKey 其他主键
+	 * @param destKey 目标主键
+	 * @return Long
 	 */
 	public Long sUnionAndStore(String key, String otherKey, String destKey) {
 		return redisTemplate.opsForSet().unionAndStore(key, otherKey, destKey);
@@ -1090,10 +1085,10 @@ public class RedisPlugin {
 	/**
 	 * key集合与多个集合的并集存储到destKey中
 	 *
-	 * @param key
-	 * @param otherKeys
-	 * @param destKey
-	 * @return
+	 * @param key 主键
+	 * @param otherKeys 其他主键集合
+	 * @param destKey 目标主键
+	 * @return Long
 	 */
 	public Long sUnionAndStore(String key, Collection<String> otherKeys,
 							   String destKey) {
@@ -1103,9 +1098,9 @@ public class RedisPlugin {
 	/**
 	 * 获取两个集合的差集
 	 *
-	 * @param key
-	 * @param otherKey
-	 * @return
+	 * @param key 主键
+	 * @param otherKey 其他主键
+	 * @return Set
 	 */
 	public Set<Object> sDifference(String key, String otherKey) {
 		return redisTemplate.opsForSet().difference(key, otherKey);
@@ -1114,9 +1109,9 @@ public class RedisPlugin {
 	/**
 	 * 获取key集合与多个集合的差集
 	 *
-	 * @param key
-	 * @param otherKeys
-	 * @return
+	 * @param key 主键
+	 * @param otherKeys 其他主键集合
+	 * @return Set
 	 */
 	public Set<Object> sDifference(String key, Collection<String> otherKeys) {
 		return redisTemplate.opsForSet().difference(key, otherKeys);
@@ -1125,10 +1120,10 @@ public class RedisPlugin {
 	/**
 	 * key集合与otherKey集合的差集存储到destKey中
 	 *
-	 * @param key
-	 * @param otherKey
-	 * @param destKey
-	 * @return
+	 * @param key 主键
+	 * @param otherKey 其他主键
+	 * @param destKey 目标主键
+	 * @return Long
 	 */
 	public Long sDifference(String key, String otherKey, String destKey) {
 		return redisTemplate.opsForSet().differenceAndStore(key, otherKey,
@@ -1138,10 +1133,10 @@ public class RedisPlugin {
 	/**
 	 * key集合与多个集合的差集存储到destKey中
 	 *
-	 * @param key
-	 * @param otherKeys
-	 * @param destKey
-	 * @return
+	 * @param key 主键
+	 * @param otherKeys 其他主键集合
+	 * @param destKey 目标主键
+	 * @return Long
 	 */
 	public Long sDifference(String key, Collection<String> otherKeys,
 							String destKey) {
@@ -1152,8 +1147,8 @@ public class RedisPlugin {
 	/**
 	 * 获取集合所有元素
 	 *
-	 * @param key
-	 * @return
+	 * @param key 主键
+	 * @return Set
 	 */
 	public Set<Object> setMembers(String key) {
 		return redisTemplate.opsForSet().members(key);
@@ -1162,8 +1157,8 @@ public class RedisPlugin {
 	/**
 	 * 随机获取集合中的一个元素
 	 *
-	 * @param key
-	 * @return
+	 * @param key 主键
+	 * @return Object
 	 */
 	public Object sRandomMember(String key) {
 		return redisTemplate.opsForSet().randomMember(key);
@@ -1172,9 +1167,9 @@ public class RedisPlugin {
 	/**
 	 * 随机获取集合中count个元素
 	 *
-	 * @param key
-	 * @param count
-	 * @return
+	 * @param key 主键
+	 * @param count 数量
+	 * @return List
 	 */
 	public List<Object> sRandomMembers(String key, long count) {
 		return redisTemplate.opsForSet().randomMembers(key, count);
@@ -1183,9 +1178,9 @@ public class RedisPlugin {
 	/**
 	 * 随机获取集合中count个元素并且去除重复的
 	 *
-	 * @param key
-	 * @param count
-	 * @return
+	 * @param key 主键
+	 * @param count 数量
+	 * @return Set
 	 */
 	public Set<Object> sDistinctRandomMembers(String key, long count) {
 		return redisTemplate.opsForSet().distinctRandomMembers(key, count);
@@ -1197,10 +1192,10 @@ public class RedisPlugin {
 	/**
 	 * 添加元素,有序集合是按照元素的score值由小到大排列
 	 *
-	 * @param key
-	 * @param value
-	 * @param score
-	 * @return
+	 * @param key 主键
+	 * @param value 值
+	 * @param score 分数
+	 * @return Boolean
 	 */
 	public Boolean zAdd(String key, String value, double score) {
 		return redisTemplate.opsForZSet().add(key, value, score);
@@ -1208,9 +1203,9 @@ public class RedisPlugin {
 
 	/**
 	 *
-	 * @param key
-	 * @param values
-	 * @return
+	 * @param key 主键
+	 * @param values 值集合
+	 * @return Long
 	 */
 	public Long zAdd(String key, Set<ZSetOperations.TypedTuple<Object>> values) {
 		return redisTemplate.opsForZSet().add(key, values);
@@ -1218,9 +1213,9 @@ public class RedisPlugin {
 
 	/**
 	 *
-	 * @param key
-	 * @param values
-	 * @return
+	 * @param key 主键
+	 * @param values 值集合
+	 * @return Long
 	 */
 	public Long zRemove(String key, Object... values) {
 		return redisTemplate.opsForZSet().remove(key, values);
@@ -1229,10 +1224,10 @@ public class RedisPlugin {
 	/**
 	 * 增加元素的score值，并返回增加后的值
 	 *
-	 * @param key
-	 * @param value
-	 * @param delta
-	 * @return
+	 * @param key 主键
+	 * @param value 值
+	 * @param delta 自增浮点数
+	 * @return Double
 	 */
 	public Double zIncrementScore(String key, String value, double delta) {
 		return redisTemplate.opsForZSet().incrementScore(key, value, delta);
@@ -1241,8 +1236,8 @@ public class RedisPlugin {
 	/**
 	 * 返回元素在集合的排名,有序集合是按照元素的score值由小到大排列
 	 *
-	 * @param key
-	 * @param value
+	 * @param key 主键
+	 * @param value 值
 	 * @return 0表示第一位
 	 */
 	public Long zRank(String key, Object value) {
@@ -1252,9 +1247,9 @@ public class RedisPlugin {
 	/**
 	 * 返回元素在集合的排名,按元素的score值由大到小排列
 	 *
-	 * @param key
-	 * @param value
-	 * @return
+	 * @param key 主键
+	 * @param value 值
+	 * @return Long
 	 */
 	public Long zReverseRank(String key, Object value) {
 		return redisTemplate.opsForZSet().reverseRank(key, value);
@@ -1263,12 +1258,10 @@ public class RedisPlugin {
 	/**
 	 * 获取集合的元素, 从小到大排序
 	 *
-	 * @param key
-	 * @param start
-	 *            开始位置
-	 * @param end
-	 *            结束位置, -1查询所有
-	 * @return
+	 * @param key 主键
+	 * @param start 开始位置
+	 * @param end 结束位置, -1查询所有
+	 * @return Set
 	 */
 	public Set<Object> zRange(String key, long start, long end) {
 		return redisTemplate.opsForZSet().range(key, start, end);
@@ -1277,10 +1270,10 @@ public class RedisPlugin {
 	/**
 	 * 获取集合元素, 并且把score值也获取
 	 *
-	 * @param key
-	 * @param start
-	 * @param end
-	 * @return
+	 * @param key 主键
+	 * @param start 开始位置, 0是开始位置
+	 * @param end 结束位置, -1查询所有
+	 * @return Set
 	 */
 	public Set<ZSetOperations.TypedTuple<Object>> zRangeWithScores(String key, long start,
 																   long end) {
@@ -1290,12 +1283,10 @@ public class RedisPlugin {
 	/**
 	 * 根据Score值查询集合元素
 	 *
-	 * @param key
-	 * @param min
-	 *            最小值
-	 * @param max
-	 *            最大值
-	 * @return
+	 * @param key 主键
+	 * @param min 最小值
+	 * @param max 最大值
+	 * @return Set
 	 */
 	public Set<Object> zRangeByScore(String key, double min, double max) {
 		return redisTemplate.opsForZSet().rangeByScore(key, min, max);
@@ -1304,12 +1295,10 @@ public class RedisPlugin {
 	/**
 	 * 根据Score值查询集合元素, 从小到大排序
 	 *
-	 * @param key
-	 * @param min
-	 *            最小值
-	 * @param max
-	 *            最大值
-	 * @return
+	 * @param key 主键
+	 * @param min 最小值
+	 * @param max 最大值
+	 * @return Set
 	 */
 	public Set<ZSetOperations.TypedTuple<Object>> zRangeByScoreWithScores(String key,
 																		  double min, double max) {
@@ -1317,13 +1306,13 @@ public class RedisPlugin {
 	}
 
 	/**
-	 *
-	 * @param key
-	 * @param min
-	 * @param max
-	 * @param start
-	 * @param end
-	 * @return
+	 * 查询Score值 在 固定范围内的数据
+	 * @param key 主键
+	 * @param min 最小
+	 * @param max 最大
+	 * @param start 开始位置, 0是开始位置
+	 * @param end 结束位置, -1查询所有
+	 * @return Set
 	 */
 	public Set<ZSetOperations.TypedTuple<Object>> zRangeByScoreWithScores(String key,
 																		  double min, double max, long start, long end) {
@@ -1334,10 +1323,10 @@ public class RedisPlugin {
 	/**
 	 * 获取集合的元素, 从大到小排序
 	 *
-	 * @param key
-	 * @param start
-	 * @param end
-	 * @return
+	 * @param key 主键
+	 * @param start 开始位置
+	 * @param end 结束位置
+	 * @return Set
 	 */
 	public Set<Object> zReverseRange(String key, long start, long end) {
 		return redisTemplate.opsForZSet().reverseRange(key, start, end);
@@ -1346,10 +1335,10 @@ public class RedisPlugin {
 	/**
 	 * 获取集合的元素, 从大到小排序, 并返回score值
 	 *
-	 * @param key
-	 * @param start
-	 * @param end
-	 * @return
+	 * @param key 主键
+	 * @param start 开始位置, 0是开始位置
+	 * @param end 结束位置, -1查询所有
+	 * @return Set<
 	 */
 	public Set<ZSetOperations.TypedTuple<Object>> zReverseRangeWithScores(String key,
 																		  long start, long end) {
@@ -1360,10 +1349,10 @@ public class RedisPlugin {
 	/**
 	 * 根据Score值查询集合元素, 从大到小排序
 	 *
-	 * @param key
-	 * @param min
-	 * @param max
-	 * @return
+	 * @param key 主键
+	 * @param min 最小
+	 * @param max 最大
+	 * @return Set
 	 */
 	public Set<Object> zReverseRangeByScore(String key, double min,
 											double max) {
@@ -1373,10 +1362,10 @@ public class RedisPlugin {
 	/**
 	 * 根据Score值查询集合元素, 从大到小排序
 	 *
-	 * @param key
-	 * @param min
-	 * @param max
-	 * @return
+	 * @param key 主键
+	 * @param min 最小
+	 * @param max 最大
+	 * @return Set
 	 */
 	public Set<ZSetOperations.TypedTuple<Object>> zReverseRangeByScoreWithScores(
 			String key, double min, double max) {
@@ -1385,13 +1374,13 @@ public class RedisPlugin {
 	}
 
 	/**
-	 *
-	 * @param key
-	 * @param min
-	 * @param max
-	 * @param start
-	 * @param end
-	 * @return
+	 * 根据Score值查询集合元素, 从大到小排序
+	 * @param key 主键
+	 * @param min 最小
+	 * @param max 最大
+	 * @param start 开始位置, 0是开始位置
+	 * @param end 结束位置, -1查询所有
+	 * @return Set
 	 */
 	public Set<Object> zReverseRangeByScore(String key, double min,
 											double max, long start, long end) {
@@ -1402,10 +1391,10 @@ public class RedisPlugin {
 	/**
 	 * 根据score值获取集合元素数量
 	 *
-	 * @param key
-	 * @param min
-	 * @param max
-	 * @return
+	 * @param key 主键
+	 * @param min 最小
+	 * @param max 最大
+	 * @return Long
 	 */
 	public Long zCount(String key, double min, double max) {
 		return redisTemplate.opsForZSet().count(key, min, max);
@@ -1414,8 +1403,8 @@ public class RedisPlugin {
 	/**
 	 * 获取集合大小
 	 *
-	 * @param key
-	 * @return
+	 * @param key 主键
+	 * @return Long
 	 */
 	public Long zSize(String key) {
 		return redisTemplate.opsForZSet().size(key);
@@ -1424,8 +1413,8 @@ public class RedisPlugin {
 	/**
 	 * 获取集合大小
 	 *
-	 * @param key
-	 * @return
+	 * @param key 主键
+	 * @return Long
 	 */
 	public Long zZCard(String key) {
 		return redisTemplate.opsForZSet().zCard(key);
@@ -1434,9 +1423,9 @@ public class RedisPlugin {
 	/**
 	 * 获取集合中value元素的score值
 	 *
-	 * @param key
-	 * @param value
-	 * @return
+	 * @param key 主键
+	 * @param value 值
+	 * @return Double
 	 */
 	public Double zScore(String key, Object value) {
 		return redisTemplate.opsForZSet().score(key, value);
@@ -1445,10 +1434,10 @@ public class RedisPlugin {
 	/**
 	 * 移除指定索引位置的成员
 	 *
-	 * @param key
-	 * @param start
-	 * @param end
-	 * @return
+	 * @param key 主键
+	 * @param start 开始位置
+	 * @param end 结束位置
+	 * @return Long
 	 */
 	public Long zRemoveRange(String key, long start, long end) {
 		return redisTemplate.opsForZSet().removeRange(key, start, end);
@@ -1457,10 +1446,10 @@ public class RedisPlugin {
 	/**
 	 * 根据指定的score值的范围来移除成员
 	 *
-	 * @param key
-	 * @param min
-	 * @param max
-	 * @return
+	 * @param key 主键
+	 * @param min 最小
+	 * @param max 最大
+	 * @return Long
 	 */
 	public Long zRemoveRangeByScore(String key, double min, double max) {
 		return redisTemplate.opsForZSet().removeRangeByScore(key, min, max);
@@ -1469,21 +1458,22 @@ public class RedisPlugin {
 	/**
 	 * 获取key和otherKey的并集并存储在destKey中
 	 *
-	 * @param key
-	 * @param otherKey
-	 * @param destKey
-	 * @return
+	 * @param key 主键
+	 * @param otherKey 其他主键
+	 * @param destKey 目标主键
+	 * @return Long
 	 */
 	public Long zUnionAndStore(String key, String otherKey, String destKey) {
 		return redisTemplate.opsForZSet().unionAndStore(key, otherKey, destKey);
 	}
 
 	/**
+	 * 获取key和otherKey的并集并存储在destKey中
 	 *
-	 * @param key
-	 * @param otherKeys
-	 * @param destKey
-	 * @return
+	 * @param key 主键
+	 * @param otherKeys 其他主键
+	 * @param destKey 目标主键
+	 * @return Long
 	 */
 	public Long zUnionAndStore(String key, Collection<String> otherKeys,
 							   String destKey) {
@@ -1494,10 +1484,10 @@ public class RedisPlugin {
 	/**
 	 * 交集
 	 *
-	 * @param key
-	 * @param otherKey
-	 * @param destKey
-	 * @return
+	 * @param key 主键
+	 * @param otherKey 其他主键
+	 * @param destKey 目标主键
+	 * @return Long
 	 */
 	public Long zIntersectAndStore(String key, String otherKey,
 								   String destKey) {
@@ -1508,10 +1498,10 @@ public class RedisPlugin {
 	/**
 	 * 交集
 	 *
-	 * @param key
-	 * @param otherKeys
-	 * @param destKey
-	 * @return
+	 * @param key 主键
+	 * @param otherKeys 其他主键
+	 * @param destKey 目标主键
+	 * @return Long
 	 */
 	public Long zIntersectAndStore(String key, Collection<String> otherKeys,
 								   String destKey) {
@@ -1523,7 +1513,8 @@ public class RedisPlugin {
 
 	/**
 	 * Redis 消息发布 Push
-	 * @param basePubMessage
+	 * @param basePubMessage 消息
+	 * @return boolean
 	 */
 	public boolean sendMessage(BaseSubMessage basePubMessage) {
 		if(basePubMessage == null){

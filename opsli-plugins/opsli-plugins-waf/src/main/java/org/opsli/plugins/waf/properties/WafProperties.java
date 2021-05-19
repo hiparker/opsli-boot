@@ -9,7 +9,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import java.util.Set;
 
 /**
- * 软防火墙
+ * 软防火墙 配置
  *
  * @author Parker
  * @date 2020-12-19

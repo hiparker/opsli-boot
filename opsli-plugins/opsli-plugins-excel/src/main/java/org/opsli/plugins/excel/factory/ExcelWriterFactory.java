@@ -25,12 +25,13 @@ import java.io.OutputStream;
 import java.util.List;
 
 /**
- * ExcelWriterFactory
+ * Excel 写工厂
  *
- * @author parker
+ * @author Parker
+ * @date 2020-09-16 11:47
  */
 public class ExcelWriterFactory extends ExcelWriter {
-    private OutputStream outputStream;
+    private final OutputStream outputStream;
     private int sheetNo = 1;
 
     public ExcelWriterFactory(OutputStream outputStream, ExcelTypeEnum typeEnum) {

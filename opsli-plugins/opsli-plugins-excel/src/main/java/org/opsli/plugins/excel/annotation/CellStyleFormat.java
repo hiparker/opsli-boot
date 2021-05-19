@@ -21,11 +21,10 @@ import org.apache.poi.ss.usermodel.IndexedColors;
 import java.lang.annotation.*;
 
 /**
- * Created Date by 2020/5/9 0009.
- *
  * Excel 样式注解
  *
- * @author parker
+ * @author Parker
+ * @date 2020-09-16 11:47
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)

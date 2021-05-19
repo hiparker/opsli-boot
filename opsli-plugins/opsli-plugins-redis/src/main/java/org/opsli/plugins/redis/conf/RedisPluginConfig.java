@@ -35,10 +35,10 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 /**
- * @Author parker
- *
  * Redis 配置类
  *
+ * @author Parker
+ * @date 2020-09-16 11:47
  */
 @Slf4j
 @Configuration
