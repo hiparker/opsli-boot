@@ -24,11 +24,10 @@ import lombok.EqualsAndHashCode;
 import org.opsli.core.base.entity.BaseEntity;
 
 /**
- * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.modulars.gentest.carinfo.entity
- * @Author: Parker
- * @CreateTime: 2020-12-20 20:12:57
- * @Description: 汽车信息
+ * 汽车信息
+ *
+ * @author Parker
+ * @date 2020-12-20 20:12:57
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -54,16 +53,11 @@ public class TestCar extends BaseEntity {
     // ========================================
 
 
-
-
-
-
     /** 多租户字段 */
     private String tenantId;
 
     /** 逻辑删除字段 */
     @TableLogic
     private Integer deleted;
-
 
 }

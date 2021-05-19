@@ -24,13 +24,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Method;
 
-
 /**
- * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.modulars.test.web
- * @Author: Parker
- * @CreateTime: 2020-09-13 17:40
- * @Description: 测试类
+ * 测试类 Controller
+ *
+ * @author Parker
+ * @date 2020-09-17 13:01
  */
 @Api(tags = "测试类")
 @Slf4j
@@ -140,7 +138,6 @@ public class TestRestController extends BaseRestController<TestEntity, TestModel
      * 测试 Excel 导出
      * @param request request
      * @param response response
-     * @return ResultVo
      */
     @ApiOperation(value = "导出Excel", notes = "导出Excel")
     @RequiresPermissionsCus("gentest_test_export")
@@ -169,7 +166,6 @@ public class TestRestController extends BaseRestController<TestEntity, TestModel
     /**
      * 测试 Excel 下载导入模版
      * @param response response
-     * @return ResultVo
      */
     @ApiOperation(value = "导出Excel模版", notes = "导出Excel模版")
     @RequiresPermissionsCus("gentest_test_import")

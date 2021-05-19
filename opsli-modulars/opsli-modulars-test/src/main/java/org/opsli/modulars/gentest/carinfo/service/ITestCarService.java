@@ -22,12 +22,11 @@ import org.opsli.modulars.gentest.carinfo.entity.TestCar;
 import org.opsli.api.wrapper.gentest.carinfo.TestCarModel;
 
 /**
-* @BelongsProject: opsli-boot
-* @BelongsPackage: org.opsli.modulars.gentest.carinfo.service
-* @Author: Parker
-* @CreateTime: 2020-12-20 20:12:57
-* @Description: 汽车信息 Service
-*/
+ * 汽车信息 Service
+ *
+ * @author Parker
+ * @date 2020-12-20 20:12:57
+ */
 public interface ITestCarService extends CrudServiceInterface<TestCar, TestCarModel> {
 
 }

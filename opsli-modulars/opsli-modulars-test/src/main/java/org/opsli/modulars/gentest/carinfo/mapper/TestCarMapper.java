@@ -21,12 +21,11 @@ import org.apache.ibatis.annotations.Param;
 import org.opsli.modulars.gentest.carinfo.entity.TestCar;
 
 /**
-* @BelongsProject: opsli-boot
-* @BelongsPackage: org.opsli.modulars.gentest.carinfo.mapper
-* @Author: Parker
-* @CreateTime: 2020-12-20 20:12:57
-* @Description: 汽车信息 Mapper
-*/
+ * 汽车信息 Mapper
+ *
+ * @author Parker
+ * @date 2020-12-20 20:12:57
+ */
 @Mapper
 public interface TestCarMapper extends BaseMapper<TestCar> {
 

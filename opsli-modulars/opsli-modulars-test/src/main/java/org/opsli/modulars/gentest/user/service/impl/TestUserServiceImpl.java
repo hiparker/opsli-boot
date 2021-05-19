@@ -28,12 +28,11 @@ import org.opsli.modulars.gentest.user.mapper.TestUserMapper;
 
 
 /**
-* @BelongsProject: opsli-boot
-* @BelongsPackage: org.opsli.modulars.gentest.user.service.impl
-* @Author: 周鹏程
-* @CreateTime: 2020-11-22 12:12:05
-* @Description: 某系统用户 Service Impl
-*/
+ * 某系统用户 Service Impl
+ *
+ * @author Parker
+ * @date 2020-11-22 12:12:05
+ */
 @Service
 public class TestUserServiceImpl extends CrudServiceImpl<TestUserMapper, TestUser, TestUserModel>
     implements ITestUserService {

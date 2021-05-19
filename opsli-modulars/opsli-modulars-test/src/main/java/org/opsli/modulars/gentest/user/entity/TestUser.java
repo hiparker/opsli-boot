@@ -24,11 +24,10 @@ import lombok.EqualsAndHashCode;
 import org.opsli.core.base.entity.BaseEntity;
 
 /**
- * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.modulars.gentest.user.entity
- * @Author: 周鹏程
- * @CreateTime: 2020-11-22 12:12:05
- * @Description: 某系统用户
+ * 某系统用户
+ *
+ * @author Parker
+ * @date 2020-11-22 12:12:05
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -53,16 +52,10 @@ public class TestUser extends BaseEntity {
 
     // ========================================
 
-
-
-
-
-
     /** 多租户字段 */
     private String tenantId;
 
     /** 逻辑删除字段 */
     private Integer deleted;
-
 
 }

@@ -26,14 +26,12 @@ import org.opsli.api.wrapper.gentest.carinfo.TestCarModel;
 import org.opsli.modulars.gentest.carinfo.service.ITestCarService;
 import org.opsli.modulars.gentest.carinfo.mapper.TestCarMapper;
 
-
 /**
-* @BelongsProject: opsli-boot
-* @BelongsPackage: org.opsli.modulars.gentest.carinfo.service.impl
-* @Author: Parker
-* @CreateTime: 2020-12-20 20:12:57
-* @Description: 汽车信息 Service Impl
-*/
+ * 汽车信息 Service Impl
+ *
+ * @author Parker
+ * @date 2020-12-20 20:12:57
+ */
 @Service
 public class TestCarServiceImpl extends CrudServiceImpl<TestCarMapper, TestCar, TestCarModel>
     implements ITestCarService {

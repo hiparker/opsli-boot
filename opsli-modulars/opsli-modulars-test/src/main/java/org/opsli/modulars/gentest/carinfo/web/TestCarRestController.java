@@ -40,12 +40,11 @@ import org.opsli.modulars.gentest.carinfo.service.ITestCarService;
 import org.opsli.api.web.gentest.carinfo.TestCarRestApi;
 
 /**
-* @BelongsProject: opsli-boot
-* @BelongsPackage: org.opsli.modulars.gentest.carinfo.web
-* @Author: Parker
-* @CreateTime: 2020-12-20 20:12:57
-* @Description: 汽车信息 Controller
-*/
+ * 汽车信息 Controller
+ *
+ * @author Parker
+ * @date 2020-12-20 20:12:57
+ */
 @Api(tags = TestCarRestApi.TITLE)
 @Slf4j
 @ApiRestController("/gentest/carinfo")
@@ -163,7 +162,6 @@ public class TestCarRestController extends BaseRestController<TestCar, TestCarMo
     *
     * @param request request
     * @param response response
-    * @return ResultVo
     */
     @ApiOperation(value = "导出Excel", notes = "导出Excel")
     @RequiresPermissionsCus("gentest_carinfo_export")
@@ -194,7 +192,6 @@ public class TestCarRestController extends BaseRestController<TestCar, TestCarMo
     * 汽车信息 Excel 下载导入模版
     * 注：这里 RequiresPermissionsCus 引入的是 自定义鉴权注解
     * @param response response
-    * @return ResultVo
     */
     @ApiOperation(value = "导出Excel模版", notes = "导出Excel模版")
     @RequiresPermissionsCus("gentest_carinfo_import")

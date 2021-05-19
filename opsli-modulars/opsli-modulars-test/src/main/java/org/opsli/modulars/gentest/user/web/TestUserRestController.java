@@ -41,12 +41,11 @@ import org.opsli.api.web.gentest.user.TestUserRestApi;
 import java.lang.reflect.Method;
 
 /**
-* @BelongsProject: opsli-boot
-* @BelongsPackage: org.opsli.modulars.gentest.user.web
-* @Author: 周鹏程
-* @CreateTime: 2020-11-22 12:12:05
-* @Description: 某系统用户 Controller
-*/
+ * 某系统用户 Controller
+ *
+ * @author Parker
+ * @date 2020-11-22 12:12:05
+ */
 @Api(tags = TestUserRestApi.TITLE)
 @Slf4j
 @ApiRestController("/gentest/user")
@@ -156,7 +155,6 @@ public class TestUserRestController extends BaseRestController<TestUser, TestUse
     * 注：这里 RequiresPermissionsCus 引入的是 自定义鉴权注解
     * @param request request
     * @param response response
-    * @return ResultVo
     */
     @ApiOperation(value = "导出Excel", notes = "导出Excel")
     @RequiresPermissionsCus("gentest_user_export")
@@ -187,7 +185,6 @@ public class TestUserRestController extends BaseRestController<TestUser, TestUse
     * 用户 Excel 下载导入模版
     * 注：这里 RequiresPermissionsCus 引入的是 自定义鉴权注解
     * @param response response
-    * @return ResultVo
     */
     @ApiOperation(value = "导出Excel模版", notes = "导出Excel模版")
     @RequiresPermissionsCus("gentest_user_import")
