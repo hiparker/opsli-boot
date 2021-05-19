@@ -52,9 +52,9 @@ import static org.opsli.common.constants.OrderConstants.UTIL_ORDER;
 /**
  * User Token Util
  *
- * @author parker
+ * @author Parker
+ * @date 2017-05-20 14:41
  */
-
 @Slf4j
 @Order(UTIL_ORDER)
 @Component

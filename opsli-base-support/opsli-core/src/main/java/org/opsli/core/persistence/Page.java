@@ -29,9 +29,10 @@ import java.util.List;
 /**
  * 分页类
  *
- * @author parker
  * @param <T>
  * @param <E>
+ * @author Parker
+ * @date 2020-09-21 23:57
  */
 @Slf4j
 public class Page<T extends BaseEntity,E extends ApiWrapper> extends PageSerializable<E>{
@@ -93,7 +94,7 @@ public class Page<T extends BaseEntity,E extends ApiWrapper> extends PageSeriali
 
     /**
      * 设置数据
-     * @param pageInfo
+     * @param pageInfo 分页信息
      */
     public void instance(PageInfo<T> pageInfo, List<E> list) {
         super.setList(list);

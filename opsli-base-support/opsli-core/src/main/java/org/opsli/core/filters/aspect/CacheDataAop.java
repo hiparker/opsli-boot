@@ -70,9 +70,9 @@ public class CacheDataAop {
 
     /**
      * 切如 更新数据
-     * @param point
-     * @return
-     * @throws Throwable
+     * @param point point
+     * @return Object
+     * @throws Throwable 异常
      */
     @Around("hotDataPut()")
     public Object hotDataPutProcess(ProceedingJoinPoint point) throws Throwable {
@@ -110,9 +110,9 @@ public class CacheDataAop {
 
     /**
      * 切如 删除数据 和 逻辑删除上
-     * @param point
-     * @return
-     * @throws Throwable
+     * @param point point
+     * @return Object
+     * @throws Throwable 异常
      */
     @Around("hotDataDel()")
     public Object hotDataDelProcess(ProceedingJoinPoint point) throws Throwable {
@@ -162,7 +162,7 @@ public class CacheDataAop {
 
     /***
      * PUT 处理数据
-     * @param point
+     * @param point point
      */
     private List<CacheDataEntity> putHandlerData(ProceedingJoinPoint point, Object returnValue){
         // 这里 只对 继承了 ApiWrapper 的类做处理
@@ -202,7 +202,7 @@ public class CacheDataAop {
 
     /***
      * DEL 处理数据
-     * @param point
+     * @param point point
      */
     private List<CacheDataEntity> delHandlerData(ProceedingJoinPoint point, Object[] args){
         if(args == null || args.length == 0){
@@ -268,8 +268,8 @@ public class CacheDataAop {
 
     /**
      * 获得方法
-     * @param point
-     * @return
+     * @param point point
+     * @return Method 方法
      */
     private Method getMethod(ProceedingJoinPoint point){
         Method m = null;
@@ -284,8 +284,8 @@ public class CacheDataAop {
 
     /**
      * 存放数据
-     * @param cacheDataList
-     * @param cacheData
+     * @param cacheDataList 缓存数据集合
+     * @param cacheData 缓存数据
      */
     private void putCacheData(List<CacheDataEntity> cacheDataList, CacheDataEntity cacheData){
         // 非法判断

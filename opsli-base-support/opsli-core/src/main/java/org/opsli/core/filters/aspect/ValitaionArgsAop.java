@@ -54,7 +54,7 @@ public class ValitaionArgsAop {
 
     /**
      * 切如 post 请求
-     * @param point
+     * @param point point
      */
     @Before("requestMapping()")
     public void validation(JoinPoint point) throws Throwable {

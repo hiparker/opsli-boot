@@ -20,11 +20,10 @@ import java.util.Collection;
 
 
 /**
- * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.modulars.system.service
- * @Author: Parker
- * @CreateTime: 2020-09-17 13:07
- * @Description: 租户 接口
+ * 邮件接口
+ *
+ * @author Parker
+ * @date 2020-09-19 20:03
  */
 public interface IEmailService {
 

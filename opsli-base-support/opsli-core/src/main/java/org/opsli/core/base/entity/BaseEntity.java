@@ -21,12 +21,10 @@ import lombok.experimental.Accessors;
 import org.opsli.api.base.warpper.ApiWrapper;
 
 /**
- *
  * Entity 基础类
  *
  * @author Parker
- * @date 2019-05-11
- *
+ * @date 2020-09-15
  */
 @Data
 @Accessors(chain = true)

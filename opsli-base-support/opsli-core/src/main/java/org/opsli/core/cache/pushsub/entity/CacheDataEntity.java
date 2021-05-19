@@ -22,11 +22,10 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.opsli.core.cache.pushsub.enums.PushSubType;
 
 /**
- * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.core.cache.pushsub.entity
- * @Author: Parker
- * @CreateTime: 2020-09-18 00:01
- * @Description: 热点数据处理 Entity
+ * 热点数据处理 Entity
+ *
+ * @author Parker
+ * @date 2020-09-18 00:01
  */
 @Data
 @AllArgsConstructor
@@ -36,9 +35,4 @@ public class CacheDataEntity {
     /** key */
     private String key;
 
-
-    public static void main(String[] args) {
-        CacheDataEntity ret = new CacheDataEntity("123");
-        System.out.println(ToStringBuilder.reflectionToString(ret));
-    }
 }

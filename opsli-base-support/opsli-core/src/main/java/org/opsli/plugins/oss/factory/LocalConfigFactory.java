@@ -29,6 +29,7 @@ import java.io.Serializable;
  * 本地存储配置工程
  *
  * @author Parker
+ * @date 2020-09-19 20:03
  */
 public enum LocalConfigFactory implements ConfigFactory<LocalConfigFactory.LocalConfig> {
 

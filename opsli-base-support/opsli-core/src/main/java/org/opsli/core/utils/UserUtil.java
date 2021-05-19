@@ -41,11 +41,10 @@ import java.util.List;
 import static org.opsli.common.constants.OrderConstants.UTIL_ORDER;
 
 /**
- * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.core.utils
- * @Author: Parker
- * @CreateTime: 2020-09-19 20:03
- * @Description: 用户工具类
+ * 用户工具类
+ *
+ * @author Parker
+ * @date 2020-09-19 20:03
  */
 @Slf4j
 @Order(UTIL_ORDER)

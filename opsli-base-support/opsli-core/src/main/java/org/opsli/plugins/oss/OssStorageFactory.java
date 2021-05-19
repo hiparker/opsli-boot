@@ -33,7 +33,6 @@ import java.util.Set;
  *
  * @author Parker
  * @date 2021年3月16日10:16:29
- *
  */
 @Slf4j
 public enum OssStorageFactory {

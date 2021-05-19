@@ -19,9 +19,10 @@ package org.opsli.plugins.oss;
 import org.opsli.common.base.msg.BaseMsg;
 
 /**
- * @Author: 周鹏程
- * @CreateTime: 2020-11-04 17:34
- * @Description: OSS服务异常 - 消息
+ * OSS服务异常 - 消息
+ *
+ * @author Parker
+ * @date 2020-09-19 20:03
  */
 public enum OssMsg implements BaseMsg {
 

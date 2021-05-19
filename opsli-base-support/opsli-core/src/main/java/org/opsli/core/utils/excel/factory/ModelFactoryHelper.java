@@ -35,11 +35,10 @@ import java.util.Iterator;
 import java.util.Map;
 
 /**
- * Created Date by 2020/1/11 0011.
- *
  * 助手类工厂
  *
  * @author Parker
+ * @date 2020-09-16
  */
 @Slf4j
 public final class ModelFactoryHelper {
@@ -56,8 +55,8 @@ public final class ModelFactoryHelper {
 
     /**
      * 获得 Model 帮助类
-     * @param modelClazz
-     * @return
+     * @param modelClazz 模型 class
+     * @return AbstractModelHelper
      */
     public static AbstractModelHelper getModelHelper(Class<?> modelClazz) throws Exception{
         // 这里需要全新设计,

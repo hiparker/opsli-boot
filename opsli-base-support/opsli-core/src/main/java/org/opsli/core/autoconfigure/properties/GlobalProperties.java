@@ -11,8 +11,8 @@ import java.util.Set;
 /**
  * OPSLI 配置文件
  *
- * @author 周鹏程
- * @date 2021-01-31 5:52 下午
+ * @author Parker
+ * @date 2020-09-15
  **/
 @Configuration
 @ConfigurationProperties(prefix = GlobalProperties.PROP_PREFIX)

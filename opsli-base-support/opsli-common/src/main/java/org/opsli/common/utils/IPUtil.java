@@ -30,8 +30,6 @@ public final class IPUtil {
 
     /** 排除结果 */
     private static final String UNKNOWN = "unknown";
-    /** 分割符 */
-    private static final String SPLIT = ",";
     /** 尝试字段 */
     private static final String[] HEADERS_TO_TRY = {
             "X-Forwarded-For",

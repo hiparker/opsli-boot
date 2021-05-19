@@ -29,11 +29,10 @@ import org.opsli.plugins.cache.EhCachePlugin;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.core.cache.pushsub.handler
- * @Author: Parker
- * @CreateTime: 2020-09-15 16:24
- * @Description: 字典消息处理
+ * 用户消息处理
+ *
+ * @author Parker
+ * @date 2020-09-16
  */
 @Slf4j
 public class UserHandler implements RedisPushSubHandler{
@@ -72,7 +71,7 @@ public class UserHandler implements RedisPushSubHandler{
 
     /**
      * 用户数据处理
-     * @param msgJson
+     * @param msgJson 信息Json
      */
     private void userHandler(JSONObject msgJson){
         JSONObject data = msgJson.getJSONObject(MsgArgsType.USER_MODEL_DATA.toString());
@@ -98,7 +97,7 @@ public class UserHandler implements RedisPushSubHandler{
 
     /**
      * 用户角色数据处理
-     * @param msgJson
+     * @param msgJson 信息Json
      */
     private void userRolesHandler(JSONObject msgJson){
         JSONArray dataArray = msgJson.getJSONArray(MsgArgsType.USER_MODEL_DATA.toString());
@@ -121,7 +120,7 @@ public class UserHandler implements RedisPushSubHandler{
 
     /**
      * 用户权限数据处理
-     * @param msgJson
+     * @param msgJson 信息Json
      */
     private void userPermsHandler(JSONObject msgJson){
         JSONArray dataArray = msgJson.getJSONArray(MsgArgsType.USER_MODEL_DATA.toString());
@@ -144,7 +143,7 @@ public class UserHandler implements RedisPushSubHandler{
 
     /**
      * 用户菜单数据处理
-     * @param msgJson
+     * @param msgJson 信息Json
      */
     private void userMenusHandler(JSONObject msgJson){
         JSONArray dataArray = msgJson.getJSONArray(MsgArgsType.USER_MODEL_DATA.toString());

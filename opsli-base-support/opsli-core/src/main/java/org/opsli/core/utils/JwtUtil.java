@@ -27,7 +27,8 @@ import static org.opsli.common.constants.OrderConstants.UTIL_ORDER;
 
 /**
  * JWT工具类
- * @author sunzhiqiang23
+ *
+ * @author 孙志强
  * @date 2020/05/29 21:23
  */
 @Slf4j

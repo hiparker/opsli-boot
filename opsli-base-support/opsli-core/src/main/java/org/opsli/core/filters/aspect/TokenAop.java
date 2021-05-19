@@ -56,7 +56,7 @@ public class TokenAop {
 
     /**
      * 切如 post 请求
-     * @param point
+     * @param point point
      */
     @Around("requestMapping()")
     public Object tokenAop(ProceedingJoinPoint point) throws Throwable {

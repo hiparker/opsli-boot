@@ -19,6 +19,7 @@ package org.opsli.plugins.email.enums;
  * Email 参数类型
  *
  * @author Parker
+ * @date 2020-09-19 20:03
  */
 public enum EmailType {
 

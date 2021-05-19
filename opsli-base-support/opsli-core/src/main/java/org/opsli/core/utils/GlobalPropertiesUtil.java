@@ -26,11 +26,10 @@ import org.springframework.stereotype.Component;
 import static org.opsli.common.constants.OrderConstants.UTIL_ORDER;
 
 /**
- * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.core.utils
- * @Author: Parker
- * @CreateTime: 2020-09-19 20:03
- * @Description: 系统配置参数 工具类
+ * 系统配置参数 工具类
+ *
+ * @author parker
+ * @date 2020-09-22 11:17
  */
 @Slf4j
 @Order(UTIL_ORDER)

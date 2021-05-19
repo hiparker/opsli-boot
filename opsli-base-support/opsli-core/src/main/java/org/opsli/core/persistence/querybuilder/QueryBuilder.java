@@ -20,17 +20,16 @@ import org.opsli.core.base.entity.BaseEntity;
 
 
 /**
- * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.core.persistence.querybuilder
- * @Author: Parker
- * @CreateTime: 2020-09-21 23:53
- * @Description: 查询构造器
+ * 查询构造器
+ *
+ * @author Parker
+ * @date 2020-09-21 23:57
  */
 public interface QueryBuilder<T extends BaseEntity> {
 
     /**
      * 构造器
-     * @return
+     * @return QueryWrapper
      */
     QueryWrapper<T> build();
 

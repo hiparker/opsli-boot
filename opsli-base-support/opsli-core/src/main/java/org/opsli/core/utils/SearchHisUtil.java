@@ -35,9 +35,10 @@ import java.util.Set;
 import static org.opsli.common.constants.OrderConstants.UTIL_ORDER;
 
 /**
- * @Author: 周鹏程
- * @CreateTime: 2020-09-22 11:17
- * @Description: 搜索历史工具类
+ * 搜索历史工具类
+ *
+ * @author Parker
+ * @date 2020-09-19 20:03
  */
 @Slf4j
 @Order(UTIL_ORDER)

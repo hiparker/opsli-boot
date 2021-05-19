@@ -26,11 +26,10 @@ import org.opsli.core.persistence.querybuilder.conf.WebQueryConf;
 import java.util.Map;
 
 /**
- * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.core.persistence.querybuilder
- * @Author: Parker
- * @CreateTime: 2020-09-21 23:57
- * @Description: Web 条件构造器
+ * Web 条件构造器
+ *
+ * @author Parker
+ * @date 2020-09-21 23:57
  */
 public class WebQueryBuilder<T extends BaseEntity> implements QueryBuilder<T>{
 
@@ -189,7 +188,6 @@ public class WebQueryBuilder<T extends BaseEntity> implements QueryBuilder<T>{
      * @param handle 操作
      * @param key 键
      * @param value 值
-     * @return
      */
     private <T extends BaseEntity> void handlerValue(QueryWrapper<T> queryWrapper, String handle, String key, String value){
         if(queryWrapper == null || StringUtils.isEmpty(handle)

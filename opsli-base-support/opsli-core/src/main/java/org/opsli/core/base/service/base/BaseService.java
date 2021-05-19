@@ -21,11 +21,10 @@ import org.opsli.core.base.entity.BaseEntity;
 import org.opsli.core.base.service.interfaces.BaseServiceInterface;
 
 /**
- * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.common.base.service
- * @Author: Parker
- * @CreateTime: 2020-09-17 12:33
- * @Description: Opsli Base Service
+ * 基础Service
+ *
+ * @author Parker
+ * @date 2020-09-15
  */
 public abstract class BaseService <M extends BaseMapper<T>, T extends BaseEntity>
         extends ServiceImpl<M, T> implements BaseServiceInterface<T> {

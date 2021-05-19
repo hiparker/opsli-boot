@@ -18,11 +18,10 @@ package org.opsli.core.msg;
 import org.opsli.common.base.msg.BaseMsg;
 
 /**
- * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.core.msg
- * @Author: Parker
- * @CreateTime: 2020-09-13 19:36
- * @Description: 核心类 - 消息
+ * 核心类 - 消息
+ *
+ * @author Parker
+ * @date 2020-09-13 19:36
  */
 public enum CoreMsg implements BaseMsg {
 

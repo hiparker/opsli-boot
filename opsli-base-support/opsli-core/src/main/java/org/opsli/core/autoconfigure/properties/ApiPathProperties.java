@@ -22,7 +22,9 @@ import org.springframework.stereotype.Component;
 
 /**
  * 接口路径前缀配置
- * @author parker
+ *
+ * @author Parker
+ * @date 2020-09-15
  */
 @Component
 @ConfigurationProperties(prefix = ApiPathProperties.PROP_PREFIX)

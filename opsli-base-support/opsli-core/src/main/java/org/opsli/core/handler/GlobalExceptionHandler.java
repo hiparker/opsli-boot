@@ -36,6 +36,8 @@ import java.sql.SQLIntegrityConstraintViolationException;
 import static org.opsli.common.constants.OrderConstants.EXCEPTION_HANDLER_ORDER;
 
 /**
+ * 遗产拦截器
+ *
  * @author parker
  * @date 2020-09-13
  */

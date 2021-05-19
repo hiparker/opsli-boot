@@ -33,7 +33,6 @@ import java.util.Map;
  * 注：排序只支持 int 类型
  *
  * @author Parker
-
  * @date 2017-05-20 14:41
  */
 public enum TreeBuildUtil {
@@ -135,9 +134,9 @@ public enum TreeBuildUtil {
 
     /**
      * 欺骗编译器 强制转换
-     * @param obj
-     * @param <T>
-     * @return
+     * @param obj 对象
+     * @param <T> 泛型
+     * @return T
      */
     private <T> Comparable<T> cast(T obj){
         return (Comparable<T>) Convert.toInt(obj);

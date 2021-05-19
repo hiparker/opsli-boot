@@ -50,7 +50,7 @@ import java.util.Set;
  *
  * 全程用 token认证 所以也就用不着 什么共享缓存 - 无状态
  *
- * @author parker
+ * @author Parker
  * @date 2017-04-20 18:33
  */
 @Configuration

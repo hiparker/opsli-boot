@@ -37,14 +37,11 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 /**
- * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.plugins.redis.entity
- * @Author: Parker
- * @CreateTime: 2020-09-15 14:50
- * @Description: Redis 消息订阅 更新本地缓存
- *
+ * Redis 消息订阅 更新本地缓存
  * 字典缓存更新
  *
+ * @author Parker
+ * @date 2020-09-15
  */
 @Slf4j
 @Configuration

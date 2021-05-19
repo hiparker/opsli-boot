@@ -25,9 +25,8 @@ import java.util.List;
 /**
  * 认证
  *
- * @author 孙志强
-
- * @date 2017-05-20 14:00
+ * @author Parker
+ * @date 2020-09-16
  */
 @Component
 @Slf4j

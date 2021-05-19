@@ -16,11 +16,10 @@ import java.util.Collection;
 import java.util.Collections;
 
 /**
- * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.plugins.email.service
- * @Author: Parker
- * @CreateTime: 2020-09-16 17:34
- * @Description: 邮件 接口实现类
+ * 邮件 接口实现类
+ *
+ * @author Parker
+ * @date 2020-09-19 20:03
  */
 @Service
 public class EmailServiceImpl implements IEmailService {

@@ -71,7 +71,7 @@ public class MybatisAutoFillInterceptor implements Interceptor {
 
     /**
      * 注入字段
-     * @param invocation
+     * @param invocation 源
      */
     private void fillField(Invocation invocation) {
         Object[] args = invocation.getArgs();
@@ -103,7 +103,7 @@ public class MybatisAutoFillInterceptor implements Interceptor {
 
     /**
      * 新增数据
-     * @param arg
+     * @param arg 参数
      */
     public void insertFill(Object arg) {
         if(arg == null ){
@@ -189,7 +189,7 @@ public class MybatisAutoFillInterceptor implements Interceptor {
 
     /**
      * 修改数据
-     * @param arg
+     * @param arg 参数
      */
     public void updateFill(Object arg) {
         if(arg == null ){
@@ -204,7 +204,7 @@ public class MybatisAutoFillInterceptor implements Interceptor {
         if (arg instanceof MapperMethod.ParamMap) {
             MapperMethod.ParamMap<?> paramMap = (MapperMethod.ParamMap<?>) arg;
             if (paramMap.containsKey(ET)) {
-                arg = paramMap.get("et");
+                arg = paramMap.get(ET);
             } else {
                 arg = paramMap.get("param1");
             }

@@ -36,7 +36,6 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * 非对称加密

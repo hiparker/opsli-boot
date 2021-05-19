@@ -26,13 +26,11 @@ import org.opsli.core.cache.pushsub.receiver.RedisPushSubReceiver;
 import org.opsli.plugins.redis.pushsub.entity.BaseSubMessage;
 
 /**
- * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.core.cache.pushsub.msgs
- * @Author: Parker
- * @CreateTime: 2020-09-15 16:50
- * @Description: 用户组织消息
+ * 用户组织消息
+ *
+ * @author Parker
+ * @date 2020-09-15
  */
-
 @Data
 @Accessors(chain = true)
 public final class OrgMsgFactory extends BaseSubMessage{
@@ -43,7 +41,9 @@ public final class OrgMsgFactory extends BaseSubMessage{
     private OrgMsgFactory(){}
 
     /**
-     * 构建消息 - 组织
+     * 构建消息 - 用户组织
+     * @param orgRefModel 用户组织模型
+     * @return 消息
      */
     public static BaseSubMessage createOrgMsg(UserOrgRefModel orgRefModel){
         BaseSubMessage baseSubMessage = new BaseSubMessage();

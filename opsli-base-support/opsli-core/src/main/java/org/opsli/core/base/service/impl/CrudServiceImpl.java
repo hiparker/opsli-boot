@@ -42,11 +42,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.common.base.service.impl
- * @Author: Parker
- * @CreateTime: 2020-09-14 17:31
- * @Description: CurdServiceImpl 基类 - 实现类
+ * CurdServiceImpl 基类 - 实现类
  *
  * 这里 可能觉得 增改 最次返回的也是实体对象 设计的有问题
  *
@@ -58,6 +54,8 @@ import java.util.Map;
  * 单独按照ID查询数据 和 按照ID修改、删除数据 隔离级别暂时不需要
  * 既然能从page列表中看到的数据 则是这个租户的数据
  *
+ * @author Parker
+ * @date 2020-09-15
  */
 @Slf4j
 @Transactional(readOnly = true)

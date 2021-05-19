@@ -42,7 +42,7 @@ import static org.opsli.common.constants.OrderConstants.UTIL_ORDER;
  * 验证码
  *
  * @author parker
- * @since 2.0.0 2018-02-10
+ * @date 2021年5月19日12:47:20
  */
 @Component
 @Order(UTIL_ORDER)

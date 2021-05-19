@@ -8,11 +8,10 @@ import org.opsli.common.annotation.validation.ValidationArgsLenMax;
 import org.opsli.common.enums.ValiArgsType;
 
 /**
- * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.modulars.test.entity
- * @Author: Parker
- * @CreateTime: 2020-09-16 17:33
- * @Description: 邮件服务
+ * 邮件服务
+ *
+ * @author Parker
+ * @date 2020-09-19 20:03
  */
 @Data
 @EqualsAndHashCode(callSuper = false)

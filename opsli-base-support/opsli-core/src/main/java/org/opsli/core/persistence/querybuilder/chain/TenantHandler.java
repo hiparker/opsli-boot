@@ -25,11 +25,10 @@ import org.opsli.core.base.entity.BaseEntity;
 import org.opsli.core.utils.UserUtil;
 
 /**
- * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.core.tenant
- * @Author: Parker
- * @CreateTime: 2020-09-22 00:50
- * @Description: 多租户赋值处理
+ * 多租户赋值处理
+ *
+ * @author Parker
+ * @date 2020-09-13 19:36
  */
 public class TenantHandler implements QueryBuilderChain{
 
@@ -49,13 +48,6 @@ public class TenantHandler implements QueryBuilderChain{
         this.queryBuilderChain = queryBuilderChain;
     }
 
-    /**
-     * 查询构建器处理
-     * @param entityClazz
-     * @param wrapper
-     * @param <T>
-     * @return
-     */
     @Override
     public <T extends BaseEntity> QueryWrapper<T> handler(Class<T> entityClazz, QueryWrapper<T> wrapper) {
         // 自身责任 -- 判断多租户

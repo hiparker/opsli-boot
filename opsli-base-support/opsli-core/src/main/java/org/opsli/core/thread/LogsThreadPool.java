@@ -9,11 +9,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
- * @BelongsProject: tank-design
- * @BelongsPackage: com.parker.tank.net.thread
- * @Author: Parker
- * @CreateTime: 2020-08-21 14:22
- * @Description: 日志保存线程
+ * 日志保存线程
+ *
+ * @author Parker
+ * @date 2020-09-16
  */
 @Slf4j
 @Component

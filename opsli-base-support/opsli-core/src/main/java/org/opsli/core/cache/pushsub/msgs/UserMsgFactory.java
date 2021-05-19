@@ -29,13 +29,11 @@ import org.opsli.plugins.redis.pushsub.entity.BaseSubMessage;
 import java.util.List;
 
 /**
- * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.core.cache.pushsub.msgs
- * @Author: Parker
- * @CreateTime: 2020-09-15 16:50
- * @Description: 用户消息
+ * 用户消息
+ *
+ * @author Parker
+ * @date 2020-09-15
  */
-
 @Data
 @Accessors(chain = true)
 public final class UserMsgFactory extends BaseSubMessage{
@@ -47,6 +45,8 @@ public final class UserMsgFactory extends BaseSubMessage{
 
     /**
      * 构建消息 - 用户
+     * @param userModel 用户模型
+     * @return 消息
      */
     public static BaseSubMessage createUserMsg(UserModel userModel){
         BaseSubMessage baseSubMessage = new BaseSubMessage();
@@ -64,6 +64,9 @@ public final class UserMsgFactory extends BaseSubMessage{
 
     /**
      * 构建消息 - 用户角色
+     * @param userId 用户ID
+     * @param roles 角色集合
+     * @return 消息
      */
     public static BaseSubMessage createUserRolesMsg(String userId, List<String> roles){
         BaseSubMessage baseSubMessage = new BaseSubMessage();
@@ -80,6 +83,9 @@ public final class UserMsgFactory extends BaseSubMessage{
 
     /**
      * 构建消息 - 用户权限
+     * @param userId 用户ID
+     * @param perms 权限集合
+     * @return 消息
      */
     public static BaseSubMessage createUserPermsMsg(String userId, List<String> perms){
         BaseSubMessage baseSubMessage = new BaseSubMessage();
@@ -96,6 +102,9 @@ public final class UserMsgFactory extends BaseSubMessage{
 
     /**
      * 构建消息 - 用户菜单
+     * @param userId 用户ID
+     * @param menus 菜单集合
+     * @return 消息
      */
     public static BaseSubMessage createUserMenusMsg(String userId, List<MenuModel> menus){
         BaseSubMessage baseSubMessage = new BaseSubMessage();

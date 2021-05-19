@@ -10,16 +10,18 @@ import java.util.Collection;
 
 /**
  * 自定义身份验证器，根据登录使用的Token匹配调用对应的Realm
+ * 
  * @author Parker
+ * @date 2020-09-16
  */
 public class CustomModularRealmAuthenticator extends ModularRealmAuthenticator {
 
     /**
      * 自定义Realm的分配策略
      * 通过realm.supports()方法匹配对应的Realm，因此才要在Realm中重写supports()方法
-     * @param realms
-     * @param token
-     * @return
+     * @param realms realm 集合
+     * @param token token
+     * @return AuthenticationInfo
      */
     @Override
     protected AuthenticationInfo doMultiRealmAuthentication(Collection<Realm> realms, AuthenticationToken token) {

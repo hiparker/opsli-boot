@@ -16,11 +16,10 @@
 package org.opsli.core.cache.pushsub.enums;
 
 /**
- * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.core.cache.pushsub.enums
- * @Author: Parker
- * @CreateTime: 2020-09-15 16:15
- * @Description: 消息具体类型
+ * 消息具体类型
+ *
+ * @author Parker
+ * @date 2020-09-16
  */
 public enum MsgArgsType {
 

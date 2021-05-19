@@ -27,11 +27,10 @@ import org.opsli.plugins.cache.EhCachePlugin;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.core.cache.pushsub.handler
- * @Author: Parker
- * @CreateTime: 2020-09-15 16:24
- * @Description: 用户组织消息处理
+ * 用户组织消息处理
+ *
+ * @author Parker
+ * @date 2020-09-16
  */
 @Slf4j
 public class OrgHandler implements RedisPushSubHandler{
@@ -52,7 +51,7 @@ public class OrgHandler implements RedisPushSubHandler{
 
     /**
      * 用户组织数据处理
-     * @param msgJson
+     * @param msgJson 信息Json
      */
     private void orgHandler(JSONObject msgJson){
         JSONObject data = msgJson.getJSONObject(MsgArgsType.ORG_USER_DATA.toString());

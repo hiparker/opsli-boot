@@ -27,11 +27,10 @@ import org.opsli.plugins.cache.EhCachePlugin;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.core.cache.pushsub.handler
- * @Author: Parker
- * @CreateTime: 2020-09-15 16:24
- * @Description: 热数据处理
+ * 热数据处理
+ *
+ * @author Parker
+ * @date 2020-09-16
  */
 @Slf4j
 public class HotDataHandler implements RedisPushSubHandler{

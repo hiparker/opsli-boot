@@ -16,11 +16,10 @@
 package org.opsli.core.cache.pushsub.enums;
 
 /**
- * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.core.cache.pushsub.enums
- * @Author: Parker
- * @CreateTime: 2020-09-16 22:28
- * @Description: 缓存操作类型
+ * 缓存操作类型
+ *
+ * @author Parker
+ * @date 2020-09-16
  */
 public enum CacheHandleType {
 

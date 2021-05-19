@@ -34,11 +34,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.List;
 
 /**
- * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.core.cache.pushsub.handler
- * @Author: Parker
- * @CreateTime: 2020-09-15 16:24
- * @Description: 字典消息处理
+ * 字典消息处理
+ *
+ * @author Parker
+ * @date 2020-09-16
  */
 @Slf4j
 public class DictHandler implements RedisPushSubHandler{
@@ -78,8 +77,8 @@ public class DictHandler implements RedisPushSubHandler{
 
     /**
      * 真正处理 - 只是处理自己本地的缓存
-     * @param dictWrapperModel
-     * @param type
+     * @param dictWrapperModel model
+     * @param type 类型
      */
     private void handler(DictWrapper dictWrapperModel, CacheHandleType type){
 

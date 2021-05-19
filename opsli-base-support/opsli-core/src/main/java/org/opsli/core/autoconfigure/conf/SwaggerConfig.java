@@ -43,7 +43,8 @@ import java.util.List;
 /**
  * Swagger 配置类
  *
- * @author parker
+ * @author Parker
+ * @date 2020-09-15
  */
 @Configuration
 @EnableSwagger2
@@ -90,7 +91,7 @@ public class SwaggerConfig {
     /**
      * api文档的详细信息函数,注意这里的注解引用的是哪个
      *
-     * @return
+     * @return ApiInfo
      */
     private ApiInfo apiInfo() {
         return new ApiInfoBuilder()
@@ -110,7 +111,7 @@ public class SwaggerConfig {
 
     /**
      * 安全模块
-     * @return
+     * @return SecurityContext
      */
     private SecurityContext securityContext() {
         return SecurityContext.builder()
@@ -121,7 +122,7 @@ public class SwaggerConfig {
 
     /**
      * jwt token
-     * @return
+     * @return List
      */
     private List<Parameter> defaultToken() {
         ParameterBuilder parameterBuilder = new ParameterBuilder();
@@ -137,7 +138,7 @@ public class SwaggerConfig {
 
     /**
      * oauth2 授权
-     * @return
+     * @return List
      */
     List<SecurityReference> defaultAuth() {
         AuthorizationScope authorizationScope = new AuthorizationScope("global", "accessEverything");

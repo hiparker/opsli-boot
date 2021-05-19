@@ -20,10 +20,11 @@ import cn.hutool.json.JSONObject;
 import org.opsli.api.base.warpper.ApiWrapper;
 
 /**
- * Created Date by 2020/1/11 0011.
  *
  * 抽象 实体助手
+ *
  * @author Parker
+ * @date 2020-09-16
  */
 public abstract class AbstractModelHelper {
 
@@ -32,7 +33,6 @@ public abstract class AbstractModelHelper {
      *
      * @param dictJson 字典Json
      * @param wrapper 导入 wrapper
-     * @return Object
      */
     abstract public void transformByImport(JSONObject dictJson, ApiWrapper wrapper);
 
@@ -41,7 +41,6 @@ public abstract class AbstractModelHelper {
      *
      * @param dictJson 字典Json
      * @param wrapper 导出 wrapper
-     * @return Object
      */
     abstract public void transformByExport(JSONObject dictJson, ApiWrapper wrapper);
 

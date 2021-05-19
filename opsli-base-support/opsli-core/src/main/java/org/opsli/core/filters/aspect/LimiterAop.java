@@ -59,7 +59,7 @@ public class LimiterAop {
 
     /**
      * 限流
-     * @param point
+     * @param point point
      */
     @Before("requestMapping()")
     public void limiterHandle(JoinPoint point){

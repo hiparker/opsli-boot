@@ -46,11 +46,7 @@ import java.util.Map;
 import static org.opsli.common.constants.OrderConstants.UTIL_ORDER;
 
 /**
- * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.core.cache.local
- * @Author: Parker
- * @CreateTime: 2020-09-16 16:20
- * @Description: 本地 缓存接口
+ * 缓存工具类
  *
  * 一、控制key的生命周期，Redis不是垃圾桶（缓存不是垃圾桶）
  * 建议使用expire设置过期时间(条件允许可以打散过期时间，防止集中过期)，不过期的数据重点关注idletime。
@@ -58,7 +54,8 @@ import static org.opsli.common.constants.OrderConstants.UTIL_ORDER;
  * 二、【强制】：拒绝bigkey(防止网卡流量、慢查询)
  * string类型控制在10KB以内，hash、list、set、zset元素个数不要超过5000。
  *
- *
+ * @author Parker
+ * @date 2020-09-16 16:20
  */
 @Slf4j
 @Order(UTIL_ORDER)

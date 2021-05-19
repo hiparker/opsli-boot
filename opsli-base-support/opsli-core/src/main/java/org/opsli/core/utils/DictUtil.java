@@ -40,11 +40,10 @@ import java.util.Map;
 import static org.opsli.common.constants.OrderConstants.UTIL_ORDER;
 
 /**
- * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.core.utils
- * @Author: Parker
- * @CreateTime: 2020-09-22 11:17
- * @Description: 字典工具类
+ * 字典工具类
+ *
+ * @author parker
+ * @date 2020-09-22 11:17
  */
 @Slf4j
 @Order(UTIL_ORDER)

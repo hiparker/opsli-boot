@@ -19,20 +19,22 @@ import com.alibaba.fastjson.JSONObject;
 import org.opsli.core.cache.pushsub.enums.PushSubType;
 
 /**
- * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.core.cache.pushsub.receiver
- * @Author: Parker
- * @CreateTime: 2020-09-15 15:11
- * @Description: 标示类 用于获得 消息未知
+ * 标示类 用于获得 消息未知
+ *
+ * @author Parker
+ * @date 2020-09-16
  */
 public interface RedisPushSubHandler {
 
-
+    /**
+     * 获得类型
+     * @return 类型
+     */
     PushSubType getType();
 
     /**
      * 消息处理
-     * @param msgJson
+     * @param msgJson 信息Json
      */
     void handler(JSONObject msgJson);
 

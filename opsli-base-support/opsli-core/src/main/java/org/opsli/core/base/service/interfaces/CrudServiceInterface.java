@@ -37,6 +37,9 @@ import java.util.List;
  *
  * @param <T>
  * @param <E>
+ *
+ * @author Parker
+ * @date 2020-09-15
  */
 public interface CrudServiceInterface<T extends BaseEntity, E extends ApiWrapper> extends BaseServiceInterface<T> {
 

@@ -3,11 +3,10 @@ package org.opsli.plugins.redis.pushsub.receiver;
 
 
 /**
- * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.plugins.redis.receiver
- * @Author: Parker
- * @CreateTime: 2020-09-15 14:49
- * @Description: Redis 消息订阅实现基类
+ * Redis 消息订阅实现基类
+ *
+ * @author Parker
+ * @date 2020-09-15
  */
 public abstract class BaseReceiver {
 
@@ -20,7 +19,7 @@ public abstract class BaseReceiver {
 
     /**
      * 获得监听信道
-     * @return
+     * @return String
      */
     public String getListenerChannel(){
         return this.channel;
@@ -28,7 +27,7 @@ public abstract class BaseReceiver {
 
     /**
      * 获得消息
-     * @param msg
+     * @param msg 消息
      */
     public abstract void receiveMessage(String msg);
 

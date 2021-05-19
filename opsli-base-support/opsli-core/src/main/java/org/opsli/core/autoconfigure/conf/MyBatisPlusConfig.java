@@ -25,10 +25,10 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 
 /**
- * @Author parker
- *
  * MyBatis - Plus 配置
  *
+ * @author Parker
+ * @date 2020-09-15
  */
 @Slf4j
 @EnableTransactionManagement
@@ -37,7 +37,7 @@ public class MyBatisPlusConfig {
 
 	/***
 	 * 乐观锁
-	 * @return
+	 * @return 拦截器
 	 */
 	@Bean
 	public OptimisticLockerInterceptor optimisticLockerInterceptor(){
@@ -46,8 +46,8 @@ public class MyBatisPlusConfig {
 
 	/**
 	 * Mybatis 拦截器
-	 * @param sqlSessionFactory
-	 * @return
+	 * @param sqlSessionFactory sqlSessionFactory
+	 * @return String
 	 */
 	@Bean
 	public String myInterceptor(SqlSessionFactory sqlSessionFactory) {

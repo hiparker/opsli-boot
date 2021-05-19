@@ -29,13 +29,11 @@ import org.opsli.plugins.redis.pushsub.entity.BaseSubMessage;
 import java.util.List;
 
 /**
- * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.core.cache.pushsub.msgs
- * @Author: Parker
- * @CreateTime: 2020-09-15 16:50
- * @Description: 字典消息
+ * 字典消息
+ *
+ * @author Parker
+ * @date 2020-09-15
  */
-
 @Data
 @Accessors(chain = true)
 public final class DictMsgFactory extends BaseSubMessage{
@@ -46,7 +44,10 @@ public final class DictMsgFactory extends BaseSubMessage{
     private DictMsgFactory(){}
 
     /**
-     * 构建消息
+     * 构建消息 字典
+     * @param dictWrapperModel 字典模型
+     * @param cacheHandleType 缓存类型
+     * @return 消息
      */
     public static BaseSubMessage createMsg(DictWrapper dictWrapperModel, CacheHandleType cacheHandleType){
         BaseSubMessage baseSubMessage = new BaseSubMessage();
@@ -62,7 +63,10 @@ public final class DictMsgFactory extends BaseSubMessage{
     }
 
     /**
-     * 构建消息
+     * 构建消息 字典
+     * @param dictWrapperModels 字典模型集合
+     * @param cacheHandleType 缓存类型
+     * @return 消息
      */
     public static BaseSubMessage createMsg(List<DictWrapper> dictWrapperModels, CacheHandleType cacheHandleType){
         BaseSubMessage baseSubMessage = new BaseSubMessage();

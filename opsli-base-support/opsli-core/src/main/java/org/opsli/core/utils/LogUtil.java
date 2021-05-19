@@ -40,18 +40,17 @@ import java.lang.reflect.Method;
 import java.util.List;
 
 /**
- * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.core.utils
- * @Author: Parker
- * @CreateTime: 2020-09-19 20:03
- * @Description: 日志工具类
+ * 日志工具类
+ *
+ * @author Parker
+ * @date 2020-09-22 11:17
  */
 @Slf4j
 public final class LogUtil {
 
     /**
      * 保存日志
-     * @param point
+     * @param point point
      * @param e 异常
      * @param timerCount 花费毫秒数
      */
@@ -128,9 +127,9 @@ public final class LogUtil {
 
     /**
      * 设置日志标题
-     * @param point
-     * @param method
-     * @param logsModel
+     * @param point point
+     * @param method 方法
+     * @param logsModel 日志模型
      */
     private static void setTitle(ProceedingJoinPoint point, Method method, LogsModel logsModel, UserModel user){
         // 设置 title
@@ -192,9 +191,9 @@ public final class LogUtil {
 
     /**
      * 递归 获得菜单全名
-     * @param menuList
-     * @param permsModel
-     * @return
+     * @param menuList 菜单集合
+     * @param permsModel 权限模型
+     * @return List
      */
     private static List<MenuModel> getParentMenu(List<MenuModel> menuList, MenuModel permsModel){
         List<MenuModel> menuModels = Lists.newArrayList();

@@ -33,11 +33,10 @@ import java.lang.reflect.Field;
 import java.nio.charset.StandardCharsets;
 
 /**
- * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.common.utils
- * @Author: Parker
- * @CreateTime: 2020-09-22 17:29
- * @Description: 验证器工具类
+ * 验证器工具类
+ *
+ * @author Parker
+ * @date 2020-09-19 20:03
  */
 @Slf4j
 public final class ValidationUtil {

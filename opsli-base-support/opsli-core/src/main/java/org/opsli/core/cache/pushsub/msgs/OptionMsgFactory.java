@@ -26,13 +26,11 @@ import org.opsli.core.cache.pushsub.receiver.RedisPushSubReceiver;
 import org.opsli.plugins.redis.pushsub.entity.BaseSubMessage;
 
 /**
- * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.core.cache.pushsub.msgs
- * @Author: Parker
- * @CreateTime: 2020-09-15 16:50
- * @Description: 参数消息
+ * 参数消息
+ *
+ * @author Parker
+ * @date 2020-09-15
  */
-
 @Data
 @Accessors(chain = true)
 public final class OptionMsgFactory extends BaseSubMessage{
@@ -44,6 +42,8 @@ public final class OptionMsgFactory extends BaseSubMessage{
 
     /**
      * 构建消息 - 参数
+     * @param optionsModel 参数模型
+     * @return 消息
      */
     public static BaseSubMessage createOptionMsg(OptionsModel optionsModel){
         BaseSubMessage baseSubMessage = new BaseSubMessage();

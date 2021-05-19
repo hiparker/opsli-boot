@@ -31,9 +31,10 @@ import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 /**
- * @Author: 周鹏程
- * @CreateTime: 2020-11-04 17:34
- * @Description: 打印启动日志
+ * 打印启动日志
+ *
+ * @author parker
+ * @date 2020-09-16
  */
 @Slf4j
 @Component

@@ -19,18 +19,19 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.opsli.core.base.entity.BaseEntity;
 
 /**
- * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.core.persistence.querybuilder.chain
- * @Author: Parker
- * @CreateTime: 2020-09-22 10:35
- * @Description: 查询构建器责任链
+ * 查询构建器责任链
+ *
+ * @author Parker
+ * @date 2020-09-13 19:36
  */
 public interface QueryBuilderChain {
 
     /**
      * 执行
-     * @param wrapper
-     * @param <T>
+     * @param entityClazz entity class
+     * @param wrapper 包装类
+     * @param <T> 泛型
+     * @return <T>
      */
     <T extends BaseEntity> QueryWrapper<T> handler(Class<T> entityClazz, QueryWrapper<T> wrapper);
 

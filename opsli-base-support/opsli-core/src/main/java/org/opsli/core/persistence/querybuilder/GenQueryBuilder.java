@@ -19,11 +19,10 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.opsli.core.base.entity.BaseEntity;
 
 /**
- * @BelongsProject: opsli-boot
- * @BelongsPackage: org.opsli.core.persistence.querybuilder
- * @Author: Parker
- * @CreateTime: 2020-09-21 23:57
- * @Description: Web 条件构造器
+ * Web 条件构造器
+ *
+ * @author Parker
+ * @date 2020-09-21 23:57
  */
 public class GenQueryBuilder<T extends BaseEntity>  implements QueryBuilder<T> {
 
