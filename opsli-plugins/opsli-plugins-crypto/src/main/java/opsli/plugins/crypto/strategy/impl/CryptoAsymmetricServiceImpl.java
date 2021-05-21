@@ -191,6 +191,7 @@ public class CryptoAsymmetricServiceImpl implements CryptoAsymmetricService {
             // 如果检测到已有异常 则直接抛出
             throw ce;
         }catch (Exception e){
+            log.error(e.getMessage(), e);
             // 解密失败
             throw new CryptoException(CryptoMsg.CRYPTO_EXCEPTION_DE);
         }
@@ -292,6 +293,12 @@ public class CryptoAsymmetricServiceImpl implements CryptoAsymmetricService {
         }
 
         return cryptoHandler;
+    }
+
+    public static void main(String[] args) {
+        String[] cut = StrUtil.cut("aaaaaaaaaaaabb", 3);
+        System.out.println(11);
+
     }
 
 }
