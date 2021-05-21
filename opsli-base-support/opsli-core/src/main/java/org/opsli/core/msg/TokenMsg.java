@@ -48,6 +48,8 @@ public enum TokenMsg implements BaseMsg {
     EXCEPTION_LOGIN_TENANT_NOT_USABLE(12105,"租户未启用，请联系管理员"),
     EXCEPTION_LOGIN_NULL(12106,"请输入账号密码"),
     EXCEPTION_LOGIN_DECRYPT(12107,"登录账号密码解析失败"),
+    EXCEPTION_USER_ROLE_NOT_NULL(12108,"用户暂无角色，请设置后登录"),
+    EXCEPTION_USER_MENU_NOT_NULL(12109,"用户暂无角色菜单，请设置后登录"),
 
     /**
      * 其他

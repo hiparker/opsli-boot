@@ -60,7 +60,6 @@ public enum SystemMsg implements BaseMsg {
     EXCEPTION_USER_PASSWORD_EQ_ERROR(20302,"旧密码不可以等于新密码"),
     EXCEPTION_USER_ID_NOT_NULL(20303,"用户Id不可为空"),
     EXCEPTION_USER_ROLES_ERROR(20304,"用户角色设置失败"),
-    EXCEPTION_USER_MENU_NOT_NULL(20305,"用户暂无角色菜单，请设置后登录"),
     EXCEPTION_USER_NO_UNIQUE(20306,"该工号已存在"),
     EXCEPTION_ORG_NOT_NULL(20307,"组织不可为空"),
     EXCEPTION_USER_ORG_ERROR(20308,"用户组织设置失败"),

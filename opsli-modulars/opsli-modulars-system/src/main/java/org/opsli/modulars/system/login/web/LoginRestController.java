@@ -15,12 +15,14 @@
  */
 package org.opsli.modulars.system.login.web;
 
+import cn.hutool.core.collection.CollUtil;
 import com.google.common.collect.Maps;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.opsli.api.base.result.ResultVo;
+import org.opsli.api.wrapper.system.menu.MenuModel;
 import org.opsli.api.wrapper.system.options.OptionsModel;
 import org.opsli.api.wrapper.system.tenant.TenantModel;
 import org.opsli.api.wrapper.system.user.UserModel;
@@ -48,6 +50,7 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -130,6 +133,20 @@ public class LoginRestController {
         if(slipCount >= UserTokenUtil.LOGIN_PROPERTIES.getSlipVerifyCount()){
             // 删除验证过后验证码
             CaptchaUtil.delCaptcha(form.getUuid());
+        }
+
+        // 检测用户是否有角色
+        List<String> roleModelList = UserUtil.getUserRolesByUserId(user.getId());
+        if(CollUtil.isEmpty(roleModelList)){
+            // 用户暂无角色，请设置后登录
+            throw new TokenException(TokenMsg.EXCEPTION_USER_ROLE_NOT_NULL);
+        }
+
+        // 检测用户是否有角色菜单
+        List<MenuModel> menuModelList = UserUtil.getMenuListByUserId(user.getId());
+        if(CollUtil.isEmpty(menuModelList)){
+            // 用户暂无角色菜单，请设置后登录
+            throw new TokenException(TokenMsg.EXCEPTION_USER_MENU_NOT_NULL);
         }
 
         //生成token，并保存到Redis

@@ -114,10 +114,6 @@ public class MenuRestController extends BaseRestController<SysMenu, MenuModel, I
 
         // 获得当前用户菜单
         List<MenuModel> menuModelList = iUserService.getMenuAllListByUserId(user.getId());
-        if(CollUtil.isEmpty(menuModelList)){
-            // 用户暂无角色菜单，请设置后登录
-            throw new ServiceException(SystemMsg.EXCEPTION_USER_MENU_NOT_NULL);
-        }
 
         // 这里有坑 如果 为 菜单数据 且 组件(Component)地址为空 不会跳转到主页 也不报错
         // 修复菜单问题导致无法跳转主页
@@ -146,10 +142,6 @@ public class MenuRestController extends BaseRestController<SysMenu, MenuModel, I
 
         // 获得用户 对应菜单
         List<MenuModel> menuModelList = UserUtil.getMenuListByUserId(user.getId());
-        if(CollUtil.isEmpty(menuModelList)){
-            // 用户暂无角色菜单，请设置后登录
-            throw new ServiceException(SystemMsg.EXCEPTION_USER_MENU_NOT_NULL);
-        }
 
         // 这里有坑 如果 为 菜单数据 且 组件(Component)地址为空 不会跳转到主页 也不报错
         // 修复菜单问题导致无法跳转主页
