@@ -23,6 +23,7 @@ import lombok.EqualsAndHashCode;
 import org.opsli.api.base.warpper.ApiWrapper;
 import org.opsli.common.annotation.validation.ValidationArgs;
 import org.opsli.common.annotation.validation.ValidationArgsLenMax;
+import org.opsli.common.annotation.validation.ValidationArgsLenMin;
 import org.opsli.common.enums.ValiArgsType;
 
 import java.util.List;
@@ -43,6 +44,7 @@ public class UserInfo extends ApiWrapper {
     @ApiModelProperty(value = "登录账户")
     @ValidationArgs({ValiArgsType.IS_NOT_NULL,ValiArgsType.IS_GENERAL})
     @ValidationArgsLenMax(32)
+    @ValidationArgsLenMin(5)
     private String username;
 
     /** 真实姓名 */

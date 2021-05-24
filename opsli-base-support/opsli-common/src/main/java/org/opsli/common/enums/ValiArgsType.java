@@ -26,20 +26,24 @@ public enum ValiArgsType {
 
     /** 不能为空 */
     IS_NOT_NULL,
-    /** 字母，数字和下划线 */
-    IS_GENERAL,
-    /** 数字 */
-    IS_NUMBER,
+    /** 整数 */
+    IS_INTEGER,
     /** 小数浮点 */
     IS_DECIMAL,
+    /** 质数（素数） */
+    IS_PRIMES,
     /** 纯字母 */
     IS_LETTER,
     /** 大写 */
     IS_UPPER_CASE,
     /** 小写 */
     IS_LOWER_CASE,
-    /** ip4 */
+    /** IP (兼容IPV4 + IPV6) */
+    IS_IP,
+    /** IP4 */
     IS_IPV4,
+    /** IP6 */
+    IS_IPV6,
     /** 金额 */
     IS_MONEY,
     /** 邮箱 */
@@ -48,18 +52,22 @@ public enum ValiArgsType {
     IS_MOBILE,
     /** 18位身份证 */
     IS_CITIZENID,
+    /** 汉字 */
+    IS_CHINESE,
+    /** 字母，数字和下划线 */
+    IS_GENERAL,
+    /** 汉字，字母，数字和下划线 */
+    IS_GENERAL_WITH_CHINESE,
     /** 邮编 */
     IS_ZIPCODE,
     /** URL */
     IS_URL,
-    /** 汉字 */
-    IS_CHINESE,
-    /** 汉字，字母，数字和下划线 */
-    IS_GENERAL_WITH_CHINESE,
     /** MAC地址 */
     IS_MAC,
     /** 中国车牌 */
     IS_PLATE_NUMBER,
+    /** 安全密码 */
+    IS_SECURITY_PASSWORD,
 
     ;
     public static void main(String[] args) {

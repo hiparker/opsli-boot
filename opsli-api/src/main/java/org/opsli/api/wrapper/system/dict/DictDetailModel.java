@@ -78,7 +78,7 @@ public class DictDetailModel extends ApiWrapper {
     @ApiModelProperty(value = "排序")
     @ExcelProperty(value = "排序", order = 2)
     @ExcelInfo
-    @ValidationArgs({ValiArgsType.IS_NOT_NULL, ValiArgsType.IS_NUMBER})
+    @ValidationArgs({ValiArgsType.IS_NOT_NULL, ValiArgsType.IS_INTEGER})
     @ValidationArgsLenMax(10)
     private Integer sortNo;
 

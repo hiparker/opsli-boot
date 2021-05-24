@@ -43,6 +43,7 @@ public class UserAndOrgModel extends ApiWrapper {
     @ExcelIgnore
     @ValidationArgs({ValiArgsType.IS_NOT_NULL,ValiArgsType.IS_GENERAL})
     @ValidationArgsLenMax(32)
+    @ValidationArgsLenMin(5)
     private String username;
 
     /** 登录密码 */

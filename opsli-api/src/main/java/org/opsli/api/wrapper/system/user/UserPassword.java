@@ -53,7 +53,7 @@ public class UserPassword implements Serializable {
 
     /** 新密码 */
     @ApiModelProperty(value = "新密码")
-    @ValidationArgs({ValiArgsType.IS_NOT_NULL})
+    @ValidationArgs({ValiArgsType.IS_NOT_NULL, ValiArgsType.IS_SECURITY_PASSWORD})
     @ValidationArgsLenMin(6)
     @ValidationArgsLenMax(50)
     private String newPassword;

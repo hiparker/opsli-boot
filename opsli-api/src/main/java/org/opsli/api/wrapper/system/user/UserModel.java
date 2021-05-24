@@ -37,12 +37,12 @@ import org.opsli.plugins.excel.annotation.ExcelInfo;
 @EqualsAndHashCode(callSuper = false)
 public class UserModel extends ApiWrapper {
 
-
     /** 登录账户 */
     @ApiModelProperty(value = "登录账户")
     @ExcelIgnore
     @ValidationArgs({ValiArgsType.IS_NOT_NULL,ValiArgsType.IS_GENERAL})
     @ValidationArgsLenMax(32)
+    @ValidationArgsLenMin(5)
     private String username;
 
     /** 登录密码 */

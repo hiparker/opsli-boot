@@ -1,5 +1,5 @@
 超级管理员 -
-  system Bb123456
+  system Bb123456.
 
 演示账户 -
-  demo Aa123456
+  demo Aa123456.

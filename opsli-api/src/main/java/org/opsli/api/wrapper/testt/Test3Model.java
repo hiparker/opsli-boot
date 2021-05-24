@@ -50,7 +50,7 @@ public class Test3Model extends ApiWrapper {
     @ApiModelProperty(value = "年龄")
     @ExcelProperty(value = "年龄", order = 2)
     @ExcelInfo
-    @ValidationArgs({ValiArgsType.IS_NOT_NULL, ValiArgsType.IS_NUMBER})
+    @ValidationArgs({ValiArgsType.IS_NOT_NULL, ValiArgsType.IS_INTEGER})
     @ValidationArgsLenMax(3)
     private Integer age;
 

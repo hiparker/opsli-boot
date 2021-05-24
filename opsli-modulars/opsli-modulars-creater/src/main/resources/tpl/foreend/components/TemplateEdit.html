@@ -87,28 +87,11 @@
   #end
   import { formateDate } from "@/utils/format";
   import { isNull } from "@/utils/validate";
-  import { #(validateTypes) getMsg} from "@/utils/valiargs";
+  import { #(validateTypes) } from "@/utils/validateRlue";
 
   export default {
     name: "#(data.model.tableName)ManagementEdit",
     data() {
-
-      #for(columnList : formList)
-      #for(column : columnList)
-      #for(vali : valiDict[column.fieldName])
-      #if(vali != "isNotNull")
-      const validate_#(column.fieldName+'_'+vali) = (rule, value, callback) => {
-        if (!#(vali)(value)) {
-          callback(new Error(getMsg("#(vali)")));
-        } else {
-          callback();
-        }
-      };
-
-      #end
-      #end
-      #end
-      #end
 
       return {
         form: {
@@ -121,14 +104,14 @@
           #for(column : columnList)
           #if(valiDict[column.fieldName] != null && valiDict[column.fieldName].size() > 0)
           #(column.fieldName): [
-            #for(vali : valiDict[column.fieldName])
-            #if(vali == "isNotNull")
+            #for(validate : valiDict[column.fieldName])
+            #if(validate == "isNotNull")
             { required: true, trigger: "blur", message: "#(column.fieldComments)非空" },
             #end
             #end
-            #for(vali : valiDict[column.fieldName])
-            #if(vali != "isNotNull")
-            { required: false, trigger: "blur", validator: validate_#(column.fieldName+'_'+vali) },
+            #for(validate : valiDict[column.fieldName])
+            #if(validate != "isNotNull")
+            { required: false, trigger: "blur", validator: #(validate) },
             #end
             #end
           ],

@@ -42,6 +42,8 @@ public enum VueCodeBuilder {
     /** 实例对象 */
     INSTANCE;
 
+    /** 验证方法前缀 */
+    private static final String VALIDATE_PREFIX = "validate_";
     /** 虚拟根路径 */
     private static final String BASE_API_PATH;
     static {
@@ -151,10 +153,10 @@ public enum VueCodeBuilder {
                 }
 
                 List<String> validateTypeList = new ArrayList<>(validateTypes.length);
-                for (String vali : validateTypeSet) {
+                for (String validate : validateTypeSet) {
                     validateTypeList.add(
                             HumpUtil.underlineToHump(
-                                    vali.toLowerCase()
+                                    VALIDATE_PREFIX + validate.toLowerCase()
                             )
                     );
                 }

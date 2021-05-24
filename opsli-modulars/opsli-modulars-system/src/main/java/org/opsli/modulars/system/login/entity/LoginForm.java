@@ -42,7 +42,7 @@ public class LoginForm extends BaseEncrypt {
 
     /** 密码 */
     @ApiModelProperty(value = "密码")
-    @ValidationArgs(ValiArgsType.IS_NOT_NULL)
+    @ValidationArgs({ValiArgsType.IS_NOT_NULL, ValiArgsType.IS_SECURITY_PASSWORD})
     @ValidationArgsLenMin(6)
     private String password;
 

@@ -47,7 +47,7 @@ public class SysAreaModel extends ApiWrapper {
     @ApiModelProperty(value = "地域编号")
     @ExcelProperty(value = "地域编号", order = 2)
     @ExcelInfo
-    @ValidationArgs({ValiArgsType.IS_NOT_NULL, ValiArgsType.IS_NUMBER})
+    @ValidationArgs({ValiArgsType.IS_NOT_NULL, ValiArgsType.IS_INTEGER})
     @ValidationArgsLenMax(40)
     private String areaCode;
 
