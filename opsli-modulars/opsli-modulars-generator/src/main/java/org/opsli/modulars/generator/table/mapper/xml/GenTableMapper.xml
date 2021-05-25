@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.opsli.modulars.generator.table.mapper.GenTableMapper">
+
+
+    <select id="findAllByTableName" resultType="String">
+        select
+         table_name AS tableName
+        from
+        gen_table
+    </select>
+
+    <update id="renewSyncState">
+        update gen_table
+        set iz_sync = '1'
+        where
+        id = #{id}
+    </update>
+
+</mapper>

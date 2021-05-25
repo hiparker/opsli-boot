@@ -45,7 +45,7 @@
         <!-- 代码生成器 -->
         <dependency>
             <groupId>org.opsliframework.boot</groupId>
-            <artifactId>opsli-modulars-creater</artifactId>
+            <artifactId>opsli-modulars-generator</artifactId>
             <version>${modulars.version}</version>
         </dependency>
         <!-- 引入测试业务模块 -->

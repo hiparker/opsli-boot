@@ -1,0 +1,29 @@
+# 暂时只支持 mysql
+opsli:
+  # 排除表 防止代码生成器直接 非法删除关键表
+  exclude-tables:
+    - gen_table
+    - gen_table_column
+    - gen_logs
+    - sys_dict
+    - sys_dict_detail
+    - sys_logs
+    - sys_menu
+    - sys_role
+    - sys_role_menu_ref
+    - sys_tenant
+    - sys_user
+    - sys_user_role_ref
+    - sys_user_org_ref
+    - sys_area
+    - sys_org
+    - sys_options
+
+  # 排除字段
+  exclude-fields:
+    - id
+    - version
+    - create_by
+    - create_time
+    - update_by
+    - update_time

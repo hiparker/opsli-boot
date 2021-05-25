@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.opsli.modulars.generator.importable.mapper.MySQLDatabaseTableMapper">
+
+
+    <select id="findTables" resultType="org.opsli.modulars.generator.importable.entity.DatabaseTable">
+        SELECT
+            TB.TABLE_SCHEMA AS dbName,
+            TB.TABLE_NAME AS tableName,
+            TB.TABLE_COMMENT AS tableComments
+        FROM
+            INFORMATION_SCHEMA.TABLES TB
+        WHERE
+            TB.TABLE_SCHEMA = #{dbName}
+            <if test="tableName != null and tableName != ''">
+                AND TB.TABLE_NAME = #{tableName}
+            </if>
+    </select>
+
+    <select id="findColumns" resultType="org.opsli.modulars.generator.importable.entity.DatabaseColumn">
+        SELECT
+            TABLE_SCHEMA AS dbName,
+            TABLE_NAME AS tableName,
+            COLUMN_NAME AS columnName,
+            data_type AS columnType,
+            CHARACTER_MAXIMUM_LENGTH AS columnLength,
+            NUMERIC_PRECISION AS columnPrecision,
+            NUMERIC_SCALE AS columnScale,
+            COLUMN_COMMENT AS columnComment,
+            IF( IS_NULLABLE = 'NO', '1', '0' ) AS izNotNull,
+            IF( COLUMN_KEY = 'PRI', '1', '0' ) AS izPk
+        FROM
+            INFORMATION_SCHEMA.COLUMNS
+        WHERE
+            TABLE_NAME = #{tableName}
+            AND TABLE_SCHEMA = #{dbName}
+        ORDER BY ORDINAL_POSITION
+    </select>
+
+</mapper>
