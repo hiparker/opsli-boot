@@ -17,6 +17,9 @@ package org.opsli.core.generator.utils;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
+import cn.hutool.core.convert.Convert;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import org.apache.commons.lang3.StringUtils;
 import org.opsli.common.enums.DictType;
 import org.opsli.common.enums.ValiArgsType;
@@ -25,7 +28,9 @@ import org.opsli.modulars.generator.column.wrapper.GenTableColumnModel;
 import org.opsli.modulars.generator.logs.wrapper.GenBuilderModel;
 import org.opsli.modulars.generator.table.wrapper.GenTableAndColumnModel;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /***
  * 代码生成器 处理工具类
@@ -37,7 +42,15 @@ public final class GeneratorHandleUtil {
 
     /** 后端 验证前缀 */
     private static final String BACKEND_VALIDATE_TYPE_PREFIX = "ValiArgsType.";
+    /** 验证方法前缀 */
+    private static final String VALIDATE_PREFIX = "validate_";
 
+    /**
+     * 处理代码生成器数据
+     * @param builderModel 数据
+     * @param excludeFields 排除字段
+     * @return GenBuilderModel
+     */
     public static GenBuilderModel handleData(GenBuilderModel builderModel, List<String> excludeFields){
         if(builderModel == null){
             return null;
@@ -66,6 +79,8 @@ public final class GeneratorHandleUtil {
             List<String> finalExcludeFields = excludeFields;
             columnList.removeIf(tmp -> finalExcludeFields.contains(tmp.getFieldName()));
 
+            List<GenTableColumnModel> queryList = Lists.newArrayList();
+
             for (GenTableColumnModel columnModel : columnList) {
                 // 1. 数据库字段名转驼峰
                 columnModel.setFieldHumpName(
@@ -74,35 +89,89 @@ public final class GeneratorHandleUtil {
                         )
                 );
 
+                // 验证集合
+                Set<String> validateTypeSet = Sets.newHashSet(columnModel.getValidateType());
+                // 如果非空 则开启非空验证
+                if(DictType.NO_YES_YES.getValue().equals(columnModel.getIzNotNull())){
+                    validateTypeSet.add(ValiArgsType.IS_NOT_NULL.toString());
+                }
+                List<String> validateTypeList = Convert.toList(String.class, validateTypeSet);
+                validateTypeList.removeIf(StringUtils::isBlank);
+
                 // 2. 后端字段验证
                 // 处理验证器
-                String validateType = columnModel.getValidateType();
-                if(StringUtils.isNotBlank(validateType)){
-                    String[] validateTypes = validateType.split(",");
-                    StringBuilder stb = new StringBuilder();
-                    boolean izNotNull = false;
-                    // 如果非空 则开启非空验证
-                    if(DictType.NO_YES_YES.getValue().equals(columnModel.getIzNotNull())){
-                        izNotNull = true;
-                        stb.append(BACKEND_VALIDATE_TYPE_PREFIX).append(ValiArgsType.IS_NOT_NULL);
+                if(!CollUtil.isEmpty(validateTypeList)){
+                    StringBuilder backendStb = new StringBuilder();
+                    StringBuilder frontendStb = new StringBuilder();
+
+                    columnModel.setFrontendValidateTypeList(Lists.newArrayList());
+                    List<String> backendList = Lists.newArrayListWithCapacity(validateTypeList.size());
+                    List<String> frontendList = Lists.newArrayListWithCapacity(validateTypeList.size());
+                    for (int i = 0; i < validateTypeList.size(); i++) {
+                        String validate = validateTypeList.get(i);
+
+                        backendStb.append(BACKEND_VALIDATE_TYPE_PREFIX).append(validate);
+                        frontendStb.append(
+                                HumpUtil.underlineToHump(
+                                VALIDATE_PREFIX + validate.toLowerCase()));
+
+                        backendList.add(validate);
+                        frontendList.add(
+                                HumpUtil.underlineToHump(
+                                        VALIDATE_PREFIX + validate.toLowerCase()));
+
+                        if(i < validateTypeList.size() - 1 ){
+                            backendStb.append(", ");
+                            frontendStb.append(", ");
+                        }
                     }
 
-                    for (int i = 0; i < validateTypes.length; i++) {
-                        String type = validateTypes[i];
-                        if(izNotNull){
-                            stb.append(", ");
-                            izNotNull = false;
-                        }
-                        if(!ValiArgsType.IS_NOT_NULL.equals(ValiArgsType.valueOf(type))){
-                            stb.append(BACKEND_VALIDATE_TYPE_PREFIX).append(type);
-                        }
-                        if(i < validateTypes.length -1 ){
-                            stb.append(", ");
-                        }
+
+                    columnModel.setBackendValidateType(backendStb.toString());
+                    columnModel.setFrontendValidateType(frontendStb.toString());
+                    model.setFrontendValidateType(frontendStb.toString());
+
+                    columnModel.setBackendValidateTypeList(backendList);
+                    columnModel.setFrontendValidateTypeList(frontendList);
+                }
+
+                // 3. 处理 Form 表单字段
+                if(DictType.NO_YES_YES.getValue().equals(columnModel.getIzShowForm())){
+                    if(CollUtil.isEmpty(model.getFormList())){
+                        model.setFormList(Lists.newArrayList());
                     }
-                    columnModel.setBackendValidateType(stb.toString());
+                    model.getFormList().add(columnModel);
+                }
+
+                // 4. 处理 Index 页面字段 - QueryList
+                if (StringUtils.isNotBlank(columnModel.getQueryType()) &&
+                        DictType.NO_YES_YES.getValue().equals(columnModel.getIzShowList())
+                    ) {
+                    queryList.add(columnModel);
+                }
+
+            }
+
+            // 5. 处理 Index 页面字段 - briefQueryList - moreQueryList
+            if(!CollUtil.isEmpty(queryList)){
+                if(CollUtil.isEmpty(model.getBriefQueryList())){
+                    model.setBriefQueryList(Lists.newArrayList());
+                }
+                if(CollUtil.isEmpty(model.getMoreQueryList())){
+                    model.setMoreQueryList(Lists.newArrayList());
+                }
+
+                for (int i = 0; i < queryList.size(); i++) {
+                    if(i < 2){
+                        model.getBriefQueryList().add(
+                                queryList.get(i));
+                    }else{
+                        model.getMoreQueryList().add(
+                                queryList.get(i));
+                    }
                 }
             }
+
         }
 
         return builderModel;

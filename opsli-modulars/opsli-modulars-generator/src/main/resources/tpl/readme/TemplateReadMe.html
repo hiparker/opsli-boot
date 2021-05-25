@@ -1,7 +1,7 @@
 > Copyright 2020 OPSLI 快速开发平台 https://www.opsli.com
 
 #[[## OPSLI 代码生成器]]#
-> 生成 #(data.codeTitle)[#(data.model.tableName)] 代码 , 生成时间：#(currTime)
+> 生成 #(data.codeTitle)[#(data.model.tableHumpName)] 代码 , 生成时间：#(currTime)
 
 > 作者: #(data.authorName)
 
@@ -38,8 +38,6 @@ api 包里的代码为 api接口层，拷贝至对应目录即可
 需要增加对应菜单的操作权限
 
 菜单配置：
-编号： 如果不存在主路径则主路径编号为`#(data.moduleName.toLowerCase())`，
-如果存在则子路径编号为`#(data.subModuleName.toLowerCase())`
 类型：菜单
 主路径：`#(data.moduleName.toLowerCase())` (如果主路径存在，则不需要创建主路径)
 子路径：`#(data.subModuleName.toLowerCase())`
@@ -49,6 +47,7 @@ api 包里的代码为 api接口层，拷贝至对应目录即可
 组件路径: `views/modules/#(data.moduleName.toLowerCase())/index`
 #end
 
+类型：按钮
 查看： `select`
 新增： `insert`
 修改： `update`

@@ -40,11 +40,11 @@ import org.springframework.format.annotation.DateTimeFormat;
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class #(data.model.tableName)Model extends ApiWrapper {
+public class #(data.model.tableHumpName)Model extends ApiWrapper {
 
     #for(column : data.model.columnList)
     ### 不等于 删除字段 和 不等于 租户字段放入上边
-    #if(column.fieldName != "deleted" && column.fieldName != "tenantId")
+    #if(column.fieldHumpName != "deleted" && column.fieldHumpName != "tenantId")
     /** #(column.fieldComments) */
     @ApiModelProperty(value = "#(column.fieldComments)")
     @ExcelProperty(value = "#(column.fieldComments)", order = #(column.sort))
@@ -53,8 +53,8 @@ public class #(data.model.tableName)Model extends ApiWrapper {
     #else
     @ExcelInfo
     #end
-    #if(column.validateType != null && column.validateType != "")
-    @ValidationArgs({#(column.validateType)})
+    #if(column.backendValidateType != null && column.backendValidateType != "")
+    @ValidationArgs({#(column.backendValidateType)})
     #end
     #if(column.fieldLength != null && column.fieldLength > 0)
     #if(column.fieldPrecision != null && column.fieldPrecision > 0)
@@ -73,7 +73,7 @@ public class #(data.model.tableName)Model extends ApiWrapper {
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     #end
     #end
-    private #(column.javaType) #(column.fieldName);
+    private #(column.javaType) #(column.fieldHumpName);
 
     #end
     #end

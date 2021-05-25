@@ -23,9 +23,9 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 #if(data.subModuleName != null && data.subModuleName != "")
-import #(data.packageName+"."+data.moduleName+"."+data.subModuleName).entity.#(data.model.tableName);
+import #(data.packageName+"."+data.moduleName+"."+data.subModuleName).entity.#(data.model.tableHumpName);
 #else
-import #(data.packageName+"."+data.moduleName).entity.#(data.model.tableName);
+import #(data.packageName+"."+data.moduleName).entity.#(data.model.tableHumpName);
 #end
 
 /**
@@ -35,6 +35,6 @@ import #(data.packageName+"."+data.moduleName).entity.#(data.model.tableName);
  * @date #(currTime)
  */
 @Mapper
-public interface #(data.model.tableName)Mapper extends BaseMapper<#(data.model.tableName)> {
+public interface #(data.model.tableHumpName)Mapper extends BaseMapper<#(data.model.tableHumpName)> {
 
 }

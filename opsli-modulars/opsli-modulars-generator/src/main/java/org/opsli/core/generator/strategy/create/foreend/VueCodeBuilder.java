@@ -60,43 +60,9 @@ public enum VueCodeBuilder {
     public Map<String,String> createIndex(GenBuilderModel builderModelTmp, String dataStr){
         GenBuilderModel builderModel =
                 WrapperUtil.transformInstance(builderModelTmp, GenBuilderModel.class, true);
-        List<GenTableColumnModel> columnList = builderModel.getModel().getColumnList();
-        // 处理数据
-        for (GenTableColumnModel columnModel : columnList) {
-            // 数据库字段名转驼峰
-            columnModel.setFieldName(
-                    HumpUtil.underlineToHump(
-                            columnModel.getFieldName()
-                    )
-            );
-        }
-
-        List<GenTableColumnModel> queryList = new ArrayList<>(2);
-        // 简单检索
-        List<GenTableColumnModel> briefQueryList = new ArrayList<>(2);
-        // 更多检索
-        List<GenTableColumnModel> moreQueryList = new ArrayList<>();
-        for (GenTableColumnModel genTableColumnModel : columnList) {
-            if (StringUtils.isNotBlank(genTableColumnModel.getQueryType()) &&
-                    genTableColumnModel.getIzShowList().equals(DictType.NO_YES_YES.getValue())
-            ) {
-                queryList.add(genTableColumnModel);
-            }
-        }
-        // 筛选数据
-        for (int i = 0; i < queryList.size(); i++) {
-            if(i < 2){
-                briefQueryList.add(queryList.get(i));
-            }else{
-                moreQueryList.add(queryList.get(i));
-            }
-        }
-
 
         String codeStr = EnjoyUtil.render("/foreend/index/TemplateIndex.html",
                 this.createKv(builderModel)
-                .set("briefQueryList", briefQueryList)
-                .set("moreQueryList", moreQueryList)
         );
 
         StringBuilder path = new StringBuilder();
@@ -129,79 +95,9 @@ public enum VueCodeBuilder {
     public Map<String,String> createEdit(GenBuilderModel builderModelTmp, String dataStr){
         GenBuilderModel builderModel =
                 WrapperUtil.transformInstance(builderModelTmp, GenBuilderModel.class, true);
-        List<GenTableColumnModel> columnList = builderModel.getModel().getColumnList();
-        List<List<GenTableColumnModel>> formList = new ArrayList<>();
-        Map<String,List<String>> valiDict = new HashMap<>();
-        Set<String> validateTypesSet = new HashSet<>();
-        // 处理验证数据
-        for (GenTableColumnModel columnModel : columnList) {
-            // 数据库字段名转驼峰
-            columnModel.setFieldName(
-                    HumpUtil.underlineToHump(
-                            columnModel.getFieldName()
-                    )
-            );
-
-            // 处理验证器
-            String validateType = columnModel.getValidateType();
-            if(StringUtils.isNotBlank(validateType)){
-                String[] validateTypes = validateType.split(",");
-                Set<String> validateTypeSet = new HashSet<>(Arrays.asList(validateTypes));
-                // 如果非空 则开启非空验证
-                if(DictType.NO_YES_YES.getValue().equals(columnModel.getIzNotNull())){
-                    validateTypeSet.add(ValiArgsType.IS_NOT_NULL.toString());
-                }
-
-                List<String> validateTypeList = new ArrayList<>(validateTypes.length);
-                for (String validate : validateTypeSet) {
-                    validateTypeList.add(
-                            HumpUtil.underlineToHump(
-                                    VALIDATE_PREFIX + validate.toLowerCase()
-                            )
-                    );
-                }
-
-                validateTypesSet.addAll(validateTypeList);
-                valiDict.put(columnModel.getFieldName(), validateTypeList);
-            }
-        }
-
-        // 处理数据
-        if(columnList.size() == 1){
-            if(DictType.NO_YES_YES.getValue().equals(columnList.get(0).getIzShowForm()) &&
-                StringUtils.isNotBlank(columnList.get(0).getShowType())
-                ){
-                List<GenTableColumnModel> formTmpList = new ArrayList<>();
-                formTmpList.add(columnList.get(0));
-                formList.add(formTmpList);
-            }
-        }else{
-            for (int i = 0; i < columnList.size(); i+=2) {
-                List<GenTableColumnModel> formTmpList = new ArrayList<>();
-                if(DictType.NO_YES_YES.getValue().equals(columnList.get(i).getIzShowForm()) &&
-                        StringUtils.isNotBlank(columnList.get(i).getShowType())
-                ){
-                    formTmpList.add(columnList.get(i));
-                    if(i+1 < columnList.size()){
-                        formTmpList.add(columnList.get(i+1));
-                    }
-                    formList.add(formTmpList);
-                }
-            }
-        }
-
-        StringBuilder validateTypeStb = new StringBuilder();
-        for (String validateType : validateTypesSet) {
-            validateTypeStb.append(validateType);
-            validateTypeStb.append(", ");
-        }
 
         String codeStr = EnjoyUtil.render("/foreend/components/TemplateEdit.html",
-                this.createKv(builderModel)
-                        .set("formList", formList)
-                        .set("valiDict", valiDict)
-                        .set("validateTypes", validateTypeStb.toString())
-        );
+                this.createKv(builderModel));
 
         StringBuilder path = new StringBuilder();
         path.append(CodeBuilder.BASE_PATH).append(dataStr).append(CodeBuilder.FOREEND_PATH)
@@ -220,7 +116,7 @@ public enum VueCodeBuilder {
         }
         Map<String,String> entityMap = new HashMap<>();
         entityMap.put(ZipUtils.FILE_PATH, path.toString());
-        entityMap.put(ZipUtils.FILE_NAME, builderModel.getModel().getTableName()+"ManagementEdit.vue");
+        entityMap.put(ZipUtils.FILE_NAME, builderModel.getModel().getTableHumpName()+"ManagementEdit.vue");
         entityMap.put(ZipUtils.FILE_DATA, codeStr);
         return entityMap;
     }
@@ -235,16 +131,6 @@ public enum VueCodeBuilder {
     public Map<String,String> createImport(GenBuilderModel builderModelTmp, String dataStr){
         GenBuilderModel builderModel =
                 WrapperUtil.transformInstance(builderModelTmp, GenBuilderModel.class, true);
-        List<GenTableColumnModel> columnList = builderModel.getModel().getColumnList();
-        // 处理数据
-        for (GenTableColumnModel columnModel : columnList) {
-            // 数据库字段名转驼峰
-            columnModel.setFieldName(
-                    HumpUtil.underlineToHump(
-                            columnModel.getFieldName()
-                    )
-            );
-        }
 
         String codeStr = EnjoyUtil.render("/foreend/components/TemplateImport.html",
                 this.createKv(builderModel)
@@ -267,7 +153,7 @@ public enum VueCodeBuilder {
         }
         Map<String,String> entityMap = new HashMap<>();
         entityMap.put(ZipUtils.FILE_PATH, path.toString());
-        entityMap.put(ZipUtils.FILE_NAME, builderModel.getModel().getTableName()+"ManagementImport.vue");
+        entityMap.put(ZipUtils.FILE_NAME, builderModel.getModel().getTableHumpName()+"ManagementImport.vue");
         entityMap.put(ZipUtils.FILE_DATA, codeStr);
         return entityMap;
     }
@@ -281,17 +167,6 @@ public enum VueCodeBuilder {
     public Map<String,String> createApi(GenBuilderModel builderModelTmp, String dataStr){
         GenBuilderModel builderModel =
                 WrapperUtil.transformInstance(builderModelTmp, GenBuilderModel.class, true);
-        List<GenTableColumnModel> columnList = builderModel.getModel().getColumnList();
-        // 处理数据
-        for (GenTableColumnModel columnModel : columnList) {
-            // 数据库字段名转驼峰
-            columnModel.setFieldName(
-                    HumpUtil.underlineToHump(
-                            columnModel.getFieldName()
-                    )
-            );
-        }
-
 
         String codeStr = EnjoyUtil.render("/foreend/api/TemplateApi.html",
                 this.createKv(builderModel)
@@ -311,7 +186,7 @@ public enum VueCodeBuilder {
         }
         Map<String,String> entityMap = new HashMap<>();
         entityMap.put(ZipUtils.FILE_PATH, path.toString());
-        entityMap.put(ZipUtils.FILE_NAME, builderModel.getModel().getTableName()+"Management.js");
+        entityMap.put(ZipUtils.FILE_NAME, builderModel.getModel().getTableHumpName()+"Management.js");
         entityMap.put(ZipUtils.FILE_DATA, codeStr);
         return entityMap;
     }

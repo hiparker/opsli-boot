@@ -40,15 +40,15 @@ import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Method;
 
 #if(data.subModuleName != null && data.subModuleName != "")
-import #(data.packageName+"."+data.moduleName+"."+data.subModuleName).entity.#(data.model.tableName);
-import #(apiPath).wrapper.#(data.moduleName+"."+data.subModuleName).#(data.model.tableName)Model;
-import #(data.packageName+"."+data.moduleName+"."+data.subModuleName).service.I#(data.model.tableName)Service;
-import #(apiPath).web.#(data.moduleName+"."+data.subModuleName).#(data.model.tableName)RestApi;
+import #(data.packageName+"."+data.moduleName+"."+data.subModuleName).entity.#(data.model.tableHumpName);
+import #(apiPath).wrapper.#(data.moduleName+"."+data.subModuleName).#(data.model.tableHumpName)Model;
+import #(data.packageName+"."+data.moduleName+"."+data.subModuleName).service.I#(data.model.tableHumpName)Service;
+import #(apiPath).web.#(data.moduleName+"."+data.subModuleName).#(data.model.tableHumpName)RestApi;
 #else
-import #(data.packageName+"."+data.moduleName).entity.#(data.model.tableName);
-import #(apiPath).wrapper.#(data.moduleName).#(data.model.tableName)Model;
-import #(data.packageName+"."+data.moduleName).service.I#(data.model.tableName)Service;
-import #(apiPath).web.#(data.moduleName).#(data.model.tableName)RestApi;
+import #(data.packageName+"."+data.moduleName).entity.#(data.model.tableHumpName);
+import #(apiPath).wrapper.#(data.moduleName).#(data.model.tableHumpName)Model;
+import #(data.packageName+"."+data.moduleName).service.I#(data.model.tableHumpName)Service;
+import #(apiPath).web.#(data.moduleName).#(data.model.tableHumpName)RestApi;
 #end
 
 /**
@@ -57,15 +57,15 @@ import #(apiPath).web.#(data.moduleName).#(data.model.tableName)RestApi;
  * @author #(data.authorName)
  * @date #(currTime)
  */
-@Api(tags = #(data.model.tableName)RestApi.TITLE)
+@Api(tags = #(data.model.tableHumpName)RestApi.TITLE)
 @Slf4j
 #if(data.subModuleName != null && data.subModuleName != "")
 @ApiRestController("/#(data.moduleName)/#(data.subModuleName)")
 #else
 @ApiRestController("/#(data.moduleName)")
 #end
-public class #(data.model.tableName)RestController extends BaseRestController<#(data.model.tableName), #(data.model.tableName)Model, I#(data.model.tableName)Service>
-    implements #(data.model.tableName)RestApi {
+public class #(data.model.tableHumpName)RestController extends BaseRestController<#(data.model.tableHumpName), #(data.model.tableHumpName)Model, I#(data.model.tableHumpName)Service>
+    implements #(data.model.tableHumpName)RestApi {
 
 
     /**
@@ -80,7 +80,7 @@ public class #(data.model.tableName)RestController extends BaseRestController<#(
     @RequiresPermissions("#(data.moduleName.toLowerCase())_select")
     #end
     @Override
-    public ResultVo<#(data.model.tableName)Model> get(#(data.model.tableName)Model model) {
+    public ResultVo<#(data.model.tableHumpName)Model> get(#(data.model.tableHumpName)Model model) {
         // 如果系统内部调用 则直接查数据库
         if(model != null && model.getIzApi() != null && model.getIzApi()){
             model = IService.get(model);
@@ -104,8 +104,8 @@ public class #(data.model.tableName)RestController extends BaseRestController<#(
     @Override
     public ResultVo<?> findPage(Integer pageNo, Integer pageSize, HttpServletRequest request) {
 
-        QueryBuilder<#(data.model.tableName)> queryBuilder = new WebQueryBuilder<>(entityClazz, request.getParameterMap());
-        Page<#(data.model.tableName), #(data.model.tableName)Model> page = new Page<>(pageNo, pageSize);
+        QueryBuilder<#(data.model.tableHumpName)> queryBuilder = new WebQueryBuilder<>(entityClazz, request.getParameterMap());
+        Page<#(data.model.tableHumpName), #(data.model.tableHumpName)Model> page = new Page<>(pageNo, pageSize);
         page.setQueryWrapper(queryBuilder.build());
         page = IService.findPage(page);
 
@@ -125,7 +125,7 @@ public class #(data.model.tableName)RestController extends BaseRestController<#(
     #end
     @EnableLog
     @Override
-    public ResultVo<?> insert(#(data.model.tableName)Model model) {
+    public ResultVo<?> insert(#(data.model.tableHumpName)Model model) {
         // 调用新增方法
         IService.insert(model);
         return ResultVo.success("新增#(data.codeTitleBrief)成功");
@@ -144,7 +144,7 @@ public class #(data.model.tableName)RestController extends BaseRestController<#(
     #end
     @EnableLog
     @Override
-    public ResultVo<?> update(#(data.model.tableName)Model model) {
+    public ResultVo<?> update(#(data.model.tableHumpName)Model model) {
         // 调用修改方法
         IService.update(model);
         return ResultVo.success("修改#(data.codeTitleBrief)成功");
@@ -214,8 +214,8 @@ public class #(data.model.tableName)RestController extends BaseRestController<#(
     public void exportExcel(HttpServletRequest request, HttpServletResponse response) {
         // 当前方法
         Method method = ReflectUtil.getMethodByName(this.getClass(), "exportExcel");
-        QueryBuilder<#(data.model.tableName)> queryBuilder = new WebQueryBuilder<>(entityClazz, request.getParameterMap());
-        super.excelExport(#(data.model.tableName)RestApi.SUB_TITLE, queryBuilder.build(), response, method);
+        QueryBuilder<#(data.model.tableHumpName)> queryBuilder = new WebQueryBuilder<>(entityClazz, request.getParameterMap());
+        super.excelExport(#(data.model.tableHumpName)RestApi.SUB_TITLE, queryBuilder.build(), response, method);
     }
 
     /**
@@ -251,7 +251,7 @@ public class #(data.model.tableName)RestController extends BaseRestController<#(
     public void importTemplate(HttpServletResponse response) {
         // 当前方法
         Method method = ReflectUtil.getMethodByName(this.getClass(), "importTemplate");
-        super.importTemplate(#(data.model.tableName)RestApi.SUB_TITLE, response, method);
+        super.importTemplate(#(data.model.tableHumpName)RestApi.SUB_TITLE, response, method);
     }
 
 }

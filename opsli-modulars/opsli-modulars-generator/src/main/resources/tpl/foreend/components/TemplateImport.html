@@ -34,15 +34,15 @@
 
 <script>
   #if(data.subModuleName != null && data.subModuleName != "")
-  import { doDownloadTemplate, doImportExcel } from "@/api/#(data.moduleName)/#(data.subModuleName)/#(data.model.tableName)Management";
+  import { doDownloadTemplate, doImportExcel } from "@/api/#(data.moduleName)/#(data.subModuleName)/#(data.model.tableHumpName)Management";
   #else
-  import { doDownloadTemplate, doImportExcel } from "@/api/#(data.moduleName)/#(data.model.tableName)Management";
+  import { doDownloadTemplate, doImportExcel } from "@/api/#(data.moduleName)/#(data.model.tableHumpName)Management";
   #end
   import {isNull} from "@/utils/validate";
   import {random} from "@/utils";
 
   export default {
-    name: "#(data.model.tableName)ManagementImport",
+    name: "#(data.model.tableHumpName)ManagementImport",
     data() {
       return {
         title: "导入Excel",

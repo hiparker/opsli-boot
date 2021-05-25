@@ -23,11 +23,11 @@ import org.opsli.core.base.service.interfaces.CrudServiceInterface;
 
 
 #if(data.subModuleName != null && data.subModuleName != "")
-import #(data.packageName+"."+data.moduleName+"."+data.subModuleName).entity.#(data.model.tableName);
-import #(apiPath).wrapper.#(data.moduleName+"."+data.subModuleName).#(data.model.tableName)Model;
+import #(data.packageName+"."+data.moduleName+"."+data.subModuleName).entity.#(data.model.tableHumpName);
+import #(apiPath).wrapper.#(data.moduleName+"."+data.subModuleName).#(data.model.tableHumpName)Model;
 #else
-import #(data.packageName+"."+data.moduleName).entity.#(data.model.tableName);
-import #(apiPath).wrapper.#(data.moduleName).#(data.model.tableName)Model;
+import #(data.packageName+"."+data.moduleName).entity.#(data.model.tableHumpName);
+import #(apiPath).wrapper.#(data.moduleName).#(data.model.tableHumpName)Model;
 #end
 
 /**
@@ -36,6 +36,6 @@ import #(apiPath).wrapper.#(data.moduleName).#(data.model.tableName)Model;
  * @author #(data.authorName)
  * @date #(currTime)
  */
-public interface I#(data.model.tableName)Service extends CrudServiceInterface<#(data.model.tableName), #(data.model.tableName)Model> {
+public interface I#(data.model.tableHumpName)Service extends CrudServiceInterface<#(data.model.tableHumpName), #(data.model.tableHumpName)Model> {
 
 }

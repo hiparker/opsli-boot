@@ -35,17 +35,17 @@ import org.opsli.core.base.entity.BaseEntity;
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class #(data.model.tableName) extends BaseEntity {
+public class #(data.model.tableHumpName) extends BaseEntity {
 
 
     #for(column : data.model.columnList)
     ### 不等于 删除字段 和 不等于 租户字段放入上边
-    #if(column.fieldName != "deleted" && column.fieldName != "tenantId")
+    #if(column.fieldHumpName != "deleted" && column.fieldHumpName != "tenantId")
     /** #(column.fieldComments) */
     #if(!column.izNotNull)
     @TableField(updateStrategy = FieldStrategy.IGNORED)
     #end
-    private #(column.javaType) #(column.fieldName);
+    private #(column.javaType) #(column.fieldHumpName);
 
     #end
     #end
@@ -54,11 +54,11 @@ public class #(data.model.tableName) extends BaseEntity {
 
     ### 专门处理 删除字段 和 租户字段
     #for(column : data.model.columnList)
-    #if(column.fieldName == "deleted")
+    #if(column.fieldHumpName == "deleted")
     /** 逻辑删除字段 */
     @TableLogic
     private Integer deleted;
-    #else if(column.fieldName == "tenantId")
+    #else if(column.fieldHumpName == "tenantId")
     /** 多租户字段 */
     private String tenantId;
     #end

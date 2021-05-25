@@ -29,9 +29,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 #if(data.subModuleName != null && data.subModuleName != "")
-import #(apiPath).wrapper.#(data.moduleName+"."+data.subModuleName).#(data.model.tableName)Model;
+import #(apiPath).wrapper.#(data.moduleName+"."+data.subModuleName).#(data.model.tableHumpName)Model;
 #else
-import #(apiPath).wrapper.#(data.moduleName).#(data.model.tableName)Model;
+import #(apiPath).wrapper.#(data.moduleName).#(data.model.tableHumpName)Model;
 #end
 
 
@@ -46,7 +46,7 @@ import #(apiPath).wrapper.#(data.moduleName).#(data.model.tableName)Model;
  * @author #(data.authorName)
  * @date #(currTime)
  */
-public interface #(data.model.tableName)RestApi {
+public interface #(data.model.tableHumpName)RestApi {
 
     /** 标题 */
     String TITLE = "#(data.codeTitle)";
@@ -59,7 +59,7 @@ public interface #(data.model.tableName)RestApi {
     * @return ResultVo
     */
     @GetMapping("/get")
-    ResultVo<#(data.model.tableName)Model> get(#(data.model.tableName)Model model);
+    ResultVo<#(data.model.tableHumpName)Model> get(#(data.model.tableHumpName)Model model);
 
     /**
     * #(data.codeTitle) 查询分页
@@ -81,7 +81,7 @@ public interface #(data.model.tableName)RestApi {
     * @return ResultVo
     */
     @PostMapping("/insert")
-    ResultVo<?> insert(@RequestBody #(data.model.tableName)Model model);
+    ResultVo<?> insert(@RequestBody #(data.model.tableHumpName)Model model);
 
     /**
     * #(data.codeTitle) 修改
@@ -89,7 +89,7 @@ public interface #(data.model.tableName)RestApi {
     * @return ResultVo
     */
     @PostMapping("/update")
-    ResultVo<?> update(@RequestBody #(data.model.tableName)Model model);
+    ResultVo<?> update(@RequestBody #(data.model.tableHumpName)Model model);
 
     /**
     * #(data.codeTitle) 删除

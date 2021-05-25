@@ -26,15 +26,15 @@ import org.springframework.transaction.annotation.Transactional;
 import org.opsli.core.base.service.impl.CrudServiceImpl;
 
 #if(data.subModuleName != null && data.subModuleName != "")
-import #(data.packageName+"."+data.moduleName+"."+data.subModuleName).entity.#(data.model.tableName);
-import #(apiPath).wrapper.#(data.moduleName+"."+data.subModuleName).#(data.model.tableName)Model;
-import #(data.packageName+"."+data.moduleName+"."+data.subModuleName).service.I#(data.model.tableName)Service;
-import #(data.packageName+"."+data.moduleName+"."+data.subModuleName).mapper.#(data.model.tableName)Mapper;
+import #(data.packageName+"."+data.moduleName+"."+data.subModuleName).entity.#(data.model.tableHumpName);
+import #(apiPath).wrapper.#(data.moduleName+"."+data.subModuleName).#(data.model.tableHumpName)Model;
+import #(data.packageName+"."+data.moduleName+"."+data.subModuleName).service.I#(data.model.tableHumpName)Service;
+import #(data.packageName+"."+data.moduleName+"."+data.subModuleName).mapper.#(data.model.tableHumpName)Mapper;
 #else
-import #(data.packageName+"."+data.moduleName).entity.#(data.model.tableName);
-import #(apiPath).wrapper.#(data.moduleName).#(data.model.tableName)Model;
-import #(data.packageName+"."+data.moduleName).service.I#(data.model.tableName)Service;
-import #(data.packageName+"."+data.moduleName).mapper.#(data.model.tableName)Mapper;
+import #(data.packageName+"."+data.moduleName).entity.#(data.model.tableHumpName);
+import #(apiPath).wrapper.#(data.moduleName).#(data.model.tableHumpName)Model;
+import #(data.packageName+"."+data.moduleName).service.I#(data.model.tableHumpName)Service;
+import #(data.packageName+"."+data.moduleName).mapper.#(data.model.tableHumpName)Mapper;
 #end
 
 
@@ -45,10 +45,10 @@ import #(data.packageName+"."+data.moduleName).mapper.#(data.model.tableName)Map
  * @date #(currTime)
  */
 @Service
-public class #(data.model.tableName)ServiceImpl extends CrudServiceImpl<#(data.model.tableName)Mapper, #(data.model.tableName), #(data.model.tableName)Model>
-    implements I#(data.model.tableName)Service {
+public class #(data.model.tableHumpName)ServiceImpl extends CrudServiceImpl<#(data.model.tableHumpName)Mapper, #(data.model.tableHumpName), #(data.model.tableHumpName)Model>
+    implements I#(data.model.tableHumpName)Service {
 
     @Autowired(required = false)
-    private #(data.model.tableName)Mapper mapper;
+    private #(data.model.tableHumpName)Mapper mapper;
 
 }

@@ -144,14 +144,24 @@ public class GenTableColumnModel extends ApiWrapper {
     @ExcelIgnore
     private String fieldHumpName;
 
-    /** 后台验证集合 */
+    /** 后端验证 */
     @JsonIgnore
     @ExcelIgnore
     private String backendValidateType;
 
-    /** 前台验证集合 */
+    /** 后端验证集合 */
     @JsonIgnore
     @ExcelIgnore
-    private List<String> frontendValidateType;
+    private List<String> backendValidateTypeList;
+
+    /** 前端验证集合 */
+    @JsonIgnore
+    @ExcelIgnore
+    private String frontendValidateType;
+
+    /** 前端验证集合 */
+    @JsonIgnore
+    @ExcelIgnore
+    private List<String> frontendValidateTypeList;
 
 }

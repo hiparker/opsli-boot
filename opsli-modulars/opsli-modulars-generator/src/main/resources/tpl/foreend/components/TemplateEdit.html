@@ -7,57 +7,55 @@
     @close="close"
   >
     <el-form ref="form" :model="form" :rules="rules" label-width="105px">
-      #for(columnList : formList)
-      #if(columnList != null && columnList.size() > 0)
-      <el-row>
-      #for(column : columnList)
+      #for(column : data.model.formList)
+      <el-row :gutter="10" >
         ### 文本框
         #if(column.showType == "0")
-        <el-col :span="12">
-          <el-form-item label="#(column.fieldComments)" prop="#(column.fieldName)">
-            <el-input v-model="form.#(column.fieldName)" autocomplete="off"></el-input>
+        <el-col :xs="24" :sm="24" :md="24" :lg="12" :xl="12">
+          <el-form-item label="#(column.fieldComments)" prop="#(column.fieldHumpName)">
+            <el-input v-model="form.#(column.fieldHumpName)" autocomplete="off"></el-input>
           </el-form-item>
         </el-col>
         ### 文本域
         #else if(column.showType == "1")
-        <el-col :span="12">
-        <el-form-item label="#(column.fieldComments)" prop="#(column.fieldName)">
-          <el-input type="textarea" v-model="form.#(column.fieldName)" autocomplete="off"></el-input>
-        </el-form-item>
+        <el-col :xs="24" :sm="24" :md="24" :lg="12" :xl="12">
+          <el-form-item label="#(column.fieldComments)" prop="#(column.fieldHumpName)">
+            <el-input type="textarea" v-model="form.#(column.fieldHumpName)" autocomplete="off"></el-input>
+          </el-form-item>
         </el-col>
         ### 字典
         #else if(column.showType == "2")
-        <el-col :span="12">
-        <el-form-item label="#(column.fieldComments)" prop="#(column.fieldName)">
-          <el-select v-model="form.#(column.fieldName)" clearable
-                     placeholder="请选择" style="width: 100%">
-            <el-option
-                    v-for="item in dict.#(column.dictTypeCode)"
-                    :key="item.dictValue"
-                    :label="item.dictName"
-                    :value="item.dictValue"
-            ></el-option>
-          </el-select>
-        </el-form-item>
+        <el-col :xs="24" :sm="24" :md="24" :lg="12" :xl="12">
+          <el-form-item label="#(column.fieldComments)" prop="#(column.fieldHumpName)">
+            <el-select v-model="form.#(column.fieldHumpName)" clearable
+                       placeholder="请选择" style="width: 100%">
+              <el-option
+                      v-for="item in dict.#(column.dictTypeCode)"
+                      :key="item.dictValue"
+                      :label="item.dictName"
+                      :value="item.dictValue"
+              ></el-option>
+            </el-select>
+          </el-form-item>
         </el-col>
         ### 日期时间
         #else if(column.showType == "3")
-        <el-col :span="12">
-        <el-form-item label="#(column.fieldComments)" prop="#(column.fieldName)">
-          <el-date-picker
-                  v-model="form.#(column.fieldName)"
-                  type="datetime"
-                  placeholder="选择#(column.fieldComments)"
-                  style="width: 100%"
-          ></el-date-picker>
-        </el-form-item>
+        <el-col :xs="24" :sm="24" :md="24" :lg="12" :xl="12">
+          <el-form-item label="#(column.fieldComments)" prop="#(column.fieldHumpName)">
+            <el-date-picker
+                    v-model="form.#(column.fieldHumpName)"
+                    type="datetime"
+                    placeholder="选择#(column.fieldComments)"
+                    style="width: 100%"
+            ></el-date-picker>
+          </el-form-item>
         </el-col>
         ### 日期
         #else if(column.showType == "4")
-        <el-col :span="12">
-          <el-form-item label="#(column.fieldComments)" prop="#(column.fieldName)">
+        <el-col :xs="24" :sm="24" :md="24" :lg="12" :xl="12">
+          <el-form-item label="#(column.fieldComments)" prop="#(column.fieldHumpName)">
             <el-date-picker
-                    v-model="form.#(column.fieldName)"
+                    v-model="form.#(column.fieldHumpName)"
                     type="date"
                     placeholder="选择#(column.fieldComments)"
                     style="width: 100%"
@@ -66,9 +64,7 @@
         </el-col>
         #end
 
-      #end
       </el-row>
-      #end
       #end
 
     </el-form>
@@ -81,16 +77,16 @@
 
 <script>
   #if(data.subModuleName != null && data.subModuleName != "")
-  import { doInsert, doUpdate } from "@/api/#(data.moduleName)/#(data.subModuleName)/#(data.model.tableName)Management";
+  import { doInsert, doUpdate } from "@/api/#(data.moduleName)/#(data.subModuleName)/#(data.model.tableHumpName)Management";
   #else
-  import { doInsert, doUpdate } from "@/api/#(data.moduleName)/#(data.model.tableName)Management";
+  import { doInsert, doUpdate } from "@/api/#(data.moduleName)/#(data.model.tableHumpName)Management";
   #end
   import { formateDate } from "@/utils/format";
   import { isNull } from "@/utils/validate";
-  import { #(validateTypes) } from "@/utils/validateRlue";
+  import { #(data.model.frontendValidateType) } from "@/utils/validateRlue";
 
   export default {
-    name: "#(data.model.tableName)ManagementEdit",
+    name: "#(data.model.tableHumpName)ManagementEdit",
     data() {
 
       return {
@@ -100,16 +96,16 @@
         },
         dict: {},
         rules: {
-          #for(columnList : formList)
+          #for(columnList : data.model.formList)
           #for(column : columnList)
-          #if(valiDict[column.fieldName] != null && valiDict[column.fieldName].size() > 0)
-          #(column.fieldName): [
-            #for(validate : valiDict[column.fieldName])
+          #if(column.frontendValidateTypeList.size() > 0)
+          #(column.fieldHumpName): [
+            #for(validate : column.frontendValidateTypeList)
             #if(validate == "isNotNull")
             { required: true, trigger: "blur", message: "#(column.fieldComments)非空" },
             #end
             #end
-            #for(validate : valiDict[column.fieldName])
+            #for(validate : column.frontendValidateTypeList)
             #if(validate != "isNotNull")
             { required: false, trigger: "blur", validator: #(validate) },
             #end

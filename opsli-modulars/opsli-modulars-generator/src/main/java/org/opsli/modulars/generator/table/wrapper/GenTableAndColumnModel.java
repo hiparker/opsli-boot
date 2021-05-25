@@ -26,6 +26,7 @@ import org.opsli.common.annotation.validation.ValidationArgsLenMax;
 import org.opsli.common.enums.ValiArgsType;
 import org.opsli.modulars.generator.column.wrapper.GenTableColumnModel;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -95,5 +96,25 @@ public class GenTableAndColumnModel extends ApiWrapper {
     @JsonIgnore
     @ExcelIgnore
     private String tableHumpName;
+
+    /** 前端Form集合 */
+    @JsonIgnore
+    @ExcelIgnore
+    private List<GenTableColumnModel> formList;
+
+    /** 简单检索集合 */
+    @JsonIgnore
+    @ExcelIgnore
+    private List<GenTableColumnModel> briefQueryList;
+
+    /** 更多检索集合 */
+    @JsonIgnore
+    @ExcelIgnore
+    private List<GenTableColumnModel> moreQueryList;
+
+    /** 前端验证集合 */
+    @JsonIgnore
+    @ExcelIgnore
+    private String frontendValidateType;
 
 }

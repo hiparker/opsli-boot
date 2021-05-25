@@ -52,16 +52,6 @@ public enum JavaCodeBuilder {
     public Map<String,String> createEntity(GenBuilderModel builderModelTmp, String dataStr){
         GenBuilderModel builderModel =
                 WrapperUtil.transformInstance(builderModelTmp, GenBuilderModel.class, true);
-        List<GenTableColumnModel> columnList = builderModel.getModel().getColumnList();
-        // 处理数据
-        for (GenTableColumnModel columnModel : columnList) {
-            // 数据库字段名转驼峰
-            columnModel.setFieldName(
-                    HumpUtil.underlineToHump(
-                            columnModel.getFieldName()
-                    )
-            );
-        }
 
         String codeStr = EnjoyUtil.render("/backend/entity/TemplateEntity.html",
                 this.createKv(builderModel)
@@ -83,7 +73,7 @@ public enum JavaCodeBuilder {
         Map<String,String> entityMap = new HashMap<>();
         entityMap.put(ZipUtils.FILE_PATH, path.toString());
         entityMap.put(ZipUtils.FILE_NAME,
-                builderModel.getModel().getTableName()+".java");
+                builderModel.getModel().getTableHumpName()+".java");
         entityMap.put(ZipUtils.FILE_DATA, codeStr);
         return entityMap;
     }
@@ -117,7 +107,7 @@ public enum JavaCodeBuilder {
         Map<String,String> entityMap = new HashMap<>();
         entityMap.put(ZipUtils.FILE_PATH, path.toString());
         entityMap.put(ZipUtils.FILE_NAME,
-                builderModel.getModel().getTableName()+"Mapper.java");
+                builderModel.getModel().getTableHumpName()+"Mapper.java");
         entityMap.put(ZipUtils.FILE_DATA, codeStr);
         return entityMap;
     }
@@ -153,7 +143,7 @@ public enum JavaCodeBuilder {
         Map<String,String> entityMap = new HashMap<>();
         entityMap.put(ZipUtils.FILE_PATH, path.toString());
         entityMap.put(ZipUtils.FILE_NAME,
-                builderModel.getModel().getTableName()+"Mapper.xml");
+                builderModel.getModel().getTableHumpName()+"Mapper.xml");
         entityMap.put(ZipUtils.FILE_DATA, codeStr);
         return entityMap;
     }
@@ -187,7 +177,7 @@ public enum JavaCodeBuilder {
         Map<String,String> entityMap = new HashMap<>();
         entityMap.put(ZipUtils.FILE_PATH, path.toString());
         entityMap.put(ZipUtils.FILE_NAME,
-                "I"+builderModel.getModel().getTableName()+"Service.java");
+                "I"+builderModel.getModel().getTableHumpName()+"Service.java");
         entityMap.put(ZipUtils.FILE_DATA, codeStr);
         return entityMap;
     }
@@ -224,7 +214,7 @@ public enum JavaCodeBuilder {
         Map<String,String> entityMap = new HashMap<>();
         entityMap.put(ZipUtils.FILE_PATH, path.toString());
         entityMap.put(ZipUtils.FILE_NAME,
-                builderModel.getModel().getTableName()+"ServiceImpl.java");
+                builderModel.getModel().getTableHumpName()+"ServiceImpl.java");
         entityMap.put(ZipUtils.FILE_DATA, codeStr);
         return entityMap;
     }
@@ -258,7 +248,7 @@ public enum JavaCodeBuilder {
         Map<String,String> entityMap = new HashMap<>();
         entityMap.put(ZipUtils.FILE_PATH, path.toString());
         entityMap.put(ZipUtils.FILE_NAME,
-                builderModel.getModel().getTableName()+"RestController.java");
+                builderModel.getModel().getTableHumpName()+"RestController.java");
         entityMap.put(ZipUtils.FILE_DATA, codeStr);
         return entityMap;
     }
@@ -273,44 +263,6 @@ public enum JavaCodeBuilder {
     public Map<String,String> createModel(GenBuilderModel builderModelTmp, String dataStr){
         GenBuilderModel builderModel =
                 WrapperUtil.transformInstance(builderModelTmp, GenBuilderModel.class, true);
-        // 处理数据
-        List<GenTableColumnModel> columnList = builderModel.getModel().getColumnList();
-        for (GenTableColumnModel columnModel : columnList) {
-            // 数据库字段名转驼峰
-            columnModel.setFieldName(
-                    HumpUtil.underlineToHump(
-                            columnModel.getFieldName()
-                    )
-            );
-
-            // 处理验证器
-            String validateType = columnModel.getValidateType();
-            if(StringUtils.isNotBlank(validateType)){
-                String[] validateTypes = validateType.split(",");
-                StringBuilder stb = new StringBuilder();
-                boolean izNotNull = false;
-                // 如果非空 则开启非空验证
-                if(DictType.NO_YES_YES.getValue().equals(columnModel.getIzNotNull())){
-                    izNotNull = true;
-                    stb.append("ValiArgsType.").append(ValiArgsType.IS_NOT_NULL);
-                }
-
-                for (int i = 0; i < validateTypes.length; i++) {
-                    String type = validateTypes[i];
-                    if(izNotNull){
-                        stb.append(", ");
-                        izNotNull = false;
-                    }
-                    if(!ValiArgsType.IS_NOT_NULL.equals(ValiArgsType.valueOf(type))){
-                        stb.append("ValiArgsType.").append(type);
-                    }
-                    if(i < validateTypes.length -1 ){
-                        stb.append(", ");
-                    }
-                }
-                columnModel.setValidateType(stb.toString());
-            }
-        }
 
         String codeStr = EnjoyUtil.render("/backend/model/TemplateModel.html",
                 this.createKv(builderModel)
@@ -332,7 +284,7 @@ public enum JavaCodeBuilder {
         Map<String,String> entityMap = new HashMap<>();
         entityMap.put(ZipUtils.FILE_PATH, path.toString());
         entityMap.put(ZipUtils.FILE_NAME,
-                builderModel.getModel().getTableName()+"Model.java");
+                builderModel.getModel().getTableHumpName()+"Model.java");
         entityMap.put(ZipUtils.FILE_DATA, codeStr);
         return entityMap;
     }
@@ -367,7 +319,7 @@ public enum JavaCodeBuilder {
         Map<String,String> entityMap = new HashMap<>();
         entityMap.put(ZipUtils.FILE_PATH, path.toString());
         entityMap.put(ZipUtils.FILE_NAME,
-                builderModel.getModel().getTableName()+"RestApi.java");
+                builderModel.getModel().getTableHumpName()+"RestApi.java");
         entityMap.put(ZipUtils.FILE_DATA, codeStr);
         return entityMap;
     }
