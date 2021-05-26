@@ -33,6 +33,8 @@ public enum TypeEnum {
 
     INT("int"),
 
+    INTEGER("integer"),
+
     BIGINT("bigint"),
 
     FLOAT("float"),
@@ -41,9 +43,17 @@ public enum TypeEnum {
 
     DECIMAL("decimal"),
 
+    CHAR("char"),
+
     VARCHAR("varchar"),
 
+    TEXT("text"),
+
+    DATE("date"),
+
     DATETIME("datetime"),
+
+    TIMESTAMP("timestamp"),
 
     BLOB("blob"),
 

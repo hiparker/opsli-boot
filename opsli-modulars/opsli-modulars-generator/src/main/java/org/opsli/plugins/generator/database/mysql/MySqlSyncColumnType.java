@@ -43,23 +43,22 @@ public enum MySqlSyncColumnType {
     private final ColumnTypeConverter columnTypeConverter = new JavaColumnTypeConverter();
 
     MySqlSyncColumnType(){
-        fieldTypeMap.put("bit", new FieldTypeAttribute(true, false));
-        fieldTypeMap.put("tinyint", new FieldTypeAttribute(true, false));
-        fieldTypeMap.put("smallint", new FieldTypeAttribute(true, false));
-        fieldTypeMap.put("int", new FieldTypeAttribute(true, false));
-        fieldTypeMap.put("integer", new FieldTypeAttribute(true, false));
-        fieldTypeMap.put("bigint", new FieldTypeAttribute(true, false));
-        fieldTypeMap.put("float", new FieldTypeAttribute(true, true));
-        fieldTypeMap.put("double", new FieldTypeAttribute(true, true));
-        fieldTypeMap.put("decimal", new FieldTypeAttribute(true, true));
-        fieldTypeMap.put("char", new FieldTypeAttribute(true, false));
-        fieldTypeMap.put("varchar", new FieldTypeAttribute(true, false));
-        fieldTypeMap.put("text", new FieldTypeAttribute(false, false));
-        fieldTypeMap.put("date", new FieldTypeAttribute(false, false));
-        fieldTypeMap.put("time", new FieldTypeAttribute(false, false));
-        fieldTypeMap.put("datetime", new FieldTypeAttribute(false, false));
-        fieldTypeMap.put("timestamp", new FieldTypeAttribute(false, false));
-        fieldTypeMap.put("blob", new FieldTypeAttribute(false, false));
+        fieldTypeMap.put(TypeEnum.BIT.getType(), new FieldTypeAttribute(true, false));
+        fieldTypeMap.put(TypeEnum.TINYINT.getType(), new FieldTypeAttribute(true, false));
+        fieldTypeMap.put(TypeEnum.SMALLINT.getType(), new FieldTypeAttribute(true, false));
+        fieldTypeMap.put(TypeEnum.INT.getType(), new FieldTypeAttribute(true, false));
+        fieldTypeMap.put(TypeEnum.INTEGER.getType(), new FieldTypeAttribute(true, false));
+        fieldTypeMap.put(TypeEnum.BIGINT.getType(), new FieldTypeAttribute(true, false));
+        fieldTypeMap.put(TypeEnum.FLOAT.getType(), new FieldTypeAttribute(true, true));
+        fieldTypeMap.put(TypeEnum.DOUBLE.getType(), new FieldTypeAttribute(true, true));
+        fieldTypeMap.put(TypeEnum.DECIMAL.getType(), new FieldTypeAttribute(true, true));
+        fieldTypeMap.put(TypeEnum.CHAR.getType(), new FieldTypeAttribute(true, false));
+        fieldTypeMap.put(TypeEnum.VARCHAR.getType(), new FieldTypeAttribute(true, false));
+        fieldTypeMap.put(TypeEnum.TEXT.getType(), new FieldTypeAttribute(false, false));
+        fieldTypeMap.put(TypeEnum.DATE.getType(), new FieldTypeAttribute(false, false));
+        fieldTypeMap.put(TypeEnum.DATETIME.getType(), new FieldTypeAttribute(false, false));
+        fieldTypeMap.put(TypeEnum.TIMESTAMP.getType(), new FieldTypeAttribute(false, false));
+        fieldTypeMap.put(TypeEnum.BLOB.getType(), new FieldTypeAttribute(false, false));
     }
 
 

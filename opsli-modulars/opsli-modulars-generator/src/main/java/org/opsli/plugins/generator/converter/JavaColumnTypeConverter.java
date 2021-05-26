@@ -36,18 +36,23 @@ public class JavaColumnTypeConverter implements ColumnTypeConverter {
     private static final Map<TypeEnum, JavaType> TYPE_MAP = new HashMap<>(64);
     static {
         TYPE_MAP.put(TypeEnum.BIT, JavaType.BOOLEAN);
-        TYPE_MAP.put(TypeEnum.BOOLEAN, JavaType.BOOLEAN);
         TYPE_MAP.put(TypeEnum.TINYINT, JavaType.BYTE);
         TYPE_MAP.put(TypeEnum.SMALLINT, JavaType.SHORT);
         TYPE_MAP.put(TypeEnum.INT, JavaType.INTEGER);
+        TYPE_MAP.put(TypeEnum.INTEGER, JavaType.INTEGER);
         TYPE_MAP.put(TypeEnum.BIGINT, JavaType.LONG);
         TYPE_MAP.put(TypeEnum.FLOAT, JavaType.FLOAT);
         TYPE_MAP.put(TypeEnum.DOUBLE, JavaType.DOUBLE);
         TYPE_MAP.put(TypeEnum.DECIMAL, JavaType.BIG_DECIMAL);
+        TYPE_MAP.put(TypeEnum.CHAR, JavaType.STRING);
         TYPE_MAP.put(TypeEnum.VARCHAR, JavaType.STRING);
+        TYPE_MAP.put(TypeEnum.TEXT, JavaType.STRING);
+        TYPE_MAP.put(TypeEnum.DATE, JavaType.DATE);
         TYPE_MAP.put(TypeEnum.DATETIME, JavaType.DATE);
+        TYPE_MAP.put(TypeEnum.TIMESTAMP, JavaType.DATE);
         TYPE_MAP.put(TypeEnum.BLOB, JavaType.BYTE_ARRAY);
         TYPE_MAP.put(TypeEnum.JSONB, JavaType.MAP_OBJECT) ;
+        TYPE_MAP.put(TypeEnum.BOOLEAN, JavaType.BOOLEAN);
     }
 
     @Override
