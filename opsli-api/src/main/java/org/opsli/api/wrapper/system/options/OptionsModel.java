@@ -22,9 +22,9 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.opsli.api.base.warpper.ApiWrapper;
-import org.opsli.common.annotation.validation.ValidationArgs;
-import org.opsli.common.annotation.validation.ValidationArgsLenMax;
-import org.opsli.common.enums.ValiArgsType;
+import org.opsli.common.annotation.validator.Validator;
+import org.opsli.common.annotation.validator.ValidatorLenMax;
+import org.opsli.common.enums.ValidatorType;
 import org.opsli.plugins.excel.annotation.ExcelInfo;
 
 /**
@@ -44,36 +44,36 @@ public class OptionsModel extends ApiWrapper {
     @ApiModelProperty(value = "参数编号")
     @ExcelProperty(value = "参数编号", order = 1)
     @ExcelInfo
-    @ValidationArgs({ValiArgsType.IS_NOT_NULL, ValiArgsType.IS_GENERAL})
-    @ValidationArgsLenMax(100)
+    @Validator({ValidatorType.IS_NOT_NULL, ValidatorType.IS_GENERAL})
+    @ValidatorLenMax(100)
     private String optionCode;
 
     /** 参数名称 */
     @ApiModelProperty(value = "参数名称")
     @ExcelProperty(value = "参数名称", order = 2)
     @ExcelInfo
-    @ValidationArgsLenMax(200)
+    @ValidatorLenMax(200)
     private String optionName;
 
     /** 参数值 */
     @ApiModelProperty(value = "参数值")
     @ExcelProperty(value = "参数值", order = 3)
     @ExcelInfo
-    @ValidationArgsLenMax(10000)
+    @ValidatorLenMax(10000)
     private String optionValue;
 
     /** 是否内置数据 0否  1是*/
     @ApiModelProperty(value = "是否内置数据 0否  1是")
     @ExcelProperty(value = "是否内置数据", order = 4)
     @ExcelInfo(dictType = "no_yes")
-    @ValidationArgsLenMax(1)
+    @ValidatorLenMax(1)
     private String izLock;
 
     /** 备注 */
     @ApiModelProperty(value = "备注")
     @ExcelProperty(value = "备注", order = 5)
     @ExcelInfo
-    @ValidationArgsLenMax(255)
+    @ValidatorLenMax(255)
     private String remark;
 
 }

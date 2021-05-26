@@ -25,7 +25,7 @@ import org.opsli.api.wrapper.system.dict.DictModel;
 import org.opsli.common.constants.MyBatisConstants;
 import org.opsli.common.enums.DictType;
 import org.opsli.common.exception.ServiceException;
-import org.opsli.common.utils.HumpUtil;
+import org.opsli.common.utils.FieldUtil;
 import org.opsli.core.base.service.impl.CrudServiceImpl;
 import org.opsli.core.msg.CoreMsg;
 import org.opsli.core.persistence.querybuilder.GenQueryBuilder;
@@ -170,7 +170,7 @@ public class DictDetailServiceImpl extends CrudServiceImpl<DictDetailMapper, Sys
         QueryBuilder<SysDictDetail> queryBuilder = new GenQueryBuilder<>();
         QueryWrapper<SysDictDetail> queryWrapper = queryBuilder.build();
         List<?> idList = Convert.toList(ids);
-        queryWrapper.in(HumpUtil.humpToUnderline(MyBatisConstants.FIELD_ID),idList);
+        queryWrapper.in(FieldUtil.humpToUnderline(MyBatisConstants.FIELD_ID),idList);
         List<SysDictDetail> list = this.findList(queryWrapper);
         boolean ret = super.deleteAll(ids);
 
@@ -208,7 +208,7 @@ public class DictDetailServiceImpl extends CrudServiceImpl<DictDetailMapper, Sys
         for (DictDetailModel model : models) {
             idList.add(model.getId());
         }
-        queryWrapper.in(HumpUtil.humpToUnderline(MyBatisConstants.FIELD_ID),idList);
+        queryWrapper.in(FieldUtil.humpToUnderline(MyBatisConstants.FIELD_ID),idList);
 
         List<SysDictDetail> list = this.findList(queryWrapper);
 
@@ -244,7 +244,7 @@ public class DictDetailServiceImpl extends CrudServiceImpl<DictDetailMapper, Sys
             return false;
         }
 
-        String key = HumpUtil.humpToUnderline("typeId");
+        String key = FieldUtil.humpToUnderline("typeId");
         QueryBuilder<SysDictDetail> queryBuilder = new GenQueryBuilder<>();
         QueryWrapper<SysDictDetail> queryWrapper = queryBuilder.build();
         queryWrapper.eq(key, parentId);
@@ -273,8 +273,8 @@ public class DictDetailServiceImpl extends CrudServiceImpl<DictDetailMapper, Sys
             return null;
         }
 
-        String key = HumpUtil.humpToUnderline("typeCode");
-        String deleted = HumpUtil.humpToUnderline("deleted");
+        String key = FieldUtil.humpToUnderline("typeCode");
+        String deleted = FieldUtil.humpToUnderline("deleted");
 
         QueryBuilder<SysDictDetail> queryBuilder = new GenQueryBuilder<>();
         QueryWrapper<SysDictDetail> queryWrapper = queryBuilder.build();

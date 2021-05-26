@@ -19,9 +19,9 @@ import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.opsli.common.annotation.validation.ValidationArgs;
-import org.opsli.common.annotation.validation.ValidationArgsLenMax;
-import org.opsli.common.enums.ValiArgsType;
+import org.opsli.common.annotation.validator.Validator;
+import org.opsli.common.annotation.validator.ValidatorLenMax;
+import org.opsli.common.enums.ValidatorType;
 
 import java.io.Serializable;
 
@@ -38,8 +38,8 @@ public class RoleMenuRefModel implements Serializable {
 
     /** 角色ID */
     @ApiModelProperty(value = "角色ID")
-    @ValidationArgs({ValiArgsType.IS_NOT_NULL})
-    @ValidationArgsLenMax(50)
+    @Validator({ValidatorType.IS_NOT_NULL})
+    @ValidatorLenMax(50)
     private String roleId;
 
     /** 权限数组 */

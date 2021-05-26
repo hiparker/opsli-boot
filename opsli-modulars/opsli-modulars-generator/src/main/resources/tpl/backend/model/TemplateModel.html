@@ -19,25 +19,28 @@ package #(apiPath).wrapper.#(data.moduleName+"."+data.subModuleName);
 package #(apiPath).wrapper.#(data.moduleName);
 #end
 
-import java.util.Date;
+#for(pkg : data.model.entityPkgList)
+import #(pkg);
+#end
 import com.alibaba.excel.annotation.ExcelProperty;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import #(apiPath).base.warpper.ApiWrapper;
-import org.opsli.common.annotation.validation.ValidationArgs;
-import org.opsli.common.annotation.validation.ValidationArgsLenMax;
-import org.opsli.common.enums.ValiArgsType;
+import org.opsli.common.annotation.validator.Validator;
+import org.opsli.common.annotation.validator.ValidatorLenMax;
+import org.opsli.common.annotation.validator.ValidatorLenMin;
+import org.opsli.common.enums.ValidatorType;
 import org.opsli.plugins.excel.annotation.ExcelInfo;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import org.springframework.format.annotation.DateTimeFormat;
 
 /**
- * #(data.codeTitle) Model
- *
- * @author #(data.authorName)
- * @date #(currTime)
- */
+* #(data.codeTitle) Model
+*
+* @author #(data.authorName)
+* @date #(currTime)
+*/
 @Data
 @EqualsAndHashCode(callSuper = false)
 public class #(data.model.tableHumpName)Model extends ApiWrapper {
@@ -53,14 +56,18 @@ public class #(data.model.tableHumpName)Model extends ApiWrapper {
     #else
     @ExcelInfo
     #end
-    #if(column.backendValidateType != null && column.backendValidateType != "")
-    @ValidationArgs({#(column.backendValidateType)})
+    #if(column.validateTypeAndCommaList != null && column.validateTypeAndCommaList.size() > 0)
+    @Validator({
+        #for(typeAndComma : column.validateTypeAndCommaList)
+        ValidatorType.#(typeAndComma)
+        #end
+    })
     #end
     #if(column.fieldLength != null && column.fieldLength > 0)
     #if(column.fieldPrecision != null && column.fieldPrecision > 0)
-    @ValidationArgsLenMax(#(column.fieldLength+column.fieldPrecision))
+    @ValidatorLenMax(#(column.fieldLength+column.fieldPrecision))
     #else
-    @ValidationArgsLenMax(#(column.fieldLength))
+    @ValidatorLenMax(#(column.fieldLength))
     #end
     #end
     ### 日期处理

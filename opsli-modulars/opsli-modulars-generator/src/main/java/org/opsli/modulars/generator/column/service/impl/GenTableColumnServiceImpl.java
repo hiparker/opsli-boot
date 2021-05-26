@@ -19,11 +19,11 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.apache.commons.lang3.StringUtils;
 import org.opsli.common.constants.MyBatisConstants;
 import org.opsli.core.base.service.impl.CrudServiceImpl;
-import org.opsli.core.generator.exception.GeneratorException;
-import org.opsli.core.generator.msg.GeneratorMsg;
+import org.opsli.plugins.generator.exception.GeneratorException;
+import org.opsli.plugins.generator.msg.GeneratorMsg;
 import org.opsli.core.persistence.querybuilder.GenQueryBuilder;
 import org.opsli.core.persistence.querybuilder.QueryBuilder;
-import org.opsli.core.utils.ValidationUtil;
+import org.opsli.core.utils.ValidatorUtil;
 import org.opsli.modulars.generator.column.entity.GenTableColumn;
 import org.opsli.modulars.generator.column.mapper.GenTableColumnMapper;
 import org.opsli.modulars.generator.column.service.IGenTableColumnService;
@@ -52,7 +52,7 @@ public class GenTableColumnServiceImpl extends CrudServiceImpl<GenTableColumnMap
     @Transactional(rollbackFor = Exception.class)
     public GenTableColumnModel insert(GenTableColumnModel model) {
         // 验证对象
-        ValidationUtil.verify(model);
+        ValidatorUtil.verify(model);
 
         if(model == null){
             return null;
@@ -84,7 +84,7 @@ public class GenTableColumnServiceImpl extends CrudServiceImpl<GenTableColumnMap
         for (GenTableColumnModel model : models) {
 
             // 验证对象合法性
-            ValidationUtil.verify(model);
+            ValidatorUtil.verify(model);
 
             // 唯一验证
             Integer count = this.uniqueVerificationByFieldName(model);
@@ -113,7 +113,7 @@ public class GenTableColumnServiceImpl extends CrudServiceImpl<GenTableColumnMap
     @Transactional(rollbackFor = Exception.class)
     public GenTableColumnModel update(GenTableColumnModel model) {
         // 验证对象
-        ValidationUtil.verify(model);
+        ValidatorUtil.verify(model);
 
         if(model == null){
             return null;

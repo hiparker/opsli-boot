@@ -25,7 +25,7 @@ import org.opsli.api.wrapper.system.org.SysOrgModel;
 import org.opsli.common.constants.MyBatisConstants;
 import org.opsli.common.enums.DictType;
 import org.opsli.common.exception.ServiceException;
-import org.opsli.common.utils.HumpUtil;
+import org.opsli.common.utils.FieldUtil;
 import org.opsli.core.base.entity.HasChildren;
 import org.opsli.core.base.service.impl.CrudServiceImpl;
 import org.opsli.core.persistence.querybuilder.GenQueryBuilder;
@@ -35,8 +35,6 @@ import org.opsli.modulars.system.SystemMsg;
 import org.opsli.modulars.system.org.entity.SysOrg;
 import org.opsli.modulars.system.org.mapper.SysOrgMapper;
 import org.opsli.modulars.system.org.service.ISysOrgService;
-import org.opsli.modulars.system.user.entity.SysUser;
-import org.opsli.modulars.system.user.service.IUserOrgRefService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -174,7 +172,7 @@ public class SysOrgServiceImpl extends CrudServiceImpl<SysOrgMapper, SysOrg, Sys
     public void updateTenantByParentId(String parentId, String tenantId) {
         QueryBuilder<SysOrg> queryBuilder = new GenQueryBuilder<>();
         QueryWrapper<SysOrg> queryWrapper = queryBuilder.build();
-        queryWrapper.eq(HumpUtil.humpToUnderline(MyBatisConstants.FIELD_PARENT_ID), parentId);
+        queryWrapper.eq(FieldUtil.humpToUnderline(MyBatisConstants.FIELD_PARENT_ID), parentId);
         List<SysOrg> entityList = super.findList(queryWrapper);
         for (SysOrg sysOrg : entityList) {
             sysOrg.setTenantId(tenantId);
@@ -192,7 +190,7 @@ public class SysOrgServiceImpl extends CrudServiceImpl<SysOrgMapper, SysOrg, Sys
     public void deleteByParentId(String parentId) {
         QueryBuilder<SysOrg> queryBuilder = new GenQueryBuilder<>();
         QueryWrapper<SysOrg> queryWrapper = queryBuilder.build();
-        queryWrapper.eq(HumpUtil.humpToUnderline(MyBatisConstants.FIELD_PARENT_ID), parentId);
+        queryWrapper.eq(FieldUtil.humpToUnderline(MyBatisConstants.FIELD_PARENT_ID), parentId);
         List<SysOrg> entityList = super.findList(queryWrapper);
         for (SysOrg sysOrg : entityList) {
             super.delete(sysOrg.getId());
@@ -240,9 +238,9 @@ public class SysOrgServiceImpl extends CrudServiceImpl<SysOrgMapper, SysOrg, Sys
         }
         QueryWrapper<SysOrg> wrapper = new QueryWrapper<>();
 
-        wrapper.in(HumpUtil.humpToUnderline(MyBatisConstants.FIELD_PARENT_ID), parentIds)
+        wrapper.in(FieldUtil.humpToUnderline(MyBatisConstants.FIELD_PARENT_ID), parentIds)
                 .eq(MyBatisConstants.FIELD_DELETE_LOGIC,  DictType.NO_YES_NO.getValue())
-                .groupBy(HumpUtil.humpToUnderline(MyBatisConstants.FIELD_PARENT_ID));
+                .groupBy(FieldUtil.humpToUnderline(MyBatisConstants.FIELD_PARENT_ID));
 
         return mapper.hasChildren(wrapper);
     }

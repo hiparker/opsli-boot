@@ -19,10 +19,9 @@ import com.alibaba.excel.annotation.ExcelIgnore;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.opsli.api.base.warpper.ApiWrapper;
-import org.opsli.common.annotation.validation.ValidationArgs;
-import org.opsli.common.annotation.validation.ValidationArgsLenMax;
-import org.opsli.common.enums.ValiArgsType;
+import org.opsli.common.annotation.validator.Validator;
+import org.opsli.common.annotation.validator.ValidatorLenMax;
+import org.opsli.common.enums.ValidatorType;
 
 import java.io.Serializable;
 
@@ -41,28 +40,28 @@ public class MenuFullModel implements Serializable {
     /** 上级菜单ID */
     @ApiModelProperty(value = "上级菜单ID")
     @ExcelIgnore
-    @ValidationArgs({ValiArgsType.IS_NOT_NULL})
-    @ValidationArgsLenMax(19)
+    @Validator({ValidatorType.IS_NOT_NULL})
+    @ValidatorLenMax(19)
     private String parentId;
 
     /** 菜单名称 */
     @ApiModelProperty(value = "菜单名称")
     @ExcelIgnore
-    @ValidationArgs({ValiArgsType.IS_NOT_NULL})
-    @ValidationArgsLenMax(100)
+    @Validator({ValidatorType.IS_NOT_NULL})
+    @ValidatorLenMax(100)
     private String title;
 
     /** 模块名 */
     @ApiModelProperty(value = "模块名")
     @ExcelIgnore
-    @ValidationArgs({ValiArgsType.IS_NOT_NULL})
-    @ValidationArgsLenMax(40)
+    @Validator({ValidatorType.IS_NOT_NULL})
+    @ValidatorLenMax(40)
     private String moduleName;
 
     /** 子模块名 */
     @ApiModelProperty(value = "子模块名")
     @ExcelIgnore
-    @ValidationArgsLenMax(40)
+    @ValidatorLenMax(40)
     private String subModuleName;
 
 }

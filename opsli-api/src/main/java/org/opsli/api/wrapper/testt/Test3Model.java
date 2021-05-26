@@ -21,9 +21,9 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.opsli.api.base.warpper.ApiWrapper;
-import org.opsli.common.annotation.validation.ValidationArgs;
-import org.opsli.common.annotation.validation.ValidationArgsLenMax;
-import org.opsli.common.enums.ValiArgsType;
+import org.opsli.common.annotation.validator.Validator;
+import org.opsli.common.annotation.validator.ValidatorLenMax;
+import org.opsli.common.enums.ValidatorType;
 import org.opsli.plugins.excel.annotation.ExcelInfo;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -42,24 +42,24 @@ public class Test3Model extends ApiWrapper {
     @ApiModelProperty(value = "金钱")
     @ExcelProperty(value = "金钱", order = 1)
     @ExcelInfo
-    @ValidationArgs({ValiArgsType.IS_NOT_NULL, ValiArgsType.IS_MONEY})
-    @ValidationArgsLenMax(10)
+    @Validator({ValidatorType.IS_NOT_NULL, ValidatorType.IS_MONEY})
+    @ValidatorLenMax(10)
     private Double money;
 
     /** 年龄 */
     @ApiModelProperty(value = "年龄")
     @ExcelProperty(value = "年龄", order = 2)
     @ExcelInfo
-    @ValidationArgs({ValiArgsType.IS_NOT_NULL, ValiArgsType.IS_INTEGER})
-    @ValidationArgsLenMax(3)
+    @Validator({ValidatorType.IS_NOT_NULL, ValidatorType.IS_INTEGER})
+    @ValidatorLenMax(3)
     private Integer age;
 
     /** 名称 */
     @ApiModelProperty(value = "名称")
     @ExcelProperty(value = "名称", order = 3)
     @ExcelInfo
-    @ValidationArgs({ValiArgsType.IS_CHINESE})
-    @ValidationArgsLenMax(50)
+    @Validator({ValidatorType.IS_CHINESE})
+    @ValidatorLenMax(50)
     private String name;
 
     /** 生日 */
@@ -74,7 +74,7 @@ public class Test3Model extends ApiWrapper {
     @ApiModelProperty(value = "是否启用")
     @ExcelProperty(value = "是否启用", order = 5)
     @ExcelInfo( dictType = "no_yes" )
-    @ValidationArgsLenMax(1)
+    @ValidatorLenMax(1)
     private String izUsable;
 
 

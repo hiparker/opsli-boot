@@ -81,9 +81,8 @@
   #else
   import { doInsert, doUpdate } from "@/api/#(data.moduleName)/#(data.model.tableHumpName)Management";
   #end
-  import { formateDate } from "@/utils/format";
   import { isNull } from "@/utils/validate";
-  import { #(data.model.frontendValidateType) } from "@/utils/validateRlue";
+  import { validatorRule } from "@/utils/validateRlue";
 
   export default {
     name: "#(data.model.tableHumpName)ManagementEdit",
@@ -98,20 +97,20 @@
         rules: {
           #for(columnList : data.model.formList)
           #for(column : columnList)
-          #if(column.frontendValidateTypeList.size() > 0)
-          #(column.fieldHumpName): [
-            #for(validate : column.frontendValidateTypeList)
-            #if(validate == "isNotNull")
-            { required: true, trigger: "blur", message: "#(column.fieldComments)非空" },
+            #if(column.validateTypeList != null && column.validateTypeList.size() > 0)
+              #(column.fieldHumpName): [
+                #for(typeNotComma : column.validateTypeList)
+                #if(typeNotComma == "IS_NOT_NULL")
+                { required: true, trigger: "blur", message: "#(column.fieldComments)非空" },
+                #end
+                #end
+                #for(typeNotComma : column.validateTypeList)
+                #if(typeNotComma != "IS_NOT_NULL")
+                { required: false, trigger: "blur", validator: validatorRule.#(typeNotComma) },
+                #end
+                #end
+              ],
             #end
-            #end
-            #for(validate : column.frontendValidateTypeList)
-            #if(validate != "isNotNull")
-            { required: false, trigger: "blur", validator: #(validate) },
-            #end
-            #end
-          ],
-          #end
           #end
           #end
         },

@@ -21,7 +21,6 @@ import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.lang.tree.Tree;
 import cn.hutool.core.lang.tree.TreeNodeConfig;
-import cn.hutool.core.lang.tree.TreeUtil;
 import cn.hutool.core.util.ReflectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.google.common.collect.Lists;
@@ -42,8 +41,7 @@ import org.opsli.common.annotation.EnableLog;
 import org.opsli.common.annotation.RequiresPermissionsCus;
 import org.opsli.common.constants.MenuConstants;
 import org.opsli.common.constants.MyBatisConstants;
-import org.opsli.common.exception.ServiceException;
-import org.opsli.common.utils.HumpUtil;
+import org.opsli.common.utils.FieldUtil;
 import org.opsli.common.utils.WrapperUtil;
 import org.opsli.core.base.controller.BaseRestController;
 import org.opsli.core.base.entity.HasChildren;
@@ -54,7 +52,6 @@ import org.opsli.core.persistence.querybuilder.QueryBuilder;
 import org.opsli.core.persistence.querybuilder.WebQueryBuilder;
 import org.opsli.core.utils.TreeBuildUtil;
 import org.opsli.core.utils.UserUtil;
-import org.opsli.modulars.system.SystemMsg;
 import org.opsli.modulars.system.menu.entity.SysMenu;
 import org.opsli.modulars.system.menu.service.IMenuService;
 import org.opsli.modulars.system.user.service.IUserService;
@@ -184,13 +181,13 @@ public class MenuRestController extends BaseRestController<SysMenu, MenuModel, I
             QueryBuilder<SysMenu> queryBuilder = new GenQueryBuilder<>();
             QueryWrapper<SysMenu> queryWrapper = queryBuilder.build();
             queryWrapper.eq(
-                    HumpUtil.humpToUnderline(MyBatisConstants.FIELD_PARENT_ID), parentId);
+                    FieldUtil.humpToUnderline(MyBatisConstants.FIELD_PARENT_ID), parentId);
             queryWrapper.eq("type", "1");
 
             // 如果传入ID 则不包含自身
             if(StringUtils.isNotEmpty(id)){
                 queryWrapper.notIn(
-                        HumpUtil.humpToUnderline(MyBatisConstants.FIELD_ID), id);
+                        FieldUtil.humpToUnderline(MyBatisConstants.FIELD_ID), id);
 
             }
 
@@ -231,7 +228,7 @@ public class MenuRestController extends BaseRestController<SysMenu, MenuModel, I
         }else{
             QueryBuilder<SysMenu> queryBuilder = new GenQueryBuilder<>();
             QueryWrapper<SysMenu> queryWrapper = queryBuilder.build();
-            queryWrapper.eq(HumpUtil.humpToUnderline(MyBatisConstants.FIELD_PARENT_ID), parentId);
+            queryWrapper.eq(FieldUtil.humpToUnderline(MyBatisConstants.FIELD_PARENT_ID), parentId);
 
             // 获得菜单
             List<SysMenu> menuList = IService.findList(queryWrapper);

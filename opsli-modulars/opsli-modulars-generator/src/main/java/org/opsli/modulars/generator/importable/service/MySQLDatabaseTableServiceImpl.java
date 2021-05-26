@@ -17,7 +17,8 @@ package org.opsli.modulars.generator.importable.service;
 
 import org.apache.commons.lang3.StringUtils;
 import org.opsli.common.utils.Props;
-import org.opsli.core.generator.enums.DataBaseType;
+import org.opsli.plugins.generator.database.mysql.MySqlSyncColumnType;
+import org.opsli.plugins.generator.enums.DataBaseType;
 import org.opsli.modulars.generator.importable.entity.DatabaseColumn;
 import org.opsli.modulars.generator.importable.entity.DatabaseTable;
 import org.opsli.modulars.generator.importable.mapper.MySQLDatabaseTableMapper;
@@ -26,6 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -54,6 +56,21 @@ public class MySQLDatabaseTableServiceImpl implements DatabaseTableService {
     @Override
     public DataBaseType getType() {
         return DataBaseType.MYSQL;
+    }
+
+    @Override
+    public List<String> getFieldTypes() {
+        return MySqlSyncColumnType.INSTANCE.getFieldTypes();
+    }
+
+    @Override
+    public Map<String, String> getJavaFieldTypes() {
+        return MySqlSyncColumnType.INSTANCE.getJavaFieldTypes();
+    }
+
+    @Override
+    public Map<String, List<String>> getJavaFieldTypesBySafety() {
+        return MySqlSyncColumnType.INSTANCE.getJavaFieldTypesBySafety();
     }
 
     @Override

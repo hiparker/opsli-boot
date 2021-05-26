@@ -26,9 +26,9 @@ import org.opsli.common.annotation.EnableLog;
 import org.opsli.common.exception.ServiceException;
 import org.opsli.common.utils.WrapperUtil;
 import org.opsli.core.base.controller.BaseRestController;
-import org.opsli.core.generator.exception.GeneratorException;
-import org.opsli.core.generator.msg.GeneratorMsg;
-import org.opsli.core.generator.strategy.sync.util.SqlSyncUtil;
+import org.opsli.plugins.generator.exception.GeneratorException;
+import org.opsli.plugins.generator.msg.GeneratorMsg;
+import org.opsli.plugins.generator.SqlSyncUtil;
 import org.opsli.core.msg.CoreMsg;
 import org.opsli.core.persistence.Page;
 import org.opsli.core.persistence.querybuilder.QueryBuilder;
@@ -45,6 +45,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -253,5 +254,26 @@ public class GenTableRestController extends BaseRestController<GenTable, GenTabl
         }
         IService.importTables(tableNameArray);
         return ResultVo.success("导入成功");
+    }
+
+    @ApiOperation(value = "获得数据库类型下 字段类型",
+            notes = "获得数据库类型下 字段类型")
+    @Override
+    public ResultVo<List<String>> getFieldTypes() {
+        return ResultVo.success(ImportTableUtil.getFieldTypes());
+    }
+
+    @ApiOperation(value = "获得数据库类型下 全部类型对应Java类型",
+            notes = "获得数据库类型下 全部类型对应Java类型")
+    @Override
+    public ResultVo<Map<String, String>> getJavaFieldTypes() {
+        return ResultVo.success(ImportTableUtil.getJavaFieldTypes());
+    }
+
+    @ApiOperation(value = "获得全部类型对应Java类型集合（兜底String 类型）",
+            notes = "获得全部类型对应Java类型集合（兜底String 类型）")
+    @Override
+    public ResultVo<Map<String, List<String>>> getJavaFieldTypesBySafety() {
+        return ResultVo.success(ImportTableUtil.getJavaFieldTypesBySafety());
     }
 }

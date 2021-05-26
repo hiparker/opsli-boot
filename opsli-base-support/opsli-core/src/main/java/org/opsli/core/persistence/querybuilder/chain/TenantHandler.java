@@ -20,7 +20,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.apache.commons.lang3.StringUtils;
 import org.opsli.api.wrapper.system.user.UserModel;
 import org.opsli.common.constants.MyBatisConstants;
-import org.opsli.common.utils.HumpUtil;
+import org.opsli.common.utils.FieldUtil;
 import org.opsli.core.base.entity.BaseEntity;
 import org.opsli.core.utils.UserUtil;
 
@@ -59,7 +59,7 @@ public class TenantHandler implements QueryBuilderChain{
             if(!UserUtil.SUPER_ADMIN.equals(user.getUsername()) &&
                     StringUtils.isNotEmpty(tenantId)
                 ){
-                    wrapper.eq(HumpUtil.humpToUnderline(MyBatisConstants.FIELD_TENANT), tenantId);
+                    wrapper.eq(FieldUtil.humpToUnderline(MyBatisConstants.FIELD_TENANT), tenantId);
             }
         }
 

@@ -29,7 +29,7 @@ import org.opsli.api.wrapper.system.user.UserModel;
 import org.opsli.common.annotation.ApiCryptoAsymmetric;
 import org.opsli.common.annotation.Limiter;
 import org.opsli.common.enums.DictType;
-import org.opsli.core.utils.ValidationUtil;
+import org.opsli.core.utils.ValidatorUtil;
 import org.opsli.core.api.TokenThreadLocal;
 import org.opsli.common.enums.AlertType;
 import org.opsli.common.enums.OptionsType;
@@ -83,7 +83,7 @@ public class LoginRestController {
         }
 
         // 验证登录对象
-        ValidationUtil.verify(form);
+        ValidatorUtil.verify(form);
 
         // 判断账号是否临时锁定
         UserTokenUtil.verifyLockAccount(form.getUsername());

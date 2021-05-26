@@ -19,7 +19,9 @@ package #(data.packageName+"."+data.moduleName+"."+data.subModuleName).entity;
 package #(data.packageName+"."+data.moduleName).entity;
 #end
 
-import java.util.Date;
+#for(pkg : data.model.entityPkgList)
+import #(pkg);
+#end
 import com.baomidou.mybatisplus.annotation.FieldStrategy;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableLogic;

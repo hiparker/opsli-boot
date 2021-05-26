@@ -83,7 +83,7 @@ public enum OssStorageFactory {
 
         // 拿到实现了 OssStorageService 接口的,所有子类
         Set<Class<?>> clazzSet = ClassUtil.scanPackageBySuper(
-                OssStorageService.class.getPackage().getName()+".impl",
+                OssStorageService.class.getPackage().getName(),
                 OssStorageService.class
         );
 

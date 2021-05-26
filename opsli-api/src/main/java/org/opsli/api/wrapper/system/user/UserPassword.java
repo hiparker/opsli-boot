@@ -20,10 +20,10 @@ import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.opsli.common.annotation.validation.ValidationArgs;
-import org.opsli.common.annotation.validation.ValidationArgsLenMax;
-import org.opsli.common.annotation.validation.ValidationArgsLenMin;
-import org.opsli.common.enums.ValiArgsType;
+import org.opsli.common.annotation.validator.Validator;
+import org.opsli.common.annotation.validator.ValidatorLenMax;
+import org.opsli.common.annotation.validator.ValidatorLenMin;
+import org.opsli.common.enums.ValidatorType;
 
 import java.io.Serializable;
 
@@ -46,29 +46,29 @@ public class UserPassword implements Serializable {
 
     /** 旧密码 */
     @ApiModelProperty(value = "旧密码")
-    @ValidationArgs({ValiArgsType.IS_NOT_NULL})
-    @ValidationArgsLenMin(6)
-    @ValidationArgsLenMax(50)
+    @Validator({ValidatorType.IS_NOT_NULL})
+    @ValidatorLenMin(6)
+    @ValidatorLenMax(50)
     private String oldPassword;
 
     /** 新密码 */
     @ApiModelProperty(value = "新密码")
-    @ValidationArgs({ValiArgsType.IS_NOT_NULL, ValiArgsType.IS_SECURITY_PASSWORD})
-    @ValidationArgsLenMin(6)
-    @ValidationArgsLenMax(50)
+    @Validator({ValidatorType.IS_NOT_NULL, ValidatorType.IS_SECURITY_PASSWORD})
+    @ValidatorLenMin(6)
+    @ValidatorLenMax(50)
     private String newPassword;
 
     /** 盐值，密码秘钥 前端不可改*/
     @ApiModelProperty(value = "盐值，密码秘钥 前端不可改")
     @ExcelIgnore
-    @ValidationArgsLenMax(50)
+    @ValidatorLenMax(50)
     private String salt;
 
     /** 登录密码强度 前端不可改 */
     @ApiModelProperty(value = "登录密码强度 前端不可改")
     @ExcelIgnore
-    @ValidationArgsLenMin(1)
-    @ValidationArgsLenMax(1)
+    @ValidatorLenMin(1)
+    @ValidatorLenMax(1)
     private String passwordLevel;
 
 }

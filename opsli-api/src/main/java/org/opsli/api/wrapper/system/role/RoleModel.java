@@ -21,9 +21,9 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.opsli.api.base.warpper.ApiWrapper;
-import org.opsli.common.annotation.validation.ValidationArgs;
-import org.opsli.common.annotation.validation.ValidationArgsLenMax;
-import org.opsli.common.enums.ValiArgsType;
+import org.opsli.common.annotation.validator.Validator;
+import org.opsli.common.annotation.validator.ValidatorLenMax;
+import org.opsli.common.enums.ValidatorType;
 import org.opsli.plugins.excel.annotation.ExcelInfo;
 
 /**
@@ -40,38 +40,38 @@ public class RoleModel extends ApiWrapper {
     @ApiModelProperty(value = "角色编码")
     @ExcelProperty(value = "角色编码", order = 1)
     @ExcelInfo
-    @ValidationArgs({ValiArgsType.IS_NOT_NULL,ValiArgsType.IS_GENERAL})
-    @ValidationArgsLenMax(50)
+    @Validator({ValidatorType.IS_NOT_NULL, ValidatorType.IS_GENERAL})
+    @ValidatorLenMax(50)
     private String roleCode;
 
     /** 角色名称 */
     @ApiModelProperty(value = "角色编码")
     @ExcelProperty(value = "角色编码", order = 2)
     @ExcelInfo
-    @ValidationArgs({ValiArgsType.IS_NOT_NULL,ValiArgsType.IS_GENERAL_WITH_CHINESE})
-    @ValidationArgsLenMax(50)
+    @Validator({ValidatorType.IS_NOT_NULL, ValidatorType.IS_GENERAL_WITH_CHINESE})
+    @ValidatorLenMax(50)
     private String roleName;
 
     /** 是否内置数据 0否  1是*/
     @ApiModelProperty(value = "是否内置数据 0否  1是")
     @ExcelProperty(value = "是否内置数据", order = 3)
     @ExcelInfo(dictType = "no_yes")
-    @ValidationArgs({ValiArgsType.IS_NOT_NULL})
-    @ValidationArgsLenMax(1)
+    @Validator({ValidatorType.IS_NOT_NULL})
+    @ValidatorLenMax(1)
     private String izLock;
 
     /** 备注 */
     @ApiModelProperty(value = "备注")
     @ExcelProperty(value = "备注", order = 4)
     @ExcelInfo
-    @ValidationArgsLenMax(255)
+    @ValidatorLenMax(255)
     private String remark;
 
 
     /** 多租户字段 */
     @ApiModelProperty(value = "多租户ID")
     @ExcelIgnore
-    @ValidationArgsLenMax(20)
+    @ValidatorLenMax(20)
     private String tenantId;
 
 }

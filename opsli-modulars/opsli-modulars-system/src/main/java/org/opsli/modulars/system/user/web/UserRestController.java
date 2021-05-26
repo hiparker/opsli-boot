@@ -39,8 +39,7 @@ import org.opsli.common.annotation.RequiresPermissionsCus;
 import org.opsli.common.constants.MyBatisConstants;
 import org.opsli.common.exception.ServiceException;
 import org.opsli.common.exception.TokenException;
-import org.opsli.common.utils.CheckStrength;
-import org.opsli.common.utils.HumpUtil;
+import org.opsli.common.utils.FieldUtil;
 import org.opsli.common.utils.WrapperUtil;
 import org.opsli.core.base.controller.BaseRestController;
 import org.opsli.core.msg.TokenMsg;
@@ -575,7 +574,7 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
                     orgIds.add(org.getPostId());
                     QueryWrapper<SysOrg> orgQueryWrapper = new QueryWrapper<>();
                     orgQueryWrapper.in(
-                            HumpUtil.humpToUnderline(MyBatisConstants.FIELD_ID),
+                            FieldUtil.humpToUnderline(MyBatisConstants.FIELD_ID),
                             orgIds);
                     List<SysOrg> orgList = iSysOrgService.findList(orgQueryWrapper);
                     if(CollUtil.isNotEmpty(orgList)){

@@ -21,9 +21,9 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.opsli.api.base.warpper.ApiWrapper;
-import org.opsli.common.annotation.validation.ValidationArgs;
-import org.opsli.common.annotation.validation.ValidationArgsLenMax;
-import org.opsli.common.enums.ValiArgsType;
+import org.opsli.common.annotation.validator.Validator;
+import org.opsli.common.annotation.validator.ValidatorLenMax;
+import org.opsli.common.enums.ValidatorType;
 import org.opsli.plugins.excel.annotation.ExcelInfo;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -42,24 +42,24 @@ public class TestCarModel extends ApiWrapper {
     @ApiModelProperty(value = "汽车名称")
     @ExcelProperty(value = "汽车名称", order = 1)
     @ExcelInfo
-    @ValidationArgs({ValiArgsType.IS_NOT_NULL, ValiArgsType.IS_GENERAL_WITH_CHINESE})
-    @ValidationArgsLenMax(20)
+    @Validator({ValidatorType.IS_NOT_NULL, ValidatorType.IS_GENERAL_WITH_CHINESE})
+    @ValidatorLenMax(20)
     private String carName;
 
     /** 汽车类型 */
     @ApiModelProperty(value = "汽车类型")
     @ExcelProperty(value = "汽车类型", order = 2)
     @ExcelInfo
-    @ValidationArgs({ValiArgsType.IS_NOT_NULL, ValiArgsType.IS_GENERAL_WITH_CHINESE})
-    @ValidationArgsLenMax(20)
+    @Validator({ValidatorType.IS_NOT_NULL, ValidatorType.IS_GENERAL_WITH_CHINESE})
+    @ValidatorLenMax(20)
     private String carType;
 
     /** 汽车品牌 */
     @ApiModelProperty(value = "汽车品牌")
     @ExcelProperty(value = "汽车品牌", order = 3)
     @ExcelInfo
-    @ValidationArgs({ValiArgsType.IS_GENERAL_WITH_CHINESE})
-    @ValidationArgsLenMax(50)
+    @Validator({ValidatorType.IS_GENERAL_WITH_CHINESE})
+    @ValidatorLenMax(50)
     private String carBrand;
 
     /** 生产日期 */
@@ -74,7 +74,7 @@ public class TestCarModel extends ApiWrapper {
     @ApiModelProperty(value = "是否启用")
     @ExcelProperty(value = "是否启用", order = 5)
     @ExcelInfo( dictType = "no_yes" )
-    @ValidationArgsLenMax(1)
+    @ValidatorLenMax(1)
     private String izUsable;
 
 

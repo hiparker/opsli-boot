@@ -15,11 +15,12 @@
  */
 package org.opsli.modulars.generator.importable.service;
 
-import org.opsli.core.generator.enums.DataBaseType;
+import org.opsli.plugins.generator.enums.DataBaseType;
 import org.opsli.modulars.generator.importable.entity.DatabaseColumn;
 import org.opsli.modulars.generator.importable.entity.DatabaseTable;
 
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -35,6 +36,25 @@ public interface DatabaseTableService {
      * @return 类型
      */
     DataBaseType getType();
+
+    /**
+     * 获得数据库类型下 字段类型
+     * @return List
+     */
+    List<String> getFieldTypes();
+
+    /**
+     * 获得数据库类型下 全部类型对应Java类型
+     * @return List
+     */
+    Map<String, String> getJavaFieldTypes();
+
+    /**
+     * 获得全部类型对应Java类型集合（兜底String 类型）
+     * @return List
+     */
+    Map<String, List<String>> getJavaFieldTypesBySafety();
+
 
     /**
      * 获得当前库中 数据库名

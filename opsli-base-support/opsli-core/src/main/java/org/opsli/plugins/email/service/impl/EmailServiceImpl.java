@@ -6,7 +6,7 @@ import cn.hutool.extra.mail.MailUtil;
 import org.opsli.api.wrapper.system.options.OptionsModel;
 import org.opsli.common.enums.DictType;
 import org.opsli.core.utils.OptionsUtil;
-import org.opsli.core.utils.ValidationUtil;
+import org.opsli.core.utils.ValidatorUtil;
 import org.opsli.plugins.email.enums.EmailType;
 import org.opsli.plugins.email.service.IEmailService;
 import org.opsli.plugins.email.wrapper.EmailModel;
@@ -52,7 +52,7 @@ public class EmailServiceImpl implements IEmailService {
             emailModel.setTo(to);
             emailModel.setSubject(subject);
             emailModel.setContent(content);
-            ValidationUtil.verify(emailModel);
+            ValidatorUtil.verify(emailModel);
         }
 
         // 获得配置信息

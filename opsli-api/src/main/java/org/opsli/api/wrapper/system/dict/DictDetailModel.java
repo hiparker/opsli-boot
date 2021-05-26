@@ -21,9 +21,9 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.opsli.api.base.warpper.ApiWrapper;
-import org.opsli.common.annotation.validation.ValidationArgs;
-import org.opsli.common.annotation.validation.ValidationArgsLenMax;
-import org.opsli.common.enums.ValiArgsType;
+import org.opsli.common.annotation.validator.Validator;
+import org.opsli.common.annotation.validator.ValidatorLenMax;
+import org.opsli.common.enums.ValidatorType;
 import org.opsli.plugins.excel.annotation.ExcelInfo;
 
 /**
@@ -40,53 +40,53 @@ public class DictDetailModel extends ApiWrapper {
     /** 字典ID */
     @ApiModelProperty(value = "字典类型ID")
     @ExcelIgnore
-    @ValidationArgs(ValiArgsType.IS_NOT_NULL)
+    @Validator(ValidatorType.IS_NOT_NULL)
     private String typeId;
 
     /** 类型编号 - 冗余 */
     @ApiModelProperty(value = "字典类型Code")
     @ExcelIgnore
-    @ValidationArgs({ValiArgsType.IS_NOT_NULL, ValiArgsType.IS_GENERAL})
-    @ValidationArgsLenMax(120)
+    @Validator({ValidatorType.IS_NOT_NULL, ValidatorType.IS_GENERAL})
+    @ValidatorLenMax(120)
     private String typeCode;
 
     /** 字典名称 */
     @ApiModelProperty(value = "字典名称")
     @ExcelProperty(value = "字典名称", order = 1)
     @ExcelInfo
-    @ValidationArgs({ValiArgsType.IS_NOT_NULL, ValiArgsType.IS_GENERAL_WITH_CHINESE})
-    @ValidationArgsLenMax(120)
+    @Validator({ValidatorType.IS_NOT_NULL, ValidatorType.IS_GENERAL_WITH_CHINESE})
+    @ValidatorLenMax(120)
     private String dictName;
 
     /** 字典值 */
     @ApiModelProperty(value = "字典值")
     @ExcelProperty(value = "字典值", order = 2)
     @ExcelInfo
-    @ValidationArgs({ValiArgsType.IS_NOT_NULL})
-    @ValidationArgsLenMax(120)
+    @Validator({ValidatorType.IS_NOT_NULL})
+    @ValidatorLenMax(120)
     private String dictValue;
 
     /** 是否内置数据 0否  1是*/
     @ApiModelProperty(value = "是否内置数据 0否  1是")
     @ExcelProperty(value = "是否内置数据", order = 2)
     @ExcelInfo(dictType = "no_yes")
-    @ValidationArgs({ValiArgsType.IS_NOT_NULL})
-    @ValidationArgsLenMax(1)
+    @Validator({ValidatorType.IS_NOT_NULL})
+    @ValidatorLenMax(1)
     private String izLock;
 
     /** 排序 */
     @ApiModelProperty(value = "排序")
     @ExcelProperty(value = "排序", order = 2)
     @ExcelInfo
-    @ValidationArgs({ValiArgsType.IS_NOT_NULL, ValiArgsType.IS_INTEGER})
-    @ValidationArgsLenMax(10)
+    @Validator({ValidatorType.IS_NOT_NULL, ValidatorType.IS_INTEGER})
+    @ValidatorLenMax(10)
     private Integer sortNo;
 
     /** 备注 */
     @ApiModelProperty(value = "备注")
     @ExcelProperty(value = "备注", order = 2)
     @ExcelInfo
-    @ValidationArgsLenMax(255)
+    @ValidatorLenMax(255)
     private String remark;
 
 

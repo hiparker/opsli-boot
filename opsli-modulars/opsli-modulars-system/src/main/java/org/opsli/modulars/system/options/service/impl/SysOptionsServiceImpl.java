@@ -30,7 +30,7 @@ import org.opsli.common.exception.ServiceException;
 import org.opsli.core.base.service.impl.CrudServiceImpl;
 import org.opsli.core.msg.CoreMsg;
 import org.opsli.core.utils.OptionsUtil;
-import org.opsli.core.utils.ValidationUtil;
+import org.opsli.core.utils.ValidatorUtil;
 import org.opsli.modulars.system.SystemMsg;
 import org.opsli.modulars.system.options.entity.SysOptions;
 import org.opsli.modulars.system.options.mapper.SysOptionsMapper;
@@ -64,7 +64,7 @@ public class SysOptionsServiceImpl extends CrudServiceImpl<SysOptionsMapper, Sys
         }
 
         // 验证数据
-        ValidationUtil.verify(model);
+        ValidatorUtil.verify(model);
 
         // 唯一验证
         Integer count = this.uniqueVerificationByCode(model);
@@ -94,7 +94,7 @@ public class SysOptionsServiceImpl extends CrudServiceImpl<SysOptionsMapper, Sys
         }
 
         // 验证数据
-        ValidationUtil.verify(model);
+        ValidatorUtil.verify(model);
 
         // 验证是否是内置数据
         OptionsModel optionsModel = this.get(model);

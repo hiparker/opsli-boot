@@ -34,7 +34,7 @@ import org.opsli.common.constants.MyBatisConstants;
 import org.opsli.common.enums.DictType;
 import org.opsli.common.exception.ServiceException;
 import org.opsli.common.utils.CheckStrength;
-import org.opsli.common.utils.HumpUtil;
+import org.opsli.common.utils.FieldUtil;
 import org.opsli.common.utils.ListDistinctUtil;
 import org.opsli.common.utils.WrapperUtil;
 import org.opsli.core.base.service.impl.CrudServiceImpl;
@@ -157,7 +157,7 @@ public class UserServiceImpl extends CrudServiceImpl<UserMapper, SysUser, UserMo
                 QueryWrapper<SysRole> roleQueryWrapper = new QueryWrapper<>();
                 roleQueryWrapper.eq("role_code", defRole);
                 roleQueryWrapper.eq(
-                        HumpUtil.humpToUnderline(MyBatisConstants.FIELD_DELETE_LOGIC),
+                        FieldUtil.humpToUnderline(MyBatisConstants.FIELD_DELETE_LOGIC),
                         DictType.NO_YES_NO.getValue());
                 SysRole sysRole = iRoleService.getOne(roleQueryWrapper);
                 if(sysRole != null){
@@ -255,7 +255,7 @@ public class UserServiceImpl extends CrudServiceImpl<UserMapper, SysUser, UserMo
         UpdateWrapper<SysUser> updateWrapper = new UpdateWrapper<>();
         updateWrapper.set("enable", enable)
                 .eq(
-                HumpUtil.humpToUnderline(MyBatisConstants.FIELD_ID), userId
+                FieldUtil.humpToUnderline(MyBatisConstants.FIELD_ID), userId
         );
         if(this.update(updateWrapper)){
             // 刷新用户缓存
@@ -352,7 +352,7 @@ public class UserServiceImpl extends CrudServiceImpl<UserMapper, SysUser, UserMo
 
         QueryBuilder<SysUser> queryBuilder = new GenQueryBuilder<>();
         QueryWrapper<SysUser> queryWrapper = queryBuilder.build();
-        queryWrapper.in(HumpUtil.humpToUnderline(MyBatisConstants.FIELD_ID),idList);
+        queryWrapper.in(FieldUtil.humpToUnderline(MyBatisConstants.FIELD_ID),idList);
         List<UserModel> modelList = super.transformTs2Ms(
                 this.findList(queryWrapper)
         );
@@ -399,7 +399,7 @@ public class UserServiceImpl extends CrudServiceImpl<UserMapper, SysUser, UserMo
 
         QueryBuilder<SysUser> queryBuilder = new GenQueryBuilder<>();
         QueryWrapper<SysUser> queryWrapper = queryBuilder.build();
-        queryWrapper.in(HumpUtil.humpToUnderline(MyBatisConstants.FIELD_ID),idList);
+        queryWrapper.in(FieldUtil.humpToUnderline(MyBatisConstants.FIELD_ID),idList);
         List<UserModel> modelList = super.transformTs2Ms(
                 this.findList(queryWrapper)
         );
@@ -415,12 +415,12 @@ public class UserServiceImpl extends CrudServiceImpl<UserMapper, SysUser, UserMo
 
     @Override
     public UserModel queryByUserName(String username) {
-        String key = HumpUtil.humpToUnderline("username");
+        String key = FieldUtil.humpToUnderline("username");
         QueryBuilder<SysUser> queryBuilder = new GenQueryBuilder<>();
         QueryWrapper<SysUser> queryWrapper = queryBuilder.build();
         queryWrapper.eq(key, username);
         queryWrapper.eq(
-                HumpUtil.humpToUnderline(MyBatisConstants.FIELD_DELETE_LOGIC)
+                FieldUtil.humpToUnderline(MyBatisConstants.FIELD_DELETE_LOGIC)
                 , "0");
         SysUser user = this.getOne(queryWrapper);
         return super.transformT2M(user);
@@ -700,7 +700,7 @@ public class UserServiceImpl extends CrudServiceImpl<UserMapper, SysUser, UserMo
 
         // 逻辑删除 查询未删除数据
         queryWrapper.eq(
-                HumpUtil.humpToUnderline(MyBatisConstants.FIELD_DELETE_LOGIC), DictType.NO_YES_NO.getValue());
+                FieldUtil.humpToUnderline(MyBatisConstants.FIELD_DELETE_LOGIC), DictType.NO_YES_NO.getValue());
 
         return mapper.findList(queryWrapper);
     }

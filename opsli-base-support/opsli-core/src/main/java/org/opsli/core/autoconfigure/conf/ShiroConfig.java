@@ -129,8 +129,9 @@ public class ShiroConfig {
 
         List<Realm> realms = Lists.newArrayList();
         // 拿到state包下 实现了 FlagRealm 接口的,所有子类
-        Set<Class<?>> clazzSet = ClassUtil.scanPackageBySuper(FlagRealm.class.getPackage().getName()
-                , FlagRealm.class
+        Set<Class<?>> clazzSet = ClassUtil.scanPackageBySuper(
+                FlagRealm.class.getPackage().getName(),
+                FlagRealm.class
         );
         for (Class<?> aClass : clazzSet) {
             // 位运算 去除抽象类

@@ -24,6 +24,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 代码生成器 - 表 API
@@ -120,5 +122,27 @@ public interface TableApi {
      */
     @PostMapping("/importTables")
     ResultVo<?> importTables(String tableNames);
+
+    /**
+     * 获得数据库类型下 字段类型
+     * @return List
+     */
+    @GetMapping("/getFieldTypes")
+    ResultVo<List<String>> getFieldTypes();
+
+    /**
+     * 获得数据库类型下 全部类型对应Java类型
+     * @return List
+     */
+    @GetMapping("/getJavaFieldTypes")
+    ResultVo<Map<String, String> > getJavaFieldTypes();
+
+    /**
+     * 获得全部类型对应Java类型集合（兜底String 类型）
+     * @return List
+     */
+    @GetMapping("/getJavaFieldTypesBySafety")
+    ResultVo<Map<String, List<String>>> getJavaFieldTypesBySafety();
+
 
 }

@@ -18,9 +18,9 @@ package org.opsli.plugins.oss.factory;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import org.opsli.common.annotation.OptionDict;
-import org.opsli.common.annotation.validation.ValidationArgs;
-import org.opsli.common.annotation.validation.ValidationArgsLenMax;
-import org.opsli.common.enums.ValiArgsType;
+import org.opsli.common.annotation.validator.Validator;
+import org.opsli.common.annotation.validator.ValidatorLenMax;
+import org.opsli.common.enums.ValidatorType;
 import org.opsli.core.utils.OptionsUtil;
 
 import java.io.Serializable;
@@ -64,14 +64,14 @@ public enum LocalConfigFactory implements ConfigFactory<LocalConfigFactory.Local
 
         /** 域名 */
         @ApiModelProperty(value = "域名")
-        @ValidationArgs({ValiArgsType.IS_NOT_NULL})
-        @ValidationArgsLenMax(100)
+        @Validator({ValidatorType.IS_NOT_NULL})
+        @ValidatorLenMax(100)
         @OptionDict("storage_local_domain")
         private String domain;
 
         /** 前缀 */
         @ApiModelProperty(value = "前缀")
-        @ValidationArgsLenMax(100)
+        @ValidatorLenMax(100)
         @OptionDict("storage_local_path_prefix")
         private String pathPrefix;
 

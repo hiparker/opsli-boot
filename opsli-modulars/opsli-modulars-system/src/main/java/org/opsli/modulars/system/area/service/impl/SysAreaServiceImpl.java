@@ -23,7 +23,7 @@ import org.opsli.api.wrapper.system.area.SysAreaModel;
 import org.opsli.common.constants.MyBatisConstants;
 import org.opsli.common.enums.DictType;
 import org.opsli.common.exception.ServiceException;
-import org.opsli.common.utils.HumpUtil;
+import org.opsli.common.utils.FieldUtil;
 import org.opsli.core.base.entity.HasChildren;
 import org.opsli.core.base.service.impl.CrudServiceImpl;
 import org.opsli.core.persistence.querybuilder.GenQueryBuilder;
@@ -132,7 +132,7 @@ public class SysAreaServiceImpl extends CrudServiceImpl<SysAreaMapper, SysArea, 
         boolean ret = false;
         QueryBuilder<SysArea> queryBuilder = new GenQueryBuilder<>();
         QueryWrapper<SysArea> queryWrapper = queryBuilder.build();
-        queryWrapper.eq(HumpUtil.humpToUnderline(MyBatisConstants.FIELD_PARENT_ID), parentId);
+        queryWrapper.eq(FieldUtil.humpToUnderline(MyBatisConstants.FIELD_PARENT_ID), parentId);
         List<SysArea> childList = super.findList(queryWrapper);
         for (SysArea child : childList) {
             super.delete(child.getId());
@@ -181,9 +181,9 @@ public class SysAreaServiceImpl extends CrudServiceImpl<SysAreaMapper, SysArea, 
         }
         QueryWrapper<SysArea> wrapper = new QueryWrapper<>();
 
-        wrapper.in(HumpUtil.humpToUnderline(MyBatisConstants.FIELD_PARENT_ID), parentIds)
+        wrapper.in(FieldUtil.humpToUnderline(MyBatisConstants.FIELD_PARENT_ID), parentIds)
                 .eq(MyBatisConstants.FIELD_DELETE_LOGIC,  DictType.NO_YES_NO.getValue())
-                .groupBy(HumpUtil.humpToUnderline(MyBatisConstants.FIELD_PARENT_ID));
+                .groupBy(FieldUtil.humpToUnderline(MyBatisConstants.FIELD_PARENT_ID));
 
         return mapper.hasChildren(wrapper);
     }

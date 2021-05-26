@@ -21,10 +21,10 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.opsli.api.base.warpper.ApiWrapper;
-import org.opsli.common.annotation.validation.ValidationArgs;
-import org.opsli.common.annotation.validation.ValidationArgsLenMax;
-import org.opsli.common.annotation.validation.ValidationArgsLenMin;
-import org.opsli.common.enums.ValiArgsType;
+import org.opsli.common.annotation.validator.Validator;
+import org.opsli.common.annotation.validator.ValidatorLenMax;
+import org.opsli.common.annotation.validator.ValidatorLenMin;
+import org.opsli.common.enums.ValidatorType;
 import org.opsli.plugins.excel.annotation.ExcelInfo;
 
 /**
@@ -41,100 +41,100 @@ public class UserAndOrgModel extends ApiWrapper {
     /** 登录账户 */
     @ApiModelProperty(value = "登录账户")
     @ExcelIgnore
-    @ValidationArgs({ValiArgsType.IS_NOT_NULL,ValiArgsType.IS_GENERAL})
-    @ValidationArgsLenMax(32)
-    @ValidationArgsLenMin(5)
+    @Validator({ValidatorType.IS_NOT_NULL, ValidatorType.IS_GENERAL})
+    @ValidatorLenMax(32)
+    @ValidatorLenMin(5)
     private String username;
 
     /** 登录密码 */
     @ApiModelProperty(value = "登录密码")
     @ExcelIgnore
-    @ValidationArgsLenMin(6)
-    @ValidationArgsLenMax(50)
+    @ValidatorLenMin(6)
+    @ValidatorLenMax(50)
     private String password;
 
     /** 登录密码强度 */
     @ApiModelProperty(value = "登录密码强度")
     @ExcelIgnore
-    @ValidationArgsLenMin(1)
-    @ValidationArgsLenMax(1)
+    @ValidatorLenMin(1)
+    @ValidatorLenMax(1)
     private String passwordLevel;
 
     /** 盐值，密码秘钥 */
     @ApiModelProperty(value = "盐值，密码秘钥")
     @ExcelIgnore
-    @ValidationArgsLenMax(50)
+    @ValidatorLenMax(50)
     private String secretKey;
 
     /** 启用状态 */
     @ApiModelProperty(value = "启用状态")
     @ExcelIgnore
-    @ValidationArgs({ValiArgsType.IS_NOT_NULL})
-    @ValidationArgsLenMax(1)
+    @Validator({ValidatorType.IS_NOT_NULL})
+    @ValidatorLenMax(1)
     private String enable;
 
     /** 真实姓名 */
     @ApiModelProperty(value = "真实姓名")
     @ExcelProperty(value = "真实姓名", order = 1)
     @ExcelInfo
-    @ValidationArgs({ValiArgsType.IS_NOT_NULL,ValiArgsType.IS_GENERAL_WITH_CHINESE})
-    @ValidationArgsLenMax(50)
+    @Validator({ValidatorType.IS_NOT_NULL, ValidatorType.IS_GENERAL_WITH_CHINESE})
+    @ValidatorLenMax(50)
     private String realName;
 
     /** 手机 */
     @ApiModelProperty(value = "手机")
     @ExcelProperty(value = "手机", order = 2)
     @ExcelInfo
-    @ValidationArgs({ValiArgsType.IS_MOBILE})
+    @Validator({ValidatorType.IS_MOBILE})
     private String mobile;
 
     /** 邮箱 */
     @ApiModelProperty(value = "邮箱")
     @ExcelProperty(value = "邮箱", order = 3)
     @ExcelInfo
-    @ValidationArgs({ValiArgsType.IS_EMAIL})
-    @ValidationArgsLenMax(100)
+    @Validator({ValidatorType.IS_EMAIL})
+    @ValidatorLenMax(100)
     private String email;
 
     /** 工号 */
     @ApiModelProperty(value = "工号")
     @ExcelProperty(value = "工号", order = 4)
     @ExcelInfo
-    @ValidationArgs({ValiArgsType.IS_GENERAL})
-    @ValidationArgsLenMax(32)
+    @Validator({ValidatorType.IS_GENERAL})
+    @ValidatorLenMax(32)
     private String no;
 
     /** 头像 */
     @ApiModelProperty(value = "头像")
     @ExcelIgnore
-    @ValidationArgsLenMax(255)
+    @ValidatorLenMax(255)
     private String avatar;
 
     /** 最后登陆IP */
     @ApiModelProperty(value = "最后登陆IP")
     @ExcelIgnore
-    @ValidationArgs(ValiArgsType.IS_IPV4)
+    @Validator(ValidatorType.IS_IPV4)
     private String loginIp;
 
     /** 备注 */
     @ApiModelProperty(value = "备注")
     @ExcelProperty(value = "备注", order = 5)
     @ExcelInfo
-    @ValidationArgsLenMax(255)
+    @ValidatorLenMax(255)
     private String remark;
 
     /** 签名 */
     @ApiModelProperty(value = "签名")
     @ExcelProperty(value = "签名", order = 5)
     @ExcelInfo
-    @ValidationArgsLenMax(255)
+    @ValidatorLenMax(255)
     private String sign;
 
 
     /** 多租户字段 */
     @ApiModelProperty(value = "多租户ID")
     @ExcelIgnore
-    @ValidationArgsLenMax(20)
+    @ValidatorLenMax(20)
     private String tenantId;
 
     /** 组织机构 */

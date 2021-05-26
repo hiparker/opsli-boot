@@ -19,9 +19,9 @@ import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.opsli.common.annotation.validation.ValidationArgs;
-import org.opsli.common.annotation.validation.ValidationArgsLenMax;
-import org.opsli.common.enums.ValiArgsType;
+import org.opsli.common.annotation.validator.Validator;
+import org.opsli.common.annotation.validator.ValidatorLenMax;
+import org.opsli.common.enums.ValidatorType;
 
 import java.io.Serializable;
 
@@ -38,27 +38,27 @@ public class UserOrgRefModel implements Serializable {
 
     /** 用户ID */
     @ApiModelProperty(value = "用户ID")
-    @ValidationArgs({ValiArgsType.IS_NOT_NULL})
-    @ValidationArgsLenMax(50)
+    @Validator({ValidatorType.IS_NOT_NULL})
+    @ValidatorLenMax(50)
     private String userId;
 
     @ApiModelProperty(value = "公司")
-    @ValidationArgs({ValiArgsType.IS_NOT_NULL})
-    @ValidationArgsLenMax(19)
+    @Validator({ValidatorType.IS_NOT_NULL})
+    @ValidatorLenMax(19)
     private String companyId;
 
     @ApiModelProperty(value = "公司名称")
     private String companyName;
 
     @ApiModelProperty(value = "部门ID")
-    @ValidationArgsLenMax(19)
+    @ValidatorLenMax(19)
     private String departmentId;
 
     @ApiModelProperty(value = "部门名称")
     private String departmentName;
 
     @ApiModelProperty(value = "岗位ID")
-    @ValidationArgsLenMax(19)
+    @ValidatorLenMax(19)
     private String postId;
 
     @ApiModelProperty(value = "岗位名称")

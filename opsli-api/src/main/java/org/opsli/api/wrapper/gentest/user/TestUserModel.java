@@ -21,9 +21,9 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.opsli.api.base.warpper.ApiWrapper;
-import org.opsli.common.annotation.validation.ValidationArgs;
-import org.opsli.common.annotation.validation.ValidationArgsLenMax;
-import org.opsli.common.enums.ValiArgsType;
+import org.opsli.common.annotation.validator.Validator;
+import org.opsli.common.annotation.validator.ValidatorLenMax;
+import org.opsli.common.enums.ValidatorType;
 import org.opsli.plugins.excel.annotation.ExcelInfo;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -43,31 +43,31 @@ public class TestUserModel extends ApiWrapper {
     @ApiModelProperty(value = "名称")
     @ExcelProperty(value = "名称", order = 1)
     @ExcelInfo
-    @ValidationArgs({ValiArgsType.IS_GENERAL_WITH_CHINESE})
-    @ValidationArgsLenMax(50)
+    @Validator({ValidatorType.IS_GENERAL_WITH_CHINESE})
+    @ValidatorLenMax(50)
     private String name;
 
     /** 金钱 */
     @ApiModelProperty(value = "金钱")
     @ExcelProperty(value = "金钱", order = 2)
     @ExcelInfo
-    @ValidationArgs({ValiArgsType.IS_NOT_NULL, ValiArgsType.IS_MONEY})
-    @ValidationArgsLenMax(8)
+    @Validator({ValidatorType.IS_NOT_NULL, ValidatorType.IS_MONEY})
+    @ValidatorLenMax(8)
     private Double money;
 
     /** 年龄 */
     @ApiModelProperty(value = "年龄")
     @ExcelProperty(value = "年龄", order = 3)
     @ExcelInfo
-    @ValidationArgs({ValiArgsType.IS_NOT_NULL, ValiArgsType.IS_INTEGER})
-    @ValidationArgsLenMax(5)
+    @Validator({ValidatorType.IS_NOT_NULL, ValidatorType.IS_INTEGER})
+    @ValidatorLenMax(5)
     private Integer age;
 
     /** 生日 */
     @ApiModelProperty(value = "生日")
     @ExcelProperty(value = "生日", order = 4)
     @ExcelInfo
-    @ValidationArgs({ValiArgsType.IS_NOT_NULL, })
+    @Validator({ValidatorType.IS_NOT_NULL, })
     @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date birth;
@@ -76,8 +76,8 @@ public class TestUserModel extends ApiWrapper {
     @ApiModelProperty(value = "是否启用")
     @ExcelProperty(value = "是否启用", order = 5)
     @ExcelInfo( dictType = "no_yes" )
-    @ValidationArgs({ValiArgsType.IS_NOT_NULL, })
-    @ValidationArgsLenMax(1)
+    @Validator({ValidatorType.IS_NOT_NULL, })
+    @ValidatorLenMax(1)
     private String izUsable;
 
 

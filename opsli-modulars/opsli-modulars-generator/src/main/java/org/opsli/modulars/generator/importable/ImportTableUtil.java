@@ -16,13 +16,15 @@
 package org.opsli.modulars.generator.importable;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.util.ClassUtil;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.opsli.core.autoconfigure.properties.DbSourceProperties;
-import org.opsli.core.generator.enums.DataBaseType;
+import org.opsli.plugins.generator.database.mysql.MySqlSyncColumnType;
+import org.opsli.plugins.generator.enums.DataBaseType;
 import org.opsli.core.utils.SpringContextHolder;
 import org.opsli.modulars.generator.importable.entity.DatabaseColumn;
 import org.opsli.modulars.generator.importable.entity.DatabaseTable;
@@ -174,6 +176,64 @@ public class ImportTableUtil{
         return databaseTableService.findColumns(dataSource.getDbName(), tableName);
     }
 
+    /**
+     * 获得数据库类型下 字段类型
+     * @return List
+     */
+    public static List<String> getFieldTypes() {
+        DatabaseTableService databaseTableService = getDatabaseTableService();
+        if(databaseTableService == null){
+            return ListUtil.empty();
+        }
+        return databaseTableService.getFieldTypes();
+    }
+
+    /**
+     * 获得数据库类型下 全部类型对应Java类型
+     * @return List
+     */
+    public static Map<String, String> getJavaFieldTypes() {
+        DatabaseTableService databaseTableService = getDatabaseTableService();
+        if(databaseTableService == null){
+            return Maps.newHashMap();
+        }
+        return databaseTableService.getJavaFieldTypes();
+    }
+
+    /**
+     * 获得全部类型对应Java类型集合（兜底String 类型）
+     * @return List
+     */
+    public static Map<String, List<String>> getJavaFieldTypesBySafety() {
+        DatabaseTableService databaseTableService = getDatabaseTableService();
+        if(databaseTableService == null){
+            return Maps.newHashMap();
+        }
+        return databaseTableService.getJavaFieldTypesBySafety();
+    }
+
+    /**
+     * 获得当前数据处理Service
+     * @return DatabaseTableService
+     */
+    private static DatabaseTableService getDatabaseTableService(){
+        Map<String, DbSourceProperties.DataSourceInfo> dataSourceInfoMap =
+                dbSourceProperties.getDataSourceInfoMap();
+        // 非法判断
+        if(CollUtil.isEmpty(dataSourceInfoMap)){
+            return null;
+        }
+
+        DbSourceProperties.DataSourceInfo dataSource = dataSourceInfoMap.get(ASSIGN_DB);
+        if(dataSource == null){
+            return null;
+        }
+
+        // 根据类型获得查询器
+        DataBaseType dataBaseType = DB_TYPE_MAP.get(dataSource.getDriverClassName());
+
+        return HANDLER_MAP.get(dataBaseType);
+    }
 
     // ====================================
 
@@ -182,8 +242,9 @@ public class ImportTableUtil{
     public void initImportTable(){
 
         // 拿到state包下 实现了 SystemEventState 接口的,所有子类
-        Set<Class<?>> clazzSet = ClassUtil.scanPackageBySuper(DatabaseTableService.class.getPackage().getName()
-                , DatabaseTableService.class
+        Set<Class<?>> clazzSet = ClassUtil.scanPackageBySuper(
+                DatabaseTableService.class.getPackage().getName(),
+                DatabaseTableService.class
         );
 
         for (Class<?> aClass : clazzSet) {
@@ -199,7 +260,7 @@ public class ImportTableUtil{
     }
 
     @Autowired
-    public void setDbSourceProperties(DbSourceProperties dbSourceProperties) {
+    public void init(DbSourceProperties dbSourceProperties) {
         ImportTableUtil.dbSourceProperties = dbSourceProperties;
     }
 }

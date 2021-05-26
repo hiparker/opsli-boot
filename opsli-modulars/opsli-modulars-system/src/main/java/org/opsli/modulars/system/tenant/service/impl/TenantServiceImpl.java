@@ -27,7 +27,7 @@ import org.opsli.api.wrapper.system.user.UserModel;
 import org.opsli.common.constants.MyBatisConstants;
 import org.opsli.common.enums.DictType;
 import org.opsli.common.exception.ServiceException;
-import org.opsli.common.utils.HumpUtil;
+import org.opsli.common.utils.FieldUtil;
 import org.opsli.core.base.service.impl.CrudServiceImpl;
 import org.opsli.core.msg.CoreMsg;
 import org.opsli.core.utils.TenantUtil;
@@ -93,7 +93,7 @@ public class TenantServiceImpl extends CrudServiceImpl<TenantMapper, SysTenant, 
         UpdateWrapper<SysTenant> updateWrapper = new UpdateWrapper<>();
         updateWrapper.set("enable", enable)
                 .eq(
-                    HumpUtil.humpToUnderline(MyBatisConstants.FIELD_ID), tenantId);
+                    FieldUtil.humpToUnderline(MyBatisConstants.FIELD_ID), tenantId);
         if(this.update(updateWrapper)){
             // 清除缓存
             this.clearCache(Collections.singletonList(tenantId));
@@ -350,7 +350,7 @@ public class TenantServiceImpl extends CrudServiceImpl<TenantMapper, SysTenant, 
 
         // 如果有租户还在被引用 则不允许删除该租户
         QueryWrapper<SysUser> queryWrapper = new QueryWrapper<>();
-        queryWrapper.in(HumpUtil.humpToUnderline(MyBatisConstants.FIELD_TENANT),
+        queryWrapper.in(FieldUtil.humpToUnderline(MyBatisConstants.FIELD_TENANT),
                 tenantIdList
         );
         int count = iUserService.count(queryWrapper);

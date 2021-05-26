@@ -22,9 +22,9 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.opsli.api.base.warpper.ApiWrapper;
-import org.opsli.common.annotation.validation.ValidationArgs;
-import org.opsli.common.annotation.validation.ValidationArgsLenMax;
-import org.opsli.common.enums.ValiArgsType;
+import org.opsli.common.annotation.validator.Validator;
+import org.opsli.common.annotation.validator.ValidatorLenMax;
+import org.opsli.common.enums.ValidatorType;
 import org.opsli.plugins.excel.annotation.ExcelInfo;
 
 /**
@@ -41,44 +41,44 @@ public class SysOrgModel extends ApiWrapper {
     @ApiModelProperty(value = "父级主键")
     @ExcelProperty(value = "父级主键", order = 1)
     @ExcelInfo
-    @ValidationArgsLenMax(19)
+    @ValidatorLenMax(19)
     private String parentId;
 
     /** 组织机构编号 */
     @ApiModelProperty(value = "组织机构编号")
     @ExcelProperty(value = "组织机构编号", order = 2)
     @ExcelInfo
-    @ValidationArgs({ValiArgsType.IS_NOT_NULL, ValiArgsType.IS_GENERAL})
-    @ValidationArgsLenMax(120)
+    @Validator({ValidatorType.IS_NOT_NULL, ValidatorType.IS_GENERAL})
+    @ValidatorLenMax(120)
     private String orgCode;
 
     /** 组织机构名称 */
     @ApiModelProperty(value = "组织机构名称")
     @ExcelProperty(value = "组织机构名称", order = 3)
     @ExcelInfo
-    @ValidationArgs({ValiArgsType.IS_NOT_NULL, ValiArgsType.IS_GENERAL_WITH_CHINESE})
-    @ValidationArgsLenMax(120)
+    @Validator({ValidatorType.IS_NOT_NULL, ValidatorType.IS_GENERAL_WITH_CHINESE})
+    @ValidatorLenMax(120)
     private String orgName;
 
     /** 组织机构类型 1-公司 2-部门 3-岗位*/
     @ApiModelProperty(value = "组织机构类型")
     @ExcelProperty(value = "组织机构类型", order = 4)
     @ExcelInfo( dictType = "org_type")
-    @ValidationArgs({ValiArgsType.IS_NOT_NULL})
-    @ValidationArgsLenMax(3)
+    @Validator({ValidatorType.IS_NOT_NULL})
+    @ValidatorLenMax(3)
     private String orgType;
 
     /** 排序 */
     @ApiModelProperty(value = "排序")
     @ExcelProperty(value = "排序", order = 5)
     @ExcelInfo
-    @ValidationArgsLenMax(10)
+    @ValidatorLenMax(10)
     private Integer sortNo;
 
     /** 多租户字段 */
     @ApiModelProperty(value = "多租户ID")
     @ExcelIgnore
-    @ValidationArgsLenMax(20)
+    @ValidatorLenMax(20)
     private String tenantId;
 
 }

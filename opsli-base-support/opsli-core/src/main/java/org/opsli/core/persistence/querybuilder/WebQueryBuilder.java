@@ -19,7 +19,7 @@ import cn.hutool.core.util.ReflectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.apache.commons.lang3.StringUtils;
 import org.opsli.common.constants.MyBatisConstants;
-import org.opsli.common.utils.HumpUtil;
+import org.opsli.common.utils.FieldUtil;
 import org.opsli.core.base.entity.BaseEntity;
 import org.opsli.core.persistence.querybuilder.conf.WebQueryConf;
 
@@ -173,7 +173,7 @@ public class WebQueryBuilder<T extends BaseEntity> implements QueryBuilder<T>{
                     key = keyStr;
                 }else{
                     // 转换驼峰 为 数据库下划线字段
-                    key = HumpUtil.humpToUnderline(key);
+                    key = FieldUtil.humpToUnderline(key);
                 }
 
                 queryWrapper.orderByDesc(key);
@@ -205,7 +205,7 @@ public class WebQueryBuilder<T extends BaseEntity> implements QueryBuilder<T>{
             key = keyStr;
         }else{
             // 转换驼峰 为 数据库下划线字段
-            key = HumpUtil.humpToUnderline(key);
+            key = FieldUtil.humpToUnderline(key);
         }
 
         switch (handle) {

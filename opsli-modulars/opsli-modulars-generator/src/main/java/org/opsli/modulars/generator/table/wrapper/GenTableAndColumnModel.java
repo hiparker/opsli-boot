@@ -21,12 +21,11 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.opsli.api.base.warpper.ApiWrapper;
-import org.opsli.common.annotation.validation.ValidationArgs;
-import org.opsli.common.annotation.validation.ValidationArgsLenMax;
-import org.opsli.common.enums.ValiArgsType;
+import org.opsli.common.annotation.validator.Validator;
+import org.opsli.common.annotation.validator.ValidatorLenMax;
+import org.opsli.common.enums.ValidatorType;
 import org.opsli.modulars.generator.column.wrapper.GenTableColumnModel;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -43,8 +42,8 @@ public class GenTableAndColumnModel extends ApiWrapper {
     /** 表名称 */
     @ApiModelProperty(value = "表名称")
     @ExcelIgnore
-    @ValidationArgs({ValiArgsType.IS_NOT_NULL, ValiArgsType.IS_GENERAL})
-    @ValidationArgsLenMax(100)
+    @Validator({ValidatorType.IS_NOT_NULL, ValidatorType.IS_GENERAL})
+    @ValidatorLenMax(100)
     private String tableName;
 
     /** 旧表名称 */
@@ -55,39 +54,39 @@ public class GenTableAndColumnModel extends ApiWrapper {
     /** 表类型 */
     @ApiModelProperty(value = "表类型")
     @ExcelIgnore
-    @ValidationArgs({ValiArgsType.IS_NOT_NULL})
-    @ValidationArgsLenMax(1)
+    @Validator({ValidatorType.IS_NOT_NULL})
+    @ValidatorLenMax(1)
     private String tableType;
 
     /** 数据库类型 */
     @ApiModelProperty(value = "数据库类型")
     @ExcelIgnore
-    @ValidationArgs({ValiArgsType.IS_NOT_NULL})
-    @ValidationArgsLenMax(30)
+    @Validator({ValidatorType.IS_NOT_NULL})
+    @ValidatorLenMax(30)
     private String jdbcType;
 
     /** 描述 */
     @ApiModelProperty(value = "描述")
     @ExcelIgnore
-    @ValidationArgsLenMax(200)
+    @ValidatorLenMax(200)
     private String comments;
 
     /** 同步 */
     @ApiModelProperty(value = "同步")
     @ExcelIgnore
-    @ValidationArgsLenMax(1)
+    @ValidatorLenMax(1)
     private String izSync;
 
     /** 备注 */
     @ApiModelProperty(value = "备注")
     @ExcelIgnore
-    @ValidationArgsLenMax(255)
+    @ValidatorLenMax(255)
     private String remark;
 
     /** 表结构 */
     @ApiModelProperty(value = "表结构")
     @ExcelIgnore
-    @ValidationArgs({ValiArgsType.IS_NOT_NULL})
+    @Validator({ValidatorType.IS_NOT_NULL})
     private List<GenTableColumnModel> columnList;
 
     // =======================
@@ -96,6 +95,11 @@ public class GenTableAndColumnModel extends ApiWrapper {
     @JsonIgnore
     @ExcelIgnore
     private String tableHumpName;
+
+    /** Entity 包地址 */
+    @JsonIgnore
+    @ExcelIgnore
+    private List<String> entityPkgList;
 
     /** 前端Form集合 */
     @JsonIgnore
@@ -111,10 +115,5 @@ public class GenTableAndColumnModel extends ApiWrapper {
     @JsonIgnore
     @ExcelIgnore
     private List<GenTableColumnModel> moreQueryList;
-
-    /** 前端验证集合 */
-    @JsonIgnore
-    @ExcelIgnore
-    private String frontendValidateType;
 
 }

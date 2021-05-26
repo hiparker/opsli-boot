@@ -21,9 +21,9 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.opsli.api.base.warpper.ApiWrapper;
-import org.opsli.common.annotation.validation.ValidationArgs;
-import org.opsli.common.annotation.validation.ValidationArgsLenMax;
-import org.opsli.common.enums.ValiArgsType;
+import org.opsli.common.annotation.validator.Validator;
+import org.opsli.common.annotation.validator.ValidatorLenMax;
+import org.opsli.common.enums.ValidatorType;
 import org.opsli.plugins.excel.annotation.ExcelInfo;
 
 /**
@@ -41,8 +41,8 @@ public class GenTableModel extends ApiWrapper {
     @ApiModelProperty(value = "表名称")
     @ExcelProperty(value = "表名称", order = 1)
     @ExcelInfo
-    @ValidationArgs({ValiArgsType.IS_NOT_NULL, ValiArgsType.IS_GENERAL})
-    @ValidationArgsLenMax(100)
+    @Validator({ValidatorType.IS_NOT_NULL, ValidatorType.IS_GENERAL})
+    @ValidatorLenMax(100)
     private String tableName;
 
     /** 旧表名称 */
@@ -54,37 +54,37 @@ public class GenTableModel extends ApiWrapper {
     @ApiModelProperty(value = "表类型")
     @ExcelProperty(value = "表类型", order = 2)
     @ExcelInfo(dictType = "table_type")
-    @ValidationArgs({ValiArgsType.IS_NOT_NULL})
-    @ValidationArgsLenMax(1)
+    @Validator({ValidatorType.IS_NOT_NULL})
+    @ValidatorLenMax(1)
     private String tableType;
 
     /** 数据库类型 */
     @ApiModelProperty(value = "数据库类型")
     @ExcelProperty(value = "数据库类型", order = 3)
     @ExcelInfo(dictType = "jdbc_type")
-    @ValidationArgs({ValiArgsType.IS_NOT_NULL})
-    @ValidationArgsLenMax(30)
+    @Validator({ValidatorType.IS_NOT_NULL})
+    @ValidatorLenMax(30)
     private String jdbcType;
 
     /** 描述 */
     @ApiModelProperty(value = "描述")
     @ExcelProperty(value = "描述", order = 4)
     @ExcelInfo
-    @ValidationArgsLenMax(200)
+    @ValidatorLenMax(200)
     private String comments;
 
     /** 同步 */
     @ApiModelProperty(value = "同步")
     @ExcelProperty(value = "是否同步", order = 5)
     @ExcelInfo(dictType = "no_yes")
-    @ValidationArgsLenMax(1)
+    @ValidatorLenMax(1)
     private String izSync;
 
     /** 备注 */
     @ApiModelProperty(value = "备注")
     @ExcelProperty(value = "备注", order = 6)
     @ExcelInfo
-    @ValidationArgsLenMax(255)
+    @ValidatorLenMax(255)
     private String remark;
 
 

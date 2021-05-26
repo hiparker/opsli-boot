@@ -22,7 +22,6 @@ import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.lang.Snowflake;
 import cn.hutool.core.lang.tree.Tree;
 import cn.hutool.core.lang.tree.TreeNodeConfig;
-import cn.hutool.core.lang.tree.TreeUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.ReflectUtil;
 import com.alibaba.fastjson.JSONArray;
@@ -43,10 +42,9 @@ import org.opsli.common.annotation.ApiRestController;
 import org.opsli.common.annotation.EnableLog;
 import org.opsli.common.annotation.RequiresPermissionsCus;
 import org.opsli.common.constants.MyBatisConstants;
-import org.opsli.common.utils.HumpUtil;
+import org.opsli.common.utils.FieldUtil;
 import org.opsli.core.base.controller.BaseRestController;
 import org.opsli.core.base.entity.HasChildren;
-import org.opsli.core.persistence.querybuilder.GenQueryBuilder;
 import org.opsli.core.persistence.querybuilder.QueryBuilder;
 import org.opsli.core.persistence.querybuilder.WebQueryBuilder;
 import org.opsli.core.utils.TreeBuildUtil;
@@ -107,7 +105,7 @@ public class SysAreaRestController extends BaseRestController<SysArea, SysAreaMo
     public ResultVo<?> findTree(String parentId) {
 
         QueryWrapper<SysArea> wrapper = new QueryWrapper<>();
-        wrapper.eq(HumpUtil.humpToUnderline(MyBatisConstants.FIELD_PARENT_ID), parentId);
+        wrapper.eq(FieldUtil.humpToUnderline(MyBatisConstants.FIELD_PARENT_ID), parentId);
         List<SysArea> dataList =  IService.findList(wrapper);
 
         // 获得BeanMapList

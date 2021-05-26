@@ -71,8 +71,9 @@ public class RedisPushSubReceiver extends BaseReceiver {
     public void initRedisPushSubHandler(){
 
         // 拿到state包下 实现了 SystemEventState 接口的,所有子类
-        Set<Class<?>> clazzSet = ClassUtil.scanPackageBySuper(RedisPushSubHandler.class.getPackage().getName()
-                , RedisPushSubHandler.class
+        Set<Class<?>> clazzSet = ClassUtil.scanPackageBySuper(
+                RedisPushSubHandler.class.getPackage().getName(),
+                RedisPushSubHandler.class
         );
 
         for (Class<?> aClass : clazzSet) {

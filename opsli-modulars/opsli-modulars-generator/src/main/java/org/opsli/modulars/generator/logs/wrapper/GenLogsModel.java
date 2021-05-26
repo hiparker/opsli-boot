@@ -20,9 +20,9 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.opsli.api.base.warpper.ApiWrapper;
-import org.opsli.common.annotation.validation.ValidationArgs;
-import org.opsli.common.annotation.validation.ValidationArgsLenMax;
-import org.opsli.common.enums.ValiArgsType;
+import org.opsli.common.annotation.validator.Validator;
+import org.opsli.common.annotation.validator.ValidatorLenMax;
+import org.opsli.common.enums.ValidatorType;
 
 /**
  * 代码生成器 - 生成日志 模型
@@ -38,51 +38,51 @@ public class GenLogsModel extends ApiWrapper {
     /** 归属表ID */
     @ApiModelProperty(value = "归属表ID")
     @ExcelIgnore
-    @ValidationArgs({ValiArgsType.IS_NOT_NULL})
-    @ValidationArgsLenMax(19)
+    @Validator({ValidatorType.IS_NOT_NULL})
+    @ValidatorLenMax(19)
     private String tableId;
 
 
     /** 包名 */
     @ApiModelProperty(value = "包名")
     @ExcelIgnore
-    @ValidationArgs({ValiArgsType.IS_NOT_NULL})
-    @ValidationArgsLenMax(255)
+    @Validator({ValidatorType.IS_NOT_NULL})
+    @ValidatorLenMax(255)
     private String packageName;
 
     /** 模块名 */
     @ApiModelProperty(value = "模块名")
     @ExcelIgnore
-    @ValidationArgs({ValiArgsType.IS_NOT_NULL})
-    @ValidationArgsLenMax(40)
+    @Validator({ValidatorType.IS_NOT_NULL})
+    @ValidatorLenMax(40)
     private String moduleName;
 
     /** 子模块名 */
     @ApiModelProperty(value = "子模块名")
     @ExcelIgnore
-    @ValidationArgsLenMax(40)
+    @ValidatorLenMax(40)
     private String subModuleName;
 
 
     /** 代码标题 */
     @ApiModelProperty(value = "代码标题")
     @ExcelIgnore
-    @ValidationArgs({ValiArgsType.IS_NOT_NULL})
-    @ValidationArgsLenMax(100)
+    @Validator({ValidatorType.IS_NOT_NULL})
+    @ValidatorLenMax(100)
     private String codeTitle;
 
     /** 代码标题简介 */
     @ApiModelProperty(value = "代码标题简介")
     @ExcelIgnore
-    @ValidationArgs({ValiArgsType.IS_NOT_NULL})
-    @ValidationArgsLenMax(100)
+    @Validator({ValidatorType.IS_NOT_NULL})
+    @ValidatorLenMax(100)
     private String codeTitleBrief;
 
     /** 作者名 */
     @ApiModelProperty(value = "作者名")
     @ExcelIgnore
-    @ValidationArgs({ValiArgsType.IS_NOT_NULL})
-    @ValidationArgsLenMax(64)
+    @Validator({ValidatorType.IS_NOT_NULL})
+    @ValidatorLenMax(64)
     private String authorName;
 
 }

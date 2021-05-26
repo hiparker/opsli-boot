@@ -22,7 +22,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.opsli.core.autoconfigure.properties.GlobalProperties;
 import org.opsli.core.utils.GlobalPropertiesUtil;
-import org.opsli.core.utils.ValidationUtil;
+import org.opsli.core.utils.ValidatorUtil;
 import org.opsli.plugins.oss.enums.OssStorageType;
 import org.opsli.plugins.oss.factory.LocalConfigFactory;
 import org.opsli.plugins.oss.service.BaseOssStorageService;
@@ -70,7 +70,7 @@ public class LocalStorageServiceImpl extends BaseOssStorageService {
         LocalConfigFactory.LocalConfig config = LocalConfigFactory.INSTANCE.getConfig();
 
         // 验证对象
-        ValidationUtil.verify(config);
+        ValidatorUtil.verify(config);
 
         // 当前时间戳
         long currentTimeMillis = System.currentTimeMillis();
@@ -128,7 +128,7 @@ public class LocalStorageServiceImpl extends BaseOssStorageService {
         // 获得配置信息
         LocalConfigFactory.LocalConfig config = LocalConfigFactory.INSTANCE.getConfig();
         // 验证对象
-        ValidationUtil.verify(config);
+        ValidatorUtil.verify(config);
 
         // 当前时间戳
         long currentTimeMillis = System.currentTimeMillis();

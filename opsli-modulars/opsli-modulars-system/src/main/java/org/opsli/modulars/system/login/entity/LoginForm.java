@@ -19,10 +19,10 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.opsli.api.base.encrypt.BaseEncrypt;
-import org.opsli.common.annotation.validation.ValidationArgs;
-import org.opsli.common.annotation.validation.ValidationArgsLenMax;
-import org.opsli.common.annotation.validation.ValidationArgsLenMin;
-import org.opsli.common.enums.ValiArgsType;
+import org.opsli.common.annotation.validator.Validator;
+import org.opsli.common.annotation.validator.ValidatorLenMax;
+import org.opsli.common.annotation.validator.ValidatorLenMin;
+import org.opsli.common.enums.ValidatorType;
 
 /**
  * 登录表单
@@ -36,19 +36,19 @@ public class LoginForm extends BaseEncrypt {
 
     /** 用户名 */
     @ApiModelProperty(value = "用户名")
-    @ValidationArgs({ValiArgsType.IS_NOT_NULL,ValiArgsType.IS_GENERAL})
-    @ValidationArgsLenMax(50)
+    @Validator({ValidatorType.IS_NOT_NULL, ValidatorType.IS_GENERAL})
+    @ValidatorLenMax(50)
     private String username;
 
     /** 密码 */
     @ApiModelProperty(value = "密码")
-    @ValidationArgs({ValiArgsType.IS_NOT_NULL, ValiArgsType.IS_SECURITY_PASSWORD})
-    @ValidationArgsLenMin(6)
+    @Validator({ValidatorType.IS_NOT_NULL, ValidatorType.IS_SECURITY_PASSWORD})
+    @ValidatorLenMin(6)
     private String password;
 
     /** 验证码 */
     @ApiModelProperty(value = "验证码")
-    @ValidationArgsLenMax(30)
+    @ValidatorLenMax(30)
     private String captcha;
 
     /** UUID */
