@@ -119,7 +119,6 @@ public interface #(data.model.tableHumpName)RestApi {
     *
     * @param request request
     * @param response response
-    * @return ResultVo
     */
     @GetMapping("/exportExcel")
     void exportExcel(HttpServletRequest request, HttpServletResponse response);
@@ -127,7 +126,6 @@ public interface #(data.model.tableHumpName)RestApi {
     /**
     * #(data.codeTitle) Excel 导入
     * @param request 文件流 request
-    * @return ResultVo
     */
     @PostMapping("/importExcel")
     ResultVo<?> importExcel(MultipartHttpServletRequest request);

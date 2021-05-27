@@ -7,8 +7,8 @@
     @close="close"
   >
     <el-form ref="form" :model="form" :rules="rules" label-width="105px">
-      #for(column : data.model.formList)
       <el-row :gutter="10" >
+      #for(column : data.model.formList)
         ### 文本框
         #if(column.showType == "0")
         <el-col :xs="24" :sm="24" :md="24" :lg="12" :xl="12">
@@ -64,8 +64,8 @@
         </el-col>
         #end
 
-      </el-row>
       #end
+      </el-row>
 
     </el-form>
     <div slot="footer" class="dialog-footer">
@@ -82,6 +82,7 @@
   import { doInsert, doUpdate } from "@/api/#(data.moduleName)/#(data.model.tableHumpName)Management";
   #end
   import { isNull } from "@/utils/validate";
+  import { formateDate } from "@/utils/format";
   import { validatorRule } from "@/utils/validateRlue";
 
   export default {
