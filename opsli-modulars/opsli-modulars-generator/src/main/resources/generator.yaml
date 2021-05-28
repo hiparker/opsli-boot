@@ -5,6 +5,8 @@ opsli:
     - gen_table
     - gen_table_column
     - gen_logs
+    - gen_template
+    - gen_template_detail
     - sys_dict
     - sys_dict_detail
     - sys_logs

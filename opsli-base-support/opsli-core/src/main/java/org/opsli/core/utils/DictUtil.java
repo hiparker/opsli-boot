@@ -51,6 +51,9 @@ import static org.opsli.common.constants.OrderConstants.UTIL_ORDER;
 @Lazy(false)
 public class DictUtil {
 
+    /** 增加初始状态开关 防止异常使用 */
+    private static boolean IS_INIT;
+
     /** 字典Service */
     private static DictDetailApi dictDetailApi;
 
@@ -62,6 +65,10 @@ public class DictUtil {
      * @return String
      */
     public static String getDictNameByValue(String typeCode, String dictValue, String defaultVal){
+        // 判断 工具类是否初始化完成
+        ThrowExceptionUtil.isThrowException(!IS_INIT,
+                CoreMsg.OTHER_EXCEPTION_UTILS_INIT);
+
         // 缓存Key
         String cacheKey = DictConstants.CACHE_PREFIX_VALUE + typeCode;
         // 缓存Key + VALUE
@@ -142,6 +149,10 @@ public class DictUtil {
      * @return String
      */
     public static String getDictValueByName(String typeCode, String dictName, String defaultVal){
+        // 判断 工具类是否初始化完成
+        ThrowExceptionUtil.isThrowException(!IS_INIT,
+                CoreMsg.OTHER_EXCEPTION_UTILS_INIT);
+
         // 缓存Key
         String cacheKey = DictConstants.CACHE_PREFIX_NAME + typeCode;
         // 缓存Key + VALUE
@@ -219,6 +230,10 @@ public class DictUtil {
      * @return List
      */
     public static List<DictWrapper> getDictList(String typeCode){
+        // 判断 工具类是否初始化完成
+        ThrowExceptionUtil.isThrowException(!IS_INIT,
+                CoreMsg.OTHER_EXCEPTION_UTILS_INIT);
+
         // 缓存Key
         String cacheKey = DictConstants.CACHE_PREFIX_NAME + typeCode;
 
@@ -336,6 +351,10 @@ public class DictUtil {
      * @param model 字典模型
      */
     public static void put(DictWrapper model){
+        // 判断 工具类是否初始化完成
+        ThrowExceptionUtil.isThrowException(!IS_INIT,
+                CoreMsg.OTHER_EXCEPTION_UTILS_INIT);
+
         // 清除缓存
         DictUtil.del(model);
 
@@ -351,6 +370,10 @@ public class DictUtil {
      * @return boolean
      */
     public static boolean del(DictWrapper model){
+        // 判断 工具类是否初始化完成
+        ThrowExceptionUtil.isThrowException(!IS_INIT,
+                CoreMsg.OTHER_EXCEPTION_UTILS_INIT);
+
         if(model == null){
             return true;
         }
@@ -418,6 +441,10 @@ public class DictUtil {
      * @return boolean
      */
     public static boolean delAll(String typeCode){
+        // 判断 工具类是否初始化完成
+        ThrowExceptionUtil.isThrowException(!IS_INIT,
+                CoreMsg.OTHER_EXCEPTION_UTILS_INIT);
+
         List<DictWrapper> dictWrapperList = DictUtil.getDictList(typeCode);
         if(CollUtil.isEmpty(dictWrapperList)){
             return true;
@@ -465,9 +492,14 @@ public class DictUtil {
 
     // ===================================
 
+    /**
+     * 初始化
+     */
     @Autowired
-    public  void setDictDetailApi(DictDetailApi dictDetailApi) {
+    public  void init(DictDetailApi dictDetailApi) {
         DictUtil.dictDetailApi = dictDetailApi;
+
+        IS_INIT = true;
     }
 
 }

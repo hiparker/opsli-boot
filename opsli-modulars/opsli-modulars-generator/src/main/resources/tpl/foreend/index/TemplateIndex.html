@@ -213,7 +213,7 @@
               查询
             </el-button>
 
-            #if(data.model.moreQueryList.size() > 0)
+            #if(data.model.moreQueryList != null && data.model.moreQueryList.size() > 0)
             <el-button icon="el-icon-search" @click="moreQuery">
               更多
             </el-button>

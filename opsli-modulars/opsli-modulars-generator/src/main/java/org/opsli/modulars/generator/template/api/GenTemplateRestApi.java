@@ -13,13 +13,13 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-#if(data.subModuleName != null && data.subModuleName != "")
-package #(apiPath).web.#(data.moduleName+"."+data.subModuleName);
-#else
-package #(apiPath).web.#(data.moduleName);
-#end
 
-import #(apiPath).base.result.ResultVo;
+package org.opsli.modulars.generator.template.api;
+
+
+import org.opsli.api.base.result.ResultVo;
+import org.opsli.modulars.generator.template.wrapper.GenTemplateAndDetailModel;
+import org.opsli.modulars.generator.template.wrapper.GenTemplateModel;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -28,41 +28,36 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-#if(data.subModuleName != null && data.subModuleName != "")
-import #(apiPath).wrapper.#(data.moduleName+"."+data.subModuleName).#(data.model.tableHumpName)Model;
-#else
-import #(apiPath).wrapper.#(data.moduleName).#(data.model.tableHumpName)Model;
-#end
 
 
 /**
- * #(data.codeTitle) Api
+ * 代码模板 Api
  *
  * 对外 API 直接 暴露 @GetMapping 或者 @PostMapping
  * 对内也推荐 单机版 不需要设置 Mapping 但是调用方法得从Controller写起
  *
  * 这样写法虽然比较绕，但是当单体项目想要改造微服务架构时 时非常容易的
  *
- * @author #(data.authorName)
- * @date #(currTime)
+ * @author 周鹏程
+ * @date 2021-05-27 14:33:49
  */
-public interface #(data.model.tableHumpName)RestApi {
+public interface GenTemplateRestApi {
 
     /** 标题 */
-    String TITLE = "#(data.codeTitle)";
+    String TITLE = "代码模板";
     /** 子标题 */
-    String SUB_TITLE = "#(data.codeTitleBrief)";
+    String SUB_TITLE = "代码模板";
 
     /**
-    * #(data.codeTitle) 查一条
+    * 代码模板 查一条
     * @param model 模型
     * @return ResultVo
     */
     @GetMapping("/get")
-    ResultVo<#(data.model.tableHumpName)Model> get(#(data.model.tableHumpName)Model model);
+    ResultVo<GenTemplateModel> get(GenTemplateModel model);
 
     /**
-    * #(data.codeTitle) 查询分页
+    * 代码模板 查询分页
     * @param pageNo 当前页
     * @param pageSize 每页条数
     * @param request request
@@ -76,23 +71,39 @@ public interface #(data.model.tableHumpName)RestApi {
     );
 
     /**
-    * #(data.codeTitle) 新增
+    * 代码模板 新增
     * @param model 模型
     * @return ResultVo
     */
     @PostMapping("/insert")
-    ResultVo<?> insert(@RequestBody #(data.model.tableHumpName)Model model);
+    ResultVo<?> insert(@RequestBody GenTemplateModel model);
 
     /**
-    * #(data.codeTitle) 修改
+     * 代码模板 新增 和 明细
+     * @param model 模型
+     * @return ResultVo
+     */
+    @PostMapping("/insertAndDetail")
+    ResultVo<?> insertAndDetail(@RequestBody GenTemplateAndDetailModel model);
+
+    /**
+    * 代码模板 修改
     * @param model 模型
     * @return ResultVo
     */
     @PostMapping("/update")
-    ResultVo<?> update(@RequestBody #(data.model.tableHumpName)Model model);
+    ResultVo<?> update(@RequestBody GenTemplateModel model);
 
     /**
-    * #(data.codeTitle) 删除
+     * 代码模板 修改 和 明细
+     * @param model 模型
+     * @return ResultVo
+     */
+    @PostMapping("/updateAndDetail")
+    ResultVo<?> updateAndDetail(@RequestBody GenTemplateAndDetailModel model);
+
+    /**
+    * 代码模板 删除
     * @param id ID
     * @return ResultVo
     */
@@ -100,7 +111,7 @@ public interface #(data.model.tableHumpName)RestApi {
     ResultVo<?> del(String id);
 
     /**
-    * #(data.codeTitle) 批量删除
+    * 代码模板 批量删除
     * @param ids ID 数组
     * @return ResultVo
     */
@@ -108,7 +119,7 @@ public interface #(data.model.tableHumpName)RestApi {
     ResultVo<?> delAll(String ids);
 
     /**
-    * #(data.codeTitle) Excel 导出
+    * 代码模板 Excel 导出
     *
     * 导出时，Token认证和方法权限认证 全部都由自定义完成
     * 因为在 导出不成功时，需要推送错误信息，
@@ -124,7 +135,7 @@ public interface #(data.model.tableHumpName)RestApi {
     void exportExcel(HttpServletRequest request, HttpServletResponse response);
 
     /**
-    * #(data.codeTitle) Excel 导入
+    * 代码模板 Excel 导入
     * @param request 文件流 request
     * @return ResultVo
     */
@@ -132,9 +143,8 @@ public interface #(data.model.tableHumpName)RestApi {
     ResultVo<?> importExcel(MultipartHttpServletRequest request);
 
     /**
-    * #(data.codeTitle) Excel 下载导入模版
+    * 代码模板 Excel 下载导入模版
     * @param response response
-    * @return ResultVo
     */
     @GetMapping("/importExcel/template")
     void importTemplate(HttpServletResponse response);
