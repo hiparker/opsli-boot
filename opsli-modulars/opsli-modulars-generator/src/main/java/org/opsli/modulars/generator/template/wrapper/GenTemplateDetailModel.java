@@ -56,9 +56,19 @@ public class GenTemplateDetailModel extends ApiWrapper {
     @ValidatorLenMax(19)
     private String parentId;
 
+    /** 类型 0 后端 1 前端 */
+    @ApiModelProperty(value = "类型")
+    @ExcelProperty(value = "类型", order = 2)
+    @ExcelInfo
+    @Validator({
+            ValidatorType.IS_NOT_NULL
+    })
+    @ValidatorLenMax(1)
+    private String type;
+
     /** 路径 */
     @ApiModelProperty(value = "路径")
-    @ExcelProperty(value = "路径", order = 2)
+    @ExcelProperty(value = "路径", order = 3)
     @ExcelInfo
     @Validator({
         ValidatorType.IS_NOT_NULL
@@ -68,7 +78,7 @@ public class GenTemplateDetailModel extends ApiWrapper {
 
     /** 文件名 */
     @ApiModelProperty(value = "文件名")
-    @ExcelProperty(value = "文件名", order = 3)
+    @ExcelProperty(value = "文件名", order = 4)
     @ExcelInfo
     @Validator({
         ValidatorType.IS_NOT_NULL
@@ -78,7 +88,7 @@ public class GenTemplateDetailModel extends ApiWrapper {
 
     /** 文件内容 */
     @ApiModelProperty(value = "文件内容")
-    @ExcelProperty(value = "文件内容", order = 4)
+    @ExcelProperty(value = "文件内容", order = 5)
     @ExcelInfo
     @Validator({
         ValidatorType.IS_NOT_NULL

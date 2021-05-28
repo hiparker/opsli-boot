@@ -43,6 +43,9 @@ public class GenTemplateDetail extends BaseEntity {
     /** 父级ID */
     private String parentId;
 
+    /** 类型 0 后端 1 前端 */
+    private String type;
+
     /** 路径 */
     private String path;
 
