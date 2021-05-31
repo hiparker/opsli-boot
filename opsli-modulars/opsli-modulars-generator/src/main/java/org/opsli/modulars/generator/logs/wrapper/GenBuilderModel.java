@@ -30,9 +30,11 @@ import org.opsli.modulars.generator.table.wrapper.GenTableAndColumnModel;
 @EqualsAndHashCode(callSuper = false)
 public class GenBuilderModel extends ApiWrapper {
 
-
     /** 归属表ID */
     private String tableId;
+
+    /** 表类型 */
+    private String tableType;
 
     /** 包名 */
     private String packageName;
@@ -51,6 +53,9 @@ public class GenBuilderModel extends ApiWrapper {
 
     /** 作者名 */
     private String authorName;
+
+    /** 模板ID */
+    private String templateId;
 
     /** 代码模型 */
     private GenTableAndColumnModel model;

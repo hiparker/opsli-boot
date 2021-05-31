@@ -32,6 +32,9 @@ public class GenLogs extends BaseEntity {
     /** 归属表ID */
     private String tableId;
 
+    /** 表类型 */
+    private String tableType;
+
     /** 包名 */
     private String packageName;
 
@@ -50,6 +53,8 @@ public class GenLogs extends BaseEntity {
     /** 作者名 */
     private String authorName;
 
+    /** 模板ID */
+    private String templateId;
 
     // ========================================
 

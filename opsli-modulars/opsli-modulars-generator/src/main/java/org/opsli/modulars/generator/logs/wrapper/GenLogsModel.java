@@ -16,6 +16,7 @@
 package org.opsli.modulars.generator.logs.wrapper;
 
 import com.alibaba.excel.annotation.ExcelIgnore;
+import com.alibaba.excel.annotation.ExcelProperty;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -23,6 +24,7 @@ import org.opsli.api.base.warpper.ApiWrapper;
 import org.opsli.common.annotation.validator.Validator;
 import org.opsli.common.annotation.validator.ValidatorLenMax;
 import org.opsli.common.enums.ValidatorType;
+import org.opsli.plugins.excel.annotation.ExcelInfo;
 
 /**
  * 代码生成器 - 生成日志 模型
@@ -41,6 +43,13 @@ public class GenLogsModel extends ApiWrapper {
     @Validator({ValidatorType.IS_NOT_NULL})
     @ValidatorLenMax(19)
     private String tableId;
+
+    /** 表类型 */
+    @ApiModelProperty(value = "表类型")
+    @ExcelIgnore
+    @Validator({ValidatorType.IS_NOT_NULL})
+    @ValidatorLenMax(1)
+    private String tableType;
 
 
     /** 包名 */
@@ -84,5 +93,12 @@ public class GenLogsModel extends ApiWrapper {
     @Validator({ValidatorType.IS_NOT_NULL})
     @ValidatorLenMax(64)
     private String authorName;
+
+    /** 模板ID */
+    @ApiModelProperty(value = "模板ID")
+    @ExcelIgnore
+    @Validator({ValidatorType.IS_NOT_NULL})
+    @ValidatorLenMax(19)
+    private String templateId;
 
 }
