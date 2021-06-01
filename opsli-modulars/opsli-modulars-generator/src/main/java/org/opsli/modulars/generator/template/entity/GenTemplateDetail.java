@@ -55,6 +55,9 @@ public class GenTemplateDetail extends BaseEntity {
     /** 文件内容 */
     private String fileContent;
 
+    /** 是否忽略文件名 */
+    private String ignoreFileName;
+
     // ========================================
 
 

@@ -59,6 +59,13 @@ public enum GeneratorMsg implements BaseMsg {
     EXCEPTION_CREATE_MENU_PARENT_NULL(50144,"上级菜单不可为空"),
 
     /**
+     * 模板
+     */
+    EXCEPTION_TEMPLATE_NAME_REPEAT(50150,"模板名称重复"),
+    EXCEPTION_TEMPLATE_COPY_NULL(50151,"暂无该模板"),
+
+
+    /**
      * 其他
      */
     EXCEPTION_OTHER_NULL(50200,"暂无数据"),

@@ -17,24 +17,28 @@ package org.opsli.plugins.generator.strategy.create;
 
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.IoUtil;
-import com.baomidou.mybatisplus.generator.AutoGenerator;
-import com.baomidou.mybatisplus.generator.config.GlobalConfig;
+import cn.hutool.core.map.MapUtil;
+import cn.hutool.core.util.StrUtil;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.jfinal.kit.Kv;
 import lombok.extern.slf4j.Slf4j;
 import org.opsli.api.ApiFlag;
-import org.opsli.common.enums.ValidatorType;
+import org.opsli.common.enums.DictType;
 import org.opsli.common.utils.Props;
 import org.opsli.common.utils.ZipUtils;
-import org.opsli.plugins.generator.strategy.create.backend.JavaCodeBuilder;
-import org.opsli.plugins.generator.strategy.create.foreend.VueCodeBuilder;
-import org.opsli.plugins.generator.strategy.create.readme.ReadMeBuilder;
-import org.opsli.plugins.generator.utils.GeneratorHandleUtil;
 import org.opsli.modulars.generator.logs.wrapper.GenBuilderModel;
+import org.opsli.modulars.generator.template.wrapper.GenTemplateDetailModel;
+import org.opsli.plugins.generator.enums.CodeType;
+import org.opsli.plugins.generator.factory.GeneratorFactory;
+import org.opsli.plugins.generator.utils.EnjoyUtil;
+import org.opsli.plugins.generator.utils.GenTemplateUtil;
+import org.opsli.plugins.generator.utils.GeneratorHandleUtil;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -50,16 +54,21 @@ public enum CodeBuilder {
     /** 实例对象 */
     INSTANCE;
 
+    /** Java文件后缀 */
+    public static final String JAVA_SUFFIX = "java";
+    /** 文件名前缀 */
+    public static final String FILE_NAME = "OPSLI-CodeCreate";
+    /** 文件夹前缀 */
+    private static final String FOLDER_PREFIX = "/";
+    /** 文件夹点前缀 */
+    private static final String POINT_PREFIX = ".";
+    /** 基础路径前缀 */
+    public static final String BASE_PATH = "/代码生成-";
+
     /** 排除字段 */
     private static final List<String> EXCLUDE_FIELDS;
-
+    /** API 地址 */
     public static final String API_PATH;
-    public static final String FILE_NAME = "OPSLI-CodeCreate";
-    public static final String BASE_PATH = "/代码生成-";
-    public static final String BACKEND_PATH = "/后端";
-    public static final String FOREEND_PATH = "/前端";
-
-
     static {
         Props props = new Props("generator.yaml");
         EXCLUDE_FIELDS = props.getList("opsli.exclude-fields");
@@ -74,58 +83,154 @@ public enum CodeBuilder {
             return;
         }
 
-        String dataStr = DateUtil.format(DateUtil.date(), "yyyyMMddHHmmss");
+        String dateStr = DateUtil.format(DateUtil.date(), "yyyyMMddHHmmss");
 
         // 处理表数据
         GenBuilderModel genBuilderModel = GeneratorHandleUtil.handleData(builderModel, EXCLUDE_FIELDS);
+        if(genBuilderModel == null){
+            return;
+        }
 
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        OutputStream out = this.getOutputStream(response, dataStr);
+
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        OutputStream out = this.getOutputStream(response, dateStr);
         try {
             if(out != null){
-                List<Map<String, String>> fileList = new ArrayList<>();
-                // 处理后端代码 ====================
-                // entity
-                fileList.add(JavaCodeBuilder.INSTANCE.createEntity(genBuilderModel, dataStr));
-                // mapper
-                fileList.add(JavaCodeBuilder.INSTANCE.createMapper(genBuilderModel, dataStr));
-                // mapper xml
-                fileList.add(JavaCodeBuilder.INSTANCE.createMapperXML(genBuilderModel, dataStr));
-                // service
-                fileList.add(JavaCodeBuilder.INSTANCE.createService(genBuilderModel, dataStr));
-                // service impl
-                fileList.add(JavaCodeBuilder.INSTANCE.createServiceImpl(genBuilderModel, dataStr));
-                // web
-                fileList.add(JavaCodeBuilder.INSTANCE.createWeb(genBuilderModel, dataStr));
-                // model
-                fileList.add(JavaCodeBuilder.INSTANCE.createModel(genBuilderModel, dataStr));
-                // api
-                fileList.add(JavaCodeBuilder.INSTANCE.createRestApi(genBuilderModel, dataStr));
+                List<GenTemplateDetailModel> templateDetailList =
+                        GenTemplateUtil.getTemplateDetailList(genBuilderModel.getTemplateId());
 
-                // 处理前端代码 ====================
-                // index
-                fileList.add(VueCodeBuilder.INSTANCE.createIndex(genBuilderModel, dataStr));
-                // edit
-                fileList.add(VueCodeBuilder.INSTANCE.createEdit(genBuilderModel, dataStr));
-                // import
-                fileList.add(VueCodeBuilder.INSTANCE.createImport(genBuilderModel, dataStr));
-                // 前api
-                fileList.add(VueCodeBuilder.INSTANCE.createApi(genBuilderModel, dataStr));
+                List<Map<String, String>> fileList =
+                        Lists.newArrayListWithCapacity(templateDetailList.size());
 
-                // 处理 ReadMe
-                fileList.add(ReadMeBuilder.INSTANCE.createReadMe(genBuilderModel, dataStr));
+                // 循环处理代码模板
+                for (GenTemplateDetailModel templateDetailModel : templateDetailList) {
+                    fileList.add(
+                            this.createCode(genBuilderModel, templateDetailModel, dateStr)
+                    );
+                }
 
                 // 生成zip文件
-                ZipUtils.toZip(fileList, baos);
+                ZipUtils.toZip(fileList, byteArrayOutputStream);
 
                 // 输出流文件
-                IoUtil.write(out,true, baos.toByteArray());
+                IoUtil.write(out,true, byteArrayOutputStream.toByteArray());
             }
         }catch (Exception e){
             log.error(e.getMessage(), e);
         }
     }
 
+    /**
+     * 生成MapperXML
+     * @param builderModel Build 模型
+     * @param templateModel 模板模型
+     * @param dataStr 数据字符串
+     * @return Map
+     */
+    private Map<String,String> createCode(final GenBuilderModel builderModel,
+                                          final GenTemplateDetailModel templateModel, final String dataStr){
+        if(builderModel == null){
+            return MapUtil.empty();
+        }
+
+
+        // 获得分类名称
+        CodeType codeType = CodeType.getCodeType(templateModel.getType());
+        String typeName = codeType.getDesc();
+
+        // 包名
+        String packageName = builderModel.getPackageName();
+
+        // 模块名
+        String moduleName = builderModel.getModuleName();
+
+        // 子模块名
+        String subModuleName = builderModel.getSubModuleName();
+
+        // 基础路径
+        String basePath = CodeBuilder.BASE_PATH + dataStr + FOLDER_PREFIX + typeName;
+        // Path路径
+        String path = templateModel.getPath();
+        if(StrUtil.isNotEmpty(path)){
+            path = StrUtil.replace(path, "${packageName}", packageName);
+            path = StrUtil.replace(path, "${moduleName}", moduleName);
+            path = StrUtil.replace(path, "${subModuleName}", subModuleName);
+            // 处理路径 前后加 [/]
+            path = this.handlePath(path);
+        }
+
+        // 代码
+        String codeStr = EnjoyUtil.renderByStr(templateModel.getFileContent(),
+                this.createKv(builderModel)
+        );
+
+        // 获得模板文件名称
+        String templateFileName = templateModel.getFileName();
+        String[] templateFileNameArr = StrUtil.split(templateFileName, ".");
+
+        // 模板文件前缀
+        String templateFilePrefix = templateFileNameArr[0];
+        // 模板文件后缀
+        String templateFileSuffix = templateFileNameArr[templateFileNameArr.length-1];
+
+        // 判断是否是Java 文件
+        if(JAVA_SUFFIX.equals(templateFileNameArr[templateFileNameArr.length-1])){
+            codeStr = GeneratorFactory.getJavaHeadAnnotation() + codeStr;
+        }
+
+        // 生成文件名
+        String fileName = builderModel.getModel().getTableHumpName();
+        if(DictType.NO_YES_NO.getValue().equals(templateModel.getIgnoreFileName()) ||
+            StrUtil.isEmpty(templateModel.getIgnoreFileName())
+            ){
+            if(templateFileNameArr.length > 1){
+                // 判断是否忽略模板文件名
+                fileName += templateFilePrefix;
+            }
+        }
+        fileName += StrUtil.prependIfMissing(templateFileSuffix, POINT_PREFIX);
+
+        Map<String,String> entityMap = Maps.newHashMapWithExpectedSize(3);
+        entityMap.put(ZipUtils.FILE_PATH, basePath + path);
+        entityMap.put(ZipUtils.FILE_NAME, fileName);
+        entityMap.put(ZipUtils.FILE_DATA, codeStr);
+
+        return entityMap;
+    }
+
+    /**
+     * 创建 Kv
+     * @param builderModel Build 模型
+     * @return Kv
+     */
+    private Kv createKv(GenBuilderModel builderModel){
+        return Kv.by("data", builderModel)
+                .set("currTime", DateUtil.now())
+                .set("apiPath", API_PATH);
+    }
+
+    /**
+     * 处理 Path 路径
+     * @param path 路径
+     * @return String
+     */
+    protected String handlePath(String path) {
+        if(StrUtil.isEmpty(path)){
+            return path;
+        }
+
+        // . 转换为 [/]
+        path = StrUtil.replace(path, POINT_PREFIX, FOLDER_PREFIX);
+
+        // 如果 第一位不是 / 则加 /
+        path = StrUtil.prependIfMissing(path, FOLDER_PREFIX);
+
+        // 如果最后一位 是 / 则减 /
+        path = StrUtil.appendIfMissing(path, FOLDER_PREFIX);
+
+        // 去除 [//]
+        return StrUtil.replace(path, "//", FOLDER_PREFIX);
+    }
 
     /**
      * 导出文件时为Writer生成OutputStream
@@ -139,15 +244,6 @@ public enum CodeBuilder {
             return response.getOutputStream();
         } catch (IOException ignored) {}
         return null;
-    }
-
-    public static void main(String[] args) {
-        // 代码生成器
-        AutoGenerator mpg = new AutoGenerator();
-
-        // 全局配置
-        GlobalConfig gc = new GlobalConfig();
-
     }
 
 }

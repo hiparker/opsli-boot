@@ -70,6 +70,21 @@ public final class EnjoyUtil {
                 .renderToString(kv);
     }
 
+    /**
+     * 根据具体魔板生成文件
+     * @param template  模板
+     * @param kv                渲染参数
+     * @return String
+     */
+    public static String renderByStr(final String template, Kv kv)  {
+
+        return Engine.use()
+                // 开启预热模式
+                .setDevMode(true)
+                .getTemplateByString(template)
+                .renderToString(kv);
+    }
+
 
     private EnjoyUtil(){}
 }

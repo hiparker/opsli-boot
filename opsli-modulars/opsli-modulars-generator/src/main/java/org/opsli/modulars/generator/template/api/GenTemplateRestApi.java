@@ -19,6 +19,7 @@ package org.opsli.modulars.generator.template.api;
 
 import org.opsli.api.base.result.ResultVo;
 import org.opsli.modulars.generator.template.wrapper.GenTemplateAndDetailModel;
+import org.opsli.modulars.generator.template.wrapper.GenTemplateCopyModel;
 import org.opsli.modulars.generator.template.wrapper.GenTemplateModel;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -101,6 +102,14 @@ public interface GenTemplateRestApi {
      */
     @PostMapping("/updateAndDetail")
     ResultVo<?> updateAndDetail(@RequestBody GenTemplateAndDetailModel model);
+
+    /**
+     * 复制 代码模板
+     * @param model 模型
+     * @return ResultVo
+     */
+    @PostMapping("/copy")
+    ResultVo<?> copy(@RequestBody GenTemplateCopyModel model);
 
     /**
     * 代码模板 删除

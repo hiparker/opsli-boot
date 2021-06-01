@@ -15,6 +15,8 @@
  */
 package org.opsli.common.utils;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -30,6 +32,7 @@ import java.util.zip.ZipOutputStream;
  * @author Parker
  * @date 2020-01-07
  */
+@Slf4j
 public class ZipUtils {
     /**
      * 缓存区大小

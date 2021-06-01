@@ -23,6 +23,7 @@ import org.opsli.core.base.service.interfaces.CrudServiceInterface;
 
 import org.opsli.modulars.generator.template.entity.GenTemplate;
 import org.opsli.modulars.generator.template.wrapper.GenTemplateAndDetailModel;
+import org.opsli.modulars.generator.template.wrapper.GenTemplateCopyModel;
 import org.opsli.modulars.generator.template.wrapper.GenTemplateModel;
 
 
@@ -48,5 +49,10 @@ public interface IGenTemplateService extends CrudServiceInterface<GenTemplate, G
      */
     GenTemplateModel updateAndDetail(GenTemplateAndDetailModel model);
 
-
+    /**
+     * 复制
+     * @param model 模型
+     * @return model
+     */
+    GenTemplateModel copy(GenTemplateCopyModel model);
 }

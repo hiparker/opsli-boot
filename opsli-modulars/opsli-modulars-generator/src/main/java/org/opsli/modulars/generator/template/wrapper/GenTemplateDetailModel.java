@@ -96,4 +96,14 @@ public class GenTemplateDetailModel extends ApiWrapper {
     @ValidatorLenMax(20000)
     private String fileContent;
 
+    /** 是否忽略文件名 */
+    @ApiModelProperty(value = "文件名")
+    @ExcelProperty(value = "文件名", order = 6)
+    @ExcelInfo
+    @Validator({
+            ValidatorType.IS_NOT_NULL
+    })
+    @ValidatorLenMax(1)
+    private String ignoreFileName;
+
 }

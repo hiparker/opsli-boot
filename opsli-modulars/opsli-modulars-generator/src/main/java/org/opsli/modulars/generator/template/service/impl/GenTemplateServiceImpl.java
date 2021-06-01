@@ -20,6 +20,7 @@ package org.opsli.modulars.generator.template.service.impl;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import org.apache.commons.lang3.StringUtils;
 import org.opsli.common.constants.MyBatisConstants;
 import org.opsli.common.exception.ServiceException;
 import org.opsli.common.utils.WrapperUtil;
@@ -32,8 +33,11 @@ import org.opsli.modulars.generator.template.mapper.GenTemplateMapper;
 import org.opsli.modulars.generator.template.service.IGenTemplateDetailService;
 import org.opsli.modulars.generator.template.service.IGenTemplateService;
 import org.opsli.modulars.generator.template.wrapper.GenTemplateAndDetailModel;
+import org.opsli.modulars.generator.template.wrapper.GenTemplateCopyModel;
 import org.opsli.modulars.generator.template.wrapper.GenTemplateDetailModel;
 import org.opsli.modulars.generator.template.wrapper.GenTemplateModel;
+import org.opsli.plugins.generator.exception.GeneratorException;
+import org.opsli.plugins.generator.msg.GeneratorMsg;
 import org.opsli.plugins.generator.utils.GenTemplateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -65,6 +69,13 @@ public class GenTemplateServiceImpl extends CrudServiceImpl<GenTemplateMapper, G
             return null;
         }
 
+        // 唯一验证
+        Integer count = this.uniqueVerificationByTemplateName(model);
+        if(count != null && count > 0){
+            // 重复
+            throw new GeneratorException(GeneratorMsg.EXCEPTION_TEMPLATE_NAME_REPEAT);
+        }
+
         GenTemplateModel insertModel = super.insert(
                 WrapperUtil.transformInstance(model, GenTemplateModel.class));
 
@@ -88,6 +99,13 @@ public class GenTemplateServiceImpl extends CrudServiceImpl<GenTemplateMapper, G
     public GenTemplateModel updateAndDetail(GenTemplateAndDetailModel model) {
         if(model == null){
             return null;
+        }
+
+        // 唯一验证
+        Integer count = this.uniqueVerificationByTemplateName(model);
+        if(count != null && count > 0){
+            // 重复
+            throw new GeneratorException(GeneratorMsg.EXCEPTION_TEMPLATE_NAME_REPEAT);
         }
 
         GenTemplateModel updateModel = super.update(
@@ -115,6 +133,50 @@ public class GenTemplateServiceImpl extends CrudServiceImpl<GenTemplateMapper, G
         return updateModel;
     }
 
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public GenTemplateModel copy(GenTemplateCopyModel model) {
+        if(model == null){
+            return null;
+        }
+
+        GenTemplateModel genTemplateModel = this.get(model.getId());
+
+        model.setId(null);
+        // 唯一验证
+        Integer count = this.uniqueVerificationByTemplateName(
+                WrapperUtil.transformInstance(model, GenTemplateAndDetailModel.class));
+        if(count != null && count > 0){
+            // 重复
+            throw new GeneratorException(GeneratorMsg.EXCEPTION_TEMPLATE_NAME_REPEAT);
+        }
+
+        if(genTemplateModel == null){
+            // 暂无该模板
+            throw new GeneratorException(GeneratorMsg.EXCEPTION_TEMPLATE_COPY_NULL);
+        }
+
+        // 设置模板名称
+        genTemplateModel.setTempName(model.getTempName());
+
+        // 获得子类模板
+        List<GenTemplateDetailModel> genTemplateDetailModelList =
+                iGenTemplateDetailService.findListByParent(genTemplateModel.getId());
+
+        GenTemplateModel insertModel = super.insert(
+                WrapperUtil.transformInstance(genTemplateModel, GenTemplateModel.class));
+
+        if(insertModel != null){
+            // 保存模型明细
+            for (GenTemplateDetailModel templateDetailModel : genTemplateDetailModelList) {
+                templateDetailModel.setParentId(insertModel.getId());
+                iGenTemplateDetailService.insert(templateDetailModel);
+            }
+        }
+
+        return insertModel;
+    }
+
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean delete(String id) {
@@ -125,7 +187,7 @@ public class GenTemplateServiceImpl extends CrudServiceImpl<GenTemplateMapper, G
 
         iGenTemplateDetailService.delByParent(id);
 
-        return this.delete(id);
+        return super.delete(id);
     }
 
     @Override
@@ -145,6 +207,28 @@ public class GenTemplateServiceImpl extends CrudServiceImpl<GenTemplateMapper, G
         return super.deleteAll(ids);
     }
 
+    /**
+     * 唯一验证
+     * @param model model
+     * @return Integer
+     */
+    @Transactional(readOnly = true)
+    public Integer uniqueVerificationByTemplateName(GenTemplateAndDetailModel model){
+        if(model == null){
+            return null;
+        }
+        QueryWrapper<GenTemplate> wrapper = new QueryWrapper<>();
+
+        // code 唯一
+        wrapper.eq("temp_name", model.getTempName());
+
+        // 重复校验排除自身
+        if(StringUtils.isNotEmpty(model.getId())){
+            wrapper.notIn(MyBatisConstants.FIELD_ID, model.getId());
+        }
+
+        return super.count(wrapper);
+    }
 
     // ====================
 

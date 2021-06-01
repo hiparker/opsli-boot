@@ -33,9 +33,6 @@ public class GenBuilderModel extends ApiWrapper {
     /** 归属表ID */
     private String tableId;
 
-    /** 表类型 */
-    private String tableType;
-
     /** 包名 */
     private String packageName;
 

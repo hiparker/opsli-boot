@@ -101,6 +101,7 @@ public abstract class CrudServiceImpl<M extends BaseMapper<T>, T extends BaseEnt
             model.setUpdateTime(null);
         }
 
+        model.setId(null);
         T entity = transformM2T(model);
         boolean ret = super.save(entity);
         if(ret){

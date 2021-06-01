@@ -33,6 +33,7 @@ import org.opsli.core.persistence.querybuilder.QueryBuilder;
 import org.opsli.core.persistence.querybuilder.WebQueryBuilder;
 import org.opsli.modulars.generator.template.api.GenTemplateRestApi;
 import org.opsli.modulars.generator.template.wrapper.GenTemplateAndDetailModel;
+import org.opsli.modulars.generator.template.wrapper.GenTemplateCopyModel;
 import org.opsli.modulars.generator.template.wrapper.GenTemplateModel;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import javax.servlet.http.HttpServletRequest;
@@ -105,6 +106,9 @@ public class GenTemplateRestController extends BaseRestController<GenTemplate, G
     @EnableLog
     @Override
     public ResultVo<?> insert(GenTemplateModel model) {
+        // 演示模式 不允许操作
+        super.demoError();
+
         // 调用新增方法
         IService.insert(model);
         return ResultVo.success("新增代码模板成功");
@@ -120,6 +124,9 @@ public class GenTemplateRestController extends BaseRestController<GenTemplate, G
     @EnableLog
     @Override
     public ResultVo<?> insertAndDetail(GenTemplateAndDetailModel model) {
+        // 演示模式 不允许操作
+        super.demoError();
+
         // 调用新增方法
         IService.insertAndDetail(model);
         return ResultVo.success("新增代码模板成功");
@@ -135,6 +142,9 @@ public class GenTemplateRestController extends BaseRestController<GenTemplate, G
     @EnableLog
     @Override
     public ResultVo<?> update(GenTemplateModel model) {
+        // 演示模式 不允许操作
+        super.demoError();
+
         // 调用修改方法
         IService.update(model);
         return ResultVo.success("修改代码模板成功");
@@ -150,9 +160,27 @@ public class GenTemplateRestController extends BaseRestController<GenTemplate, G
     @EnableLog
     @Override
     public ResultVo<?> updateAndDetail(GenTemplateAndDetailModel model) {
+        // 演示模式 不允许操作
+        super.demoError();
+
         // 调用修改方法
         IService.updateAndDetail(model);
         return ResultVo.success("修改代码模板成功");
+    }
+
+    /**
+     * 复制 代码模板
+     * @param model 模型
+     * @return ResultVo
+     */
+    @ApiOperation(value = "新增代码模板数据", notes = "新增代码模板数据")
+    @RequiresPermissions("generator_template_copy")
+    @EnableLog
+    @Override
+    public ResultVo<?> copy(GenTemplateCopyModel model) {
+        // 调用复制方法
+        IService.copy(model);
+        return ResultVo.success("复制代码模板成功");
     }
 
     /**
@@ -165,6 +193,9 @@ public class GenTemplateRestController extends BaseRestController<GenTemplate, G
     @EnableLog
     @Override
     public ResultVo<?> del(String id){
+        // 演示模式 不允许操作
+        super.demoError();
+
         IService.delete(id);
         return ResultVo.success("删除代码模板成功");
     }
@@ -179,6 +210,9 @@ public class GenTemplateRestController extends BaseRestController<GenTemplate, G
     @EnableLog
     @Override
     public ResultVo<?> delAll(String ids){
+        // 演示模式 不允许操作
+        super.demoError();
+
         String[] idArray = Convert.toStrArray(ids);
         IService.deleteAll(idArray);
         return ResultVo.success("批量删除代码模板成功");
