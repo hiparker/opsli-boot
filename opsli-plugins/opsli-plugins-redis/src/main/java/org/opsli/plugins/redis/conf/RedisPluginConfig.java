@@ -19,6 +19,7 @@ import cn.hutool.core.io.IoUtil;
 import com.alibaba.fastjson.support.spring.FastJsonRedisSerializer;
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
+import org.opsli.plugins.redis.jsonserializer.FastJson2JsonRedisSerializer;
 import org.opsli.plugins.redis.scripts.RedisScriptCache;
 import org.opsli.plugins.redis.scripts.enums.RedisScriptsEnum;
 import org.springframework.context.annotation.Bean;
@@ -44,7 +45,7 @@ import java.util.List;
 @Configuration
 public class RedisPluginConfig {
 
-    private static final FastJsonRedisSerializer<Object> FAST_JSON_REDIS_SERIALIZER = new FastJsonRedisSerializer<>(Object.class);
+    private static final FastJson2JsonRedisSerializer<?> FAST_JSON_REDIS_SERIALIZER = new FastJson2JsonRedisSerializer<>(Object.class);
 
     @Resource
     private LettuceConnectionFactory factory;
