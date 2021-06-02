@@ -16,15 +16,16 @@
 package org.opsli.core.utils;
 
 import cn.hutool.core.convert.Convert;
+import cn.hutool.core.lang.Validator;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.ReflectUtil;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.opsli.common.enums.ValidatorType;
 import org.opsli.common.utils.DefPatternPool;
 import org.opsli.common.msg.ValidatorMsg;
 import org.opsli.api.wrapper.system.dict.DictModel;
-import org.opsli.common.annotation.validator.Validator;
 import org.opsli.common.annotation.validator.ValidatorLenMax;
 import org.opsli.common.annotation.validator.ValidatorLenMin;
 import org.opsli.common.exception.ServiceException;
@@ -52,10 +53,11 @@ public final class ValidatorUtil {
 
         Field[] fields = ReflectUtil.getFields(obj.getClass());
         for (Field field : fields) {
-            // 获得 统一验证 注解
-            Validator validator = field.getAnnotation(Validator.class);
+            // 获得 统一验证 注解 （起码冲突了）
+            org.opsli.common.annotation.validator.Validator validator =
+                    field.getAnnotation(org.opsli.common.annotation.validator.Validator.class);
             if (validator != null) {
-                org.opsli.common.enums.ValidatorType[] types = validator.value();
+                ValidatorType[] types = validator.value();
                 Object fieldValue = ReflectUtil.getFieldValue(obj, field);
                 ValidatorUtil.check(field, types, fieldValue);
             }
@@ -84,7 +86,7 @@ public final class ValidatorUtil {
      * @param types 类型数组
      * @param fieldValue 字段值
      */
-    private static void check(Field field, org.opsli.common.enums.ValidatorType[] types, Object fieldValue){
+    private static void check(Field field, ValidatorType[] types, Object fieldValue){
         // 获得字段名
         String fieldName = field.getName();
         ApiModelProperty annotation = field.getAnnotation(ApiModelProperty.class);
@@ -95,13 +97,13 @@ public final class ValidatorUtil {
         String value = Convert.toStr(fieldValue);
 
         // 循环验证
-        for (org.opsli.common.enums.ValidatorType type : types) {
+        for (ValidatorType type : types) {
             try {
                 boolean verifyRet;
                 switch (type) {
                     // 不能为空
                     case IS_NOT_NULL: {
-                        verifyRet = cn.hutool.core.lang.Validator.isNotEmpty(fieldValue);
+                        verifyRet = Validator.isNotEmpty(fieldValue);
                         if (!verifyRet) {
                             ValidatorMsg msg = ValidatorMsg.EXCEPTION_IS_NOT_NULL;
                             msg.setFieldName(fieldName);
@@ -114,7 +116,7 @@ public final class ValidatorUtil {
                         if (StringUtils.isEmpty(value)) {
                             break;
                         }
-                        verifyRet = cn.hutool.core.lang.Validator.isGeneral(value);
+                        verifyRet = Validator.isGeneral(value);
                         if (!verifyRet) {
                             ValidatorMsg msg = ValidatorMsg.EXCEPTION_IS_GENERAL;
                             msg.setFieldName(fieldName);
@@ -168,7 +170,7 @@ public final class ValidatorUtil {
                         if (StringUtils.isEmpty(value)) {
                             break;
                         }
-                        verifyRet =  cn.hutool.core.lang.Validator.isLetter(value);
+                        verifyRet =  Validator.isLetter(value);
                         if (!verifyRet) {
                             ValidatorMsg msg = ValidatorMsg.EXCEPTION_IS_LETTER;
                             msg.setFieldName(fieldName);
@@ -181,7 +183,7 @@ public final class ValidatorUtil {
                         if (StringUtils.isEmpty(value)) {
                             break;
                         }
-                        verifyRet =  cn.hutool.core.lang.Validator.isUpperCase(value);
+                        verifyRet =  Validator.isUpperCase(value);
                         if (!verifyRet) {
                             ValidatorMsg msg = ValidatorMsg.EXCEPTION_IS_UPPER_CASE;
                             msg.setFieldName(fieldName);
@@ -194,7 +196,7 @@ public final class ValidatorUtil {
                         if (StringUtils.isEmpty(value)) {
                             break;
                         }
-                        verifyRet =  cn.hutool.core.lang.Validator.isLowerCase(value);
+                        verifyRet =  Validator.isLowerCase(value);
                         if (!verifyRet) {
                             ValidatorMsg msg = ValidatorMsg.EXCEPTION_IS_LOWER_CASE;
                             msg.setFieldName(fieldName);
@@ -207,7 +209,7 @@ public final class ValidatorUtil {
                         if (StringUtils.isEmpty(value)) {
                             break;
                         }
-                        verifyRet =  cn.hutool.core.lang.Validator.isIpv4(value) || cn.hutool.core.lang.Validator.isIpv6(value) ;
+                        verifyRet =  Validator.isIpv4(value) || Validator.isIpv6(value) ;
                         if (!verifyRet) {
                             ValidatorMsg msg = ValidatorMsg.EXCEPTION_IS_IP;
                             msg.setFieldName(fieldName);
@@ -220,7 +222,7 @@ public final class ValidatorUtil {
                         if (StringUtils.isEmpty(value)) {
                             break;
                         }
-                        verifyRet =  cn.hutool.core.lang.Validator.isIpv4(value);
+                        verifyRet =  Validator.isIpv4(value);
                         if (!verifyRet) {
                             ValidatorMsg msg = ValidatorMsg.EXCEPTION_IS_IPV4;
                             msg.setFieldName(fieldName);
@@ -233,7 +235,7 @@ public final class ValidatorUtil {
                         if(StringUtils.isEmpty(value)){
                             break;
                         }
-                        verifyRet = cn.hutool.core.lang.Validator.isIpv6(value);
+                        verifyRet = Validator.isIpv6(value);
                         if(!verifyRet){
                             ValidatorMsg msg = ValidatorMsg.EXCEPTION_IS_IPV6;
                             msg.setFieldName(fieldName);
@@ -246,7 +248,7 @@ public final class ValidatorUtil {
                         if (StringUtils.isEmpty(value)) {
                             break;
                         }
-                        verifyRet = cn.hutool.core.lang.Validator.isMoney(value);
+                        verifyRet = Validator.isMoney(value);
                         if (!verifyRet) {
                             ValidatorMsg msg = ValidatorMsg.EXCEPTION_IS_MONEY;
                             msg.setFieldName(fieldName);
@@ -259,7 +261,7 @@ public final class ValidatorUtil {
                         if (StringUtils.isEmpty(value)) {
                             break;
                         }
-                        verifyRet = cn.hutool.core.lang.Validator.isEmail(value);
+                        verifyRet = Validator.isEmail(value);
                         if (!verifyRet) {
                             ValidatorMsg msg = ValidatorMsg.EXCEPTION_IS_EMAIL;
                             msg.setFieldName(fieldName);
@@ -272,7 +274,7 @@ public final class ValidatorUtil {
                         if (StringUtils.isEmpty(value)) {
                             break;
                         }
-                        verifyRet = cn.hutool.core.lang.Validator.isMobile(value);
+                        verifyRet = Validator.isMobile(value);
                         if (!verifyRet) {
                             ValidatorMsg msg = ValidatorMsg.EXCEPTION_IS_MOBILE;
                             msg.setFieldName(fieldName);
@@ -285,7 +287,7 @@ public final class ValidatorUtil {
                         if (StringUtils.isEmpty(value)) {
                             break;
                         }
-                        verifyRet = cn.hutool.core.lang.Validator.isCitizenId(value);
+                        verifyRet = Validator.isCitizenId(value);
                         if (!verifyRet) {
                             ValidatorMsg msg = ValidatorMsg.EXCEPTION_IS_CITIZENID;
                             msg.setFieldName(fieldName);
@@ -298,7 +300,7 @@ public final class ValidatorUtil {
                         if (StringUtils.isEmpty(value)) {
                             break;
                         }
-                        verifyRet = cn.hutool.core.lang.Validator.isZipCode(value);
+                        verifyRet = Validator.isZipCode(value);
                         if (!verifyRet) {
                             ValidatorMsg msg = ValidatorMsg.EXCEPTION_IS_ZIPCODE;
                             msg.setFieldName(fieldName);
@@ -311,7 +313,7 @@ public final class ValidatorUtil {
                         if (StringUtils.isEmpty(value)) {
                             break;
                         }
-                        verifyRet = cn.hutool.core.lang.Validator.isUrl(value);
+                        verifyRet = Validator.isUrl(value);
                         if (!verifyRet) {
                             ValidatorMsg msg = ValidatorMsg.EXCEPTION_IS_URL;
                             msg.setFieldName(fieldName);
@@ -324,7 +326,7 @@ public final class ValidatorUtil {
                         if (StringUtils.isEmpty(value)) {
                             break;
                         }
-                        verifyRet = cn.hutool.core.lang.Validator.isChinese(value);
+                        verifyRet = Validator.isChinese(value);
                         if (!verifyRet) {
                             ValidatorMsg msg = ValidatorMsg.EXCEPTION_IS_CHINESE;
                             msg.setFieldName(fieldName);
@@ -337,7 +339,7 @@ public final class ValidatorUtil {
                         if (StringUtils.isEmpty(value)) {
                             break;
                         }
-                        verifyRet = cn.hutool.core.lang.Validator.isGeneralWithChinese(value);
+                        verifyRet = Validator.isGeneralWithChinese(value);
                         if (!verifyRet) {
                             ValidatorMsg msg = ValidatorMsg.EXCEPTION_IS_GENERAL_WITH_CHINESE;
                             msg.setFieldName(fieldName);
@@ -350,7 +352,7 @@ public final class ValidatorUtil {
                         if (StringUtils.isEmpty(value)) {
                             break;
                         }
-                        verifyRet = cn.hutool.core.lang.Validator.isMac(value);
+                        verifyRet = Validator.isMac(value);
                         if (!verifyRet) {
                             ValidatorMsg msg = ValidatorMsg.EXCEPTION_IS_MAC;
                             msg.setFieldName(fieldName);
@@ -363,7 +365,7 @@ public final class ValidatorUtil {
                         if (StringUtils.isEmpty(value)) {
                             break;
                         }
-                        verifyRet = cn.hutool.core.lang.Validator.isPlateNumber(value);
+                        verifyRet = Validator.isPlateNumber(value);
                         if (!verifyRet) {
                             ValidatorMsg msg = ValidatorMsg.EXCEPTION_IS_PLATE_NUMBER;
                             msg.setFieldName(fieldName);
@@ -376,7 +378,7 @@ public final class ValidatorUtil {
                         if (StringUtils.isEmpty(value)) {
                             break;
                         }
-                        verifyRet = cn.hutool.core.lang.Validator.isMatchRegex(
+                        verifyRet = Validator.isMatchRegex(
                                 DefPatternPool.SECURITY_PASSWORD, value);
                         if (!verifyRet) {
                             ValidatorMsg msg = ValidatorMsg.EXCEPTION_IS_SECURITY_PASSWORD;

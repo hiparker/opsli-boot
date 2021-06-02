@@ -15,9 +15,14 @@
  */
 package org.opsli.plugins.generator.strategy.create;
 
+import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.ListUtil;
+import cn.hutool.core.convert.Convert;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.map.MapUtil;
+import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -25,6 +30,7 @@ import com.jfinal.kit.Kv;
 import lombok.extern.slf4j.Slf4j;
 import org.opsli.api.ApiFlag;
 import org.opsli.common.enums.DictType;
+import org.opsli.common.utils.MessUtil;
 import org.opsli.common.utils.Props;
 import org.opsli.common.utils.ZipUtils;
 import org.opsli.modulars.generator.logs.wrapper.GenBuilderModel;
@@ -138,23 +144,13 @@ public enum CodeBuilder {
         CodeType codeType = CodeType.getCodeType(templateModel.getType());
         String typeName = codeType.getDesc();
 
-        // 包名
-        String packageName = builderModel.getPackageName();
-
-        // 模块名
-        String moduleName = builderModel.getModuleName();
-
-        // 子模块名
-        String subModuleName = builderModel.getSubModuleName();
-
         // 基础路径
         String basePath = CodeBuilder.BASE_PATH + dataStr + FOLDER_PREFIX + typeName;
         // Path路径
         String path = templateModel.getPath();
         if(StrUtil.isNotEmpty(path)){
-            path = StrUtil.replace(path, "${packageName}", packageName);
-            path = StrUtil.replace(path, "${moduleName}", moduleName);
-            path = StrUtil.replace(path, "${subModuleName}", subModuleName);
+            // 替换占位符
+            path = handleReplace(path, builderModel);
             // 处理路径 前后加 [/]
             path = this.handlePath(path);
         }
@@ -164,31 +160,23 @@ public enum CodeBuilder {
                 this.createKv(builderModel)
         );
 
-        // 获得模板文件名称
-        String templateFileName = templateModel.getFileName();
-        String[] templateFileNameArr = StrUtil.split(templateFileName, ".");
-
-        // 模板文件前缀
-        String templateFilePrefix = templateFileNameArr[0];
         // 模板文件后缀
-        String templateFileSuffix = templateFileNameArr[templateFileNameArr.length-1];
+        String templateFileSuffix = FileUtil.getSuffix(templateModel.getFileName());
 
         // 判断是否是Java 文件
-        if(JAVA_SUFFIX.equals(templateFileNameArr[templateFileNameArr.length-1])){
+        if(JAVA_SUFFIX.equals(templateFileSuffix)){
             codeStr = GeneratorFactory.getJavaHeadAnnotation() + codeStr;
         }
 
         // 生成文件名
         String fileName = builderModel.getModel().getTableHumpName();
-        if(DictType.NO_YES_NO.getValue().equals(templateModel.getIgnoreFileName()) ||
-            StrUtil.isEmpty(templateModel.getIgnoreFileName())
-            ){
-            if(templateFileNameArr.length > 1){
-                // 判断是否忽略模板文件名
-                fileName += templateFilePrefix;
-            }
+
+        // 判断是否忽略文件名 （忽略默认采用 表名+后缀名）
+        if(DictType.NO_YES_YES.getValue().equals(templateModel.getIgnoreFileName())){
+            fileName += StrUtil.prependIfMissing(templateFileSuffix, POINT_PREFIX);
+        }else {
+            fileName = handleReplace(templateModel.getFileName(), builderModel);
         }
-        fileName += StrUtil.prependIfMissing(templateFileSuffix, POINT_PREFIX);
 
         Map<String,String> entityMap = Maps.newHashMapWithExpectedSize(3);
         entityMap.put(ZipUtils.FILE_PATH, basePath + path);
@@ -214,7 +202,7 @@ public enum CodeBuilder {
      * @param path 路径
      * @return String
      */
-    protected String handlePath(String path) {
+    private String handlePath(String path) {
         if(StrUtil.isEmpty(path)){
             return path;
         }
@@ -233,6 +221,30 @@ public enum CodeBuilder {
     }
 
     /**
+     * 处理替换占位符
+     * @param str 原字符串
+     * @param builderModel 模型数据
+     * @return String
+     */
+    private String handleReplace(String str, GenBuilderModel builderModel){
+        // 非法处理
+        if(StrUtil.isEmpty(str) || builderModel == null){
+            return str;
+        }
+
+        String prefix = "${";
+        String suffix = "}";
+        List<String> placeholderList = MessUtil.getPlaceholderList(str);
+        for (String placeholderField : placeholderList) {
+            Object property = BeanUtil.getProperty(builderModel, placeholderField);
+            str = StrUtil.replace(str,
+                    prefix + placeholderField + suffix,
+                    Convert.toStr(property));
+        }
+        return str;
+    }
+
+    /**
      * 导出文件时为Writer生成OutputStream
      */
     private OutputStream getOutputStream(HttpServletResponse response, String dataStr){
@@ -244,6 +256,15 @@ public enum CodeBuilder {
             return response.getOutputStream();
         } catch (IOException ignored) {}
         return null;
+    }
+
+    public static void main(String[] args) {
+
+        String aaa = "aaaaaaaaab${bb}bbbbbbbb${bbaa}bbbbbbbccccccccccccc";
+        List<String> placeholderList = MessUtil.getPlaceholderList(aaa);
+        for (String s : placeholderList) {
+            System.out.println(s);
+        }
     }
 
 }

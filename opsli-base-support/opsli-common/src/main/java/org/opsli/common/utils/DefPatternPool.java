@@ -32,6 +32,12 @@ public final class DefPatternPool {
 	 */
 	public final static Pattern SECURITY_PASSWORD = Pattern.compile("^\\S*(?=\\S{6,})(?=\\S*\\d)(?=\\S*[A-Z])(?=\\S*[a-z])(?=\\S*[!@#$%^&*?.])\\S*$");
 
+	/**
+	 * 占位符  /\$\{(\w+)\}/g
+	 * ${xxxx}
+	 */
+	public final static Pattern PLACEHOLDER = Pattern.compile("\\$\\{([\\w\\.\\-\\/\\+\\$\\#\\@\\!\\^\\&\\(\\)]+)\\}");
+
 
 	// -------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
