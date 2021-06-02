@@ -133,14 +133,14 @@
 │       │   │   │               └── utils                       核心模块 - 工具类
 │       │   │   │
 ├── opsli-modulars                                        业务
-│   ├── opsli-modulars-creater                              代码生成器
+│   ├── opsli-modulars-generator                              代码生成器
 │   │   ├── src
 │   │   │   ├── main
 │   │   │   │   ├── java
 │   │   │   │   │   └── org
 │   │   │   │   │       └── opsli
 │   │   │   │   │           ├──core                           代码生成器 - 核心包
-│   │   │   │   │           │   └── creater
+│   │   │   │   │           │   └── generator
 │   │   │   │   │           │       ├── enums                   代码生成器 - 枚举类
 │   │   │   │   │           │       ├── exception               代码生成器 - 异常类
 │   │   │   │   │           │       ├── msg                     代码生成器 - 信息类
@@ -148,7 +148,7 @@
 │   │   │   │   │           │       └── utils                   代码生成器 - 工具包
 │   │   │   │   │           │
 │   │   │   │   │           └── modulars                      代码生成器 - 业务包
-│   │   │   │   │               └── creater
+│   │   │   │   │               └── generator
 │   │   │   │   │                   ├── column                  代码生成器 - 表结构
 │   │   │   │   │                   ├── createrlogs             代码生成器 - 生成记录
 │   │   │   │   │                   ├── general                 代码生成器 - 同步数据库执行器
