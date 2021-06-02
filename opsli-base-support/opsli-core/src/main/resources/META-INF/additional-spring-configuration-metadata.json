@@ -170,6 +170,14 @@
       "type": "java.lang.Integer",
       "defaultValue": 20000,
       "description": "Excel 导出最大操作数."
+    },
+
+    {
+      "name": "opsli.generator.enable",
+      "sourceType": "org.opsli.core.autoconfigure.properties.GlobalProperties$Generator",
+      "type": "java.lang.Boolean",
+      "defaultValue": false,
+      "description": "代码生成器."
     }
   ]
 }

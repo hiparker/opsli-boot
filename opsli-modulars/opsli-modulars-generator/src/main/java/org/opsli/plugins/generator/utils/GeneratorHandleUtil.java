@@ -22,13 +22,16 @@ import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
 import org.opsli.common.enums.DictType;
 import org.opsli.common.enums.ValidatorType;
+import org.opsli.common.exception.ServiceException;
 import org.opsli.common.utils.FieldUtil;
 import org.opsli.common.utils.ListDistinctUtil;
+import org.opsli.core.autoconfigure.properties.GlobalProperties;
 import org.opsli.modulars.generator.column.wrapper.GenTableColumnModel;
 import org.opsli.modulars.generator.importable.ImportTableUtil;
 import org.opsli.modulars.generator.logs.wrapper.GenBuilderModel;
 import org.opsli.modulars.generator.table.wrapper.GenTableAndColumnModel;
 import org.opsli.plugins.generator.enums.JavaType;
+import org.opsli.plugins.generator.msg.GeneratorMsg;
 
 import java.util.List;
 import java.util.Map;
@@ -170,6 +173,20 @@ public final class GeneratorHandleUtil {
         }
 
         return builderModel;
+    }
+
+    /**
+     * 判断 代码生成器 是否启用
+     *
+     * @param globalProperties 配置类
+     */
+    public static void judgeGeneratorEnable(GlobalProperties globalProperties){
+        // 代码生成器未启用
+        if(globalProperties.getGenerator() == null ||
+                !globalProperties.getGenerator().getEnable()){
+            // 代码生成器未启用
+            throw new ServiceException(GeneratorMsg.EXCEPTION_NOT_ENABLE);
+        }
     }
 
     // =================

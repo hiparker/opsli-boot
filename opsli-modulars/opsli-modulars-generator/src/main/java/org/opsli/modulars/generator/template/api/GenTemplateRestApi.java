@@ -120,14 +120,6 @@ public interface GenTemplateRestApi {
     ResultVo<?> del(String id);
 
     /**
-    * 代码模板 批量删除
-    * @param ids ID 数组
-    * @return ResultVo
-    */
-    @PostMapping("/delAll")
-    ResultVo<?> delAll(String ids);
-
-    /**
     * 代码模板 Excel 导出
     *
     * 导出时，Token认证和方法权限认证 全部都由自定义完成

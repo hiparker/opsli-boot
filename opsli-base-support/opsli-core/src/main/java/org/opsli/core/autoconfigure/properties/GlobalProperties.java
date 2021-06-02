@@ -40,6 +40,8 @@ public class GlobalProperties {
     /** Excel类 */
     private Excel excel;
 
+    /** 代码生成器 */
+    private Generator generator;
 
     // ============== 内部类 =============
 
@@ -131,6 +133,18 @@ public class GlobalProperties {
 
         /** 最大导出操作数 */
         private Integer exportMaxCount;
+
+    }
+
+    /**
+     * 代码生成器
+     */
+    @Data
+    @EqualsAndHashCode(callSuper = false)
+    public static class Generator {
+
+        /** 启用 */
+        private Boolean enable;
 
     }
 

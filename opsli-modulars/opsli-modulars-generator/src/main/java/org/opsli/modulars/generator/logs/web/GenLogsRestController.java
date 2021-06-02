@@ -27,6 +27,7 @@ import org.opsli.modulars.generator.logs.api.GenLogsApi;
 import org.opsli.modulars.generator.logs.entity.GenLogs;
 import org.opsli.modulars.generator.logs.service.IGenLogsService;
 import org.opsli.modulars.generator.logs.wrapper.GenLogsModel;
+import org.opsli.plugins.generator.utils.GeneratorHandleUtil;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -47,6 +48,9 @@ public class GenLogsRestController extends BaseRestController<GenLogs, GenLogsMo
     @RequiresPermissions("dev_generator_select")
     @Override
     public ResultVo<GenLogsModel> getByTableId(String tableId) {
+        // 判断代码生成器 是否启用
+        GeneratorHandleUtil.judgeGeneratorEnable(super.globalProperties);
+
         GenLogsModel byTableId = IService.getByTableId(tableId);
         return ResultVo.success(byTableId);
     }
@@ -60,6 +64,9 @@ public class GenLogsRestController extends BaseRestController<GenLogs, GenLogsMo
     @EnableLog
     @Override
     public void create(GenLogsModel model, HttpServletResponse response) {
+        // 判断代码生成器 是否启用
+        GeneratorHandleUtil.judgeGeneratorEnable(super.globalProperties);
+
         // 调用生成方法
         IService.create(model, response);
 
@@ -77,6 +84,9 @@ public class GenLogsRestController extends BaseRestController<GenLogs, GenLogsMo
     @EnableLog
     @Override
     public ResultVo<?> createMenu(String menuParentId, String tableId) {
+        // 判断代码生成器 是否启用
+        GeneratorHandleUtil.judgeGeneratorEnable(super.globalProperties);
+
         // 演示模式 不允许操作
         super.demoError();
 

@@ -23,6 +23,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.apache.commons.lang3.StringUtils;
 import org.opsli.common.constants.MyBatisConstants;
 import org.opsli.common.exception.ServiceException;
+import org.opsli.common.utils.FieldUtil;
 import org.opsli.common.utils.WrapperUtil;
 import org.opsli.core.base.service.impl.CrudServiceImpl;
 import org.opsli.core.msg.CoreMsg;
@@ -183,6 +184,16 @@ public class GenTemplateServiceImpl extends CrudServiceImpl<GenTemplateMapper, G
         GenTemplateModel base = this.get(id);
         if (base == null) {
             return false;
+        }
+
+        // 验证 是否允许删除
+        QueryWrapper<GenTemplate> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("table_type", base.getTableType());
+        queryWrapper.notIn(FieldUtil.humpToUnderline(MyBatisConstants.FIELD_ID), id);
+        int count = this.count(queryWrapper);
+        if(count == 0){
+            // 代码模板同一表类型下，至少保障有一个模板
+            throw new GeneratorException(GeneratorMsg.EXCEPTION_TEMPLATE_AT_LEAST_ONE);
         }
 
         iGenTemplateDetailService.delByParent(id);

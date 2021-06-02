@@ -35,6 +35,7 @@ import org.opsli.modulars.generator.template.api.GenTemplateRestApi;
 import org.opsli.modulars.generator.template.wrapper.GenTemplateAndDetailModel;
 import org.opsli.modulars.generator.template.wrapper.GenTemplateCopyModel;
 import org.opsli.modulars.generator.template.wrapper.GenTemplateModel;
+import org.opsli.plugins.generator.utils.GeneratorHandleUtil;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -69,6 +70,9 @@ public class GenTemplateRestController extends BaseRestController<GenTemplate, G
     @RequiresPermissions("generator_template_select")
     @Override
     public ResultVo<GenTemplateModel> get(GenTemplateModel model) {
+        // 判断代码生成器 是否启用
+        GeneratorHandleUtil.judgeGeneratorEnable(super.globalProperties);
+
         // 如果系统内部调用 则直接查数据库
         if(model != null && model.getIzApi() != null && model.getIzApi()){
             model = IService.get(model);
@@ -87,6 +91,8 @@ public class GenTemplateRestController extends BaseRestController<GenTemplate, G
     @RequiresPermissions("generator_template_select")
     @Override
     public ResultVo<?> findPage(Integer pageNo, Integer pageSize, HttpServletRequest request) {
+        // 判断代码生成器 是否启用
+        GeneratorHandleUtil.judgeGeneratorEnable(super.globalProperties);
 
         QueryBuilder<GenTemplate> queryBuilder = new WebQueryBuilder<>(entityClazz, request.getParameterMap());
         Page<GenTemplate, GenTemplateModel> page = new Page<>(pageNo, pageSize);
@@ -106,6 +112,9 @@ public class GenTemplateRestController extends BaseRestController<GenTemplate, G
     @EnableLog
     @Override
     public ResultVo<?> insert(GenTemplateModel model) {
+        // 判断代码生成器 是否启用
+        GeneratorHandleUtil.judgeGeneratorEnable(super.globalProperties);
+
         // 演示模式 不允许操作
         super.demoError();
 
@@ -124,6 +133,9 @@ public class GenTemplateRestController extends BaseRestController<GenTemplate, G
     @EnableLog
     @Override
     public ResultVo<?> insertAndDetail(GenTemplateAndDetailModel model) {
+        // 判断代码生成器 是否启用
+        GeneratorHandleUtil.judgeGeneratorEnable(super.globalProperties);
+
         // 演示模式 不允许操作
         super.demoError();
 
@@ -142,6 +154,9 @@ public class GenTemplateRestController extends BaseRestController<GenTemplate, G
     @EnableLog
     @Override
     public ResultVo<?> update(GenTemplateModel model) {
+        // 判断代码生成器 是否启用
+        GeneratorHandleUtil.judgeGeneratorEnable(super.globalProperties);
+
         // 演示模式 不允许操作
         super.demoError();
 
@@ -160,6 +175,9 @@ public class GenTemplateRestController extends BaseRestController<GenTemplate, G
     @EnableLog
     @Override
     public ResultVo<?> updateAndDetail(GenTemplateAndDetailModel model) {
+        // 判断代码生成器 是否启用
+        GeneratorHandleUtil.judgeGeneratorEnable(super.globalProperties);
+
         // 演示模式 不允许操作
         super.demoError();
 
@@ -178,6 +196,9 @@ public class GenTemplateRestController extends BaseRestController<GenTemplate, G
     @EnableLog
     @Override
     public ResultVo<?> copy(GenTemplateCopyModel model) {
+        // 判断代码生成器 是否启用
+        GeneratorHandleUtil.judgeGeneratorEnable(super.globalProperties);
+
         // 调用复制方法
         IService.copy(model);
         return ResultVo.success("复制代码模板成功");
@@ -193,31 +214,15 @@ public class GenTemplateRestController extends BaseRestController<GenTemplate, G
     @EnableLog
     @Override
     public ResultVo<?> del(String id){
+        // 判断代码生成器 是否启用
+        GeneratorHandleUtil.judgeGeneratorEnable(super.globalProperties);
+
         // 演示模式 不允许操作
         super.demoError();
 
         IService.delete(id);
         return ResultVo.success("删除代码模板成功");
     }
-
-    /**
-    * 代码模板 批量删除
-    * @param ids ID 数组
-    * @return ResultVo
-    */
-    @ApiOperation(value = "批量删除代码模板数据", notes = "批量删除代码模板数据")
-    @RequiresPermissions("generator_template_update")
-    @EnableLog
-    @Override
-    public ResultVo<?> delAll(String ids){
-        // 演示模式 不允许操作
-        super.demoError();
-
-        String[] idArray = Convert.toStrArray(ids);
-        IService.deleteAll(idArray);
-        return ResultVo.success("批量删除代码模板成功");
-    }
-
 
     /**
     * 代码模板 Excel 导出
@@ -238,6 +243,9 @@ public class GenTemplateRestController extends BaseRestController<GenTemplate, G
     @EnableLog
     @Override
     public void exportExcel(HttpServletRequest request, HttpServletResponse response) {
+        // 判断代码生成器 是否启用
+        GeneratorHandleUtil.judgeGeneratorEnable(super.globalProperties);
+
         // 当前方法
         Method method = ReflectUtil.getMethodByName(this.getClass(), "exportExcel");
         QueryBuilder<GenTemplate> queryBuilder = new WebQueryBuilder<>(entityClazz, request.getParameterMap());
@@ -255,6 +263,9 @@ public class GenTemplateRestController extends BaseRestController<GenTemplate, G
     @EnableLog
     @Override
     public ResultVo<?> importExcel(MultipartHttpServletRequest request) {
+        // 判断代码生成器 是否启用
+        GeneratorHandleUtil.judgeGeneratorEnable(super.globalProperties);
+
         return super.importExcel(request);
     }
 
@@ -267,6 +278,9 @@ public class GenTemplateRestController extends BaseRestController<GenTemplate, G
     @RequiresPermissionsCus("generator_template_import")
     @Override
     public void importTemplate(HttpServletResponse response) {
+        // 判断代码生成器 是否启用
+        GeneratorHandleUtil.judgeGeneratorEnable(super.globalProperties);
+
         // 当前方法
         Method method = ReflectUtil.getMethodByName(this.getClass(), "importTemplate");
         super.importTemplate(GenTemplateRestApi.SUB_TITLE, response, method);

@@ -62,13 +62,15 @@ public enum GeneratorMsg implements BaseMsg {
      * 模板
      */
     EXCEPTION_TEMPLATE_NAME_REPEAT(50150,"模板名称重复"),
-    EXCEPTION_TEMPLATE_COPY_NULL(50151,"暂无该模板"),
+    EXCEPTION_TEMPLATE_AT_LEAST_ONE(50151,"代码模板同一表类型下，至少保障有一个模板"),
+    EXCEPTION_TEMPLATE_COPY_NULL(50152,"暂无该模板"),
 
 
     /**
      * 其他
      */
     EXCEPTION_OTHER_NULL(50200,"暂无数据"),
+    EXCEPTION_NOT_ENABLE(50201,"代码生成器未启用"),
 
     ;
 

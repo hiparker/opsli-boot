@@ -77,6 +77,9 @@ knife4j:
 opsli:
   # 演示模式
   enable-demo: false
+  # 代码生成器
+  generator:
+    enable: true
   # web 上传文件路径
   web:
     upload-path: var/files

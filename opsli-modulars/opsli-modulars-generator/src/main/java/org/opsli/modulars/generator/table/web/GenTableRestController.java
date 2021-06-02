@@ -41,6 +41,7 @@ import org.opsli.modulars.generator.table.entity.GenTable;
 import org.opsli.modulars.generator.table.service.IGenTableService;
 import org.opsli.modulars.generator.table.wrapper.GenTableAndColumnModel;
 import org.opsli.modulars.generator.table.wrapper.GenTableModel;
+import org.opsli.plugins.generator.utils.GeneratorHandleUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.servlet.http.HttpServletRequest;
@@ -73,6 +74,9 @@ public class GenTableRestController extends BaseRestController<GenTable, GenTabl
     @RequiresPermissions("dev_generator_select")
     @Override
     public ResultVo<GenTableAndColumnModel> get(GenTableModel model) {
+        // 判断代码生成器 是否启用
+        GeneratorHandleUtil.judgeGeneratorEnable(super.globalProperties);
+
         // 如果系统内部调用 则直接查数据库
         if(model != null && model.getIzApi() != null && model.getIzApi()){
             model = IService.get(model);
@@ -106,6 +110,8 @@ public class GenTableRestController extends BaseRestController<GenTable, GenTabl
     @RequiresPermissions("dev_generator_select")
     @Override
     public ResultVo<?> findPage(Integer pageNo, Integer pageSize, HttpServletRequest request) {
+        // 判断代码生成器 是否启用
+        GeneratorHandleUtil.judgeGeneratorEnable(super.globalProperties);
 
         QueryBuilder<GenTable> queryBuilder = new WebQueryBuilder<>(GenTable.class, request.getParameterMap());
         Page<GenTable, GenTableModel> page = new Page<>(pageNo, pageSize);
@@ -125,6 +131,9 @@ public class GenTableRestController extends BaseRestController<GenTable, GenTabl
     @EnableLog
     @Override
     public ResultVo<?> insert(GenTableAndColumnModel model) {
+        // 判断代码生成器 是否启用
+        GeneratorHandleUtil.judgeGeneratorEnable(super.globalProperties);
+
         // 演示模式 不允许操作
         //super.demoError();
 
@@ -144,6 +153,9 @@ public class GenTableRestController extends BaseRestController<GenTable, GenTabl
     @EnableLog
     @Override
     public ResultVo<?> update(GenTableAndColumnModel model) {
+        // 判断代码生成器 是否启用
+        GeneratorHandleUtil.judgeGeneratorEnable(super.globalProperties);
+
         // 演示模式 不允许操作
         //super.demoError();
 
@@ -164,6 +176,9 @@ public class GenTableRestController extends BaseRestController<GenTable, GenTabl
     @EnableLog
     @Override
     public ResultVo<?> del(String id){
+        // 判断代码生成器 是否启用
+        GeneratorHandleUtil.judgeGeneratorEnable(super.globalProperties);
+
         // 演示模式 不允许操作
         //super.demoError();
 
@@ -188,6 +203,9 @@ public class GenTableRestController extends BaseRestController<GenTable, GenTabl
     @EnableLog
     @Override
     public ResultVo<?> delAll(String ids){
+        // 判断代码生成器 是否启用
+        GeneratorHandleUtil.judgeGeneratorEnable(super.globalProperties);
+
         // 演示模式 不允许操作
         //super.demoError();
         String[] idArray = Convert.toStrArray(ids);
@@ -213,6 +231,9 @@ public class GenTableRestController extends BaseRestController<GenTable, GenTabl
     @EnableLog
     @Override
     public ResultVo<?> sync(String id){
+        // 判断代码生成器 是否启用
+        GeneratorHandleUtil.judgeGeneratorEnable(super.globalProperties);
+
         // 演示模式 不允许操作
         super.demoError();
 
@@ -239,6 +260,9 @@ public class GenTableRestController extends BaseRestController<GenTable, GenTabl
     @RequiresPermissions("dev_generator_select")
     @Override
     public ResultVo<?> getTables() {
+        // 判断代码生成器 是否启用
+        GeneratorHandleUtil.judgeGeneratorEnable(super.globalProperties);
+
         return ResultVo.success(ImportTableUtil.findTables());
     }
 
@@ -247,6 +271,9 @@ public class GenTableRestController extends BaseRestController<GenTable, GenTabl
     @EnableLog
     @Override
     public ResultVo<?> importTables(String tableNames) {
+        // 判断代码生成器 是否启用
+        GeneratorHandleUtil.judgeGeneratorEnable(super.globalProperties);
+
         String[] tableNameArray = Convert.toStrArray(tableNames);
         if(tableNameArray == null){
             // 未选中表，无法导入
@@ -260,6 +287,9 @@ public class GenTableRestController extends BaseRestController<GenTable, GenTabl
             notes = "获得数据库类型下 字段类型")
     @Override
     public ResultVo<List<String>> getFieldTypes() {
+        // 判断代码生成器 是否启用
+        GeneratorHandleUtil.judgeGeneratorEnable(super.globalProperties);
+
         return ResultVo.success(ImportTableUtil.getFieldTypes());
     }
 
@@ -267,6 +297,9 @@ public class GenTableRestController extends BaseRestController<GenTable, GenTabl
             notes = "获得数据库类型下 全部类型对应Java类型")
     @Override
     public ResultVo<Map<String, String>> getJavaFieldTypes() {
+        // 判断代码生成器 是否启用
+        GeneratorHandleUtil.judgeGeneratorEnable(super.globalProperties);
+
         return ResultVo.success(ImportTableUtil.getJavaFieldTypes());
     }
 
@@ -274,6 +307,9 @@ public class GenTableRestController extends BaseRestController<GenTable, GenTabl
             notes = "获得全部类型对应Java类型集合（兜底String 类型）")
     @Override
     public ResultVo<Map<String, List<String>>> getJavaFieldTypesBySafety() {
+        // 判断代码生成器 是否启用
+        GeneratorHandleUtil.judgeGeneratorEnable(super.globalProperties);
+
         return ResultVo.success(ImportTableUtil.getJavaFieldTypesBySafety());
     }
 }
