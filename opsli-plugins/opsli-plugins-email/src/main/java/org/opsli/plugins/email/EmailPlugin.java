@@ -13,8 +13,10 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.opsli.plugins.email.service;
+package org.opsli.plugins.email;
 
+
+import org.opsli.plugins.email.conf.EmailConfig;
 
 import java.util.Collection;
 
@@ -25,7 +27,7 @@ import java.util.Collection;
  * @author Parker
  * @date 2020-09-19 20:03
  */
-public interface IEmailService {
+public interface EmailPlugin {
 
 
     /**
@@ -33,18 +35,20 @@ public interface IEmailService {
      * @param to 收件人
      * @param subject 主题
      * @param content 内容
+     * @param emailConfig 配置
      * @return String
      */
-    String send(String to, String subject, String content);
+    String send(String to, String subject, String content, EmailConfig emailConfig);
 
     /**
      * 发送邮件
      * @param tos 收件人(可多人发送)
      * @param subject 主题
      * @param content 内容
+     * @param emailConfig 配置
      * @return String
      */
-    String send(Collection<String> tos, String subject, String content);
+    String send(Collection<String> tos, String subject, String content, EmailConfig emailConfig);
 
     /**
      * 发送邮件
@@ -52,9 +56,10 @@ public interface IEmailService {
      * @param subject 主题
      * @param content 内容
      * @param isHtml 是否 Html内容
+     * @param emailConfig 配置
      * @return String
      */
-    String send(String to, String subject, String content, boolean isHtml);
+    String send(String to, String subject, String content, boolean isHtml, EmailConfig emailConfig);
 
     /**
      * 发送邮件
@@ -62,9 +67,10 @@ public interface IEmailService {
      * @param subject 主题
      * @param content 内容
      * @param isHtml 是否 Html内容
+     * @param emailConfig 配置
      * @return String
      */
-    String send(Collection<String> tos, String subject, String content, boolean isHtml);
+    String send(Collection<String> tos, String subject, String content, boolean isHtml, EmailConfig emailConfig);
 
 
 }

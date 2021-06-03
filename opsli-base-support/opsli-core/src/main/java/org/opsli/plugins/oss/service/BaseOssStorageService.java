@@ -18,6 +18,7 @@ package org.opsli.plugins.oss.service;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.RandomUtil;
+import cn.hutool.core.util.StrUtil;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 
@@ -25,7 +26,7 @@ import java.io.File;
 import java.io.InputStream;
 
 /**
- * 云存储 (支持本地、七牛、阿里云、腾讯云、又拍云)
+ * 云存储 (支持本地、又拍云...持续更新中)
  *
  * @author Parker
  * @date 2021年4月30日16:12:45
@@ -33,7 +34,7 @@ import java.io.InputStream;
 public abstract class BaseOssStorageService implements OssStorageService {
 
     /** 文件夹前缀 */
-    private static final String FOLDER_PREFIX = "/";
+    public static final String FOLDER_PREFIX = "/";
     private static final String FOLDER_WINDOWS_PREFIX = "\\";
 
     /**
@@ -118,10 +119,7 @@ public abstract class BaseOssStorageService implements OssStorageService {
 
         if(isHandleFirst){
             // 如果 第一位不是 / 则加 /
-            char firstChar = path.charAt(0);
-            if(!StringUtils.equals(FOLDER_PREFIX, Convert.toStr(firstChar))){
-                path = FOLDER_PREFIX + path;
-            }
+            path = StrUtil.prependIfMissing(path, FOLDER_PREFIX);
         }
 
         // 如果最后一位 是 / 则减 /

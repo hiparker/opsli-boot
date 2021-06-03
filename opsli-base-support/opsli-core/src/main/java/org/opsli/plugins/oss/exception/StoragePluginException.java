@@ -13,27 +13,32 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package opsli.plugins.crypto.model;
+package org.opsli.plugins.oss.exception;
 
-import lombok.Data;
-import opsli.plugins.crypto.enums.CryptoAsymmetricType;
+import org.opsli.common.base.msg.BaseMsg;
+import org.opsli.common.exception.ServiceException;
 
 /**
- * 非对称加密
+ * 存储服务 异常
  *
  * @author Parker
- * @date 2021年5月17日15:59:52
+ * @date 2020-09-16 11:47
  */
-@Data
-public class CryptoAsymmetric {
+public class StoragePluginException extends ServiceException {
 
-    /** 加解密类别 */
-    private CryptoAsymmetricType cryptoType;
+    public StoragePluginException(Integer code, String errorMessage) {
+        super(code, errorMessage);
+    }
 
-    /** 公钥 */
-    private String publicKey;
+    public StoragePluginException(Integer code, String errorMessage, Throwable e) {
+        super(code, errorMessage);
+    }
 
-    /** 私钥 */
-    private String privateKey;
+    public StoragePluginException(BaseMsg msg) {
+        super(msg);
+    }
 
+    public StoragePluginException(BaseMsg msg, Throwable e) {
+        super(msg);
+    }
 }

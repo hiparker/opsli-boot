@@ -1,4 +1,4 @@
-package org.opsli.plugins.oss.factory;
+package org.opsli.plugins.oss.conf;
 
 
 /**

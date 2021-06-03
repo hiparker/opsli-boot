@@ -41,6 +41,13 @@
             <version>${plugins.version}</version>
         </dependency>
 
+        <!-- 引入邮件插件 -->
+        <dependency>
+            <groupId>org.opsliframework.boot</groupId>
+            <artifactId>opsli-plugins-email</artifactId>
+            <version>${plugins.version}</version>
+        </dependency>
+
         <!-- 引入Redis插件 -->
         <dependency>
             <groupId>org.opsliframework.boot</groupId>

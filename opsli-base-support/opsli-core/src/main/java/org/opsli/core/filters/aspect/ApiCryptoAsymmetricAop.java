@@ -33,7 +33,7 @@ import org.opsli.api.base.result.ResultVo;
 import org.opsli.common.annotation.ApiCryptoAsymmetric;
 import org.opsli.common.exception.ServiceException;
 import org.opsli.core.msg.CoreMsg;
-import org.opsli.core.utils.OptionsUtil;
+import org.opsli.core.options.CryptoConfigFactory;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
@@ -84,8 +84,7 @@ public class ApiCryptoAsymmetricAop {
         CryptoAsymmetric cryptoAsymmetric = null;
         if(annotation != null && annotation.enable()){
             asymmetric = CryptoPlugin.getAsymmetric();
-            cryptoAsymmetric =
-                    OptionsUtil.getOptionByBean(asymmetric.createNilModel());
+            cryptoAsymmetric = CryptoConfigFactory.INSTANCE.getCryptoAsymmetric();
         }
 
         // 1. 请求解密

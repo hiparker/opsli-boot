@@ -25,6 +25,8 @@ public enum OssStorageType {
 
     /** 存储服务类型 */
     LOCAL("local", "本地"),
+    UP_YUN("upYun", "又拍云"),
+
 
     ;
 

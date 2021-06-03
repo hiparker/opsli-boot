@@ -18,10 +18,6 @@ package org.opsli.modulars.generator.template.wrapper;
 
 
 
-import java.math.BigDecimal;
-
-import java.util.Date;
-
 import com.alibaba.excel.annotation.ExcelProperty;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -29,11 +25,8 @@ import lombok.EqualsAndHashCode;
 import org.opsli.api.base.warpper.ApiWrapper;
 import org.opsli.common.annotation.validator.Validator;
 import org.opsli.common.annotation.validator.ValidatorLenMax;
-import org.opsli.common.annotation.validator.ValidatorLenMin;
 import org.opsli.common.enums.ValidatorType;
 import org.opsli.plugins.excel.annotation.ExcelInfo;
-import com.fasterxml.jackson.annotation.JsonFormat;
-import org.springframework.format.annotation.DateTimeFormat;
 
 /**
 * 代码模板详情 Model

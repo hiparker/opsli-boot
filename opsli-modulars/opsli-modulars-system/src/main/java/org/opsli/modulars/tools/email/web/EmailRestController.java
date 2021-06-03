@@ -5,7 +5,8 @@ import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.opsli.api.base.result.ResultVo;
 import org.opsli.common.annotation.ApiRestController;
-import org.opsli.plugins.email.service.IEmailService;
+import org.opsli.core.options.EmailConfigFactory;
+import org.opsli.plugins.email.EmailPlugin;
 import org.opsli.plugins.email.wrapper.EmailModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,7 +25,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 public class EmailRestController {
 
     @Autowired
-    private IEmailService iEmailService;
+    private EmailPlugin emailPlugin;
 
     /**
      * 测试发送邮件
@@ -35,13 +36,13 @@ public class EmailRestController {
     @PostMapping("/testSend")
     public ResultVo<?> testSend(@RequestBody EmailModel model) {
         try {
-            iEmailService
-                    .send(model.getTo(), model.getSubject(), model.getContent());
+            emailPlugin
+                    .send(model.getTo(), model.getSubject(), model.getContent(),
+                            EmailConfigFactory.INSTANCE.getConfig());
             return ResultVo.success("邮件发送成功");
         }catch (Exception e){
             return ResultVo.error("邮件发送失败 - " + e.getMessage());
         }
     }
-
 
 }

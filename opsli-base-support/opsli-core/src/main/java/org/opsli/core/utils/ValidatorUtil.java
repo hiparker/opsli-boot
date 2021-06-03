@@ -22,12 +22,12 @@ import cn.hutool.core.util.ReflectUtil;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.opsli.common.annotation.validator.ValidatorLenMax;
+import org.opsli.common.annotation.validator.ValidatorLenMin;
 import org.opsli.common.enums.ValidatorType;
 import org.opsli.common.utils.DefPatternPool;
 import org.opsli.common.msg.ValidatorMsg;
 import org.opsli.api.wrapper.system.dict.DictModel;
-import org.opsli.common.annotation.validator.ValidatorLenMax;
-import org.opsli.common.annotation.validator.ValidatorLenMin;
 import org.opsli.common.exception.ServiceException;
 
 import java.lang.reflect.Field;

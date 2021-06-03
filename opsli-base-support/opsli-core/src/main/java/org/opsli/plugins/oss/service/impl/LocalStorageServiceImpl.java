@@ -17,14 +17,14 @@ package org.opsli.plugins.oss.service.impl;
 
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.util.StrUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.opsli.core.autoconfigure.properties.GlobalProperties;
 import org.opsli.core.utils.GlobalPropertiesUtil;
 import org.opsli.core.utils.ValidatorUtil;
 import org.opsli.plugins.oss.enums.OssStorageType;
-import org.opsli.plugins.oss.factory.LocalConfigFactory;
+import org.opsli.plugins.oss.conf.LocalConfigFactory;
 import org.opsli.plugins.oss.service.BaseOssStorageService;
 
 import java.io.File;
@@ -80,12 +80,12 @@ public class LocalStorageServiceImpl extends BaseOssStorageService {
 
         // 静态路径
         String genPath = globalProperties != null && globalProperties.getWeb() != null &&
-                StringUtils.isNotEmpty(globalProperties.getWeb().getUploadPath())
+                StrUtil.isNotEmpty(globalProperties.getWeb().getUploadPath())
                 ? globalProperties.getWeb().getUploadPath()
                 : FileUtil.getUserHomePath();
 
         // 静态路径前缀 默认为空
-        String pathPrefix = StringUtils.isNotEmpty(config.getPathPrefix())?config.getPathPrefix():"";
+        String pathPrefix = StrUtil.isNotEmpty(config.getPathPrefix())?config.getPathPrefix():"";
 
         // 文件夹名称
         String folderName = DateUtil.format(currDate, "yyyyMMdd");
@@ -138,12 +138,12 @@ public class LocalStorageServiceImpl extends BaseOssStorageService {
 
         // 静态路径
         String genPath = globalProperties != null && globalProperties.getWeb() != null &&
-                StringUtils.isNotEmpty(globalProperties.getWeb().getUploadPath())
+                StrUtil.isNotEmpty(globalProperties.getWeb().getUploadPath())
                 ? globalProperties.getWeb().getUploadPath()
                 : FileUtil.getUserHomePath();
 
         // 静态路径前缀 默认为空
-        String pathPrefix = StringUtils.isNotEmpty(config.getPathPrefix())?config.getPathPrefix():"";
+        String pathPrefix = StrUtil.isNotEmpty(config.getPathPrefix())?config.getPathPrefix():"";
 
         // 文件夹名称
         String folderName = DateUtil.format(currDate, "yyyyMMdd");

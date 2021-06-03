@@ -16,7 +16,6 @@
 package org.opsli.modulars.generator.logs.wrapper;
 
 import com.alibaba.excel.annotation.ExcelIgnore;
-import com.alibaba.excel.annotation.ExcelProperty;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -24,7 +23,6 @@ import org.opsli.api.base.warpper.ApiWrapper;
 import org.opsli.common.annotation.validator.Validator;
 import org.opsli.common.annotation.validator.ValidatorLenMax;
 import org.opsli.common.enums.ValidatorType;
-import org.opsli.plugins.excel.annotation.ExcelInfo;
 
 /**
  * 代码生成器 - 生成日志 模型

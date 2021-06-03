@@ -13,27 +13,42 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package opsli.plugins.crypto.model;
+package org.opsli.plugins.oss.msg;
 
-import lombok.Data;
-import opsli.plugins.crypto.enums.CryptoAsymmetricType;
+
+import org.opsli.common.base.msg.BaseMsg;
 
 /**
- * 非对称加密
+ * OSS服务异常 - 消息
  *
  * @author Parker
- * @date 2021年5月17日15:59:52
+ * @date 2020-09-19 20:03
  */
-@Data
-public class CryptoAsymmetric {
+public enum OssMsg implements BaseMsg {
 
-    /** 加解密类别 */
-    private CryptoAsymmetricType cryptoType;
+    /**
+     * OSS
+     */
+    EXCEPTION_UPLOAD_ERROR(90500, "上传文件失败，请检查配置信息"),
+    EXCEPTION_UPLOAD_AUTH_ERROR(90501, "权限认证异常")
 
-    /** 公钥 */
-    private String publicKey;
+    ;
 
-    /** 私钥 */
-    private String privateKey;
+    private final int code;
+    private final String message;
 
+    OssMsg(int code, String message){
+        this.code = code;
+        this.message = message;
+    }
+
+    @Override
+    public Integer getCode() {
+        return this.code;
+    }
+
+    @Override
+    public String getMessage() {
+        return this.message;
+    }
 }

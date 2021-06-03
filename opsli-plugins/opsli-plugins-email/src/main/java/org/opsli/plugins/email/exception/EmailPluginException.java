@@ -13,42 +13,24 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.opsli.plugins.oss;
-
+package org.opsli.plugins.email.exception;
 
 import org.opsli.common.base.msg.BaseMsg;
+import org.opsli.common.exception.ServiceException;
 
 /**
- * OSS服务异常 - 消息
+ * 邮件 异常
  *
  * @author Parker
- * @date 2020-09-19 20:03
+ * @date 2020-09-16 11:47
  */
-public enum OssMsg implements BaseMsg {
+public class EmailPluginException extends ServiceException {
 
-    /**
-     * OSS
-     */
-
-
-
-    ;
-
-    private final int code;
-    private final String message;
-
-    OssMsg(int code, String message){
-        this.code = code;
-        this.message = message;
+    public EmailPluginException(Integer code, String errorMessage) {
+        super(code, errorMessage);
     }
 
-    @Override
-    public Integer getCode() {
-        return this.code;
-    }
-
-    @Override
-    public String getMessage() {
-        return this.message;
+    public EmailPluginException(BaseMsg msg) {
+        super(msg);
     }
 }
