@@ -36,6 +36,8 @@ public interface MyBatisConstants {
     String FIELD_ID = "id";
     /** PID */
     String FIELD_PARENT_ID = "parentId";
+    /** PIDs */
+    String FIELD_PARENT_IDS = "parentIds";
     /** 创建人 */
     String FIELD_CREATE_BY = "createBy";
     /** 更新时间 */
@@ -50,4 +52,6 @@ public interface MyBatisConstants {
     String FIELD_OPTIMISTIC_LOCK = "version";
     /** 多租户字段 */
     String FIELD_TENANT = "tenantId";
+    /** 组织字段 */
+    String FIELD_ORG_GROUP = "org_group";
 }

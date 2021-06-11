@@ -20,28 +20,34 @@ import cn.hutool.core.convert.Convert;
 import cn.hutool.core.lang.tree.Tree;
 import cn.hutool.core.lang.tree.TreeNodeConfig;
 import cn.hutool.core.util.ReflectUtil;
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.google.common.collect.Maps;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.opsli.api.base.result.ResultVo;
 import org.opsli.api.web.system.org.SysOrgRestApi;
 import org.opsli.api.wrapper.system.org.SysOrgModel;
+import org.opsli.api.wrapper.system.user.UserModel;
+import org.opsli.api.wrapper.system.user.UserOrgRefModel;
 import org.opsli.common.annotation.ApiRestController;
 import org.opsli.common.annotation.EnableLog;
 import org.opsli.common.annotation.RequiresPermissionsCus;
 import org.opsli.common.constants.MyBatisConstants;
 import org.opsli.common.utils.FieldUtil;
+import org.opsli.common.utils.ListDistinctUtil;
 import org.opsli.common.utils.WrapperUtil;
 import org.opsli.core.base.controller.BaseRestController;
-import org.opsli.core.base.entity.HasChildren;
 import org.opsli.core.persistence.querybuilder.GenQueryBuilder;
 import org.opsli.core.persistence.querybuilder.QueryBuilder;
 import org.opsli.core.persistence.querybuilder.WebQueryBuilder;
+import org.opsli.core.utils.OrgUtil;
 import org.opsli.core.utils.TreeBuildUtil;
+import org.opsli.core.utils.UserUtil;
 import org.opsli.modulars.system.org.entity.SysOrg;
 import org.opsli.modulars.system.org.service.ISysOrgService;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
@@ -50,7 +56,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Method;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -65,16 +70,81 @@ import java.util.Set;
 public class SysOrgRestController extends BaseRestController<SysOrg, SysOrgModel, ISysOrgService>
     implements SysOrgRestApi {
 
+    /** 虚拟总节点 ID */
+    private static final String VIRTUAL_TOTAL_NODE = "-1";
     /** 父节点ID */
     private static final String PARENT_ID = "0";
-    /** 显示全部 */
-    public static final String ORG_ALL = "all";
-    /** 未分组 */
-    public static final String ORG_NULL = "org_null";
     /** 排序字段 */
     private static final String SORT_FIELD = "sortNo";
-    /** 是否包含子集 */
-    private static final String HAS_CHILDREN = "hasChildren";
+    /** 分割符 */
+    private static final String DELIMITER = ",";
+
+    /**
+     * 获得当前用户下 组织
+     * @return ResultVo
+     */
+    @ApiOperation(value = "获得当前用户下 组织", notes = "获得当前用户下 组织")
+    @Override
+    public ResultVo<?> findTreeByDefWithUserToLike() {
+        // 生成 全部/未分组
+        String parentId = PARENT_ID;
+        List<SysOrgModel> orgModelList = OrgUtil.createDefShowNodes(parentId, Lists.newArrayList());
+
+        QueryBuilder<SysOrg> queryBuilder = new GenQueryBuilder<>();
+        QueryWrapper<SysOrg> wrapper = queryBuilder.build();
+        UserModel currUser = UserUtil.getUser();
+        List<UserOrgRefModel> orgListByUserId = OrgUtil.getOrgListByUserId(currUser.getId());
+        if(!CollUtil.isEmpty(orgListByUserId)){
+            List<String> parentIdList = Lists.newArrayListWithCapacity(orgListByUserId.size());
+
+            // 处理ParentId数据
+            for (UserOrgRefModel userOrgRefModel : orgListByUserId) {
+                String orgId = userOrgRefModel.getOrgId();
+                String orgIds = userOrgRefModel.getOrgIds();
+                // 减掉 结尾自身 orgId  得到  org表中 parentIds
+                String parentIds =
+                        StrUtil.replace(orgIds, StrUtil.prependIfMissing(orgId, DELIMITER), "");
+                parentIdList.add(parentIds);
+            }
+
+            // 去重
+            parentIdList = ListDistinctUtil.distinct(parentIdList);
+
+            List<String> finalParentIdList = parentIdList;
+            wrapper.and(wra -> {
+                // 增加右模糊 查询条件
+                for (int i = 0; i < finalParentIdList.size(); i++) {
+                    // 右模糊匹配
+                    wra.likeRight(
+                            FieldUtil.humpToUnderline(MyBatisConstants.FIELD_PARENT_IDS),
+                            finalParentIdList.get(i));
+
+                    if(i < finalParentIdList.size() - 1){
+                        wra.or();
+                    }
+                }
+            });
+
+            // 获得组织
+            List<SysOrg> dataList = IService.findList(wrapper);
+            if(CollUtil.isNotEmpty(dataList)){
+                for (SysOrg sysOrg : dataList) {
+                    // 如果父级ID 与 当前检索父级ID 一致 则默认初始化ID为主ID
+                    if(!CollUtil.contains(parentIdList, sysOrg.getParentIds())){
+                        continue;
+                    }
+
+                    sysOrg.setParentId(parentId);
+                }
+                orgModelList.addAll(
+                        WrapperUtil.transformInstance(dataList, modelClazz)
+                );
+            }
+        }
+
+        // 处理组织树
+        return handleOrgTree(parentId, orgModelList, false);
+    }
 
     /**
      * 获得组织树 懒加载
@@ -82,100 +152,79 @@ public class SysOrgRestController extends BaseRestController<SysOrg, SysOrgModel
      */
     @ApiOperation(value = "获得组织树 懒加载", notes = "获得组织树 懒加载")
     @Override
-    public ResultVo<?> findTreeLazyByUser(String parentId) {
+    public ResultVo<?> findTreeLazy(String parentId, String id) {
+        List<SysOrgModel> orgModelList;
+        if(StringUtils.isEmpty(parentId)){
+            orgModelList = Lists.newArrayList();
+            parentId = VIRTUAL_TOTAL_NODE;
+            // 生成根节点组织
+            SysOrgModel model = getGenOrgModel();
+            orgModelList.add(model);
+        }else{
+            QueryBuilder<SysOrg> queryBuilder = new GenQueryBuilder<>();
+            QueryWrapper<SysOrg> wrapper = queryBuilder.build();
+            wrapper.eq(FieldUtil.humpToUnderline(MyBatisConstants.FIELD_PARENT_ID), parentId);
 
-        QueryBuilder<SysOrg> queryBuilder = new GenQueryBuilder<>();
-        QueryWrapper<SysOrg> wrapper = queryBuilder.build();
-        wrapper.eq(FieldUtil.humpToUnderline(MyBatisConstants.FIELD_PARENT_ID), parentId);
+            // 如果传入ID 则不包含自身
+            if(StringUtils.isNotEmpty(id)){
+                wrapper.notIn(
+                        FieldUtil.humpToUnderline(MyBatisConstants.FIELD_ID), id);
 
-        // 获得用户 对应菜单
-        List<SysOrg> dataList = IService.findList(wrapper);
-        List<SysOrgModel> orgModelList = WrapperUtil.transformInstance(dataList, modelClazz);
+            }
 
-        // 处理展示节点
-        this.handleShowNodes(parentId, orgModelList);
+            // 获得组织
+            List<SysOrg> dataList = IService.findList(wrapper);
+            orgModelList = WrapperUtil.transformInstance(dataList, modelClazz);
+        }
 
-        //配置
-        TreeNodeConfig treeNodeConfig = new TreeNodeConfig();
-        // 自定义属性名 都要默认值的
-        treeNodeConfig.setWeightKey(SORT_FIELD);
-        // 最大递归深度 最多支持4层菜单
-        treeNodeConfig.setDeep(3);
-
-        //转换器
-        List<Tree<Object>> treeNodes = TreeBuildUtil.INSTANCE.build(orgModelList, parentId, treeNodeConfig);
-
-        // 处理是否包含子集
-        this.handleTreeHasChildren(treeNodes);
-
-        return ResultVo.success(treeNodes);
-    }
-
-
-
-
-    /**
-     * 获得组织树 懒加载
-     * @return ResultVo
-     */
-    @ApiOperation(value = "获得组织树 懒加载", notes = "获得组织树 懒加载")
-    @Override
-    public ResultVo<?> findTreeLazy(String parentId) {
-
-        QueryBuilder<SysOrg> queryBuilder = new GenQueryBuilder<>();
-        QueryWrapper<SysOrg> wrapper = queryBuilder.build();
-        wrapper.eq(FieldUtil.humpToUnderline(MyBatisConstants.FIELD_PARENT_ID), parentId);
-
-        // 获得用户 对应菜单
-        List<SysOrg> dataList = IService.findList(wrapper);
-        List<SysOrgModel> orgModelList = WrapperUtil.transformInstance(dataList, modelClazz);
-
-
-        //配置
-        TreeNodeConfig treeNodeConfig = new TreeNodeConfig();
-        // 自定义属性名 都要默认值的
-        treeNodeConfig.setWeightKey(SORT_FIELD);
-        // 最大递归深度 最多支持4层菜单
-        treeNodeConfig.setDeep(3);
-
-        //转换器
-        List<Tree<Object>> treeNodes = TreeBuildUtil.INSTANCE.build(orgModelList, parentId, treeNodeConfig);
-
-        // 处理是否包含子集
-        this.handleTreeHasChildren(treeNodes);
-
-        return ResultVo.success(treeNodes);
+        // 处理组织树
+        return handleOrgTree(parentId, orgModelList, true);
     }
 
     /**
-     * 获得组织树树
+     * 获得组织树
      * @return ResultVo
      */
     @ApiOperation(value = "获得组织树", notes = "获得组织树")
+    @RequiresPermissions("system_org_select")
     @Override
-    public ResultVo<?> findGridTree(String parentId) {
+    public ResultVo<?> findTreeByDef(boolean isGen, String id) {
+        List<SysOrgModel> orgModelList = Lists.newArrayList();
+        String parentId = PARENT_ID;
+        if(isGen){
+            parentId = VIRTUAL_TOTAL_NODE;
+            // 生成根节点组织
+            SysOrgModel model = getGenOrgModel();
+            orgModelList.add(model);
+        }
 
         QueryBuilder<SysOrg> queryBuilder = new GenQueryBuilder<>();
         QueryWrapper<SysOrg> wrapper = queryBuilder.build();
-        wrapper.eq(FieldUtil.humpToUnderline(MyBatisConstants.FIELD_PARENT_ID), parentId);
+//        // 左模糊匹配
+//        wrapper.likeLeft(
+//                FieldUtil.humpToUnderline(MyBatisConstants.FIELD_PARENT_IDS), parentId);
 
-        // 获得用户 对应菜单
+        // 如果传入ID 则不包含自身
+        if(StringUtils.isNotEmpty(id)){
+            wrapper.notIn(
+                    FieldUtil.humpToUnderline(MyBatisConstants.FIELD_ID), id);
+
+        }
+
+        // 获得组织
         List<SysOrg> dataList = IService.findList(wrapper);
-        List<SysOrgModel> orgModelList = WrapperUtil.transformInstance(dataList, modelClazz);
+        if(CollUtil.isNotEmpty(dataList)){
+            orgModelList.addAll(
+                    WrapperUtil.transformInstance(dataList, modelClazz)
+            );
+        }
 
-
-        //配置
-        TreeNodeConfig treeNodeConfig = new TreeNodeConfig();
-        // 自定义属性名 都要默认值的
-        treeNodeConfig.setWeightKey(SORT_FIELD);
-        // 最大递归深度 最多支持4层菜单
-        treeNodeConfig.setDeep(3);
-
-        //转换器
-        List<Tree<Object>> treeNodes = TreeBuildUtil.INSTANCE.build(orgModelList, parentId, treeNodeConfig);
-
-        return ResultVo.success(treeNodes);
+        // 处理组织树
+        return handleOrgTree(parentId, orgModelList, false);
     }
+
+
+
 
     // ==============
 
@@ -188,40 +237,19 @@ public class SysOrgRestController extends BaseRestController<SysOrg, SysOrgModel
     @RequiresPermissions("system_org_select")
     @Override
     public ResultVo<SysOrgModel> get(SysOrgModel model) {
-        // 如果系统内部调用 则直接查数据库
-        if(model != null && model.getIzApi() != null && model.getIzApi()){
-            model = IService.get(model);
+        if(model != null){
+            if(StringUtils.equals(PARENT_ID, model.getId())){
+                // 生成根节点组织
+                model = getGenOrgModel();
+            }else{
+                // 如果系统内部调用 则直接查数据库
+                if (model.getIzApi() != null && model.getIzApi()){
+                    model = IService.get(model);
+                }
+            }
         }
+
         return ResultVo.success(model);
-    }
-
-    /**
-     * 获得组织树树
-     * @return ResultVo
-     */
-    @ApiOperation(value = "获得菜单树", notes = "获得菜单树")
-    @RequiresPermissions("system_org_select")
-    @Override
-    public ResultVo<?> findTree(HttpServletRequest request) {
-
-        QueryBuilder<SysOrg> queryBuilder = new WebQueryBuilder<>(entityClazz,
-                request.getParameterMap());
-
-
-        // 获得用户 对应菜单
-        List<SysOrg> dataList = IService.findList(queryBuilder.build());
-
-        //配置
-        TreeNodeConfig treeNodeConfig = new TreeNodeConfig();
-        // 自定义属性名 都要默认值的
-        treeNodeConfig.setWeightKey(SORT_FIELD);
-        // 最大递归深度 最多支持4层菜单
-        treeNodeConfig.setDeep(3);
-
-        //转换器
-        List<Tree<Object>> treeNodes = TreeBuildUtil.INSTANCE.build(dataList, treeNodeConfig);
-
-        return ResultVo.success(treeNodes);
     }
 
     /**
@@ -342,68 +370,56 @@ public class SysOrgRestController extends BaseRestController<SysOrg, SysOrgModel
 
     // ==============================
 
-
     /**
-     * 处理展示节点
-     * @param parentId 父节点ID
-     * @param orgModelList 组织集合
+     * 生成根节点ID
+     * @return SysOrgModel
      */
-    private void handleShowNodes(String parentId, List<SysOrgModel> orgModelList) {
-        // 0 为初始值
-        if(PARENT_ID.equals(parentId)){
-            // 显示全部
-            SysOrgModel orgAll = new SysOrgModel();
-            orgAll.setId(ORG_ALL);
-            orgAll.setOrgCode("-2");
-            orgAll.setOrgName("全部");
-            orgAll.setOrgType("-2");
-            orgAll.setParentId("0");
-            orgAll.setSortNo(-2);
-            orgModelList.add(orgAll);
-
-            // 未分组
-            SysOrgModel orgNull = new SysOrgModel();
-            orgNull.setId(ORG_NULL);
-            orgNull.setOrgCode("-1");
-            orgNull.setOrgName("未分组");
-            orgNull.setOrgType("-1");
-            orgNull.setParentId("0");
-            orgNull.setSortNo(-1);
-            orgModelList.add(orgNull);
-        }
+    private SysOrgModel getGenOrgModel() {
+        SysOrgModel model = new SysOrgModel();
+        model.setId(PARENT_ID);
+        model.setOrgName("组织架构");
+        model.setSortNo(-1);
+        model.setParentId(VIRTUAL_TOTAL_NODE);
+        return model;
     }
 
+
+
     /**
-     * 处理是否包含子集
-     * @param treeNodes 树节点
+     * 处理组织树
+     * @param parentId 父级ID
+     * @param orgModelList 组织集合
+     * @param izLazy 是否懒加载
+     * @return ResultVo
      */
-    private void handleTreeHasChildren(List<Tree<Object>> treeNodes) {
-        if(CollUtil.isEmpty(treeNodes)){
-            return;
-        }
+    private ResultVo<?> handleOrgTree(String parentId, List<SysOrgModel> orgModelList, boolean izLazy) {
+        //配置
+        TreeNodeConfig treeNodeConfig = new TreeNodeConfig();
+        // 自定义属性名 都要默认值的
+        treeNodeConfig.setWeightKey(SORT_FIELD);
+        // 最大递归深度 最多支持4层
+        treeNodeConfig.setDeep(4);
 
-        Set<String> parentIds = Sets.newHashSet();
-        for (Tree<Object> treeNode : treeNodes) {
-            parentIds.add(Convert.toStr(treeNode.getId()));
-        }
+        //转换器
+        List<Tree<Object>> treeNodes = TreeBuildUtil.INSTANCE.build(orgModelList, parentId, treeNodeConfig);
 
-        // 数据排查是否存在下级
-        List<HasChildren> hasChildrenList = IService.hasChildren(parentIds);
-        if (CollUtil.isNotEmpty(hasChildrenList)) {
-            Map<String, Boolean> tmp = Maps.newHashMap();
-            for (HasChildren hasChildren : hasChildrenList) {
-                if (hasChildren.getCount() != null && hasChildren.getCount() > 0) {
-                    tmp.put(hasChildren.getParentId(), true);
-                }
+        // 是否懒加载
+        if(izLazy){
+            // 处理是否包含子集
+            super.handleTreeHasChildren(treeNodes,
+                    (parentIds)-> IService.hasChildren(parentIds));
+        }else{
+            Set<String> parentIdSet = Sets.newHashSet();
+            for (SysOrgModel sysOrgModel : orgModelList) {
+                parentIdSet.add(sysOrgModel.getParentId());
             }
 
-            for (Tree<Object> treeNode : treeNodes) {
-                Boolean tmpFlag = tmp.get(Convert.toStr(treeNode.getId()));
-                if (tmpFlag != null && tmpFlag) {
-                    treeNode.putExtra(HAS_CHILDREN, true);
-                }
-            }
+            // 处理是否包含子集
+            super.handleTreeHasChildren(treeNodes,
+                    (parentIds)-> IService.hasChildren(parentIdSet));
         }
+
+        return ResultVo.success(treeNodes);
     }
 
 }

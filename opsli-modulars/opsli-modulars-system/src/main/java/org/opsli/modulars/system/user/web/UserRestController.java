@@ -22,7 +22,6 @@ import cn.hutool.core.util.StrUtil;
 import com.alibaba.excel.util.CollectionUtils;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -37,9 +36,11 @@ import org.opsli.common.annotation.ApiRestController;
 import org.opsli.common.annotation.EnableLog;
 import org.opsli.common.annotation.RequiresPermissionsCus;
 import org.opsli.common.constants.MyBatisConstants;
+import org.opsli.common.enums.DictType;
 import org.opsli.common.exception.ServiceException;
 import org.opsli.common.exception.TokenException;
 import org.opsli.common.utils.FieldUtil;
+import org.opsli.common.utils.ListDistinctUtil;
 import org.opsli.common.utils.WrapperUtil;
 import org.opsli.core.base.controller.BaseRestController;
 import org.opsli.core.msg.TokenMsg;
@@ -47,15 +48,14 @@ import org.opsli.core.persistence.Page;
 import org.opsli.core.persistence.querybuilder.GenQueryBuilder;
 import org.opsli.core.persistence.querybuilder.QueryBuilder;
 import org.opsli.core.persistence.querybuilder.WebQueryBuilder;
+import org.opsli.core.persistence.querybuilder.conf.WebQueryConf;
 import org.opsli.core.utils.OptionsUtil;
 import org.opsli.core.utils.OrgUtil;
 import org.opsli.core.utils.UserUtil;
 import org.opsli.modulars.system.SystemMsg;
-import org.opsli.modulars.system.org.entity.SysOrg;
 import org.opsli.modulars.system.org.service.ISysOrgService;
-import org.opsli.modulars.system.org.web.SysOrgRestController;
 import org.opsli.modulars.system.user.entity.SysUser;
-import org.opsli.modulars.system.user.entity.SysUserAndOrg;
+import org.opsli.modulars.system.user.entity.SysUserWeb;
 import org.opsli.modulars.system.user.service.IUserService;
 import org.opsli.plugins.oss.OssStorageFactory;
 import org.opsli.plugins.oss.service.BaseOssStorageService;
@@ -70,7 +70,6 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 
 /**
@@ -85,8 +84,6 @@ import java.util.Map;
 public class UserRestController extends BaseRestController<SysUser, UserModel, IUserService>
         implements UserApi {
 
-    @Autowired
-    private ISysOrgService iSysOrgService;
 
     /**
      * 当前登陆用户信息
@@ -133,7 +130,7 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
      */
     @ApiOperation(value = "当前登陆用户组织机构", notes = "当前登陆用户组织机构")
     @Override
-    public ResultVo<UserOrgRefModel> getOrg() {
+    public ResultVo<?> getOrg() {
         UserModel user = UserUtil.getUser();
         return this.getOrgByUserId(user.getId());
     }
@@ -145,9 +142,9 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
      */
     @ApiOperation(value = "用户组织机构", notes = "用户组织机构")
     @Override
-    public ResultVo<UserOrgRefModel> getOrgByUserId(String userId) {
-        UserOrgRefModel orgRef = OrgUtil.getOrgByUserId(userId);
-        return ResultVo.success(orgRef);
+    public ResultVo<?> getOrgByUserId(String userId) {
+        List<UserOrgRefModel> orgListByUserId = OrgUtil.getOrgListByUserId(userId);
+        return ResultVo.success(orgListByUserId);
     }
 
     /**
@@ -313,44 +310,31 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
      * 用户信息 查询分页
      * @param pageNo 当前页
      * @param pageSize 每页条数
+     * @param orgIdGroup 组织ID组
      * @param request request
      * @return ResultVo
      */
     @ApiOperation(value = "获得分页数据", notes = "获得分页数据 - 查询构造器")
     @RequiresPermissions("system_user_select")
     @Override
-    public ResultVo<?> findPage(Integer pageNo, Integer pageSize, UserOrgRefModel org, HttpServletRequest request) {
-        QueryBuilder<SysUserAndOrg> queryBuilder = new WebQueryBuilder<>(SysUserAndOrg.class, request.getParameterMap());
-        Page<SysUserAndOrg, UserAndOrgModel> page = new Page<>(pageNo, pageSize);
-        QueryWrapper<SysUserAndOrg> queryWrapper = queryBuilder.build();
-        if(org != null){
-            // 公司ID
-            if(StringUtils.isNotBlank(org.getCompanyId())){
-                // 未分组判断
-                if(SysOrgRestController.ORG_NULL.equals(org.getCompanyId())){
-                    queryWrapper.isNull("b.org_id");
+    public ResultVo<?> findPage(Integer pageNo, Integer pageSize,
+                                 String orgIdGroup,
+                                 HttpServletRequest request) {
+        QueryBuilder<SysUserWeb> queryBuilder = new WebQueryBuilder<>(
+                SysUserWeb.class, request.getParameterMap());
+        Page<SysUserWeb, UserWebModel> page = new Page<>(pageNo, pageSize);
+        QueryWrapper<SysUserWeb> queryWrapper = queryBuilder.build();
 
-                }else{
-                    queryWrapper.eq("b.org_id", org.getCompanyId());
-                }
-            }
+        // 处理组织权限
+        OrgUtil.handleOrgIdGroupCondition(orgIdGroup, queryWrapper);
 
-            // 部门ID
-            if(StringUtils.isNotBlank(org.getDepartmentId())){
-                queryWrapper.eq("c.org_id", org.getDepartmentId());
-            }
-
-            // 岗位ID
-            if(StringUtils.isNotBlank(org.getPostId())){
-                queryWrapper.eq("d.org_id", org.getPostId());
-            }
-        }
         page.setQueryWrapper(queryWrapper);
         page = IService.findPageByCus(page);
         // 密码防止分页泄露处理
-        for (UserAndOrgModel userModel : page.getList()) {
+        for (UserWebModel userModel : page.getList()) {
             userModel.setSecretKey(null);
             userModel.setPassword(null);
+            userModel.setPasswordLevel(null);
         }
         return ResultVo.success(page.getPageData());
     }
@@ -547,60 +531,60 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
      */
     @ApiOperation(value = "用户组织机构", notes = "用户组织机构")
     @Override
-    public ResultVo<UserOrgRefModel> getOrgInfoByUserId(String userId) {
-        UserOrgRefModel org = null;
+    public ResultVo<UserOrgRefWebModel> getOrgInfoByUserId(String userId) {
+        UserOrgRefWebModel org = null;
         // 不写SQL了 直接分页 第一页 取第一条
-        QueryBuilder<SysUserAndOrg> queryBuilder = new GenQueryBuilder<>();
-        Page<SysUserAndOrg, UserAndOrgModel> page = new Page<>(1, 1);
-        QueryWrapper<SysUserAndOrg> queryWrapper = queryBuilder.build();
+        QueryBuilder<SysUserWeb> queryBuilder = new GenQueryBuilder<>();
+        Page<SysUserWeb, UserWebModel> page = new Page<>(1, 1);
+        QueryWrapper<SysUserWeb> queryWrapper = queryBuilder.build();
         queryWrapper.eq(
                 "a.id",
                 userId
         );
         page.setQueryWrapper(queryWrapper);
         page = IService.findPageByCus(page);
-        List<UserAndOrgModel> list = page.getList();
+        List<UserWebModel> list = page.getList();
         if(CollUtil.isNotEmpty(list)){
-            UserAndOrgModel userAndOrgModel = list.get(0);
-            if(userAndOrgModel != null){
-                org  = userAndOrgModel.getOrg();
-                if(org != null){
+            UserWebModel userWebModel = list.get(0);
+            if(userWebModel != null){
+//                org  = userAndOrgModel.getOrg();
+//                if(org != null){
+//
+//                    org.setUserId(userId);
 
-                    org.setUserId(userId);
+//                    List<String> orgIds = Lists.newArrayListWithCapacity(3);
+//                    orgIds.add(org.getCompanyId());
+//                    orgIds.add(org.getDepartmentId());
+//                    orgIds.add(org.getPostId());
+//                    QueryWrapper<SysOrg> orgQueryWrapper = new QueryWrapper<>();
+//                    orgQueryWrapper.in(
+//                            FieldUtil.humpToUnderline(MyBatisConstants.FIELD_ID),
+//                            orgIds);
+//                    List<SysOrg> orgList = iSysOrgService.findList(orgQueryWrapper);
+//                    if(CollUtil.isNotEmpty(orgList)){
+//                        Map<String, SysOrg> tmp = Maps.newHashMap();
+//                        for (SysOrg sysOrg : orgList) {
+//                            tmp.put(sysOrg.getId(), sysOrg);
+//                        }
+//
+//                        // 设置 名称
+//                        SysOrg company = tmp.get(org.getCompanyId());
+//                        if(company != null){
+//                            org.setCompanyName(company.getOrgName());
+//                        }
+//
+//                        SysOrg department = tmp.get(org.getDepartmentId());
+//                        if(department != null){
+//                            org.setDepartmentName(department.getOrgName());
+//                        }
+//
+//                        SysOrg post = tmp.get(org.getPostId());
+//                        if(post != null){
+//                            org.setPostName(post.getOrgName());
+//                        }
+//                    }
 
-                    List<String> orgIds = Lists.newArrayListWithCapacity(3);
-                    orgIds.add(org.getCompanyId());
-                    orgIds.add(org.getDepartmentId());
-                    orgIds.add(org.getPostId());
-                    QueryWrapper<SysOrg> orgQueryWrapper = new QueryWrapper<>();
-                    orgQueryWrapper.in(
-                            FieldUtil.humpToUnderline(MyBatisConstants.FIELD_ID),
-                            orgIds);
-                    List<SysOrg> orgList = iSysOrgService.findList(orgQueryWrapper);
-                    if(CollUtil.isNotEmpty(orgList)){
-                        Map<String, SysOrg> tmp = Maps.newHashMap();
-                        for (SysOrg sysOrg : orgList) {
-                            tmp.put(sysOrg.getId(), sysOrg);
-                        }
-
-                        // 设置 名称
-                        SysOrg company = tmp.get(org.getCompanyId());
-                        if(company != null){
-                            org.setCompanyName(company.getOrgName());
-                        }
-
-                        SysOrg department = tmp.get(org.getDepartmentId());
-                        if(department != null){
-                            org.setDepartmentName(department.getOrgName());
-                        }
-
-                        SysOrg post = tmp.get(org.getPostId());
-                        if(post != null){
-                            org.setPostName(post.getOrgName());
-                        }
-                    }
-
-                }
+//                }
             }
         }
         return ResultVo.success(org);

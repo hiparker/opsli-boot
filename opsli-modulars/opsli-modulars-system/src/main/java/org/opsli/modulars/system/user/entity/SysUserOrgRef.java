@@ -38,11 +38,13 @@ public class SysUserOrgRef implements Serializable {
     /** 用户ID */
     private String userId;
 
-    /** 组织ID */
+    /** 当前组织 */
     private String orgId;
 
-    /** 组织类型 */
-    private String orgType;
+    /** 组织ID集合 xxx,xxx */
+    private String orgIds;
 
+    /** 是否默认 */
+    private String izDef;
 
 }

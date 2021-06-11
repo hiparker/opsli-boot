@@ -52,6 +52,6 @@ public class SysDict extends BaseEntity {
 
     /** 逻辑删除字段 */
     @TableLogic
-    private Integer deleted;
+    private String deleted;
 
 }

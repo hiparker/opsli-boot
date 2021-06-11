@@ -16,13 +16,13 @@
 package org.opsli.modulars.system.user.service;
 
 import org.opsli.api.wrapper.system.menu.MenuModel;
-import org.opsli.api.wrapper.system.user.UserAndOrgModel;
+import org.opsli.api.wrapper.system.user.UserWebModel;
 import org.opsli.api.wrapper.system.user.UserModel;
 import org.opsli.api.wrapper.system.user.UserPassword;
 import org.opsli.core.base.service.interfaces.CrudServiceInterface;
 import org.opsli.core.persistence.Page;
 import org.opsli.modulars.system.user.entity.SysUser;
-import org.opsli.modulars.system.user.entity.SysUserAndOrg;
+import org.opsli.modulars.system.user.entity.SysUserWeb;
 
 import java.util.List;
 
@@ -122,5 +122,5 @@ public interface IUserService extends CrudServiceInterface<SysUser, UserModel> {
      * @param page 分页
      * @return  Page<T>
      */
-    Page<SysUserAndOrg, UserAndOrgModel> findPageByCus(Page<SysUserAndOrg,UserAndOrgModel> page);
+    Page<SysUserWeb, UserWebModel> findPageByCus(Page<SysUserWeb, UserWebModel> page);
 }

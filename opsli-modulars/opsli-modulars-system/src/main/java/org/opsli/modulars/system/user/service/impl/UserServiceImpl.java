@@ -27,7 +27,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.opsli.api.base.warpper.ApiWrapper;
 import org.opsli.api.wrapper.system.menu.MenuModel;
 import org.opsli.api.wrapper.system.options.OptionsModel;
-import org.opsli.api.wrapper.system.user.UserAndOrgModel;
+import org.opsli.api.wrapper.system.user.UserWebModel;
 import org.opsli.api.wrapper.system.user.UserModel;
 import org.opsli.api.wrapper.system.user.UserPassword;
 import org.opsli.common.constants.MyBatisConstants;
@@ -42,7 +42,8 @@ import org.opsli.core.msg.CoreMsg;
 import org.opsli.core.persistence.Page;
 import org.opsli.core.persistence.querybuilder.GenQueryBuilder;
 import org.opsli.core.persistence.querybuilder.QueryBuilder;
-import org.opsli.core.persistence.querybuilder.chain.TenantHandler;
+import org.opsli.core.persistence.querybuilder.chain.QueryOrgHandler;
+import org.opsli.core.persistence.querybuilder.chain.QueryTenantHandler;
 import org.opsli.core.utils.OptionsUtil;
 import org.opsli.core.utils.UserUtil;
 import org.opsli.modulars.system.SystemMsg;
@@ -51,7 +52,7 @@ import org.opsli.modulars.system.menu.service.IMenuService;
 import org.opsli.modulars.system.role.entity.SysRole;
 import org.opsli.modulars.system.role.service.IRoleService;
 import org.opsli.modulars.system.user.entity.SysUser;
-import org.opsli.modulars.system.user.entity.SysUserAndOrg;
+import org.opsli.modulars.system.user.entity.SysUserWeb;
 import org.opsli.modulars.system.user.mapper.UserMapper;
 import org.opsli.modulars.system.user.service.IUserRoleRefService;
 import org.opsli.modulars.system.user.service.IUserService;
@@ -116,6 +117,8 @@ public class UserServiceImpl extends CrudServiceImpl<UserMapper, SysUser, UserMo
         model.setLoginIp(null);
         // 默认用户状态为启用
         model.setEnable(DictType.NO_YES_YES.getValue());
+        // 默认未分配组织
+        model.setIzExistOrg(DictType.NO_YES_NO.getValue());
 
         // 新增可以直接设置密码
         if(StringUtils.isNotEmpty(model.getPassword())){
@@ -208,6 +211,7 @@ public class UserServiceImpl extends CrudServiceImpl<UserMapper, SysUser, UserMo
         model.setSecretKey(null);
         model.setLoginIp(null);
         model.setEnable(null);
+        model.setIzExistOrg(null);
 
         UserModel update = super.update(model);
         if(update != null){
@@ -545,9 +549,10 @@ public class UserServiceImpl extends CrudServiceImpl<UserMapper, SysUser, UserMo
     public List<SysUser> findList(QueryWrapper<SysUser> queryWrapper) {
         // 如果没有租户修改能力 则默认增加租户限制
         if(!UserUtil.isHasUpdateTenantPerms(UserUtil.getUser())){
-            // 多租户处理
-            TenantHandler tenantHandler = new TenantHandler();
-            tenantHandler.handler(entityClazz, queryWrapper);
+            // 数据处理责任链
+            queryWrapper = new QueryTenantHandler(
+                    new QueryOrgHandler()
+            ).handler(entityClazz, queryWrapper);
         }
 
         return super.list(queryWrapper);
@@ -559,9 +564,10 @@ public class UserServiceImpl extends CrudServiceImpl<UserMapper, SysUser, UserMo
         QueryWrapper<SysUser> queryWrapper = queryBuilder.build();
         // 如果没有租户修改能力 则默认增加租户限制
         if(!UserUtil.isHasUpdateTenantPerms(UserUtil.getUser())){
-            // 多租户处理
-            TenantHandler tenantHandler = new TenantHandler();
-            tenantHandler.handler(entityClazz, queryWrapper);
+            // 数据处理责任链
+            queryWrapper = new QueryTenantHandler(
+                    new QueryOrgHandler()
+            ).handler(entityClazz, queryWrapper);
         }
         return super.list(queryWrapper);
     }
@@ -689,37 +695,44 @@ public class UserServiceImpl extends CrudServiceImpl<UserMapper, SysUser, UserMo
     }
 
 
-    private List<SysUserAndOrg> findListByCus(QueryWrapper<SysUserAndOrg> queryWrapper) {
+    private List<SysUserWeb> findListByCus(QueryWrapper<SysUserWeb> queryWrapper) {
         // 如果没有租户修改能力 则默认增加租户限制
         if(!UserUtil.isHasUpdateTenantPerms(UserUtil.getUser())){
-            // 多租户处理
-            TenantHandler tenantHandler = new TenantHandler();
-            tenantHandler.handler(SysUserAndOrg.class, queryWrapper);
+            // 数据处理责任链
+            queryWrapper = new QueryTenantHandler(
+                    new QueryOrgHandler()
+            ).handler(SysUserWeb.class, queryWrapper);
         }
 
 
         // 逻辑删除 查询未删除数据
         queryWrapper.eq(
                 FieldUtil.humpToUnderline(MyBatisConstants.FIELD_DELETE_LOGIC), DictType.NO_YES_NO.getValue());
-
+        // 按照ID 分组
+        queryWrapper.groupBy("a.id","b.user_id");
         return mapper.findList(queryWrapper);
     }
 
     @Override
-    public Page<SysUserAndOrg,UserAndOrgModel> findPageByCus(Page<SysUserAndOrg,UserAndOrgModel> page) {
+    public Page<SysUserWeb, UserWebModel> findPageByCus(Page<SysUserWeb, UserWebModel> page) {
         UserModel currUser = UserUtil.getUser();
+
+        QueryWrapper<SysUserWeb> queryWrapper = page.getQueryWrapper();
+
         // 如果不是超级管理员则 无法看到超级管理员账户
         if(!UserUtil.SUPER_ADMIN.equals(currUser.getUsername())){
-            QueryWrapper<SysUserAndOrg> queryWrapper = page.getQueryWrapper();
             queryWrapper.notIn("username", UserUtil.SUPER_ADMIN);
             page.setQueryWrapper(queryWrapper);
         }
 
+        // 不能查看自身
+        queryWrapper.notIn("username", currUser.getUsername());
+
         page.pageHelperBegin();
         try{
-            List<SysUserAndOrg> list = this.findListByCus(page.getQueryWrapper());
-            PageInfo<SysUserAndOrg> pageInfo = new PageInfo<>(list);
-            List<UserAndOrgModel> es = WrapperUtil.transformInstance(pageInfo.getList(), UserAndOrgModel.class);
+            List<SysUserWeb> list = this.findListByCus(page.getQueryWrapper());
+            PageInfo<SysUserWeb> pageInfo = new PageInfo<>(list);
+            List<UserWebModel> es = WrapperUtil.transformInstance(pageInfo.getList(), UserWebModel.class);
             page.instance(pageInfo, es);
         } finally {
             page.pageHelperEnd();

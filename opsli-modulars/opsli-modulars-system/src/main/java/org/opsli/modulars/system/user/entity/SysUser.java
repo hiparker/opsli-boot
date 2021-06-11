@@ -76,11 +76,14 @@ public class SysUser extends BaseEntity {
     @TableField(updateStrategy = FieldStrategy.IGNORED)
     private String sign;
 
+    /** 是否存在组织 */
+    private String izExistOrg;
+
     // ========================================
 
     /** 逻辑删除字段 */
     @TableLogic
-    private Integer deleted;
+    private String deleted;
 
     /** 多租户字段 */
     private String tenantId;

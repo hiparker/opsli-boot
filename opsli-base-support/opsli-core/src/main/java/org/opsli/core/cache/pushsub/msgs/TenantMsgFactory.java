@@ -19,7 +19,6 @@ import com.alibaba.fastjson.JSONObject;
 import lombok.Data;
 import lombok.experimental.Accessors;
 import org.opsli.api.wrapper.system.tenant.TenantModel;
-import org.opsli.api.wrapper.system.user.UserOrgRefModel;
 import org.opsli.core.cache.pushsub.enums.MsgArgsType;
 import org.opsli.core.cache.pushsub.enums.PushSubType;
 import org.opsli.core.cache.pushsub.receiver.RedisPushSubReceiver;

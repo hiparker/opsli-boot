@@ -17,8 +17,11 @@ package org.opsli.api.web.system.user;
 
 import org.opsli.api.base.result.ResultVo;
 import org.opsli.api.wrapper.system.user.UserOrgRefModel;
+import org.opsli.api.wrapper.system.user.UserOrgRefWebModel;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+
+import java.util.List;
 
 
 /**
@@ -46,6 +49,13 @@ public interface UserOrgRefApi {
      * @return ResultVo
      */
     @PostMapping("/setOrg")
-    ResultVo<?> setOrg(@RequestBody UserOrgRefModel model);
+    ResultVo<?> setOrg(@RequestBody UserOrgRefWebModel model);
+
+    /**
+     * 根据用户ID 获得组织列表
+     * @param userId 用户ID
+     * @return List
+     */
+    ResultVo<List<UserOrgRefModel>> findListByUserId(String userId);
 
 }

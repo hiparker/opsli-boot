@@ -17,6 +17,7 @@ package org.opsli.api.wrapper.system.user;
 
 import com.alibaba.excel.annotation.ExcelIgnore;
 import com.alibaba.excel.annotation.ExcelProperty;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -134,6 +135,12 @@ public class UserModel extends ApiWrapper {
     @ExcelIgnore
     @ValidatorLenMax(20)
     private String tenantId;
+
+    /** 是否存在组织 */
+    @JsonIgnore
+    @ExcelIgnore
+    @ValidatorLenMax(1)
+    private String izExistOrg;
 
 
 }

@@ -18,8 +18,7 @@ package org.opsli.core.cache.pushsub.msgs;
 import com.alibaba.fastjson.JSONObject;
 import lombok.Data;
 import lombok.experimental.Accessors;
-import org.opsli.api.wrapper.system.menu.MenuModel;
-import org.opsli.api.wrapper.system.user.UserOrgRefModel;
+import org.opsli.api.wrapper.system.user.UserOrgRefWebModel;
 import org.opsli.core.cache.pushsub.enums.MsgArgsType;
 import org.opsli.core.cache.pushsub.enums.PushSubType;
 import org.opsli.core.cache.pushsub.receiver.RedisPushSubReceiver;
@@ -45,7 +44,7 @@ public final class OrgMsgFactory extends BaseSubMessage{
      * @param orgRefModel 用户组织模型
      * @return 消息
      */
-    public static BaseSubMessage createOrgMsg(UserOrgRefModel orgRefModel){
+    public static BaseSubMessage createOrgMsg(UserOrgRefWebModel orgRefModel){
         BaseSubMessage baseSubMessage = new BaseSubMessage();
         // 数据
         JSONObject jsonObj = new JSONObject();

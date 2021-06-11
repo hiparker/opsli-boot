@@ -23,6 +23,7 @@ import org.opsli.api.base.result.ResultVo;
 import org.opsli.api.web.system.user.UserOrgRefApi;
 import org.opsli.api.wrapper.system.user.UserModel;
 import org.opsli.api.wrapper.system.user.UserOrgRefModel;
+import org.opsli.api.wrapper.system.user.UserOrgRefWebModel;
 import org.opsli.common.annotation.ApiRestController;
 import org.opsli.common.exception.ServiceException;
 import org.opsli.core.autoconfigure.properties.GlobalProperties;
@@ -31,6 +32,8 @@ import org.opsli.core.utils.UserUtil;
 import org.opsli.modulars.system.SystemMsg;
 import org.opsli.modulars.system.user.service.IUserOrgRefService;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.List;
 
 /**
  * 用户-组织 Controller
@@ -50,6 +53,11 @@ public class UserOrgRefRestController implements UserOrgRefApi {
     @Autowired
     private IUserOrgRefService iUserOrgRefService;
 
+    @Override
+    public ResultVo<List<UserOrgRefModel>> findListByUserId(String userId) {
+        List<UserOrgRefModel> listByUserId = iUserOrgRefService.findListByUserId(userId);
+        return ResultVo.success(listByUserId);
+    }
 
     /**
      * 设置组织
@@ -58,18 +66,16 @@ public class UserOrgRefRestController implements UserOrgRefApi {
      */
     @Override
     @RequiresPermissions("system_user_setOrg")
-    public ResultVo<?> setOrg(UserOrgRefModel model) {
+    public ResultVo<?> setOrg(UserOrgRefWebModel model) {
         // 演示模式 不允许操作
         this.demoError();
 
         boolean ret = iUserOrgRefService.setOrg(model);
-        if(ret){
-            return ResultVo.success();
+        if(!ret){
+            // 权限设置失败
+            throw new ServiceException(SystemMsg.EXCEPTION_USER_ORG_ERROR);
         }
-        // 权限设置失败
-        return ResultVo.error(SystemMsg.EXCEPTION_USER_ORG_ERROR.getCode(),
-                SystemMsg.EXCEPTION_USER_ORG_ERROR.getMessage()
-                );
+        return ResultVo.success();
     }
 
 

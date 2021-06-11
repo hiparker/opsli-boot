@@ -43,7 +43,7 @@ public abstract class BaseEntity extends ApiWrapper {
 	/**
 
 	@TableLogic
-	private Integer deleted;
+	private String deleted;
 
 	**/
 

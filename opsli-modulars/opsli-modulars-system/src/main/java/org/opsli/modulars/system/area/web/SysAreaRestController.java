@@ -42,6 +42,7 @@ import org.opsli.common.annotation.ApiRestController;
 import org.opsli.common.annotation.EnableLog;
 import org.opsli.common.annotation.RequiresPermissionsCus;
 import org.opsli.common.constants.MyBatisConstants;
+import org.opsli.common.constants.TreeConstants;
 import org.opsli.common.utils.FieldUtil;
 import org.opsli.core.base.controller.BaseRestController;
 import org.opsli.core.base.entity.HasChildren;
@@ -74,8 +75,6 @@ import java.util.Set;
 public class SysAreaRestController extends BaseRestController<SysArea, SysAreaModel, ISysAreaService>
     implements SysAreaRestApi {
 
-    /** 是否包含子集 */
-    private static final String HAS_CHILDREN = "hasChildren";
     /** 排序字段 */
     private static final String SORT_FIELD = "sortNo";
 
@@ -122,7 +121,8 @@ public class SysAreaRestController extends BaseRestController<SysArea, SysAreaMo
         List<Tree<Object>> treeNodes = TreeBuildUtil.INSTANCE.build(beanMapList, parentId, treeNodeConfig);
 
         // 处理是否包含子集
-        this.handleTreeHasChildren(treeNodes);
+        super.handleTreeHasChildren(treeNodes,
+                (parentIds)-> IService.hasChildren(parentIds));
 
         return ResultVo.success(treeNodes);
     }
@@ -156,7 +156,8 @@ public class SysAreaRestController extends BaseRestController<SysArea, SysAreaMo
         List<Tree<Object>> treeNodes = TreeBuildUtil.INSTANCE.build(beanMapList, treeNodeConfig);
 
         // 处理是否包含子集
-        this.handleTreeHasChildren(treeNodes);
+        super.handleTreeHasChildren(treeNodes,
+                (parentIds)-> IService.hasChildren(parentIds));
 
         return ResultVo.success(treeNodes);
     }
@@ -307,39 +308,6 @@ public class SysAreaRestController extends BaseRestController<SysArea, SysAreaMo
             beanMapList.add(beanToMap);
         }
         return beanMapList;
-    }
-
-    /**
-     * 处理是否包含子集
-     * @param treeNodes 树节点
-     */
-    private void handleTreeHasChildren(List<Tree<Object>> treeNodes) {
-        if(CollUtil.isEmpty(treeNodes)){
-            return;
-        }
-
-        Set<String> parentIds = Sets.newHashSet();
-        for (Tree<Object> treeNode : treeNodes) {
-            parentIds.add(Convert.toStr(treeNode.getId()));
-        }
-
-        // 数据排查是否存在下级
-        List<HasChildren> hasChildrenList = IService.hasChildren(parentIds);
-        if (CollUtil.isNotEmpty(hasChildrenList)) {
-            Map<String, Boolean> tmp = Maps.newHashMap();
-            for (HasChildren hasChildren : hasChildrenList) {
-                if (hasChildren.getCount() != null && hasChildren.getCount() > 0) {
-                    tmp.put(hasChildren.getParentId(), true);
-                }
-            }
-
-            for (Tree<Object> treeNode : treeNodes) {
-                Boolean tmpFlag = tmp.get(Convert.toStr(treeNode.getId()));
-                if (tmpFlag != null && tmpFlag) {
-                    treeNode.putExtra(HAS_CHILDREN, true);
-                }
-            }
-        }
     }
 
 

@@ -23,7 +23,7 @@ import org.apache.ibatis.annotations.Param;
 import org.opsli.api.wrapper.system.user.UserPassword;
 import org.opsli.modulars.system.menu.entity.SysMenu;
 import org.opsli.modulars.system.user.entity.SysUser;
-import org.opsli.modulars.system.user.entity.SysUserAndOrg;
+import org.opsli.modulars.system.user.entity.SysUserWeb;
 
 import java.util.List;
 
@@ -99,5 +99,5 @@ public interface UserMapper extends BaseMapper<SysUser> {
      * @param wrapper 条件查询器
      * @return List
      */
-    List<SysUserAndOrg> findList(@Param(Constants.WRAPPER) Wrapper<?> wrapper);
+    List<SysUserWeb> findList(@Param(Constants.WRAPPER) Wrapper<?> wrapper);
 }

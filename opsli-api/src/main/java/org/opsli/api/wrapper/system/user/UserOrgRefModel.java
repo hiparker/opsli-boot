@@ -16,17 +16,20 @@
 package org.opsli.api.wrapper.system.user;
 
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
+import com.baomidou.mybatisplus.annotation.TableId;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.opsli.api.wrapper.system.org.SysOrgModel;
 import org.opsli.common.annotation.validator.Validator;
 import org.opsli.common.annotation.validator.ValidatorLenMax;
 import org.opsli.common.enums.ValidatorType;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
- * 角色表
+ * 用户组织关系表
  *
  * @author Parker
  * @date 2020-09-16 17:33
@@ -36,32 +39,26 @@ import java.io.Serializable;
 @ExcelIgnoreUnannotated
 public class UserOrgRefModel implements Serializable {
 
+    /** ID */
+    @ApiModelProperty(value = "ID")
+    private String id;
+
     /** 用户ID */
     @ApiModelProperty(value = "用户ID")
     @Validator({ValidatorType.IS_NOT_NULL})
     @ValidatorLenMax(50)
     private String userId;
 
-    @ApiModelProperty(value = "公司")
-    @Validator({ValidatorType.IS_NOT_NULL})
-    @ValidatorLenMax(19)
-    private String companyId;
+    /** 当前组织 */
+    @ApiModelProperty(value = "当前组织")
+    private String orgId;
 
-    @ApiModelProperty(value = "公司名称")
-    private String companyName;
+    /** 组织ID集合 xxx,xxx */
+    @ApiModelProperty(value = "组织ID集合")
+    private String orgIds;
 
-    @ApiModelProperty(value = "部门ID")
-    @ValidatorLenMax(19)
-    private String departmentId;
-
-    @ApiModelProperty(value = "部门名称")
-    private String departmentName;
-
-    @ApiModelProperty(value = "岗位ID")
-    @ValidatorLenMax(19)
-    private String postId;
-
-    @ApiModelProperty(value = "岗位名称")
-    private String postName;
+    /** 是否默认 */
+    @ApiModelProperty(value = "是否默认")
+    private String izDef;
 
 }

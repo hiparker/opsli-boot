@@ -37,6 +37,7 @@ import org.opsli.plugins.excel.annotation.ExcelInfo;
 @EqualsAndHashCode(callSuper = false)
 public class SysOrgModel extends ApiWrapper {
 
+
     /** 父级主键 */
     @ApiModelProperty(value = "父级主键")
     @ExcelProperty(value = "父级主键", order = 1)
@@ -44,9 +45,15 @@ public class SysOrgModel extends ApiWrapper {
     @ValidatorLenMax(19)
     private String parentId;
 
+    /** 父级主键集合 xxx,xxx */
+    @ApiModelProperty(value = "父级主键集合")
+    @ExcelProperty(value = "父级主键集合", order = 2)
+    @ExcelInfo
+    private String parentIds;
+
     /** 组织机构编号 */
     @ApiModelProperty(value = "组织机构编号")
-    @ExcelProperty(value = "组织机构编号", order = 2)
+    @ExcelProperty(value = "组织机构编号", order = 3)
     @ExcelInfo
     @Validator({ValidatorType.IS_NOT_NULL, ValidatorType.IS_GENERAL})
     @ValidatorLenMax(120)
@@ -54,19 +61,11 @@ public class SysOrgModel extends ApiWrapper {
 
     /** 组织机构名称 */
     @ApiModelProperty(value = "组织机构名称")
-    @ExcelProperty(value = "组织机构名称", order = 3)
+    @ExcelProperty(value = "组织机构名称", order = 4)
     @ExcelInfo
     @Validator({ValidatorType.IS_NOT_NULL, ValidatorType.IS_GENERAL_WITH_CHINESE})
     @ValidatorLenMax(120)
     private String orgName;
-
-    /** 组织机构类型 1-公司 2-部门 3-岗位*/
-    @ApiModelProperty(value = "组织机构类型")
-    @ExcelProperty(value = "组织机构类型", order = 4)
-    @ExcelInfo( dictType = "org_type")
-    @Validator({ValidatorType.IS_NOT_NULL})
-    @ValidatorLenMax(3)
-    private String orgType;
 
     /** 排序 */
     @ApiModelProperty(value = "排序")
@@ -74,6 +73,13 @@ public class SysOrgModel extends ApiWrapper {
     @ExcelInfo
     @ValidatorLenMax(10)
     private Integer sortNo;
+
+    /** 备注 */
+    @ApiModelProperty(value = "备注")
+    @ExcelProperty(value = "备注", order = 6)
+    @ExcelInfo
+    @ValidatorLenMax(255)
+    private String remark;
 
     /** 多租户字段 */
     @ApiModelProperty(value = "多租户ID")

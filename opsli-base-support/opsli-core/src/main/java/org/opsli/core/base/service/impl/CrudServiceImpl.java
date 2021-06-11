@@ -32,7 +32,8 @@ import org.opsli.core.base.service.interfaces.CrudServiceInterface;
 import org.opsli.core.persistence.Page;
 import org.opsli.core.persistence.querybuilder.GenQueryBuilder;
 import org.opsli.core.persistence.querybuilder.QueryBuilder;
-import org.opsli.core.persistence.querybuilder.chain.TenantHandler;
+import org.opsli.core.persistence.querybuilder.chain.QueryOrgHandler;
+import org.opsli.core.persistence.querybuilder.chain.QueryTenantHandler;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
@@ -210,17 +211,24 @@ public abstract class CrudServiceImpl<M extends BaseMapper<T>, T extends BaseEnt
 
     @Override
     public List<T> findList(QueryWrapper<T> queryWrapper) {
-        // 多租户处理
-        QueryWrapper<T> qWrapper = new TenantHandler().handler(entityClazz, queryWrapper);
-        return super.list(qWrapper);
+        // 数据处理责任链
+        queryWrapper = new QueryTenantHandler(
+                new QueryOrgHandler()
+        ).handler(entityClazz, queryWrapper);
+
+        return super.list(queryWrapper);
     }
 
     @Override
     public List<T> findAllList() {
         QueryBuilder<T> queryBuilder = new GenQueryBuilder<>();
-        // 多租户处理
-        QueryWrapper<T> qWrapper = new TenantHandler().handler(entityClazz, queryBuilder.build());
-        return super.list(qWrapper);
+        QueryWrapper<T> queryWrapper = queryBuilder.build();
+        // 数据处理责任链
+        queryWrapper = new QueryTenantHandler(
+                new QueryOrgHandler()
+        ).handler(entityClazz, queryWrapper);
+
+        return super.list(queryWrapper);
     }
 
     @Override
@@ -250,7 +258,6 @@ public abstract class CrudServiceImpl<M extends BaseMapper<T>, T extends BaseEnt
         }
         return page;
     }
-
 
     // ======================== 对象转化 ========================
 

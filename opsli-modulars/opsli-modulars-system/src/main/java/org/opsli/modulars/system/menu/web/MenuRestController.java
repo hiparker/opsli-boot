@@ -25,7 +25,6 @@ import cn.hutool.core.util.ReflectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -41,10 +40,10 @@ import org.opsli.common.annotation.EnableLog;
 import org.opsli.common.annotation.RequiresPermissionsCus;
 import org.opsli.common.constants.MenuConstants;
 import org.opsli.common.constants.MyBatisConstants;
+import org.opsli.common.enums.DictType;
 import org.opsli.common.utils.FieldUtil;
 import org.opsli.common.utils.WrapperUtil;
 import org.opsli.core.base.controller.BaseRestController;
-import org.opsli.core.base.entity.HasChildren;
 import org.opsli.core.general.StartPrint;
 import org.opsli.core.persistence.Page;
 import org.opsli.core.persistence.querybuilder.GenQueryBuilder;
@@ -63,7 +62,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 
 /**
@@ -83,10 +81,6 @@ public class MenuRestController extends BaseRestController<SysMenu, MenuModel, I
 
     /** 排序字段 */
     private static final String SORT_FIELD = "order";
-    /** 是否包含子集 */
-    private static final String HAS_CHILDREN = "hasChildren";
-    /** 是否是叶子节点 */
-    private static final String IS_LEAF = "isLeaf";
 
     /** 虚拟总节点 ID */
     private static final String VIRTUAL_TOTAL_NODE = "-1";
@@ -114,7 +108,8 @@ public class MenuRestController extends BaseRestController<SysMenu, MenuModel, I
 
         // 这里有坑 如果 为 菜单数据 且 组件(Component)地址为空 不会跳转到主页 也不报错
         // 修复菜单问题导致无法跳转主页
-        menuModelList.removeIf(menuModel -> MenuConstants.MENU.equals(menuModel.getType()) &&
+        menuModelList.removeIf(
+                menuModel -> MenuConstants.MENU.equals(menuModel.getType()) &&
                 (StringUtils.isEmpty(menuModel.getComponent()) ||
                         StringUtils.isEmpty(menuModel.getUrl())
                 ));
@@ -142,7 +137,8 @@ public class MenuRestController extends BaseRestController<SysMenu, MenuModel, I
 
         // 这里有坑 如果 为 菜单数据 且 组件(Component)地址为空 不会跳转到主页 也不报错
         // 修复菜单问题导致无法跳转主页
-        menuModelList.removeIf(menuModel -> MenuConstants.MENU.equals(menuModel.getType()) &&
+        menuModelList.removeIf(
+                menuModel -> MenuConstants.MENU.equals(menuModel.getType()) &&
                 (StringUtils.isEmpty(menuModel.getComponent()) ||
                 StringUtils.isEmpty(menuModel.getUrl())
                         ));
@@ -167,14 +163,8 @@ public class MenuRestController extends BaseRestController<SysMenu, MenuModel, I
         List<MenuModel> menuModelList;
         if(StringUtils.isEmpty(parentId)){
             menuModelList = Lists.newArrayList();
-            parentId = VIRTUAL_TOTAL_NODE;
-            MenuModel model = new MenuModel();
-            model.setId(MenuConstants.GEN_ID);
-            model.setMenuName("根节点");
-            model.setHidden("0");
-            model.setSortNo(-1);
-            model.setType("1");
-            model.setParentId(parentId);
+            // 生成根节点菜单
+            MenuModel model = getGenMenuModel();
             menuModelList.add(model);
         }else{
             // 只查菜单
@@ -182,7 +172,7 @@ public class MenuRestController extends BaseRestController<SysMenu, MenuModel, I
             QueryWrapper<SysMenu> queryWrapper = queryBuilder.build();
             queryWrapper.eq(
                     FieldUtil.humpToUnderline(MyBatisConstants.FIELD_PARENT_ID), parentId);
-            queryWrapper.eq("type", "1");
+            queryWrapper.eq("type", MenuConstants.MENU);
 
             // 如果传入ID 则不包含自身
             if(StringUtils.isNotEmpty(id)){
@@ -200,7 +190,8 @@ public class MenuRestController extends BaseRestController<SysMenu, MenuModel, I
         List<Tree<Object>> treeNodes = getMenuTrees(menuModelList, parentId,1);
 
         // 处理是否包含子集
-        this.handleTreeIsLeafByChoose(treeNodes);
+        super.handleTreeHasChildren(treeNodes,
+                (parentIds)-> IService.hasChildrenByChoose(parentIds));
 
         return ResultVo.success(treeNodes);
     }
@@ -216,14 +207,8 @@ public class MenuRestController extends BaseRestController<SysMenu, MenuModel, I
         List<MenuModel> menuModelList;
         if(StringUtils.isEmpty(parentId)){
             menuModelList = Lists.newArrayList();
-            parentId = VIRTUAL_TOTAL_NODE;
-            MenuModel model = new MenuModel();
-            model.setId(MenuConstants.GEN_ID);
-            model.setMenuName("根节点");
-            model.setHidden("0");
-            model.setSortNo(-1);
-            model.setType("1");
-            model.setParentId(parentId);
+            // 生成根节点菜单
+            MenuModel model = getGenMenuModel();
             menuModelList.add(model);
         }else{
             QueryBuilder<SysMenu> queryBuilder = new GenQueryBuilder<>();
@@ -238,7 +223,8 @@ public class MenuRestController extends BaseRestController<SysMenu, MenuModel, I
         List<Tree<Object>> treeNodes = getMenuTrees(menuModelList, parentId,1);
 
         // 处理是否包含子集
-        this.handleTreeHasChildren(treeNodes);
+        super.handleTreeHasChildren(treeNodes,
+                (parentIds)-> IService.hasChildren(parentIds));
 
         return ResultVo.success(treeNodes);
     }
@@ -251,10 +237,8 @@ public class MenuRestController extends BaseRestController<SysMenu, MenuModel, I
     @RequiresPermissions("system_menu_select")
     @Override
     public ResultVo<?> findMenuTreePage(HttpServletRequest request) {
-
         QueryBuilder<SysMenu> queryBuilder = new WebQueryBuilder<>(entityClazz,
                 request.getParameterMap());
-
 
         // 获得菜单
         List<SysMenu> menuList = IService.findList(queryBuilder.build());
@@ -292,11 +276,8 @@ public class MenuRestController extends BaseRestController<SysMenu, MenuModel, I
     public ResultVo<MenuModel> get(MenuModel model) {
         if(model != null){
             if(StringUtils.equals(MenuConstants.GEN_ID, model.getId())){
-                model.setMenuName("根节点");
-                model.setHidden("0");
-                model.setSortNo(-1);
-                model.setType("1");
-                model.setParentId(VIRTUAL_TOTAL_NODE);
+                // 生成根节点菜单
+                model = getGenMenuModel();
             }else{
                 // 如果系统内部调用 则直接查数据库
                 if (model.getIzApi() != null && model.getIzApi()){
@@ -589,72 +570,19 @@ public class MenuRestController extends BaseRestController<SysMenu, MenuModel, I
         return TreeBuildUtil.INSTANCE.build(beanMapList, treeNodeConfig);
     }
 
-
     /**
-     * 处理是否包含子集
-     * @param treeNodes 树节点
+     * 生成根节点
+     * @return MenuModel
      */
-    private void handleTreeHasChildren(List<Tree<Object>> treeNodes) {
-        if(CollUtil.isEmpty(treeNodes)){
-            return;
-        }
-
-        Set<String> parentIds = Sets.newHashSet();
-        for (Tree<Object> treeNode : treeNodes) {
-            parentIds.add(Convert.toStr(treeNode.getId()));
-        }
-
-        // 数据排查是否存在下级
-        List<HasChildren> hasChildrenList = IService.hasChildren(parentIds);
-        if (CollUtil.isNotEmpty(hasChildrenList)) {
-            Map<String, Boolean> tmp = Maps.newHashMap();
-            for (HasChildren hasChildren : hasChildrenList) {
-                if (hasChildren.getCount() != null && hasChildren.getCount() > 0) {
-                    tmp.put(hasChildren.getParentId(), true);
-                }
-            }
-
-            for (Tree<Object> treeNode : treeNodes) {
-                Boolean tmpFlag = tmp.get(Convert.toStr(treeNode.getId()));
-                if (tmpFlag != null && tmpFlag) {
-                    treeNode.putExtra(HAS_CHILDREN, true);
-                }
-            }
-        }
-    }
-
-
-    /**
-     * 处理是否包含子集
-     * @param treeNodes 树节点
-     */
-    private void handleTreeIsLeafByChoose(List<Tree<Object>> treeNodes) {
-        if(CollUtil.isEmpty(treeNodes)){
-            return;
-        }
-
-        Set<String> parentIds = Sets.newHashSet();
-        for (Tree<Object> treeNode : treeNodes) {
-            parentIds.add(Convert.toStr(treeNode.getId()));
-        }
-
-        // 数据排查是否存在下级
-        List<HasChildren> hasChildrenList = IService.hasChildrenByChoose(parentIds);
-        Map<String, Boolean> tmp = Maps.newHashMap();
-        for (HasChildren hasChildren : hasChildrenList) {
-            if (hasChildren.getCount() != null && hasChildren.getCount() > 0) {
-                tmp.put(hasChildren.getParentId(), false);
-            }
-        }
-
-        for (Tree<Object> treeNode : treeNodes) {
-            Boolean tmpFlag = tmp.get(Convert.toStr(treeNode.getId()));
-            if (tmpFlag == null || tmpFlag) {
-                treeNode.putExtra(IS_LEAF, true);
-            }else {
-                treeNode.putExtra(IS_LEAF, false);
-            }
-        }
+    private MenuModel getGenMenuModel() {
+        MenuModel model = new MenuModel();
+        model.setId(MenuConstants.GEN_ID);
+        model.setMenuName("根菜单");
+        model.setHidden(DictType.NO_YES_NO.getValue());
+        model.setSortNo(-1);
+        model.setType(MenuConstants.MENU);
+        model.setParentId(VIRTUAL_TOTAL_NODE);
+        return model;
     }
 
     /**

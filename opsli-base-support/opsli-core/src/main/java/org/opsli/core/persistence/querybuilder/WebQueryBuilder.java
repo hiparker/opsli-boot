@@ -38,6 +38,10 @@ public class WebQueryBuilder<T extends BaseEntity> implements QueryBuilder<T>{
     private static final String EQ = "EQ";
     /** 模糊匹配 */
     private static final String LIKE = "LIKE";
+    /** 左模糊匹配 */
+    private static final String LIKE_LEFT = "LIKEL";
+    /** 右模糊匹配 */
+    private static final String LIKE_RIGHT = "LIKER";
     /** 日期匹配 */
     private static final String BEGIN = "BEGIN";
     private static final String END = "END";
@@ -217,6 +221,14 @@ public class WebQueryBuilder<T extends BaseEntity> implements QueryBuilder<T>{
                 // 模糊匹配
                 queryWrapper.like(key, value);
                 break;
+            case LIKE_LEFT:
+                // 模糊匹配 左
+                queryWrapper.likeLeft(key, value);
+                break;
+            case LIKE_RIGHT:
+                // 模糊匹配 右
+                queryWrapper.likeRight(key, value);
+                break;
             case BEGIN:
                 // 大于等于
                 queryWrapper.ge(key, value);
@@ -282,6 +294,8 @@ public class WebQueryBuilder<T extends BaseEntity> implements QueryBuilder<T>{
             case EQ:
             case END:
             case LIKE:
+            case LIKE_LEFT:
+            case LIKE_RIGHT:
             case BEGIN:
                 return true;
             default:

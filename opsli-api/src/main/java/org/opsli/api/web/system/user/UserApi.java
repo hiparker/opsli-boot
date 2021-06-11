@@ -19,7 +19,7 @@ import org.opsli.api.base.result.ResultVo;
 import org.opsli.api.wrapper.system.menu.MenuModel;
 import org.opsli.api.wrapper.system.user.UserInfo;
 import org.opsli.api.wrapper.system.user.UserModel;
-import org.opsli.api.wrapper.system.user.UserOrgRefModel;
+import org.opsli.api.wrapper.system.user.UserOrgRefWebModel;
 import org.opsli.api.wrapper.system.user.UserPassword;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -72,7 +72,7 @@ public interface UserApi {
      * @return ResultVo
      */
     @GetMapping("/getOrg")
-    ResultVo<UserOrgRefModel> getOrg();
+    ResultVo<?> getOrg();
 
     /**
      * 当前登陆用户信息
@@ -81,7 +81,7 @@ public interface UserApi {
      * @return ResultVo
      */
     @GetMapping("/getOrgByUserId")
-    ResultVo<UserOrgRefModel> getOrgByUserId(String userId);
+    ResultVo<?> getOrgByUserId(String userId);
 
     /**
      * 根据 userId 获得用户角色Id集合
@@ -94,6 +94,7 @@ public interface UserApi {
 
     /**
      * 修改密码
+     * @param userPassword 账号密码
      * @return ResultVo
      */
     @PostMapping("/updatePassword")
@@ -148,7 +149,7 @@ public interface UserApi {
      * 用户信息 查询分页
      * @param pageNo 当前页
      * @param pageSize 每页条数
-     * @param org 组织
+     * @param orgIdGroup 组织ID组
      * @param request request
      * @return ResultVo
      */
@@ -156,7 +157,7 @@ public interface UserApi {
     ResultVo<?> findPage(
             @RequestParam(name = "pageNo", defaultValue = "1") Integer pageNo,
             @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize,
-            UserOrgRefModel org,
+            @RequestParam(name = "orgIdGroup") String orgIdGroup,
             HttpServletRequest request
     );
 
@@ -265,7 +266,7 @@ public interface UserApi {
      * @param userId 用户ID
      * @return ResultVo
      */
-    ResultVo<UserOrgRefModel> getOrgInfoByUserId(String userId);
+    ResultVo<UserOrgRefWebModel> getOrgInfoByUserId(String userId);
 
 
 }

@@ -47,28 +47,29 @@ public interface SysOrgRestApi {
 
 
     /**
-     * 获得懒加载树 By 用户
-     * @param parentId 父级ID
-     * @return ResultVo
-     */
-    @GetMapping("/findTreeLazyByUser")
-    ResultVo<?> findTreeLazyByUser(String parentId);
-
-    /**
      * 获得懒加载树
      * @param parentId 父级ID
+     * @param id 忽略自身ID
      * @return ResultVo
      */
     @GetMapping("/findTreeLazy")
-    ResultVo<?> findTreeLazy(String parentId);
+    ResultVo<?> findTreeLazy(String parentId, String id);
 
     /**
-     * 获得控件树
-     * @param parentId 父级ID
+     * 获得全量树 包含默认节点
+     * @param isGen 是否包含根节点
+     * @param id 忽略自身ID
      * @return ResultVo
      */
-    @GetMapping("/findGridTree")
-    ResultVo<?> findGridTree(String parentId);
+    @GetMapping("/findTreeByDef")
+    ResultVo<?> findTreeByDef(boolean isGen, String id);
+
+    /**
+     * 获得当前用户下 组织
+     * @return ResultVo
+     */
+    @GetMapping("/findTreeByDefWithUserToLike")
+    ResultVo<?> findTreeByDefWithUserToLike();
 
     // ================
 
@@ -79,14 +80,6 @@ public interface SysOrgRestApi {
     */
     @GetMapping("/get")
     ResultVo<SysOrgModel> get(SysOrgModel model);
-
-    /**
-    * 组织树
-    * @param request request
-    * @return ResultVo
-    */
-    @GetMapping("/findTree")
-    ResultVo<?> findTree( HttpServletRequest request );
 
     /**
     * 组织机构表 新增

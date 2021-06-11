@@ -56,6 +56,6 @@ public class TestUser extends BaseEntity {
     private String tenantId;
 
     /** 逻辑删除字段 */
-    private Integer deleted;
+    private String deleted;
 
 }

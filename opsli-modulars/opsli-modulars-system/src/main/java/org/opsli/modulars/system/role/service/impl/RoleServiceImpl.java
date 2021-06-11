@@ -26,7 +26,8 @@ import org.opsli.common.exception.ServiceException;
 import org.opsli.core.base.service.impl.CrudServiceImpl;
 import org.opsli.core.persistence.querybuilder.GenQueryBuilder;
 import org.opsli.core.persistence.querybuilder.QueryBuilder;
-import org.opsli.core.persistence.querybuilder.chain.TenantHandler;
+import org.opsli.core.persistence.querybuilder.chain.QueryOrgHandler;
+import org.opsli.core.persistence.querybuilder.chain.QueryTenantHandler;
 import org.opsli.core.utils.UserUtil;
 import org.opsli.modulars.system.SystemMsg;
 import org.opsli.modulars.system.role.entity.SysRole;
@@ -144,9 +145,10 @@ public class RoleServiceImpl extends CrudServiceImpl<RoleMapper, SysRole, RoleMo
     public List<SysRole> findList(QueryWrapper<SysRole> queryWrapper) {
         // 如果没有租户修改能力 则默认增加租户限制
         if(!UserUtil.isHasUpdateTenantPerms(UserUtil.getUser())){
-            // 多租户处理
-            TenantHandler tenantHandler = new TenantHandler();
-            tenantHandler.handler(entityClazz, queryWrapper);
+            // 数据处理责任链
+            queryWrapper = new QueryTenantHandler(
+                    new QueryOrgHandler()
+            ).handler(entityClazz, queryWrapper);
         }
 
         return super.list(queryWrapper);
@@ -159,9 +161,10 @@ public class RoleServiceImpl extends CrudServiceImpl<RoleMapper, SysRole, RoleMo
 
         // 如果没有租户修改能力 则默认增加租户限制
         if(!UserUtil.isHasUpdateTenantPerms(UserUtil.getUser())){
-            // 多租户处理
-            TenantHandler tenantHandler = new TenantHandler();
-            tenantHandler.handler(entityClazz, queryWrapper);
+            // 数据处理责任链
+            queryWrapper = new QueryTenantHandler(
+                    new QueryOrgHandler()
+            ).handler(entityClazz, queryWrapper);
         }
 
         return super.list(queryWrapper);
@@ -188,8 +191,10 @@ public class RoleServiceImpl extends CrudServiceImpl<RoleMapper, SysRole, RoleMo
             wrapper.notIn(MyBatisConstants.FIELD_ID, model.getId());
         }
 
-        // 租户检测
-        wrapper = new TenantHandler().handler(super.entityClazz, wrapper);
+        // 数据处理责任链
+        wrapper = new QueryTenantHandler(
+                new QueryOrgHandler()
+        ).handler(entityClazz, wrapper);
 
         return super.count(wrapper);
     }

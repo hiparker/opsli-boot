@@ -33,9 +33,11 @@ import org.opsli.core.base.entity.BaseEntity;
 @EqualsAndHashCode(callSuper = false)
 public class SysOrg extends BaseEntity {
 
-
     /** 父级主键 */
     private String parentId;
+
+    /** 父级主键集合   xxx,xxx */
+    private String parentIds;
 
     /** 组织机构编号 */
     private String orgCode;
@@ -43,19 +45,19 @@ public class SysOrg extends BaseEntity {
     /** 组织机构名称 */
     private String orgName;
 
-    /** 组织机构类型: 1-公司 2-部门 3-岗位 */
-    private String orgType;
-
     /** 排序 */
     private Integer sortNo;
 
+    /** 备注 */
+    @TableField(updateStrategy = FieldStrategy.IGNORED)
+    private String remark;
 
     // ========================================
 
 
     /** 逻辑删除字段 */
     @TableLogic
-    private Integer deleted;
+    private String deleted;
 
     /** 多租户字段 */
     private String tenantId;

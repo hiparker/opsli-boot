@@ -16,6 +16,7 @@
 package org.opsli.modulars.system.user.service;
 
 import org.opsli.api.wrapper.system.user.UserOrgRefModel;
+import org.opsli.api.wrapper.system.user.UserOrgRefWebModel;
 
 import java.util.List;
 
@@ -33,6 +34,13 @@ public interface IUserOrgRefService {
      * @param model 模型
      * @return boolean
      */
-    boolean setOrg(UserOrgRefModel model);
+    boolean setOrg(UserOrgRefWebModel model);
+
+    /**
+     * 根据用户ID 获得组织列表
+     * @param userId 用户ID
+     * @return List
+     */
+    List<UserOrgRefModel> findListByUserId(String userId);
 
 }
