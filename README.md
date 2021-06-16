@@ -289,6 +289,25 @@
 
 感谢Star，感恩相遇，愿世间美好与我们环环相扣，加油！屏幕前的我们，打破桎梏，坚守初心。其实人生改变命运的机会并没有太多，我们并不是不优秀，我们也并不是一无是处，我们也希望驻足山巅被众人仰望，也许我们缺少的只是一个机会，缺少的只是生命中的导师，我希望这个框架帮助到更多的人，希望有一天，我们面试的时候不再胆怯，希望有一天别人看到的不仅仅是你的努力，还有你的功成名就，出人头地。
 
+## 鸣谢
+
+- <a href="https://www.jetbrains.com/?from=opsli-boot" rel="nofollow">感谢 JetBrains 提供的免费开源 License:</a>
+
+    <a href="https://www.jetbrains.com/?from=opsli-boot" rel="nofollow"><img src="https://camo.githubusercontent.com/a4b533abbf1bd277a3943956fa8bed240b02184ccc6b5e9f751ae2f5afd7cfa6/687474703a2f2f7374617469632e786b636f64696e672e636f6d2f737072696e672d626f6f742d64656d6f2f3036343331322e6a7067" width="100px" alt="jetbrains"  style="max-width:100%;"></a>
+
+## 贡献者列表
+
+[![contributors](https://whnb.wang/contributors/hiparker/opsli-boot)](https://github.com/hiparker/opsli-boot)
+
+## Stars 趋势
+
+### Gitee
+[![Stargazers over time](https://whnb.wang/stars/hiparker/opsli-boot)](https://github.com/hiparker/opsli-boot)
+
+### Github
+[![Stargazers over time](https://starchart.cc/hiparker/opsli-boot.svg)](https://github.com/hiparker/opsli-boot)
+
+
 ## 支持
 
 > 谢谢您愿意支持开源
@@ -297,3 +316,4 @@
 <img width="200" src="https://gitee.com/hiparker/opsli-ui/raw/master/repository-images/vx.png"/>
 <img width="200" src="https://gitee.com/hiparker/opsli-ui/raw/master/repository-images/zfb.png"/>
 </div>
+
