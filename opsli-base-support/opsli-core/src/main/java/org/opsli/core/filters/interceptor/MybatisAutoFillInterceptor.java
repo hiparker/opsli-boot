@@ -29,8 +29,7 @@ import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.mapping.SqlCommandType;
 import org.apache.ibatis.plugin.*;
 import org.opsli.common.constants.MyBatisConstants;
-import org.opsli.core.utils.UserUtil;
-import org.opsli.core.utils.excel.factory.AbstractModelHelper;
+import org.opsli.core.utils.UserTokenUtil;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Field;
@@ -145,7 +144,7 @@ public class MybatisAutoFillInterceptor implements Interceptor {
                     // 如果创建人 为空则进行默认赋值
                     Object createValue = ReflectUtil.getFieldValue(arg, f.getName());
                     if(StringUtils.isBlank(Convert.toStr(createValue))){
-                        BeanUtil.setProperty(arg, MyBatisConstants.FIELD_CREATE_BY, UserUtil.getUser().getId());
+                        BeanUtil.setProperty(arg, MyBatisConstants.FIELD_CREATE_BY, UserTokenUtil.getUserIdByToken());
                     }
                     break;
                 // 更新人
@@ -153,7 +152,7 @@ public class MybatisAutoFillInterceptor implements Interceptor {
                     // 如果更新人 为空则进行默认赋值
                     Object updateValue = ReflectUtil.getFieldValue(arg, f.getName());
                     if(StringUtils.isBlank(Convert.toStr(updateValue))){
-                        BeanUtil.setProperty(arg, MyBatisConstants.FIELD_UPDATE_BY, UserUtil.getUser().getId());
+                        BeanUtil.setProperty(arg, MyBatisConstants.FIELD_UPDATE_BY, UserTokenUtil.getUserIdByToken());
                     }
                     break;
                 // 创建日期
@@ -178,7 +177,7 @@ public class MybatisAutoFillInterceptor implements Interceptor {
                     // 如果租户ID 为空则进行默认赋值
                     Object tenantValue = ReflectUtil.getFieldValue(arg, f.getName());
                     if(StringUtils.isBlank(Convert.toStr(tenantValue))){
-                        BeanUtil.setProperty(arg, MyBatisConstants.FIELD_TENANT,  UserUtil.getTenantId());
+                        BeanUtil.setProperty(arg, MyBatisConstants.FIELD_TENANT,  UserTokenUtil.getTenantIdByToken());
                     }
                     break;
                 default:
@@ -242,7 +241,7 @@ public class MybatisAutoFillInterceptor implements Interceptor {
                     // 如果更新人 为空则进行默认赋值
                     Object updateValue = ReflectUtil.getFieldValue(arg, f.getName());
                     if(StringUtils.isBlank(Convert.toStr(updateValue))){
-                        BeanUtil.setProperty(arg, MyBatisConstants.FIELD_UPDATE_BY, UserUtil.getUser().getId());
+                        BeanUtil.setProperty(arg, MyBatisConstants.FIELD_UPDATE_BY, UserTokenUtil.getUserIdByToken());
                     }
                     break;
                 // 更新日期

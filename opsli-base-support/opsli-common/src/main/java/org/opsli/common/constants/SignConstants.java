@@ -8,11 +8,14 @@ package org.opsli.common.constants;
  */
 public interface SignConstants {
 
-    /** username */
+    /** 用户账号 */
     String ACCOUNT = "account";
 
-    /** user Id */
+    /** 用户ID */
     String USER_ID = "userId";
+
+    /** 租户ID */
+    String TENANT_ID = "tenantId";
 
     /** 时间戳 */
     String TIMESTAMP  = "timestamp";

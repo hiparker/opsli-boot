@@ -33,6 +33,7 @@ import org.opsli.common.constants.TokenConstants;
 import org.opsli.common.constants.TokenTypeConstants;
 import org.opsli.common.enums.LoginLimitRefuse;
 import org.opsli.common.exception.TokenException;
+import org.opsli.core.api.TokenThreadLocal;
 import org.opsli.core.autoconfigure.properties.GlobalProperties;
 import org.opsli.core.cache.local.CacheUtil;
 import org.opsli.core.msg.CoreMsg;
@@ -118,7 +119,11 @@ public class UserTokenUtil {
             // 生成 Token 包含 username userId timestamp
             boolean reviveMode = LOGIN_PROPERTIES.getReviveMode() != null && LOGIN_PROPERTIES.getReviveMode();
             String signToken = JwtUtil.sign(
-                    TokenTypeConstants.TYPE_SYSTEM, user.getUsername(), user.getId(), !reviveMode);
+                    TokenTypeConstants.TYPE_SYSTEM,
+                    user.getUsername(),
+                    user.getId(),
+                    user.getTenantId(),
+                    !reviveMode);
 
             // 获得当前Token时间戳
             long timestamp = Convert.toLong(
@@ -155,15 +160,17 @@ public class UserTokenUtil {
 
     /**
      * 根据 Token 获得用户ID
+     * @return String
+     */
+    public static String getUserIdByToken() {
+        return getUserIdByToken(TokenThreadLocal.get());
+    }
+    /**
+     * 根据 Token 获得用户ID
      * @param token token
      * @return String
      */
     public static String getUserIdByToken(String token) {
-        // 判断 工具类是否初始化完成
-        ThrowExceptionUtil.isThrowException(!IS_INIT,
-                CoreMsg.OTHER_EXCEPTION_UTILS_INIT);
-
-
         if(StringUtils.isEmpty(token)){
             return null;
         }
@@ -174,17 +181,20 @@ public class UserTokenUtil {
         return userId;
     }
 
+
     /**
-     * 根据 Token 获得 username
+     * 根据 Token 获得 用户名
+     * @return String
+     */
+    public static String getUserNameByToken() {
+        return getUserNameByToken(TokenThreadLocal.get());
+    }
+    /**
+     * 根据 Token 获得 用户名
      * @param token token
      * @return String
      */
     public static String getUserNameByToken(String token) {
-        // 判断 工具类是否初始化完成
-        ThrowExceptionUtil.isThrowException(!IS_INIT,
-                CoreMsg.OTHER_EXCEPTION_UTILS_INIT);
-
-
         if(StringUtils.isEmpty(token)){
             return null;
         }
@@ -195,7 +205,29 @@ public class UserTokenUtil {
         return username;
     }
 
+    /**
+     * 根据 Token 获得 租户ID
+     * @return String
+     */
+    public static String getTenantIdByToken() {
+        return getTenantIdByToken(TokenThreadLocal.get());
+    }
 
+    /**
+     * 根据 Token 获得 租户ID
+     * @param token token
+     * @return String
+     */
+    public static String getTenantIdByToken(String token) {
+        if(StringUtils.isEmpty(token)){
+            return null;
+        }
+        String username = "";
+        try {
+            username = JwtUtil.getClaim(token, SignConstants.TENANT_ID);
+        }catch (Exception ignored){}
+        return username;
+    }
 
     /**
      * 退出登陆

@@ -96,7 +96,8 @@ public class JwtUtil {
      * @param isExpire 是否过期
      * @return java.lang.String 返回加密的Token
      */
-    public static String sign(String tokenType, String account, String userId, boolean isExpire) {
+    public static String sign(String tokenType, String account,
+                              String userId, String tenantId, boolean isExpire) {
         // 判断 工具类是否初始化完成
         ThrowExceptionUtil.isThrowException(!IS_INIT,
                 CoreMsg.OTHER_EXCEPTION_UTILS_INIT);
@@ -110,6 +111,7 @@ public class JwtUtil {
                 .withClaim(SignConstants.TYPE, tokenType)
                 .withClaim(SignConstants.ACCOUNT, account)
                 .withClaim(SignConstants.USER_ID, userId)
+                .withClaim(SignConstants.TENANT_ID, tenantId)
                 .withClaim(SignConstants.TIMESTAMP, String.valueOf(currentTimeMillis));
 
         // 如果为是 则开启失效时间
@@ -150,7 +152,8 @@ public class JwtUtil {
     // ==================
 
     public static void main(String[] args) {
-        String token = JwtUtil.sign(TokenTypeConstants.TYPE_SYSTEM, "test","123123", true);
+        String token = JwtUtil.sign(TokenTypeConstants.TYPE_SYSTEM,
+                "test","123123", "",true);
 
         boolean verify = JwtUtil.verify(token);
         System.out.println(token);
