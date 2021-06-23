@@ -110,8 +110,6 @@ public class LoginRestController {
         // 如果验证成功， 则清除锁定信息
         UserTokenUtil.clearLockAccount(form.getUsername());
 
-
-
         // 如果不是超级管理员
         if(!StringUtils.equals(UserUtil.SUPER_ADMIN, user.getUsername())){
             // 账号锁定验证
@@ -121,11 +119,24 @@ public class LoginRestController {
                 throw new TokenException(TokenMsg.EXCEPTION_LOGIN_ACCOUNT_LOCKED);
             }
 
-            // 租户启用验证
+            // 验证租户是否生效
             TenantModel tenant = TenantUtil.getTenant(user.getTenantId());
             if(tenant == null){
-                // 租户未启用，请联系管理员
                 throw new TokenException(TokenMsg.EXCEPTION_LOGIN_TENANT_NOT_USABLE);
+            }
+
+            // 检测用户是否有角色
+            List<String> roleModelList = UserUtil.getUserRolesByUserId(user.getId());
+            if(CollUtil.isEmpty(roleModelList)){
+                // 用户暂无角色，请设置后登录
+                throw new TokenException(TokenMsg.EXCEPTION_USER_ROLE_NOT_NULL);
+            }
+
+            // 检测用户是否有角色菜单
+            List<MenuModel> menuModelList = UserUtil.getMenuListByUserId(user.getId());
+            if(CollUtil.isEmpty(menuModelList)){
+                // 用户暂无角色菜单，请设置后登录
+                throw new TokenException(TokenMsg.EXCEPTION_USER_MENU_NOT_NULL);
             }
         }
 
@@ -133,20 +144,6 @@ public class LoginRestController {
         if(slipCount >= UserTokenUtil.LOGIN_PROPERTIES.getSlipVerifyCount()){
             // 删除验证过后验证码
             CaptchaUtil.delCaptcha(form.getUuid());
-        }
-
-        // 检测用户是否有角色
-        List<String> roleModelList = UserUtil.getUserRolesByUserId(user.getId());
-        if(CollUtil.isEmpty(roleModelList)){
-            // 用户暂无角色，请设置后登录
-            throw new TokenException(TokenMsg.EXCEPTION_USER_ROLE_NOT_NULL);
-        }
-
-        // 检测用户是否有角色菜单
-        List<MenuModel> menuModelList = UserUtil.getMenuListByUserId(user.getId());
-        if(CollUtil.isEmpty(menuModelList)){
-            // 用户暂无角色菜单，请设置后登录
-            throw new TokenException(TokenMsg.EXCEPTION_USER_MENU_NOT_NULL);
         }
 
         //生成token，并保存到Redis
