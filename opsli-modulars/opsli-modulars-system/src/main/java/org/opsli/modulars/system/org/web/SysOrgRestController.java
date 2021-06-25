@@ -156,9 +156,9 @@ public class SysOrgRestController extends BaseRestController<SysOrg, SysOrgModel
         List<SysOrgModel> orgModelList;
         if(StringUtils.isEmpty(parentId)){
             orgModelList = Lists.newArrayList();
-            parentId = VIRTUAL_TOTAL_NODE;
             // 生成根节点组织
             SysOrgModel model = getGenOrgModel();
+            parentId = model.getParentId();
             orgModelList.add(model);
         }else{
             QueryBuilder<SysOrg> queryBuilder = new GenQueryBuilder<>();
@@ -192,9 +192,9 @@ public class SysOrgRestController extends BaseRestController<SysOrg, SysOrgModel
         List<SysOrgModel> orgModelList = Lists.newArrayList();
         String parentId = PARENT_ID;
         if(isGen){
-            parentId = VIRTUAL_TOTAL_NODE;
             // 生成根节点组织
             SysOrgModel model = getGenOrgModel();
+            parentId = model.getParentId();
             orgModelList.add(model);
         }
 

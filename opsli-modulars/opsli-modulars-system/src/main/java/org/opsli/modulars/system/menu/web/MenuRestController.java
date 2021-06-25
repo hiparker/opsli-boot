@@ -165,6 +165,7 @@ public class MenuRestController extends BaseRestController<SysMenu, MenuModel, I
             menuModelList = Lists.newArrayList();
             // 生成根节点菜单
             MenuModel model = getGenMenuModel();
+            parentId = model.getParentId();
             menuModelList.add(model);
         }else{
             // 只查菜单
@@ -209,6 +210,7 @@ public class MenuRestController extends BaseRestController<SysMenu, MenuModel, I
             menuModelList = Lists.newArrayList();
             // 生成根节点菜单
             MenuModel model = getGenMenuModel();
+            parentId = model.getParentId();
             menuModelList.add(model);
         }else{
             QueryBuilder<SysMenu> queryBuilder = new GenQueryBuilder<>();
