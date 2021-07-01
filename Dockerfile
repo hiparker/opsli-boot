@@ -2,7 +2,7 @@
 FROM openjdk:8u222-jre
 
 MAINTAINER opsli.com
-LABEL version=V1.3.3
+LABEL version=V1.4.0
 LABEL description=OPSLI-快速开发平台
 LABEL qqGroup=724850675
 
@@ -23,7 +23,7 @@ RUN ln -sf /usr/share/zoneinfo/$TZ /etc/localtime \
     && echo $TZ > /etc/timezone
 
 # 启动镜像
-ENTRYPOINT ["java", "-Dfile.encoding=utf-8", "-Djava.security.egd=file:/dev/./urandom", "-jar", "opsli-starter-1.3.3.jar"]
+ENTRYPOINT ["java", "-Dfile.encoding=utf-8", "-Djava.security.egd=file:/dev/./urandom", "-jar", "opsli-starter-1.4.0.jar"]
 CMD ["-Xmx2048m", "-Xms2048m",  "-XX:+UseG1GC", "-XX:MaxGCPauseMillis=200", "--spring.profiles.active=dev"]
 
 # 暴露端口
