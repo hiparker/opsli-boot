@@ -13,9 +13,10 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.opsli.common.thread.wait;
+package org.opsli.common.thread;
 
 import cn.hutool.core.collection.CollUtil;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
@@ -31,14 +32,12 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @date 2020-12-10 10:36
  */
 @Slf4j
-public class AsyncProcessWaitExecutor {
+public class AsyncProcessExecutorByWait implements AsyncProcessExecutor{
 
-    /** 任务执行计数器 */
-    private AtomicInteger count;
     /** 任务队列 */
     private final List<Runnable> taskList;
 
-    public AsyncProcessWaitExecutor(){
+    public AsyncProcessExecutorByWait(){
         taskList = new ArrayList<>();
     }
 
@@ -46,48 +45,64 @@ public class AsyncProcessWaitExecutor {
      * 执行
      * @param task 任务
      */
-    public void put(final Runnable task){
+    @Override
+    public AsyncProcessExecutorByWait put(final Runnable task){
         taskList.add(task);
+        return this;
     }
 
     /**
      * 执行 线程锁 等待查询结果 结果完成后继续执行
+     *
+     * @return boolean 最终直接结果
      */
-    public void execute(){
+    @Override
+    public boolean execute(){
         if(CollUtil.isEmpty(this.taskList)){
-            return;
+            return true;
         }
 
-        // 初始化锁参数
-        count = new AtomicInteger(this.taskList.size());
-        // 门闩 线程锁
-        CountDownLatch latch = new CountDownLatch(this.taskList.size());
-
+        // 锁
+        AsyncWaitLock lock = new AsyncWaitLock(this.taskList.size());
         for (Runnable task : this.taskList) {
             // 多线程执行任务
-            boolean execute = AsyncProcessQueueWait.execute(task, count, latch);
-            // 执行任务被拒绝 门闩减1 计数器不动 End
-            if(!execute){
-                latch.countDown();
-            }
+            AsyncProcessCoordinator.execute(task, lock);
         }
 
         // 线程锁 等待查询结果 结果完成后继续执行
         try {
-            latch.await();
+            lock.getLatch().await();
         }catch (Exception e){
             log.error(e.getMessage(), e);
         }
+
+        // 返回执行结果
+        return lock.getCount().get() == 0;
     }
 
+    // ========================================
+
     /**
-     * 线程锁 等待查询结果 结果完成后继续执行
+     * 线程锁对象
+     *
+     * @author Parker
+     * @date 2020-10-08 10:24
      */
-    public boolean isSuccess(){
-        if(CollUtil.isEmpty(this.taskList)){
-            return true;
+    @Getter
+    public static class AsyncWaitLock {
+
+        /** 门闩 */
+        private final CountDownLatch latch;
+
+        /** 计数器 */
+        private final AtomicInteger count;
+
+        public AsyncWaitLock(int count){
+            // 初始化锁参数
+            this.count = new AtomicInteger(count);
+            // 门闩 线程锁
+            this.latch = new CountDownLatch(count);
         }
-        return count.get() == 0;
     }
 
 }

@@ -166,20 +166,19 @@ public class WebQueryBuilder<T extends BaseEntity> implements QueryBuilder<T>{
         // 如果没有排序 默认按照 修改时间倒叙排序
         if(orderCount == 0){
             if(StringUtils.isNotEmpty(this.defaultOrderField)){
-                String key = this.defaultOrderField;
-                String keyStr = null;
-                if(conf != null){
-                    keyStr = conf.get(key);
-                }
+                String key = StringUtils.isNotEmpty(conf.get(this.defaultOrderField))
+                        ?conf.get(this.defaultOrderField)
+                        :this.defaultOrderField;
+                // 如果Key 与 默认Key 想等，且Entity 不包含这个字段 则不进行排序
+                if(StringUtils.equals(key, this.defaultOrderField)) {
+                    // 如果Entity 不包含这个字段 则不进行排序
+                    if(!ReflectUtil.hasField(entityClazz, key)) {
+                        return queryWrapper;
+                    }
 
-                // 检测 Conf 配置中是否已经指定该配置
-                if(StringUtils.isNotEmpty(keyStr)){
-                    key = keyStr;
-                }else{
                     // 转换驼峰 为 数据库下划线字段
                     key = FieldUtil.humpToUnderline(key);
                 }
-
                 queryWrapper.orderByDesc(key);
             }
         }

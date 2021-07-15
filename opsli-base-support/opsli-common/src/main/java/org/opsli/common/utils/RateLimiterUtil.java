@@ -21,7 +21,8 @@ import com.google.common.collect.Maps;
 import com.google.common.util.concurrent.RateLimiter;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-import org.opsli.common.thread.refuse.AsyncProcessQueueReFuse;
+import org.opsli.common.thread.AsyncProcessExecutor;
+import org.opsli.common.thread.AsyncProcessExecutorFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.Duration;
@@ -184,12 +185,14 @@ public final class RateLimiterUtil {
     public static void main(String[] args) {
         int count = 500;
         RateLimiterUtil.removeIp("127.0.0.1");
+        AsyncProcessExecutor normalExecutor = AsyncProcessExecutorFactory.createNormalExecutor();
         for (int i = 0; i < count; i++) {
-            AsyncProcessQueueReFuse.execute(()->{
+            normalExecutor.put(()->{
                 boolean enter = RateLimiterUtil.enter("127.0.0.1","/api/v1", 2d);
                 System.out.println(enter);
             });
         }
+        normalExecutor.execute();
     }
 
 }

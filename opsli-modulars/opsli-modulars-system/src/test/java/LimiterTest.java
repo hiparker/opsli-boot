@@ -1,7 +1,8 @@
 import cn.hutool.http.HttpUtil;
 import com.google.common.collect.Maps;
 import org.junit.Test;
-import org.opsli.common.thread.refuse.AsyncProcessQueueReFuse;
+import org.opsli.common.thread.AsyncProcessExecutor;
+import org.opsli.common.thread.AsyncProcessExecutorFactory;
 
 import java.util.Map;
 
@@ -15,14 +16,16 @@ public class LimiterTest {
 
     @Test
     public void test(){
+        AsyncProcessExecutor normalExecutor = AsyncProcessExecutorFactory.createNormalExecutor();
         for (int i = 0; i < 1000; i++) {
-            AsyncProcessQueueReFuse.execute(()->{
+            normalExecutor.put(()->{
                 Map<String,Object> map = Maps.newHashMap();
                 map.put("username","demo");
                 String ret = HttpUtil.get("http://127.0.0.1:8080/opsli-boot/system/slipCount", map);
                 System.out.println(ret);
             });
         }
+        normalExecutor.execute();
     }
 
 }

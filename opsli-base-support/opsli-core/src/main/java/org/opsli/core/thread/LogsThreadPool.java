@@ -4,7 +4,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.opsli.api.base.result.ResultVo;
 import org.opsli.api.web.system.logs.LogsApi;
 import org.opsli.api.wrapper.system.logs.LogsModel;
-import org.opsli.common.thread.refuse.AsyncProcessQueueReFuse;
+import org.opsli.common.thread.AsyncProcessExecutor;
+import org.opsli.common.thread.AsyncProcessExecutorFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -31,13 +32,15 @@ public class LogsThreadPool {
             return;
         }
 
-        AsyncProcessQueueReFuse.execute(()->{
+        AsyncProcessExecutor normalExecutor = AsyncProcessExecutorFactory.createNormalExecutor();
+        normalExecutor.put(()->{
             // 存储临时 token
             ResultVo<?> ret = logsApi.insert(logsModel);
             if(!ret.isSuccess()){
                 log.error(ret.getMsg());
             }
         });
+        normalExecutor.execute();
     }
 
 

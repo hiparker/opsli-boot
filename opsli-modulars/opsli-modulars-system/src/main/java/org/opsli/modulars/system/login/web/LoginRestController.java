@@ -29,12 +29,13 @@ import org.opsli.api.wrapper.system.user.UserModel;
 import org.opsli.common.annotation.ApiCryptoAsymmetric;
 import org.opsli.common.annotation.Limiter;
 import org.opsli.common.enums.DictType;
+import org.opsli.common.thread.AsyncProcessExecutor;
+import org.opsli.common.thread.AsyncProcessExecutorFactory;
 import org.opsli.core.utils.ValidatorUtil;
 import org.opsli.core.api.TokenThreadLocal;
 import org.opsli.common.enums.AlertType;
 import org.opsli.common.enums.OptionsType;
 import org.opsli.common.exception.TokenException;
-import org.opsli.common.thread.refuse.AsyncProcessQueueReFuse;
 import org.opsli.common.utils.IPUtil;
 import org.opsli.core.msg.TokenMsg;
 import org.opsli.core.utils.*;
@@ -149,13 +150,15 @@ public class LoginRestController {
         //生成token，并保存到Redis
         ResultVo<UserTokenUtil.TokenRet> resultVo = UserTokenUtil.createToken(user);
         if(resultVo.isSuccess()){
+            AsyncProcessExecutor normalExecutor = AsyncProcessExecutorFactory.createNormalExecutor();
             // 异步保存IP
-            AsyncProcessQueueReFuse.execute(()->{
+            normalExecutor.put(()->{
                 // 保存用户最后登录IP
                 String clientIpAddress = IPUtil.getClientIdBySingle(request);
                 user.setLoginIp(clientIpAddress);
                 iUserService.updateLoginIp(user);
             });
+            normalExecutor.execute();
         }
         return resultVo;
     }
