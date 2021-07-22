@@ -166,6 +166,9 @@ public class WebQueryBuilder<T extends BaseEntity> implements QueryBuilder<T>{
         // 如果没有排序 默认按照 修改时间倒叙排序
         if(orderCount == 0){
             if(StringUtils.isNotEmpty(this.defaultOrderField)){
+                if(conf == null){
+                    conf = new WebQueryConf();
+                }
                 String key = StringUtils.isNotEmpty(conf.get(this.defaultOrderField))
                         ?conf.get(this.defaultOrderField)
                         :this.defaultOrderField;
