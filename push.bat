@@ -3,7 +3,8 @@ echo "Git Pushing ......"
 echo ""
 
 git push "git@github.com:hiparker/opsli-boot.git" master
-s
+git push -f "git@gitee.com:hiparker/opsli-boot.git" master
+
 
 
 
