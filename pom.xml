@@ -430,27 +430,6 @@
     <!-- 环境选择 -->
     <profiles>
         <profile>
-            <!-- 开发环境 -->
-            <id>dev</id>
-            <properties>
-                <spring.active>dev</spring.active>
-            </properties>
-        </profile>
-        <profile>
-            <!-- 发布环境 -->
-            <id>release</id>
-            <properties>
-                <spring.active>release</spring.active>
-            </properties>
-        </profile>
-        <profile>
-            <!-- 测试环境 -->
-            <id>beta</id>
-            <properties>
-                <spring.active>beta</spring.active>
-            </properties>
-        </profile>
-        <profile>
             <!-- 本地环境 -->
             <id>local</id>
             <properties>
@@ -460,6 +439,27 @@
                 <!-- 设置默认激活这个配置 -->
                 <activeByDefault>true</activeByDefault>
             </activation>
+        </profile>
+        <profile>
+            <!-- 开发环境 -->
+            <id>dev</id>
+            <properties>
+                <spring.active>dev</spring.active>
+            </properties>
+        </profile>
+        <profile>
+            <!-- 测试环境 -->
+            <id>test</id>
+            <properties>
+                <spring.active>test</spring.active>
+            </properties>
+        </profile>
+        <profile>
+            <!-- 发布环境 -->
+            <id>prod</id>
+            <properties>
+                <spring.active>prod</spring.active>
+            </properties>
         </profile>
     </profiles>
 

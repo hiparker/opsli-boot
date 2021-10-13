@@ -79,6 +79,7 @@ opsli:
   web:
     upload-path: var/files
 
-# 系统日志
-log:
-  path: var/log
+# 日志
+logging:
+  level:
+    root: info

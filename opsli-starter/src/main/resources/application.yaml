@@ -26,6 +26,8 @@ server:
 #        include: metrics,httptrace
 
 spring:
+  application:
+    name: opsli-boot
   profiles:
     #此处由maven的环境选择决定
     active: "@spring.active@"
@@ -109,6 +111,7 @@ spring:
         filters: stat,wall,slf4j
         # 通过connectProperties属性来打开mergeSql功能；慢SQL记录
         connectionProperties: druid.stat.mergeSql\=true;druid.stat.slowSqlMillis\=5000
+
 
 #mybatis-plus 插件
 mybatis-plus:
