@@ -16,7 +16,7 @@
 package org.opsli.common.constants;
 
 /**
- * 菜单常量
+ * 菜单常量 v1.4.1 修复菜单无法加载根节点问题
  *
  * @author Parker
  * @date 2021年3月10日15:50:16
