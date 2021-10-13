@@ -17,13 +17,19 @@ package org.opsli.core.base.controller;
 
 
 import cn.hutool.core.annotation.AnnotationUtil;
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.collection.ListUtil;
+import cn.hutool.core.convert.Convert;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.date.TimeInterval;
+import cn.hutool.core.lang.tree.Tree;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.excel.support.ExcelTypeEnum;
 import com.alibaba.excel.util.CollectionUtils;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.opsli.api.base.result.ResultVo;
@@ -32,6 +38,7 @@ import org.opsli.api.wrapper.system.user.UserModel;
 import org.opsli.common.annotation.RequiresPermissionsCus;
 import org.opsli.common.annotation.hotdata.EnableHotData;
 import org.opsli.common.constants.CacheConstants;
+import org.opsli.common.constants.TreeConstants;
 import org.opsli.common.enums.ExcelOperate;
 import org.opsli.common.exception.ServiceException;
 import org.opsli.common.exception.TokenException;
@@ -40,6 +47,7 @@ import org.opsli.common.utils.OutputStreamUtil;
 import org.opsli.common.utils.WrapperUtil;
 import org.opsli.core.autoconfigure.properties.GlobalProperties;
 import org.opsli.core.base.entity.BaseEntity;
+import org.opsli.core.base.entity.HasChildren;
 import org.opsli.core.base.service.interfaces.CrudServiceInterface;
 import org.opsli.core.cache.local.CacheUtil;
 import org.opsli.core.msg.CoreMsg;
@@ -60,9 +68,8 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Method;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
+import java.util.function.Function;
 
 /**
  * 默认 范型引用 子类的Service ， 为简单的CRUD做足准备
@@ -350,6 +357,67 @@ public abstract class BaseRestController <T extends BaseEntity, E extends ApiWra
         if(globalProperties.isEnableDemo() &&
                 !StringUtils.equals(UserUtil.SUPER_ADMIN, user.getUsername())){
             throw new ServiceException(CoreMsg.EXCEPTION_ENABLE_DEMO);
+        }
+    }
+
+
+    /**
+     * 处理是否包含子集
+     * @param treeNodes 树节点
+     */
+    protected List<Tree<Object>> handleTreeHasChildren(List<Tree<Object>> treeNodes,
+                                                       Function<Set<String>, List<HasChildren>> callback) {
+        if(CollUtil.isEmpty(treeNodes) || callback == null){
+            return treeNodes;
+        }
+
+        Set<String> parentIds = Sets.newHashSet();
+        for (Tree<Object> treeNode : treeNodes) {
+            parentIds.add(Convert.toStr(treeNode.getId()));
+        }
+
+        // 数据排查是否存在下级
+        List<HasChildren> hasChildrenList = callback.apply(parentIds);
+        if(CollUtil.isEmpty(hasChildrenList)){
+            hasChildrenList = ListUtil.empty();
+        }
+
+        // 字典
+        Map<String, Boolean> hasChildrenDict = Maps.newHashMap();
+        for (HasChildren hasChildren : hasChildrenList) {
+            if (hasChildren.getCount() != null && hasChildren.getCount() > 0) {
+                hasChildrenDict.put(hasChildren.getParentId(), true);
+            }
+        }
+
+        // 处理节点
+        this.handleTreeHasChildren(treeNodes, hasChildrenDict);
+
+        return treeNodes;
+    }
+
+    /**
+     * 处理 树节点是否 有子节点
+     * @param treeNodes 树节点
+     * @param hasChildrenDict 字典树
+     */
+    private void handleTreeHasChildren(List<Tree<Object>> treeNodes,
+                                       Map<String, Boolean> hasChildrenDict){
+
+        for (Tree<Object> treeNode : treeNodes) {
+            Boolean tmpFlag = hasChildrenDict.get(Convert.toStr(treeNode.getId()));
+            if (tmpFlag != null && tmpFlag) {
+                treeNode.putExtra(TreeConstants.IS_LEAF, false);
+                treeNode.putExtra(TreeConstants.HAS_CHILDREN, true);
+            }else {
+                treeNode.putExtra(TreeConstants.IS_LEAF, true);
+                treeNode.putExtra(TreeConstants.HAS_CHILDREN, false);
+            }
+
+            // 如果不为空 则继续递归处理
+            if(CollUtil.isNotEmpty(treeNode.getChildren())){
+                handleTreeHasChildren(treeNode.getChildren(), hasChildrenDict);
+            }
         }
     }
 
