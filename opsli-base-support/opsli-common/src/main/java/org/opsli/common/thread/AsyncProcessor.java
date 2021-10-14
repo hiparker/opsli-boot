@@ -1,35 +1,30 @@
 package org.opsli.common.thread;
 
+import cn.hutool.core.util.StrUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 
 import java.util.concurrent.*;
 
 /**
- * 线程池实际处理者
+ * 自定义线程执行器 - 等待线程执行完毕不拒绝
  *
- * @author Parker
+ * @author 周鹏程
  * @date 2020-10-08 10:24
  */
 @Slf4j
-public final class AsyncProcessor {
+public class AsyncProcessor {
 
     /**
-     * 默认最大并发数
+     * 默认最大并发数<br>
      */
     private static final int DEFAULT_MAX_CONCURRENT = Runtime.getRuntime().availableProcessors() * 2;
 
     /**
      * 线程池名称格式
      */
-    private static final String THREAD_POOL_NAME = "ExternalConvertProcessPool-%d";
-
-    /**
-     * 线程工厂名称
-     */
-    private static final ThreadFactory FACTORY = new BasicThreadFactory.Builder()
-            .namingPattern(THREAD_POOL_NAME)
-            .daemon(true).build();
+    private static final String THREAD_POOL_NAME = "AsyncProcessPool-{}-%d";
 
     /**
      * 默认队列大小
@@ -37,7 +32,7 @@ public final class AsyncProcessor {
     private static final int DEFAULT_SIZE = 1024;
 
     /**
-     * 默认线程池等待时间 秒
+     * 默认线程池关闭等待时间 秒
      */
     private static final int DEFAULT_WAIT_TIME = 10;
 
@@ -47,66 +42,56 @@ public final class AsyncProcessor {
     private static final long DEFAULT_KEEP_ALIVE = 60L;
 
     /**
-     * Executor
+     * 执行器
      */
-    private static final ExecutorService EXECUTOR;
+    private ExecutorService execute;
+
 
     /**
-     * 执行队列
+     * 初始化
      */
-    private static final BlockingQueue<Runnable> EXECUTOR_QUEUE = new ArrayBlockingQueue<>(DEFAULT_SIZE);
-
-    static {
-        // 创建 Executor
-        // 此处默认最大值改为处理器数量的 4 倍
-        try {
-           EXECUTOR = new ThreadPoolExecutor(DEFAULT_MAX_CONCURRENT,
-                   DEFAULT_MAX_CONCURRENT * 4, DEFAULT_KEEP_ALIVE,
-               TimeUnit.SECONDS, EXECUTOR_QUEUE, FACTORY);
-
-            // 主动关闭执行器
-            autoCloseProcess();
-        } catch (Exception e) {
-            log.error("AsyncProcessor 异步处理器初始化错误", e);
-            throw new ExceptionInInitializerError(e);
-        }
-    }
-
-    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    /**
-     * 此类型无法实例化
-     */
-    private AsyncProcessor() {}
-
-    /**
-     * 主动关闭执行器
-     */
-    private static void autoCloseProcess() {
-        if(AsyncProcessor.EXECUTOR == null){
+    public AsyncProcessor(String key){
+        if(StringUtils.isBlank(key)){
             return;
         }
 
-        // 这里不会自动关闭线程， 当线程超过阈值时 抛异常
-        // 关闭事件的挂钩
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            log.info("AsyncProcessor 异步处理器关闭");
+        // 线程工厂名称
+        String formatThreadPoolName = StrUtil.format(THREAD_POOL_NAME, key);
+        BasicThreadFactory basicThreadFactory = new BasicThreadFactory.Builder()
+                .namingPattern(formatThreadPoolName)
+                .daemon(true).build();
 
-            AsyncProcessor.EXECUTOR.shutdown();
-            try {
-                // 等待1秒执行关闭
-                if (!AsyncProcessor.EXECUTOR.awaitTermination(AsyncProcessor.DEFAULT_WAIT_TIME,
-                        TimeUnit.SECONDS)) {
-                    log.error("AsyncProcessor 由于等待超时，异步处理器立即关闭");
-                    AsyncProcessor.EXECUTOR.shutdownNow();
+        // 创建 Executor
+        // 此处默认最大值改为处理器数量的 4 倍
+        try {
+            // 执行队列
+            BlockingQueue<Runnable> executorQueue = new ArrayBlockingQueue<>(DEFAULT_SIZE);
+            execute = new ThreadPoolExecutor(DEFAULT_MAX_CONCURRENT, DEFAULT_MAX_CONCURRENT * 4, DEFAULT_KEEP_ALIVE,
+                    TimeUnit.SECONDS, executorQueue, basicThreadFactory);
+            // 这里不会自动关闭线程， 当线程超过阈值时 抛异常
+            // 关闭事件的挂钩
+            Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+                log.info("AsyncProcessorWait 异步处理器关闭");
+
+                execute.shutdown();
+
+                try {
+                    // 等待1秒执行关闭
+                    if (!execute.awaitTermination(DEFAULT_WAIT_TIME, TimeUnit.SECONDS)) {
+                        log.error("AsyncProcessorWait 由于等待超时，异步处理器立即关闭");
+                        execute.shutdownNow();
+                    }
+                } catch (InterruptedException e) {
+                    log.error("AsyncProcessorWait 异步处理器关闭中断");
+                    execute.shutdownNow();
                 }
-            } catch (InterruptedException e) {
-                log.error("AsyncProcessor 异步处理器关闭中断");
-                AsyncProcessor.EXECUTOR.shutdownNow();
-            }
 
-            log.info("AsyncProcessor 异步处理器关闭完成");
-        }));
+                log.info("AsyncProcessorWait 异步处理器关闭完成");
+            }));
+        } catch (Exception e) {
+            log.error("AsyncProcessorWait 异步处理器初始化错误", e);
+            throw new ExceptionInInitializerError(e);
+        }
     }
 
 
@@ -114,14 +99,14 @@ public final class AsyncProcessor {
      * 执行任务，不管是否成功<br>
      * 其实也就是包装以后的 {@link } 方法
      *
-     * @param task 任务
-     * @return boolean
+     * @param task
+     * @return
      */
-    protected static boolean executeTask(Runnable task) {
+    public boolean executeTask(Runnable task) {
         try {
-            EXECUTOR.execute(task);
+            execute.execute(task);
         } catch (RejectedExecutionException e) {
-            log.error("AsyncProcessor 执行任务被拒绝", e);
+            log.error("AsyncProcessorWait 执行任务被拒绝", e);
             return false;
         }
         return true;
@@ -134,12 +119,12 @@ public final class AsyncProcessor {
      * @param task 任务
      * @return Future<T>
      */
-    protected static <T> Future<T> submitTask(Callable<T> task) {
+    public <T> Future<T> submitTask(Callable<T> task) {
         try {
-            return EXECUTOR.submit(task);
+            return execute.submit(task);
         } catch (RejectedExecutionException e) {
-            log.error("AsyncProcessor 执行任务被拒绝", e);
-            throw new UnsupportedOperationException("AsyncProcessor 无法提交任务，已被拒绝", e);
+            log.error("AsyncProcessorWait 执行任务被拒绝", e);
+            throw new UnsupportedOperationException("AsyncProcessorWait 无法提交任务，已被拒绝", e);
         }
     }
 }

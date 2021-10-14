@@ -1,5 +1,7 @@
 package org.opsli.common.thread;
 
+import java.util.function.Function;
+
 /**
  * 异步进程 执行器
  *
@@ -21,5 +23,12 @@ public interface AsyncProcessExecutor {
 	 * @return boolean
 	 */
 	boolean execute();
+
+	/**
+	 * 执行异常回调
+	 * @param callback 回调
+	 * @return boolean
+	 */
+	boolean executeErrorCallback(Function<Runnable, Void> callback);
 
 }
