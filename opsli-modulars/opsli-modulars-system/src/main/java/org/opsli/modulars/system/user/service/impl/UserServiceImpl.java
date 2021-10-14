@@ -27,9 +27,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.opsli.api.base.warpper.ApiWrapper;
 import org.opsli.api.wrapper.system.menu.MenuModel;
 import org.opsli.api.wrapper.system.options.OptionsModel;
-import org.opsli.api.wrapper.system.user.UserWebModel;
 import org.opsli.api.wrapper.system.user.UserModel;
 import org.opsli.api.wrapper.system.user.UserPassword;
+import org.opsli.api.wrapper.system.user.UserWebModel;
 import org.opsli.common.constants.MyBatisConstants;
 import org.opsli.common.enums.DictType;
 import org.opsli.common.exception.ServiceException;
@@ -762,6 +762,9 @@ public class UserServiceImpl extends CrudServiceImpl<UserMapper, SysUser, UserMo
         if(StringUtils.isNotEmpty(model.getId())){
             wrapper.notIn(MyBatisConstants.FIELD_ID, model.getId());
         }
+
+        // 租户检测
+        wrapper = new QueryTenantHandler().handler(super.entityClazz, wrapper);
 
         return super.count(wrapper);
     }
