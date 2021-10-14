@@ -334,19 +334,18 @@ public class MenuServiceImpl extends CrudServiceImpl<MenuMapper, SysMenu, MenuMo
      * @return Integer
      */
     @Transactional(readOnly = true)
-    public Integer uniqueVerificationByPermissions(MenuModel model){
+    public boolean uniqueVerificationByPermissions(MenuModel model){
         if(model == null){
-            return null;
+            return false;
         }
         if(!MenuConstants.BUTTON.equals(model.getType())){
-            return null;
+            return true;
         }
 
         QueryWrapper<SysMenu> wrapper = new QueryWrapper<>();
 
         // code 唯一
-        wrapper.eq(MyBatisConstants.FIELD_DELETE_LOGIC,  DictType.NO_YES_NO.getValue())
-                .eq("permissions", model.getPermissions())
+        wrapper.eq("permissions", model.getPermissions())
                 .eq("type", MenuConstants.BUTTON);
 
         // 重复校验排除自身
@@ -354,7 +353,7 @@ public class MenuServiceImpl extends CrudServiceImpl<MenuMapper, SysMenu, MenuMo
             wrapper.notIn(MyBatisConstants.FIELD_ID, model.getId());
         }
 
-        return super.count(wrapper);
+        return super.count(wrapper) == 0;
     }
 
     /**

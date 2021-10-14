@@ -46,7 +46,7 @@ public enum SystemMsg implements BaseMsg {
     /**
      * 角色
      */
-    EXCEPTION_ROLE_UNIQUE(20200,"角色编号重复，该角色已存在"),
+    EXCEPTION_ROLE_UNIQUE(20200,"角色编号或名称重复，该角色已存在！"),
     EXCEPTION_ROLE_ID_NOT_NULL(20201,"角色Id不可为空"),
     EXCEPTION_ROLE_PERMS_ERROR(20202,"角色权限设置失败"),
 

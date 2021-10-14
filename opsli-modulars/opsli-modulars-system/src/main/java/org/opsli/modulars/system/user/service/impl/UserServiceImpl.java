@@ -99,15 +99,15 @@ public class UserServiceImpl extends CrudServiceImpl<UserMapper, SysUser, UserMo
             }
         }
 
-        // 唯一验证
-        Integer count = this.uniqueVerificationByName(model);
-        if(count != null && count > 0){
+        // 唯一验证 - 用户名
+        boolean verificationByName = this.uniqueVerificationByName(model);
+        if(!verificationByName){
             // 重复
             throw new ServiceException(SystemMsg.EXCEPTION_USER_UNIQUE);
         }
         // 唯一验证 - 工号
-        count = this.uniqueVerificationByNo(model);
-        if(count != null && count > 0){
+        boolean verificationByNo  = this.uniqueVerificationByNo(model);
+        if(!verificationByNo){
             // 重复
             throw new ServiceException(SystemMsg.EXCEPTION_USER_NO_UNIQUE);
         }
@@ -190,14 +190,14 @@ public class UserServiceImpl extends CrudServiceImpl<UserMapper, SysUser, UserMo
         }
 
         // 唯一验证 - 用户名
-        Integer count = this.uniqueVerificationByName(model);
-        if(count != null && count > 0){
+        boolean verificationByName = this.uniqueVerificationByName(model);
+        if(!verificationByName){
             // 重复
             throw new ServiceException(SystemMsg.EXCEPTION_USER_UNIQUE);
         }
         // 唯一验证 - 工号
-        count = this.uniqueVerificationByNo(model);
-        if(count != null && count > 0){
+        boolean verificationByNo  = this.uniqueVerificationByNo(model);
+        if(!verificationByNo){
             // 重复
             throw new ServiceException(SystemMsg.EXCEPTION_USER_NO_UNIQUE);
         }
@@ -748,15 +748,14 @@ public class UserServiceImpl extends CrudServiceImpl<UserMapper, SysUser, UserMo
      * @return Integer
      */
     @Transactional(readOnly = true)
-    public Integer uniqueVerificationByNo(UserModel model){
+    public boolean uniqueVerificationByNo(UserModel model){
         if(model == null){
-            return null;
+            return false;
         }
         QueryWrapper<SysUser> wrapper = new QueryWrapper<>();
 
         // no 唯一
-        wrapper.eq(MyBatisConstants.FIELD_DELETE_LOGIC,  DictType.NO_YES_NO.getValue())
-                .eq("no", model.getNo());
+        wrapper.eq("no", model.getNo());
 
         // 重复校验排除自身
         if(StringUtils.isNotEmpty(model.getId())){
@@ -764,9 +763,12 @@ public class UserServiceImpl extends CrudServiceImpl<UserMapper, SysUser, UserMo
         }
 
         // 租户检测
-        wrapper = new QueryTenantHandler().handler(super.entityClazz, wrapper);
+        // 数据处理责任链
+        wrapper = new QueryTenantHandler(
+                new QueryOrgHandler()
+        ).handler(entityClazz, wrapper);
 
-        return super.count(wrapper);
+        return super.count(wrapper) == 0;
     }
 
     /**
@@ -775,22 +777,21 @@ public class UserServiceImpl extends CrudServiceImpl<UserMapper, SysUser, UserMo
      * @return Integer
      */
     @Transactional(readOnly = true)
-    public Integer uniqueVerificationByName(UserModel model){
+    public boolean uniqueVerificationByName(UserModel model){
         if(model == null){
-            return null;
+            return false;
         }
         QueryWrapper<SysUser> wrapper = new QueryWrapper<>();
 
         // name 唯一
-        wrapper.eq(MyBatisConstants.FIELD_DELETE_LOGIC,  DictType.NO_YES_NO.getValue())
-                .eq("username", model.getUsername());
+        wrapper.eq("username", model.getUsername());
 
         // 重复校验排除自身
         if(StringUtils.isNotEmpty(model.getId())){
             wrapper.notIn(MyBatisConstants.FIELD_ID, model.getId());
         }
 
-        return super.count(wrapper);
+        return super.count(wrapper) == 0;
     }
 
     // ==================

@@ -59,10 +59,10 @@ public class GenTableColumnServiceImpl extends CrudServiceImpl<GenTableColumnMap
         }
 
         // 唯一验证
-        Integer count = this.uniqueVerificationByFieldName(model);
-        if(count != null && count > 0){
+        boolean verificationByFieldName = this.uniqueVerificationByFieldName(model);
+        if(!verificationByFieldName){
             // 重复
-         throw new GeneratorException(GeneratorMsg.EXCEPTION_TABLE_COLUMN_FIELD_NAME_REPEAT);
+            throw new GeneratorException(GeneratorMsg.EXCEPTION_TABLE_COLUMN_FIELD_NAME_REPEAT);
         }
 
         return super.insert(model);
@@ -87,8 +87,8 @@ public class GenTableColumnServiceImpl extends CrudServiceImpl<GenTableColumnMap
             ValidatorUtil.verify(model);
 
             // 唯一验证
-            Integer count = this.uniqueVerificationByFieldName(model);
-            if(count != null && count > 0){
+            boolean verificationByFieldName = this.uniqueVerificationByFieldName(model);
+            if(!verificationByFieldName){
                 // 重复
                 throw new GeneratorException(GeneratorMsg.EXCEPTION_TABLE_COLUMN_FIELD_NAME_REPEAT);
             }
@@ -120,8 +120,8 @@ public class GenTableColumnServiceImpl extends CrudServiceImpl<GenTableColumnMap
         }
 
         // 唯一验证
-        Integer count = this.uniqueVerificationByFieldName(model);
-        if(count != null && count > 0){
+        boolean verificationByFieldName = this.uniqueVerificationByFieldName(model);
+        if(!verificationByFieldName){
             // 重复
             throw new GeneratorException(GeneratorMsg.EXCEPTION_TABLE_COLUMN_FIELD_NAME_REPEAT);
         }
@@ -179,9 +179,9 @@ public class GenTableColumnServiceImpl extends CrudServiceImpl<GenTableColumnMap
      * @return Integer
      */
     @Transactional(readOnly = true)
-    public Integer uniqueVerificationByFieldName(GenTableColumnModel model){
+    public boolean uniqueVerificationByFieldName(GenTableColumnModel model){
         if(model == null){
-            return null;
+            return false;
         }
         QueryWrapper<GenTableColumn> wrapper = new QueryWrapper<>();
 
@@ -194,7 +194,7 @@ public class GenTableColumnServiceImpl extends CrudServiceImpl<GenTableColumnMap
             wrapper.notIn(MyBatisConstants.FIELD_ID, model.getId());
         }
 
-        return super.count(wrapper);
+        return super.count(wrapper) == 0;
     }
 }
 

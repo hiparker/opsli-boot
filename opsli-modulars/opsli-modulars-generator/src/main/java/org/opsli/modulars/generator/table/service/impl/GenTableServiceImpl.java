@@ -71,8 +71,8 @@ public class GenTableServiceImpl extends CrudServiceImpl<GenTableMapper, GenTabl
         }
 
         // 唯一验证
-        Integer count = this.uniqueVerificationByTableName(model);
-        if(count != null && count > 0){
+        boolean verificationByTableName = this.uniqueVerificationByTableName(model);
+        if(!verificationByTableName){
             // 重复
             throw new GeneratorException(GeneratorMsg.EXCEPTION_TABLE_NAME_REPEAT);
         }
@@ -97,8 +97,8 @@ public class GenTableServiceImpl extends CrudServiceImpl<GenTableMapper, GenTabl
         }
 
         // 唯一验证
-        Integer count = this.uniqueVerificationByTableName(model);
-        if(count != null && count > 0){
+        boolean verificationByTableName = this.uniqueVerificationByTableName(model);
+        if(!verificationByTableName){
             // 重复
             throw new GeneratorException(GeneratorMsg.EXCEPTION_TABLE_NAME_REPEAT);
         }
@@ -261,9 +261,9 @@ public class GenTableServiceImpl extends CrudServiceImpl<GenTableMapper, GenTabl
      * @return Integer
      */
     @Transactional(readOnly = true)
-    public Integer uniqueVerificationByTableName(GenTableModel model){
+    public boolean uniqueVerificationByTableName(GenTableModel model){
         if(model == null){
-            return null;
+            return false;
         }
         QueryWrapper<GenTable> wrapper = new QueryWrapper<>();
 
@@ -275,7 +275,7 @@ public class GenTableServiceImpl extends CrudServiceImpl<GenTableMapper, GenTabl
             wrapper.notIn(MyBatisConstants.FIELD_ID, model.getId());
         }
 
-        return super.count(wrapper);
+        return super.count(wrapper) == 0;
     }
 }
 

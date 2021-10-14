@@ -67,8 +67,8 @@ public class DictDetailServiceImpl extends CrudServiceImpl<DictDetailMapper, Sys
     public DictDetailModel insert(DictDetailModel model) {
 
         // 唯一验证
-        Integer count = this.uniqueVerificationByNameOrValue(model);
-        if(count != null && count > 0){
+        boolean verificationByNameOrValue = this.uniqueVerificationByNameOrValue(model);
+        if(!verificationByNameOrValue){
             // 重复
             throw new ServiceException(SystemMsg.EXCEPTION_DICT_DETAIL_UNIQUE);
         }
@@ -97,8 +97,8 @@ public class DictDetailServiceImpl extends CrudServiceImpl<DictDetailMapper, Sys
     public DictDetailModel update(DictDetailModel model) {
 
         // 唯一验证
-        Integer count = this.uniqueVerificationByNameOrValue(model);
-        if(count != null && count > 0){
+        boolean verificationByNameOrValue = this.uniqueVerificationByNameOrValue(model);
+        if(!verificationByNameOrValue){
             // 重复
             throw new ServiceException(SystemMsg.EXCEPTION_DICT_DETAIL_UNIQUE);
         }
@@ -293,15 +293,14 @@ public class DictDetailServiceImpl extends CrudServiceImpl<DictDetailMapper, Sys
      * @return Integer
      */
     @Transactional(readOnly = true)
-    public Integer uniqueVerificationByNameOrValue(DictDetailModel model){
+    public boolean uniqueVerificationByNameOrValue(DictDetailModel model){
         if(model == null){
-            return null;
+            return false;
         }
         QueryWrapper<SysDictDetail> wrapper = new QueryWrapper<>();
 
         // name 唯一
-        wrapper.eq(MyBatisConstants.FIELD_DELETE_LOGIC,  DictType.NO_YES_NO.getValue())
-                .eq("type_code", model.getTypeCode());
+        wrapper.eq("type_code", model.getTypeCode());
 
         // 名称 或者 Val 重复
         wrapper.and(wra ->
@@ -313,7 +312,7 @@ public class DictDetailServiceImpl extends CrudServiceImpl<DictDetailMapper, Sys
             wrapper.notIn(MyBatisConstants.FIELD_ID, model.getId());
         }
 
-        return super.count(wrapper);
+        return super.count(wrapper) == 0;
     }
 
     // ================

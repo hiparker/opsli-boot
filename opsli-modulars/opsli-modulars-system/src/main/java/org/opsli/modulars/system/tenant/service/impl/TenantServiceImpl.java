@@ -113,8 +113,8 @@ public class TenantServiceImpl extends CrudServiceImpl<TenantMapper, SysTenant, 
         model.setEnable(DictType.NO_YES_NO.getValue());
 
         // 唯一验证
-        Integer count = this.uniqueVerificationByName(model);
-        if(count != null && count > 0){
+        boolean verificationByName = this.uniqueVerificationByName(model);
+        if(!verificationByName){
             // 重复
             throw new ServiceException(SystemMsg.EXCEPTION_TENANT_UNIQUE);
         }
@@ -132,8 +132,8 @@ public class TenantServiceImpl extends CrudServiceImpl<TenantMapper, SysTenant, 
         model.setEnable(null);
 
         // 唯一验证
-        Integer count = this.uniqueVerificationByName(model);
-        if(count != null && count > 0){
+        boolean verificationByName = this.uniqueVerificationByName(model);
+        if(!verificationByName){
             // 重复
             throw new ServiceException(SystemMsg.EXCEPTION_TENANT_UNIQUE);
         }
@@ -321,9 +321,9 @@ public class TenantServiceImpl extends CrudServiceImpl<TenantMapper, SysTenant, 
      * @return Integer
      */
     @Transactional(readOnly = true)
-    public Integer uniqueVerificationByName(TenantModel model){
+    public boolean uniqueVerificationByName(TenantModel model){
         if(model == null){
-            return null;
+            return false;
         }
         QueryWrapper<SysTenant> wrapper = new QueryWrapper<>();
 
@@ -336,7 +336,7 @@ public class TenantServiceImpl extends CrudServiceImpl<TenantMapper, SysTenant, 
             wrapper.notIn(MyBatisConstants.FIELD_ID, model.getId());
         }
 
-        return super.count(wrapper);
+        return super.count(wrapper) == 0;
     }
 
     /**

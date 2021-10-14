@@ -57,8 +57,8 @@ public class DictServiceImpl extends CrudServiceImpl<DictMapper, SysDict, DictMo
         }
 
         // 唯一验证
-        Integer count = this.uniqueVerificationByCode(model);
-        if(count != null && count > 0){
+        boolean verificationByCode = this.uniqueVerificationByCode(model);
+        if(!verificationByCode){
             // 重复
             throw new ServiceException(SystemMsg.EXCEPTION_DICT_UNIQUE);
         }
@@ -74,8 +74,8 @@ public class DictServiceImpl extends CrudServiceImpl<DictMapper, SysDict, DictMo
         }
 
         // 唯一验证
-        Integer count = this.uniqueVerificationByCode(model);
-        if(count != null && count > 0){
+        boolean verificationByCode = this.uniqueVerificationByCode(model);
+        if(!verificationByCode){
             // 重复
             throw new ServiceException(SystemMsg.EXCEPTION_DICT_UNIQUE);
         }
@@ -165,9 +165,9 @@ public class DictServiceImpl extends CrudServiceImpl<DictMapper, SysDict, DictMo
      * @return Integer
      */
     @Transactional(readOnly = true)
-    public Integer uniqueVerificationByCode(DictModel model){
+    public boolean uniqueVerificationByCode(DictModel model){
         if(model == null){
-            return null;
+            return false;
         }
         QueryWrapper<SysDict> wrapper = new QueryWrapper<>();
 
@@ -180,7 +180,7 @@ public class DictServiceImpl extends CrudServiceImpl<DictMapper, SysDict, DictMo
             wrapper.notIn(MyBatisConstants.FIELD_ID, model.getId());
         }
 
-        return super.count(wrapper);
+        return super.count(wrapper) == 0;
     }
 
 }

@@ -72,8 +72,9 @@ public class RoleServiceImpl extends CrudServiceImpl<RoleMapper, SysRole, RoleMo
         }
 
         // 唯一验证
-        Integer count = this.uniqueVerificationByCode(model);
-        if(count != null && count > 0){
+        boolean verificationByCode = this.uniqueVerificationByCode(model);
+        boolean verificationByName = this.uniqueVerificationByName(model);
+        if(!verificationByCode || !verificationByName){
             // 重复
             throw new ServiceException(SystemMsg.EXCEPTION_ROLE_UNIQUE);
         }
@@ -97,8 +98,9 @@ public class RoleServiceImpl extends CrudServiceImpl<RoleMapper, SysRole, RoleMo
         }
 
         // 唯一验证
-        Integer count = this.uniqueVerificationByCode(model);
-        if(count != null && count > 0){
+        boolean verificationByCode = this.uniqueVerificationByCode(model);
+        boolean verificationByName = this.uniqueVerificationByName(model);
+        if(!verificationByCode || !verificationByName){
             // 重复
             throw new ServiceException(SystemMsg.EXCEPTION_ROLE_UNIQUE);
         }
@@ -176,28 +178,59 @@ public class RoleServiceImpl extends CrudServiceImpl<RoleMapper, SysRole, RoleMo
      * @return Integer
      */
     @Transactional(readOnly = true)
-    public Integer uniqueVerificationByCode(RoleModel model){
+    public boolean uniqueVerificationByCode(RoleModel model){
         if(model == null){
-            return null;
+            return false;
         }
         QueryWrapper<SysRole> wrapper = new QueryWrapper<>();
 
         // code 唯一
-        wrapper.eq(MyBatisConstants.FIELD_DELETE_LOGIC,  DictType.NO_YES_NO.getValue())
-                .eq("role_code", model.getRoleCode());
+        wrapper.eq("role_code", model.getRoleCode());
 
         // 重复校验排除自身
         if(StringUtils.isNotEmpty(model.getId())){
             wrapper.notIn(MyBatisConstants.FIELD_ID, model.getId());
         }
 
+        // 租户检测
         // 数据处理责任链
         wrapper = new QueryTenantHandler(
                 new QueryOrgHandler()
         ).handler(entityClazz, wrapper);
 
-        return super.count(wrapper);
+        return super.count(wrapper) == 0;
     }
+
+
+    /**
+     * 唯一验证
+     * @param model model
+     * @return Integer
+     */
+    @Transactional(readOnly = true)
+    public boolean uniqueVerificationByName(RoleModel model){
+        if(model == null){
+            return false;
+        }
+        QueryWrapper<SysRole> wrapper = new QueryWrapper<>();
+
+        // code 唯一
+        wrapper.eq("role_name", model.getRoleName());
+
+        // 重复校验排除自身
+        if(StringUtils.isNotEmpty(model.getId())){
+            wrapper.notIn(MyBatisConstants.FIELD_ID, model.getId());
+        }
+
+        // 租户检测
+        // 数据处理责任链
+        wrapper = new QueryTenantHandler(
+                new QueryOrgHandler()
+        ).handler(entityClazz, wrapper);
+
+        return super.count(wrapper) == 0;
+    }
+
 
 
 }

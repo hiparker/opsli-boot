@@ -73,8 +73,8 @@ public class SysOrgServiceImpl extends CrudServiceImpl<SysOrgMapper, SysOrg, Sys
         model.setParentIds(null);
 
         // 唯一验证
-        Integer count = this.uniqueVerificationByCode(model);
-        if(count != null && count > 0){
+        boolean verificationByCode = this.uniqueVerificationByCode(model);
+        if(!verificationByCode){
             // 重复
             throw new ServiceException(SystemMsg.EXCEPTION_ORG_UNIQUE);
         }
@@ -114,8 +114,8 @@ public class SysOrgServiceImpl extends CrudServiceImpl<SysOrgMapper, SysOrg, Sys
         model.setParentIds(null);
 
         // 唯一验证
-        Integer count = this.uniqueVerificationByCode(model);
-        if(count != null && count > 0){
+        boolean verificationByCode = this.uniqueVerificationByCode(model);
+        if(!verificationByCode){
             // 重复
             throw new ServiceException(SystemMsg.EXCEPTION_ORG_UNIQUE);
         }
@@ -267,13 +267,12 @@ public class SysOrgServiceImpl extends CrudServiceImpl<SysOrgMapper, SysOrg, Sys
      * @return Integer
      */
     @Transactional(readOnly = true)
-    public Integer uniqueVerificationByCode(SysOrgModel model){
+    public boolean uniqueVerificationByCode(SysOrgModel model){
         if(model == null){
-            return null;
+            return false;
         }
         QueryWrapper<SysOrg> wrapper = new QueryWrapper<>();
-        wrapper.eq(MyBatisConstants.FIELD_DELETE_LOGIC,  DictType.NO_YES_NO.getValue())
-                .eq("org_code", model.getOrgCode());
+        wrapper.eq("org_code", model.getOrgCode());
 
         // 重复校验排除自身
         if(StringUtils.isNotEmpty(model.getId())){
@@ -283,7 +282,7 @@ public class SysOrgServiceImpl extends CrudServiceImpl<SysOrgMapper, SysOrg, Sys
         // 租户检测
         wrapper = new QueryTenantHandler().handler(super.entityClazz, wrapper);
 
-        return super.count(wrapper);
+        return super.count(wrapper) == 0;
     }
 
 

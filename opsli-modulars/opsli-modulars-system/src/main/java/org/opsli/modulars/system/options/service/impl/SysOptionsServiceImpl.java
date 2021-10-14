@@ -67,8 +67,8 @@ public class SysOptionsServiceImpl extends CrudServiceImpl<SysOptionsMapper, Sys
         ValidatorUtil.verify(model);
 
         // 唯一验证
-        Integer count = this.uniqueVerificationByCode(model);
-        if(count != null && count > 0){
+        boolean verificationByCode = this.uniqueVerificationByCode(model);
+        if(!verificationByCode){
             // 重复
             throw new ServiceException(SystemMsg.EXCEPTION_OPTIONS_UNIQUE);
         }
@@ -113,8 +113,8 @@ public class SysOptionsServiceImpl extends CrudServiceImpl<SysOptionsMapper, Sys
         }
 
         // 唯一验证
-        Integer count = this.uniqueVerificationByCode(model);
-        if(count != null && count > 0){
+        boolean verificationByCode = this.uniqueVerificationByCode(model);
+        if(!verificationByCode){
             // 重复
             throw new ServiceException(SystemMsg.EXCEPTION_OPTIONS_UNIQUE);
         }
@@ -249,9 +249,9 @@ public class SysOptionsServiceImpl extends CrudServiceImpl<SysOptionsMapper, Sys
      * @return Integer
      */
     @Transactional(readOnly = true)
-    public Integer uniqueVerificationByCode(OptionsModel model){
+    public boolean uniqueVerificationByCode(OptionsModel model){
         if(model == null){
-            return null;
+            return false;
         }
         QueryWrapper<SysOptions> wrapper = new QueryWrapper<>();
         wrapper.eq("option_code", model.getOptionCode());
@@ -261,7 +261,7 @@ public class SysOptionsServiceImpl extends CrudServiceImpl<SysOptionsMapper, Sys
             wrapper.notIn(MyBatisConstants.FIELD_ID, model.getId());
         }
 
-        return super.count(wrapper);
+        return super.count(wrapper) == 0;
     }
 
     /**

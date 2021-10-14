@@ -71,8 +71,8 @@ public class GenTemplateServiceImpl extends CrudServiceImpl<GenTemplateMapper, G
         }
 
         // 唯一验证
-        Integer count = this.uniqueVerificationByTemplateName(model);
-        if(count != null && count > 0){
+        boolean verificationByTemplateName = this.uniqueVerificationByTemplateName(model);
+        if(!verificationByTemplateName){
             // 重复
             throw new GeneratorException(GeneratorMsg.EXCEPTION_TEMPLATE_NAME_REPEAT);
         }
@@ -103,8 +103,8 @@ public class GenTemplateServiceImpl extends CrudServiceImpl<GenTemplateMapper, G
         }
 
         // 唯一验证
-        Integer count = this.uniqueVerificationByTemplateName(model);
-        if(count != null && count > 0){
+        boolean verificationByTemplateName = this.uniqueVerificationByTemplateName(model);
+        if(!verificationByTemplateName){
             // 重复
             throw new GeneratorException(GeneratorMsg.EXCEPTION_TEMPLATE_NAME_REPEAT);
         }
@@ -144,10 +144,11 @@ public class GenTemplateServiceImpl extends CrudServiceImpl<GenTemplateMapper, G
         GenTemplateModel genTemplateModel = this.get(model.getId());
 
         model.setId(null);
+
         // 唯一验证
-        Integer count = this.uniqueVerificationByTemplateName(
+        boolean verificationByTemplateName = this.uniqueVerificationByTemplateName(
                 WrapperUtil.transformInstance(model, GenTemplateAndDetailModel.class));
-        if(count != null && count > 0){
+        if(!verificationByTemplateName){
             // 重复
             throw new GeneratorException(GeneratorMsg.EXCEPTION_TEMPLATE_NAME_REPEAT);
         }
@@ -224,9 +225,9 @@ public class GenTemplateServiceImpl extends CrudServiceImpl<GenTemplateMapper, G
      * @return Integer
      */
     @Transactional(readOnly = true)
-    public Integer uniqueVerificationByTemplateName(GenTemplateAndDetailModel model){
+    public boolean uniqueVerificationByTemplateName(GenTemplateAndDetailModel model){
         if(model == null){
-            return null;
+            return false;
         }
         QueryWrapper<GenTemplate> wrapper = new QueryWrapper<>();
 
@@ -238,7 +239,7 @@ public class GenTemplateServiceImpl extends CrudServiceImpl<GenTemplateMapper, G
             wrapper.notIn(MyBatisConstants.FIELD_ID, model.getId());
         }
 
-        return super.count(wrapper);
+        return super.count(wrapper) == 0;
     }
 
     // ====================

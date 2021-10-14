@@ -70,8 +70,8 @@ public class SysAreaServiceImpl extends CrudServiceImpl<SysAreaMapper, SysArea, 
         }
 
         // 唯一验证
-        Integer count = this.uniqueVerificationByCode(model);
-        if(count != null && count > 0){
+        boolean verificationByCode = this.uniqueVerificationByCode(model);
+        if(!verificationByCode){
             // 重复
             throw new ServiceException(SystemMsg.EXCEPTION_AREA_UNIQUE);
         }
@@ -92,8 +92,8 @@ public class SysAreaServiceImpl extends CrudServiceImpl<SysAreaMapper, SysArea, 
         }
 
         // 唯一验证
-        Integer count = this.uniqueVerificationByCode(model);
-        if(count != null && count > 0){
+        boolean verificationByCode = this.uniqueVerificationByCode(model);
+        if(!verificationByCode){
             // 重复
             throw new ServiceException(SystemMsg.EXCEPTION_AREA_UNIQUE);
         }
@@ -149,22 +149,21 @@ public class SysAreaServiceImpl extends CrudServiceImpl<SysAreaMapper, SysArea, 
      * @return Integer
      */
     @Transactional(readOnly = true)
-    public Integer uniqueVerificationByCode(SysAreaModel model){
+    public boolean uniqueVerificationByCode(SysAreaModel model){
         if(model == null){
-            return null;
+            return false;
         }
         QueryWrapper<SysArea> wrapper = new QueryWrapper<>();
 
         // code 唯一
-        wrapper.eq(MyBatisConstants.FIELD_DELETE_LOGIC,  DictType.NO_YES_NO.getValue())
-                .eq("area_code", model.getAreaCode());
+        wrapper.eq("area_code", model.getAreaCode());
 
         // 重复校验排除自身
         if(StringUtils.isNotEmpty(model.getId())){
             wrapper.notIn(MyBatisConstants.FIELD_ID, model.getId());
         }
 
-        return super.count(wrapper);
+        return super.count(wrapper) == 0;
     }
 
 
