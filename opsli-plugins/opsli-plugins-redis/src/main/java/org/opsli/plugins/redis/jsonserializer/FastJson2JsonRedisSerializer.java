@@ -1,5 +1,7 @@
 package org.opsli.plugins.redis.jsonserializer;
 
+import cn.hutool.core.util.NumberUtil;
+import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.support.config.FastJsonConfig;
 import lombok.extern.slf4j.Slf4j;
@@ -13,11 +15,14 @@ import java.nio.charset.StandardCharsets;
  * FastJson2JsonRedisSerializer
  *  Redis使用FastJson序列化
  *
- * @author Parker
+ * @author 周鹏程
  * @date 2021年6月1日13:57:02
  */
 @Slf4j
 public class FastJson2JsonRedisSerializer<T> implements RedisSerializer<T> {
+
+    /** 双引号 */
+    private static final String SYMBOL = "\"";
 
     public static final Charset DEFAULT_CHARSET = StandardCharsets.UTF_8;
     private FastJsonConfig fastJsonConfig = new FastJsonConfig();
@@ -61,18 +66,36 @@ public class FastJson2JsonRedisSerializer<T> implements RedisSerializer<T> {
             return null;
         }
         try {
-            return cast(JSON.parseObject(
+            String sourceStr = new String(bytes);
+            Object parse = JSON.parseObject(
                     bytes,
                     fastJsonConfig.getCharset(),
                     type,
                     fastJsonConfig.getParserConfig(),
                     fastJsonConfig.getParseProcess(),
                     JSON.DEFAULT_PARSER_FEATURE,
-                    fastJsonConfig.getFeatures()
-            ));
+                    fastJsonConfig.getFeatures());
+
+            // 验证字符串
+            String verifyStr = sourceStr;
+            boolean wrap = StrUtil.isWrap(verifyStr, SYMBOL);
+            if(wrap){
+                // 去掉前后缀
+                verifyStr = StrUtil.unWrap(verifyStr, SYMBOL, SYMBOL);
+            }
+
+            // 如果是数字
+            if(NumberUtil.isNumber(verifyStr)){
+                // 比较位数是否相同 如果不同 则补位
+                String currStr = parse.toString();
+                if(!StrUtil.equals(verifyStr, currStr)){
+                    parse = verifyStr;
+                }
+            }
+
+            return cast(parse);
         } catch (Exception ex) {
-            // 容错处理
-            log.error(ex.getMessage(), ex);
+            //log.error(ex.getMessage(), ex);
             String str = new String(bytes, DEFAULT_CHARSET);
             return cast(str);
         }
