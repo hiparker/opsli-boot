@@ -52,9 +52,11 @@ public class TestCar extends BaseEntity {
 
     // ========================================
 
-
     /** 多租户字段 */
     private String tenantId;
+
+    /** 组织机构 */
+    private String orgIds;
 
     /** 逻辑删除字段 */
     @TableLogic

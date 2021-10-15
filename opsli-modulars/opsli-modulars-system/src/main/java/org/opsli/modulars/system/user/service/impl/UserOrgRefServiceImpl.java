@@ -23,7 +23,6 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
-import org.opsli.api.base.warpper.ApiWrapper;
 import org.opsli.api.wrapper.system.org.SysOrgModel;
 import org.opsli.api.wrapper.system.user.UserModel;
 import org.opsli.api.wrapper.system.user.UserOrgRefModel;
@@ -35,12 +34,8 @@ import org.opsli.common.utils.FieldUtil;
 import org.opsli.common.utils.ListDistinctUtil;
 import org.opsli.common.utils.WrapperUtil;
 import org.opsli.core.msg.CoreMsg;
-import org.opsli.core.persistence.querybuilder.GenQueryBuilder;
-import org.opsli.core.persistence.querybuilder.QueryBuilder;
-import org.opsli.core.utils.OrgUtil;
 import org.opsli.core.utils.UserUtil;
 import org.opsli.modulars.system.SystemMsg;
-import org.opsli.modulars.system.menu.entity.SysMenu;
 import org.opsli.modulars.system.org.entity.SysOrg;
 import org.opsli.modulars.system.org.service.ISysOrgService;
 import org.opsli.modulars.system.user.entity.SysUser;
@@ -194,6 +189,28 @@ public class UserOrgRefServiceImpl extends ServiceImpl<UserOrgRefMapper, SysUser
         iUserService.update(updateUserWrapper);
     }
 
+    @Override
+    public String getDefOrgId(String userId) {
+        String orgId = null;
+        QueryWrapper<SysUserOrgRef> wrapper = new QueryWrapper<>();
+        wrapper.eq("user_id", userId);
+        wrapper.eq("iz_def", DictType.NO_YES_YES.getValue());
+        SysUserOrgRef sysUserOrgRef = this.getOne(wrapper);
+        if(sysUserOrgRef != null){
+            orgId = sysUserOrgRef.getOrgId();
+        }
+        return orgId;
+    }
+
+    @Override
+    public UserOrgRefModel getDefOrgByUserId(String userId) {
+        QueryWrapper<SysUserOrgRef> wrapper = new QueryWrapper<>();
+        wrapper.eq("user_id", userId);
+        wrapper.eq("iz_def", DictType.NO_YES_YES.getValue());
+        return WrapperUtil.transformInstance(
+                this.getOne(wrapper), UserOrgRefModel.class);
+    }
+
     /**
      * 生成Org关联对象
      * @param userId 用户ID
@@ -225,8 +242,12 @@ public class UserOrgRefServiceImpl extends ServiceImpl<UserOrgRefMapper, SysUser
         if(CollUtil.isNotEmpty(userIds)){
             int cacheCount = 0;
             for (String userId : userIds) {
-                cacheCount++;
-                boolean tmp = OrgUtil.refreshOrg(userId);
+                cacheCount+=2;
+                boolean tmp = UserUtil.refreshUserOrgs(userId);
+                if(tmp){
+                    cacheCount--;
+                }
+                tmp = UserUtil.refreshUserDefOrg(userId);
                 if(tmp){
                     cacheCount--;
                 }

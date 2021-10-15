@@ -113,7 +113,7 @@ public class RoleMenuRefServiceImpl extends ServiceImpl<RoleMenuRefMapper,SysRol
         if(CollUtil.isNotEmpty(userIdList)){
             int cacheCount = 0;
             for (String userId : userIdList) {
-                cacheCount += 3;
+                cacheCount += 6;
                 boolean tmp;
                 // 清空当期用户缓存角色、权限、菜单
                 tmp = UserUtil.refreshUserRoles(userId);
@@ -125,6 +125,18 @@ public class RoleMenuRefServiceImpl extends ServiceImpl<RoleMenuRefMapper,SysRol
                     cacheCount--;
                 }
                 tmp = UserUtil.refreshUserMenus(userId);
+                if(tmp){
+                    cacheCount--;
+                }
+                tmp = UserUtil.refreshUserOrgs(userId);
+                if(tmp){
+                    cacheCount--;
+                }
+                tmp = UserUtil.refreshUserDefRole(userId);
+                if(tmp){
+                    cacheCount--;
+                }
+                tmp = UserUtil.refreshUserDefOrg(userId);
                 if(tmp){
                     cacheCount--;
                 }

@@ -50,7 +50,7 @@ public enum TokenMsg implements BaseMsg {
     EXCEPTION_LOGIN_DECRYPT(12107,"登录账号密码解析失败"),
     EXCEPTION_USER_ROLE_NOT_NULL(12108,"用户暂无角色，请设置后登录"),
     EXCEPTION_USER_MENU_NOT_NULL(12109,"用户暂无角色菜单，请设置后登录"),
-
+    EXCEPTION_USER_PERMS_NOT_NULL(12110,"用户暂无权限，请设置后登录"),
     /**
      * 其他
      */

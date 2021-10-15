@@ -92,7 +92,7 @@ public class SysOrgRestController extends BaseRestController<SysOrg, SysOrgModel
 
         QueryBuilder<SysOrg> queryBuilder = new GenQueryBuilder<>();
         QueryWrapper<SysOrg> wrapper = queryBuilder.build();
-        List<UserOrgRefModel> orgListByUserId = OrgUtil.getOrgByCurrUser();
+        List<UserOrgRefModel> orgListByUserId = UserUtil.getOrgByCurrUser();
         if(!CollUtil.isEmpty(orgListByUserId)){
             List<String> parentIdList = Lists.newArrayListWithCapacity(orgListByUserId.size());
 

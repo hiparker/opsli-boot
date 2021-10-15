@@ -365,7 +365,7 @@ public class CheckStrength {
      */
     public static boolean equalsNull(String str) {
       int strLen;
-      if (str == null || (strLen = str.length()) == 0 || str.equalsIgnoreCase("null")) {
+      if (str == null || (strLen = str.length()) == 0 || "null".equalsIgnoreCase(str)) {
         return true;
       }
       for (int i = 0; i < strLen; i++) {

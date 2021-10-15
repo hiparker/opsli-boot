@@ -17,6 +17,7 @@ package org.opsli.core.persistence.querybuilder.chain;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.opsli.core.base.entity.BaseEntity;
+import org.opsli.core.persistence.querybuilder.conf.WebQueryConf;
 
 /**
  * 查询构建器责任链
@@ -34,5 +35,16 @@ public interface QueryBuilderChain {
      * @return <T>
      */
     <T extends BaseEntity> QueryWrapper<T> handler(Class<T> entityClazz, QueryWrapper<T> wrapper);
+
+    /**
+     * 执行
+     * @param entityClazz entity class
+     * @param wrapper 包装类
+     * @param webQueryConf 字段（如果是关联查询 出现字段冲突可指定字段）
+     * @param <T> 泛型
+     * @return <T>
+     */
+    <T extends BaseEntity> QueryWrapper<T> handler(Class<T> entityClazz, WebQueryConf webQueryConf,
+                                                   QueryWrapper<T> wrapper);
 
 }

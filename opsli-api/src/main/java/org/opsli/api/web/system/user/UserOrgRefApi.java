@@ -16,6 +16,7 @@
 package org.opsli.api.web.system.user;
 
 import org.opsli.api.base.result.ResultVo;
+import org.opsli.api.wrapper.system.org.SysOrgModel;
 import org.opsli.api.wrapper.system.user.UserOrgRefModel;
 import org.opsli.api.wrapper.system.user.UserOrgRefWebModel;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -57,5 +58,22 @@ public interface UserOrgRefApi {
      * @return List
      */
     ResultVo<List<UserOrgRefModel>> findListByUserId(String userId);
+
+
+    /**
+     * 根据 userId 获得用户默认组织
+     * @param userId 用户Id
+     * @return ResultVo
+     */
+    //@GetMapping("/getRolesByUserId")
+    ResultVo<UserOrgRefModel> getDefOrgByUserId(String userId);
+
+    /**
+     * 当前登陆用户信息
+     *
+     * @param userId 用户ID
+     * @return ResultVo
+     */
+    ResultVo<UserOrgRefWebModel> getOrgInfoByUserId(String userId);
 
 }

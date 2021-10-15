@@ -27,8 +27,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.opsli.api.base.warpper.ApiWrapper;
 import org.opsli.api.wrapper.system.menu.MenuModel;
 import org.opsli.api.wrapper.system.options.OptionsModel;
+import org.opsli.api.wrapper.system.role.RoleModel;
 import org.opsli.api.wrapper.system.user.UserModel;
 import org.opsli.api.wrapper.system.user.UserPassword;
+import org.opsli.api.wrapper.system.user.UserRoleRefModel;
 import org.opsli.api.wrapper.system.user.UserWebModel;
 import org.opsli.common.constants.MyBatisConstants;
 import org.opsli.common.enums.DictType;
@@ -42,7 +44,7 @@ import org.opsli.core.msg.CoreMsg;
 import org.opsli.core.persistence.Page;
 import org.opsli.core.persistence.querybuilder.GenQueryBuilder;
 import org.opsli.core.persistence.querybuilder.QueryBuilder;
-import org.opsli.core.persistence.querybuilder.chain.QueryOrgHandler;
+import org.opsli.core.persistence.querybuilder.chain.QueryDataPermsHandler;
 import org.opsli.core.persistence.querybuilder.chain.QueryTenantHandler;
 import org.opsli.core.utils.OptionsUtil;
 import org.opsli.core.utils.UserUtil;
@@ -164,9 +166,14 @@ public class UserServiceImpl extends CrudServiceImpl<UserMapper, SysUser, UserMo
                         DictType.NO_YES_NO.getValue());
                 SysRole sysRole = iRoleService.getOne(roleQueryWrapper);
                 if(sysRole != null){
+                    UserRoleRefModel userRoleRefModel = UserRoleRefModel.builder()
+                            .userId(insertModel.getId())
+                            .roleIds(Convert.toStrArray(sysRole.getId()))
+                            .defRoleId(sysRole.getId())
+                            .build();
+
                     // 设置用户默认角色
-                    iUserRoleRefService.setRoles(insertModel.getId(),
-                            Convert.toStrArray(sysRole.getId()));
+                    iUserRoleRefService.setRoles(userRoleRefModel);
                 }
             }
         }
@@ -431,109 +438,6 @@ public class UserServiceImpl extends CrudServiceImpl<UserMapper, SysUser, UserMo
     }
 
     @Override
-    public List<String> getRoleCodeList(String userId) {
-        List<String> roles = mapper.getRoleCodeList(userId);
-        // 去重
-        return ListDistinctUtil.distinct(roles);
-    }
-
-    @Override
-    public List<String> getRoleIdList(String userId) {
-        List<String> roles = mapper.getRoleIdList(userId);
-        // 去重
-        return ListDistinctUtil.distinct(roles);
-    }
-
-    @Override
-    public List<String> getAllPerms(String userId) {
-
-        UserModel userModel = this.get(userId);
-        if(userModel == null){
-            return ListUtil.empty();
-        }
-
-        List<String> perms;
-
-        // 判断是否是超级管理员 如果是超级管理员 则默认享有全部权限
-        if(StringUtils.equals(UserUtil.SUPER_ADMIN, userModel.getUsername())){
-            perms = Lists.newArrayList();
-            QueryBuilder<SysMenu> queryBuilder = new GenQueryBuilder<>();
-            QueryWrapper<SysMenu> queryWrapper = queryBuilder.build();
-            queryWrapper.notIn("parent_id", -1);
-            queryWrapper.eq("type", '2');
-            queryWrapper.eq("hidden", '0');
-            List<SysMenu> menuList = iMenuService.findList(queryWrapper);
-            for (SysMenu sysMenu : menuList) {
-                perms.add(sysMenu.getPermissions());
-            }
-        }else{
-            perms = mapper.queryAllPerms(userId);
-        }
-
-        // 去重
-        return ListDistinctUtil.distinct(perms);
-    }
-
-    @Override
-    public List<MenuModel> getMenuListByUserId(String userId) {
-
-        UserModel userModel = this.get(userId);
-        if(userModel == null){
-            return ListUtil.empty();
-        }
-
-        List<SysMenu> menuList;
-        // 判断是否是超级管理员 如果是超级管理员 则默认享有全部权限
-        if(StringUtils.equals(UserUtil.SUPER_ADMIN, userModel.getUsername())){
-            QueryBuilder<SysMenu> queryBuilder = new GenQueryBuilder<>();
-            QueryWrapper<SysMenu> queryWrapper = queryBuilder.build();
-            queryWrapper.notIn("parent_id", -1);
-            queryWrapper.in("type", '1', '3');
-            queryWrapper.eq("hidden", '0');
-            menuList = iMenuService.findList(queryWrapper);
-        }else{
-            menuList = mapper.findMenuListByUserId(userId);
-        }
-
-        // 去重处理 这里不放在SQL 是为了保证数据库兼容性
-        List<SysMenu> distinctList = ListDistinctUtil.distinct(
-                menuList, Comparator.comparing(ApiWrapper::getId));
-
-        return WrapperUtil.transformInstance(distinctList, MenuModel.class);
-    }
-
-    @Override
-    public List<MenuModel> getMenuAllListByUserId(String userId) {
-
-        UserModel userModel = this.get(userId);
-        if(userModel == null){
-            return ListUtil.empty();
-        }
-
-        List<SysMenu> menuList;
-        // 判断是否是超级管理员 如果是超级管理员 则默认享有全部权限
-        if(StringUtils.equals(UserUtil.SUPER_ADMIN, userModel.getUsername())){
-            QueryBuilder<SysMenu> queryBuilder = new GenQueryBuilder<>();
-            QueryWrapper<SysMenu> queryWrapper = queryBuilder.build();
-            queryWrapper.notIn("parent_id", -1);
-            queryWrapper.eq("hidden", '0');
-            menuList = iMenuService.findList(queryWrapper);
-        }else{
-            menuList = mapper.findMenuAllListByUserId(userId);
-        }
-
-        if(CollUtil.isEmpty(menuList)){
-            return ListUtil.empty();
-        }
-
-        // 去重处理 这里不放在SQL 是为了保证数据库兼容性
-        List<SysMenu> distinctList = ListDistinctUtil.distinct(
-                menuList, Comparator.comparing(ApiWrapper::getId));
-
-        return WrapperUtil.transformInstance(distinctList, MenuModel.class);
-    }
-
-    @Override
     public Page<SysUser, UserModel> findPage(Page<SysUser, UserModel> page) {
         UserModel currUser = UserUtil.getUser();
         // 如果不是超级管理员则 无法看到超级管理员账户
@@ -551,7 +455,7 @@ public class UserServiceImpl extends CrudServiceImpl<UserMapper, SysUser, UserMo
         if(!UserUtil.isHasUpdateTenantPerms(UserUtil.getUser())){
             // 数据处理责任链
             queryWrapper = new QueryTenantHandler(
-                    new QueryOrgHandler()
+                    new QueryDataPermsHandler()
             ).handler(entityClazz, queryWrapper);
         }
 
@@ -566,7 +470,7 @@ public class UserServiceImpl extends CrudServiceImpl<UserMapper, SysUser, UserMo
         if(!UserUtil.isHasUpdateTenantPerms(UserUtil.getUser())){
             // 数据处理责任链
             queryWrapper = new QueryTenantHandler(
-                    new QueryOrgHandler()
+                    new QueryDataPermsHandler()
             ).handler(entityClazz, queryWrapper);
         }
         return super.list(queryWrapper);
@@ -700,7 +604,7 @@ public class UserServiceImpl extends CrudServiceImpl<UserMapper, SysUser, UserMo
         if(!UserUtil.isHasUpdateTenantPerms(UserUtil.getUser())){
             // 数据处理责任链
             queryWrapper = new QueryTenantHandler(
-                    new QueryOrgHandler()
+                    new QueryDataPermsHandler()
             ).handler(SysUserWeb.class, queryWrapper);
         }
 
@@ -765,7 +669,7 @@ public class UserServiceImpl extends CrudServiceImpl<UserMapper, SysUser, UserMo
         // 租户检测
         // 数据处理责任链
         wrapper = new QueryTenantHandler(
-                new QueryOrgHandler()
+                new QueryDataPermsHandler()
         ).handler(entityClazz, wrapper);
 
         return super.count(wrapper) == 0;

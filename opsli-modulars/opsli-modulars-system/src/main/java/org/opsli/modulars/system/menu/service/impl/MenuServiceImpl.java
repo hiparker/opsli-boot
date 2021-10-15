@@ -374,7 +374,7 @@ public class MenuServiceImpl extends CrudServiceImpl<MenuMapper, SysMenu, MenuMo
         List<String> userIdList = iUserRoleRefService.getUserIdListByMenuId(menuModel.getId());
         if(CollUtil.isNotEmpty(userIdList)){
             for (String userId : userIdList) {
-                cacheCount += 3;
+                cacheCount += 6;
                 // 清空当期用户缓存角色、权限、菜单
                 cacheRet = UserUtil.refreshUserRoles(userId);
                 if(cacheRet){
@@ -385,6 +385,18 @@ public class MenuServiceImpl extends CrudServiceImpl<MenuMapper, SysMenu, MenuMo
                     cacheCount--;
                 }
                 cacheRet = UserUtil.refreshUserMenus(userId);
+                if(cacheRet){
+                    cacheCount--;
+                }
+                cacheRet = UserUtil.refreshUserOrgs(userId);
+                if(cacheRet){
+                    cacheCount--;
+                }
+                cacheRet = UserUtil.refreshUserDefRole(userId);
+                if(cacheRet){
+                    cacheCount--;
+                }
+                cacheRet = UserUtil.refreshUserDefOrg(userId);
                 if(cacheRet){
                     cacheCount--;
                 }

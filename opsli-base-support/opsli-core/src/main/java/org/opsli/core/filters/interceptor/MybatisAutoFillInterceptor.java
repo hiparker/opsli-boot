@@ -28,8 +28,11 @@ import org.apache.ibatis.executor.Executor;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.mapping.SqlCommandType;
 import org.apache.ibatis.plugin.*;
+import org.opsli.api.wrapper.system.org.SysOrgModel;
+import org.opsli.api.wrapper.system.user.UserOrgRefModel;
 import org.opsli.common.constants.MyBatisConstants;
 import org.opsli.core.utils.UserTokenUtil;
+import org.opsli.core.utils.UserUtil;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Field;
@@ -178,6 +181,19 @@ public class MybatisAutoFillInterceptor implements Interceptor {
                     Object tenantValue = ReflectUtil.getFieldValue(arg, f.getName());
                     if(StringUtils.isBlank(Convert.toStr(tenantValue))){
                         BeanUtil.setProperty(arg, MyBatisConstants.FIELD_TENANT,  UserTokenUtil.getTenantIdByToken());
+                    }
+                    break;
+                // 组织机构设置
+                case MyBatisConstants.FIELD_ORG_GROUP:
+                    // 如果组织IDs 为空则进行默认赋值
+                    Object orgValue = ReflectUtil.getFieldValue(arg, f.getName());
+                    if(StringUtils.isBlank(Convert.toStr(orgValue))){
+                        UserOrgRefModel userOrgRefModel =
+                                UserUtil.getUserDefOrgByUserId(UserTokenUtil.getUserIdByToken());
+                        if(null != userOrgRefModel){
+                            String orgIds = userOrgRefModel.getOrgIds();
+                            BeanUtil.setProperty(arg, MyBatisConstants.FIELD_ORG_GROUP, orgIds);
+                        }
                     }
                     break;
                 default:

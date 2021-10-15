@@ -16,11 +16,15 @@
 package org.opsli.api.web.system.user;
 
 import org.opsli.api.base.result.ResultVo;
+import org.opsli.api.wrapper.system.menu.MenuModel;
 import org.opsli.api.wrapper.system.role.RoleMenuRefModel;
+import org.opsli.api.wrapper.system.role.RoleModel;
 import org.opsli.api.wrapper.system.user.UserRoleRefModel;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+
+import java.util.List;
 
 
 /**
@@ -41,6 +45,13 @@ public interface UserRoleRefApi {
     /** 子标题 */
     String SUB_TITLE = "用户角色";
 
+    /**
+     * 设置角色
+     * @param userId 用户ID
+     * @return ResultVo
+     */
+    @GetMapping("/getRoles")
+    ResultVo<?> getRoles(String userId);
 
     /**
      * 设置角色
@@ -49,5 +60,38 @@ public interface UserRoleRefApi {
      */
     @PostMapping("/setRoles")
     ResultVo<?> setRoles(@RequestBody UserRoleRefModel model);
+
+
+    /**
+     * 根据 userId 获得用户角色
+     * @param userId 用户Id
+     * @return ResultVo
+     */
+    //@GetMapping("/getRolesByUserId")
+    ResultVo<List<String>> getRolesByUserId(String userId);
+
+    /**
+     * 根据 userId 获得用户默认角色
+     * @param userId 用户Id
+     * @return ResultVo
+     */
+    //@GetMapping("/getRolesByUserId")
+    ResultVo<RoleModel> getDefRoleByUserId(String userId);
+
+    /**
+     * 根据 userId 获得用户权限
+     * @param userId 用户Id
+     * @return ResultVo
+     */
+    //@GetMapping("/queryAllPerms")
+    ResultVo<List<String>> getAllPerms(String userId);
+
+    /**
+     * 根据 userId 获得用户菜单
+     * @param userId 用户Id
+     * @return ResultVo
+     */
+    //@GetMapping("/queryAllPerms")
+    ResultVo<List<MenuModel>> getMenuListByUserId(String userId);
 
 }

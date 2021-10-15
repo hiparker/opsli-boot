@@ -53,6 +53,7 @@ import org.opsli.core.utils.TreeBuildUtil;
 import org.opsli.core.utils.UserUtil;
 import org.opsli.modulars.system.menu.entity.SysMenu;
 import org.opsli.modulars.system.menu.service.IMenuService;
+import org.opsli.modulars.system.user.service.IUserRoleRefService;
 import org.opsli.modulars.system.user.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
@@ -77,7 +78,7 @@ public class MenuRestController extends BaseRestController<SysMenu, MenuModel, I
         implements MenuApi {
 
     @Autowired
-    private IUserService iUserService;
+    private IUserRoleRefService iUserRoleRefService;
 
     /** 排序字段 */
     private static final String SORT_FIELD = "order";
@@ -104,7 +105,7 @@ public class MenuRestController extends BaseRestController<SysMenu, MenuModel, I
         UserModel user = UserUtil.getUser();
 
         // 获得当前用户菜单
-        List<MenuModel> menuModelList = iUserService.getMenuAllListByUserId(user.getId());
+        List<MenuModel> menuModelList = iUserRoleRefService.getMenuAllListByUserId(user.getId());
 
         // 这里有坑 如果 为 菜单数据 且 组件(Component)地址为空 不会跳转到主页 也不报错
         // 修复菜单问题导致无法跳转主页

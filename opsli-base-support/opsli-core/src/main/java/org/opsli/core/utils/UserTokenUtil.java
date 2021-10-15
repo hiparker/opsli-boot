@@ -254,12 +254,15 @@ public class UserTokenUtil {
                 // 如果缓存中 无该用户任何Token信息 则删除用户缓存
                 Long size = redisPlugin.sSize(
                         CacheUtil.getPrefixName() + TICKET_PREFIX + user.getUsername());
-                if(size == null || size == 0L){
+                if(size == null || size == 0L) {
                     // 删除相关信息
                     UserUtil.refreshUser(user);
                     UserUtil.refreshUserRoles(user.getId());
                     UserUtil.refreshUserAllPerms(user.getId());
                     UserUtil.refreshUserMenus(user.getId());
+                    UserUtil.refreshUserOrgs(user.getId());
+                    UserUtil.refreshUserDefRole(userId);
+                    UserUtil.refreshUserDefOrg(userId);
                 }
             }
 

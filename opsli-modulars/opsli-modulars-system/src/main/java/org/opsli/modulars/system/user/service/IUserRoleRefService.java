@@ -15,6 +15,11 @@
  */
 package org.opsli.modulars.system.user.service;
 
+import org.opsli.api.wrapper.system.menu.MenuModel;
+import org.opsli.api.wrapper.system.role.RoleModel;
+import org.opsli.api.wrapper.system.user.UserRoleRefModel;
+import org.opsli.modulars.system.menu.entity.SysMenu;
+
 import java.util.List;
 
 /**
@@ -24,6 +29,41 @@ import java.util.List;
  * @date 2020-09-16 17:33
  */
 public interface IUserRoleRefService {
+
+    /**
+     * 根据用户ID 获得当前角色编码集合
+     * @param userId 用户ID
+     * @return List
+     */
+    List<String> getRoleCodeList(String userId);
+
+    /**
+     * 根据用户ID 获得当前角色Id集合
+     * @param userId 用户ID
+     * @return List
+     */
+    List<String> getRoleIdList(String userId);
+
+    /**
+     * 根据用户ID 获得权限
+     * @param userId 用户ID
+     * @return List
+     */
+    List<String> getAllPerms(String userId);
+
+    /**
+     * 根据用户ID 获得菜单集合
+     * @param userId 用户ID
+     * @return List
+     */
+    List<MenuModel> getMenuListByUserId(String userId);
+
+    /**
+     * 根据用户ID 获得全部菜单集合
+     * @param userId 用户ID
+     * @return List
+     */
+    List<MenuModel> getMenuAllListByUserId(String userId);
 
     /**
      * 根据角色ID 获得当前用户Id集合
@@ -40,11 +80,24 @@ public interface IUserRoleRefService {
     List<String> getUserIdListByMenuId(String roleId);
 
     /**
-     * 保存角色
+     * 根据用户ID 获得当前默认角色ID
      * @param userId 用户ID
-     * @param roleIds 角色ID 集合
+     * @return List
+     */
+    String getDefRoleId(String userId);
+
+    /**
+     * 根据用户ID 获得当前角色对象
+     * @param userId 用户ID
+     * @return List
+     */
+    RoleModel getDefRoleByUserId(String userId);
+
+    /**
+     * 保存角色
+     * @param model 模型
      * @return boolean
      */
-    boolean setRoles(String userId,String[] roleIds);
+    boolean setRoles(UserRoleRefModel model);
 
 }

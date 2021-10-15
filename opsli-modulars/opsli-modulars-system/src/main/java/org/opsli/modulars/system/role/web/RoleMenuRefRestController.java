@@ -70,7 +70,7 @@ public class RoleMenuRefRestController implements RoleMenuRefApi {
      * @param model roleId 角色Id
      * @return ResultVo
      */
-    @RequiresPermissions("system_role_setPerms")
+    @RequiresPermissions("system_role_setMenuPerms")
     @Override
     public ResultVo<?> getPerms(RoleMenuRefModel model) {
         if(model == null){
@@ -99,11 +99,11 @@ public class RoleMenuRefRestController implements RoleMenuRefApi {
     }
 
     /**
-     * 设置权限
+     * 设置菜單权限
      * @param model 模型
      * @return ResultVo
      */
-    @RequiresPermissions("system_role_setPerms")
+    @RequiresPermissions("system_role_setMenuPerms")
     @EnableLog
     @Override
     public ResultVo<?> setPerms(RoleMenuRefModel model) {

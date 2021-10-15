@@ -32,6 +32,7 @@ import org.opsli.common.annotation.EnableLog;
 import org.opsli.common.annotation.RequiresPermissionsCus;
 import org.opsli.common.constants.MyBatisConstants;
 import org.opsli.common.exception.ServiceException;
+import org.opsli.common.utils.FieldUtil;
 import org.opsli.core.base.controller.BaseRestController;
 import org.opsli.core.persistence.Page;
 import org.opsli.core.persistence.querybuilder.GenQueryBuilder;
@@ -93,8 +94,17 @@ public class RoleRestController extends BaseRestController<SysRole, RoleModel, I
     public ResultVo<?> findPage(Integer pageNo, Integer pageSize, HttpServletRequest request) {
 
         QueryBuilder<SysRole> queryBuilder = new WebQueryBuilder<>(entityClazz, request.getParameterMap());
+        QueryWrapper<SysRole> wrapper = queryBuilder.build();
+
+        UserModel user = UserUtil.getUser();
+        // 如果是超级管理员 则查询为空的角色
+        if(StringUtils.equals(UserUtil.SUPER_ADMIN, user.getUsername())){
+            // 角色分页 增加租户权限
+            wrapper.isNull(FieldUtil.humpToUnderline(MyBatisConstants.FIELD_TENANT));
+        }
+
         Page<SysRole, RoleModel> page = new Page<>(pageNo, pageSize);
-        page.setQueryWrapper(queryBuilder.build());
+        page.setQueryWrapper(wrapper);
         page = IService.findPage(page);
 
         return ResultVo.success(page.getPageData());

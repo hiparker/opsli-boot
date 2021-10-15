@@ -32,7 +32,7 @@ import org.opsli.core.base.service.interfaces.CrudServiceInterface;
 import org.opsli.core.persistence.Page;
 import org.opsli.core.persistence.querybuilder.GenQueryBuilder;
 import org.opsli.core.persistence.querybuilder.QueryBuilder;
-import org.opsli.core.persistence.querybuilder.chain.QueryOrgHandler;
+import org.opsli.core.persistence.querybuilder.chain.QueryDataPermsHandler;
 import org.opsli.core.persistence.querybuilder.chain.QueryTenantHandler;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -213,7 +213,7 @@ public abstract class CrudServiceImpl<M extends BaseMapper<T>, T extends BaseEnt
     public List<T> findList(QueryWrapper<T> queryWrapper) {
         // 数据处理责任链
         queryWrapper = new QueryTenantHandler(
-                new QueryOrgHandler()
+                new QueryDataPermsHandler()
         ).handler(entityClazz, queryWrapper);
 
         return super.list(queryWrapper);
@@ -225,7 +225,7 @@ public abstract class CrudServiceImpl<M extends BaseMapper<T>, T extends BaseEnt
         QueryWrapper<T> queryWrapper = queryBuilder.build();
         // 数据处理责任链
         queryWrapper = new QueryTenantHandler(
-                new QueryOrgHandler()
+                new QueryDataPermsHandler()
         ).handler(entityClazz, queryWrapper);
 
         return super.list(queryWrapper);

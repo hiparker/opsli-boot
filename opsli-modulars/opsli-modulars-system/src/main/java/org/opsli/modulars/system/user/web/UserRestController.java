@@ -21,7 +21,6 @@ import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.excel.util.CollectionUtils;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.google.common.collect.Lists;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -31,16 +30,13 @@ import org.opsli.api.base.result.ResultVo;
 import org.opsli.api.web.system.user.UserApi;
 import org.opsli.api.wrapper.system.menu.MenuModel;
 import org.opsli.api.wrapper.system.options.OptionsModel;
+import org.opsli.api.wrapper.system.role.RoleModel;
 import org.opsli.api.wrapper.system.user.*;
 import org.opsli.common.annotation.ApiRestController;
 import org.opsli.common.annotation.EnableLog;
 import org.opsli.common.annotation.RequiresPermissionsCus;
-import org.opsli.common.constants.MyBatisConstants;
-import org.opsli.common.enums.DictType;
 import org.opsli.common.exception.ServiceException;
 import org.opsli.common.exception.TokenException;
-import org.opsli.common.utils.FieldUtil;
-import org.opsli.common.utils.ListDistinctUtil;
 import org.opsli.common.utils.WrapperUtil;
 import org.opsli.core.base.controller.BaseRestController;
 import org.opsli.core.msg.TokenMsg;
@@ -48,14 +44,13 @@ import org.opsli.core.persistence.Page;
 import org.opsli.core.persistence.querybuilder.GenQueryBuilder;
 import org.opsli.core.persistence.querybuilder.QueryBuilder;
 import org.opsli.core.persistence.querybuilder.WebQueryBuilder;
-import org.opsli.core.persistence.querybuilder.conf.WebQueryConf;
 import org.opsli.core.utils.OptionsUtil;
 import org.opsli.core.utils.OrgUtil;
 import org.opsli.core.utils.UserUtil;
 import org.opsli.modulars.system.SystemMsg;
-import org.opsli.modulars.system.org.service.ISysOrgService;
 import org.opsli.modulars.system.user.entity.SysUser;
 import org.opsli.modulars.system.user.entity.SysUserWeb;
+import org.opsli.modulars.system.user.service.IUserRoleRefService;
 import org.opsli.modulars.system.user.service.IUserService;
 import org.opsli.plugins.oss.OssStorageFactory;
 import org.opsli.plugins.oss.service.BaseOssStorageService;
@@ -84,6 +79,8 @@ import java.util.List;
 public class UserRestController extends BaseRestController<SysUser, UserModel, IUserService>
         implements UserApi {
 
+    @Autowired
+    private IUserRoleRefService iUserRoleRefService;
 
     /**
      * 当前登陆用户信息
@@ -143,7 +140,7 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
     @ApiOperation(value = "用户组织机构", notes = "用户组织机构")
     @Override
     public ResultVo<?> getOrgByUserId(String userId) {
-        List<UserOrgRefModel> orgListByUserId = OrgUtil.getOrgListByUserId(userId);
+        List<UserOrgRefModel> orgListByUserId = UserUtil.getOrgListByUserId(userId);
         return ResultVo.success(orgListByUserId);
     }
 
@@ -155,7 +152,7 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
     @ApiOperation(value = "根据 userId 获得用户角色Id集合", notes = "根据 userId 获得用户角色Id集合")
     @Override
     public ResultVo<List<String>> getRoleIdsByUserId(String userId) {
-        List<String> roleIdList = IService.getRoleIdList(userId);
+        List<String> roleIdList = iUserRoleRefService.getRoleIdList(userId);
         return ResultVo.success(roleIdList);
     }
 
@@ -489,104 +486,5 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
         return ResultVo.success(userModel);
     }
 
-    /**
-     * 根据 userId 获得用户角色
-     * @param userId 用户Id
-     * @return ResultVo
-     */
-    @Override
-    public ResultVo<List<String>> getRolesByUserId(String userId) {
-        List<String> roleCodeList = IService.getRoleCodeList(userId);
-        return ResultVo.success(roleCodeList);
-    }
 
-    /**
-     * 根据 userId 获得用户权限
-     * @param userId 用户Id
-     * @return ResultVo
-     */
-    @Override
-    public ResultVo<List<String>> getAllPerms(String userId) {
-        List<String> allPerms = IService.getAllPerms(userId);
-        return ResultVo.success(allPerms);
-    }
-
-
-    /**
-     * 根据 userId 获得用户菜单
-     * @param userId 用户Id
-     * @return ResultVo
-     */
-    @Override
-    public ResultVo<List<MenuModel>> getMenuListByUserId(String userId) {
-        List<MenuModel> menuModelList = IService.getMenuListByUserId(userId);
-        return ResultVo.success(menuModelList);
-    }
-
-
-    /**
-     * 用户组织机构
-     * @param userId 用户ID
-     * @return ResultVo
-     */
-    @ApiOperation(value = "用户组织机构", notes = "用户组织机构")
-    @Override
-    public ResultVo<UserOrgRefWebModel> getOrgInfoByUserId(String userId) {
-        UserOrgRefWebModel org = null;
-        // 不写SQL了 直接分页 第一页 取第一条
-        QueryBuilder<SysUserWeb> queryBuilder = new GenQueryBuilder<>();
-        Page<SysUserWeb, UserWebModel> page = new Page<>(1, 1);
-        QueryWrapper<SysUserWeb> queryWrapper = queryBuilder.build();
-        queryWrapper.eq(
-                "a.id",
-                userId
-        );
-        page.setQueryWrapper(queryWrapper);
-        page = IService.findPageByCus(page);
-        List<UserWebModel> list = page.getList();
-        if(CollUtil.isNotEmpty(list)){
-            UserWebModel userWebModel = list.get(0);
-            if(userWebModel != null){
-//                org  = userAndOrgModel.getOrg();
-//                if(org != null){
-//
-//                    org.setUserId(userId);
-
-//                    List<String> orgIds = Lists.newArrayListWithCapacity(3);
-//                    orgIds.add(org.getCompanyId());
-//                    orgIds.add(org.getDepartmentId());
-//                    orgIds.add(org.getPostId());
-//                    QueryWrapper<SysOrg> orgQueryWrapper = new QueryWrapper<>();
-//                    orgQueryWrapper.in(
-//                            FieldUtil.humpToUnderline(MyBatisConstants.FIELD_ID),
-//                            orgIds);
-//                    List<SysOrg> orgList = iSysOrgService.findList(orgQueryWrapper);
-//                    if(CollUtil.isNotEmpty(orgList)){
-//                        Map<String, SysOrg> tmp = Maps.newHashMap();
-//                        for (SysOrg sysOrg : orgList) {
-//                            tmp.put(sysOrg.getId(), sysOrg);
-//                        }
-//
-//                        // 设置 名称
-//                        SysOrg company = tmp.get(org.getCompanyId());
-//                        if(company != null){
-//                            org.setCompanyName(company.getOrgName());
-//                        }
-//
-//                        SysOrg department = tmp.get(org.getDepartmentId());
-//                        if(department != null){
-//                            org.setDepartmentName(department.getOrgName());
-//                        }
-//
-//                        SysOrg post = tmp.get(org.getPostId());
-//                        if(post != null){
-//                            org.setPostName(post.getOrgName());
-//                        }
-//                    }
-
-//                }
-            }
-        }
-        return ResultVo.success(org);
-    }
 }

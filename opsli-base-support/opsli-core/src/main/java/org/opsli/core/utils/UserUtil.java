@@ -23,11 +23,15 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.crypto.hash.Md5Hash;
 import org.opsli.api.base.result.ResultVo;
 import org.opsli.api.web.system.user.UserApi;
+import org.opsli.api.web.system.user.UserOrgRefApi;
+import org.opsli.api.web.system.user.UserRoleRefApi;
 import org.opsli.api.wrapper.system.menu.MenuModel;
+import org.opsli.api.wrapper.system.role.RoleModel;
 import org.opsli.api.wrapper.system.user.UserModel;
-import org.opsli.common.exception.ServiceException;
-import org.opsli.core.api.TokenThreadLocal;
+import org.opsli.api.wrapper.system.user.UserOrgRefModel;
+import org.opsli.api.wrapper.system.user.UserOrgRefWebModel;
 import org.opsli.common.exception.TokenException;
+import org.opsli.core.api.TokenThreadLocal;
 import org.opsli.core.autoconfigure.properties.GlobalProperties;
 import org.opsli.core.cache.local.CacheUtil;
 import org.opsli.core.msg.CoreMsg;
@@ -36,6 +40,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
+
 import java.util.List;
 
 import static org.opsli.common.constants.OrderConstants.UTIL_ORDER;
@@ -55,6 +60,9 @@ public class UserUtil {
     /** 前缀 */
     public static final String PREFIX_ID = "userId:";
     public static final String PREFIX_ID_ROLES = "userId:roles:";
+    public static final String PREFIX_ID_DEF_ROLE = "userId:def_role:";
+    public static final String PREFIX_ID_ORGS = "userId:orgs";
+    public static final String PREFIX_ID_DEF_ORG = "userId:def_org:";
     public static final String PREFIX_ID_PERMISSIONS = "userId:permissions:";
     public static final String PREFIX_ID_MENUS = "userId:menus:";
     public static final String PREFIX_USERNAME = "username:";
@@ -64,6 +72,12 @@ public class UserUtil {
 
     /** 用户Service */
     private static UserApi userApi;
+
+    /** 用户角色 Api */
+    private static UserRoleRefApi userRoleRefApi;
+
+    /** 用户组织 Api */
+    private static UserOrgRefApi userOrgRefApi;
 
     /** 超级管理员 */
     public static String SUPER_ADMIN;
@@ -274,7 +288,7 @@ public class UserUtil {
             }
 
             // 查询数据库
-            ResultVo<List<String>> resultVo = userApi.getRolesByUserId(userId);
+            ResultVo<List<String>> resultVo = userRoleRefApi.getRolesByUserId(userId);
             if(resultVo.isSuccess()){
                 roles = resultVo.getData();
                 // 存入缓存
@@ -342,7 +356,7 @@ public class UserUtil {
             }
 
             // 查询数据库
-            ResultVo<List<String>> resultVo = userApi.getAllPerms(userId);
+            ResultVo<List<String>> resultVo = userRoleRefApi.getAllPerms(userId);
             if(resultVo.isSuccess()){
                 permissions = resultVo.getData();
                 // 存入缓存
@@ -362,6 +376,87 @@ public class UserUtil {
         }
 
         return permissions;
+    }
+
+    /**
+     * 根据 userId 获得用户组织机构
+     * @param userId 用户ID
+     * @return List
+     */
+    public static List<UserOrgRefModel> getOrgListByUserId(String userId){
+        // 判断 工具类是否初始化完成
+        ThrowExceptionUtil.isThrowException(!IS_INIT,
+                CoreMsg.OTHER_EXCEPTION_UTILS_INIT);
+
+        // 缓存Key
+        String cacheKey = PREFIX_ID_ORGS + userId;
+
+        List<UserOrgRefModel> orgList;
+
+        // 先从缓存里拿
+        Object obj = CacheUtil.getTimed(cacheKey);
+        orgList = Convert.toList(UserOrgRefModel.class, obj);
+        if(CollUtil.isNotEmpty(orgList)){
+            return orgList;
+        }
+
+        // 拿不到 --------
+        // 防止缓存穿透判断
+        boolean hasNilFlag = CacheUtil.hasNilFlag(cacheKey);
+        if(hasNilFlag){
+            return ListUtil.empty();
+        }
+
+
+        try {
+            // 分布式加锁
+            if(!DistributedLockUtil.lock(cacheKey)){
+                // 无法申领分布式锁
+                log.error(CoreMsg.REDIS_EXCEPTION_LOCK.getMessage());
+                return ListUtil.empty();
+            }
+
+            // 如果获得锁 则 再次检查缓存里有没有， 如果有则直接退出， 没有的话才发起数据库请求
+            obj = CacheUtil.getTimed(cacheKey);
+            orgList = Convert.toList(UserOrgRefModel.class, obj);
+            if(CollUtil.isNotEmpty(orgList)){
+                return orgList;
+            }
+
+            // 查询数据库
+            ResultVo<List<UserOrgRefModel>> resultVo = userOrgRefApi.findListByUserId(userId);
+            if(resultVo.isSuccess()){
+                orgList = resultVo.getData();
+                // 存入缓存
+                CacheUtil.put(cacheKey, orgList);
+            }
+        }catch (Exception e){
+            log.error(e.getMessage(), e);
+        }finally {
+            // 释放锁
+            DistributedLockUtil.unlock(cacheKey);
+        }
+
+        if(CollUtil.isEmpty(orgList)){
+            // 设置空变量 用于防止穿透判断
+            CacheUtil.putNilFlag(cacheKey);
+            return ListUtil.empty();
+        }
+
+        return orgList;
+    }
+
+    /**
+     * 根据 当前用户的组织机构
+     * @return List
+     */
+    public static List<UserOrgRefModel> getOrgByCurrUser(){
+        // 判断 工具类是否初始化完成
+        ThrowExceptionUtil.isThrowException(!IS_INIT,
+                CoreMsg.OTHER_EXCEPTION_UTILS_INIT);
+
+        UserModel user = UserUtil.getUser();
+        return getOrgListByUserId(user.getId());
     }
 
     /**
@@ -410,7 +505,7 @@ public class UserUtil {
             }
 
             // 查询数据库
-            ResultVo<List<MenuModel>> resultVo = userApi.getMenuListByUserId(userId);
+            ResultVo<List<MenuModel>> resultVo = userRoleRefApi.getMenuListByUserId(userId);
             if(resultVo.isSuccess()){
                 menus = resultVo.getData();
                 // 存入缓存
@@ -431,6 +526,136 @@ public class UserUtil {
 
         return menus;
     }
+
+    /**
+     * 根据 userId 获得用户默认角色
+     * @param userId 用户ID
+     * @return List
+     */
+    public static RoleModel getUserDefRoleByUserId(String userId){
+
+        // 判断 工具类是否初始化完成
+        ThrowExceptionUtil.isThrowException(!IS_INIT,
+                CoreMsg.OTHER_EXCEPTION_UTILS_INIT);
+
+        // 缓存Key
+        String cacheKey = PREFIX_ID_DEF_ROLE + userId;
+
+        // 先从缓存里拿
+        RoleModel roleModel = CacheUtil.getTimed(RoleModel.class, cacheKey);
+        if (roleModel != null){
+            return roleModel;
+        }
+
+        // 拿不到 --------
+        // 防止缓存穿透判断
+        boolean hasNilFlag = CacheUtil.hasNilFlag(cacheKey);
+        if(hasNilFlag){
+            return null;
+        }
+
+        try {
+            // 分布式加锁
+            if(!DistributedLockUtil.lock(cacheKey)){
+                // 无法申领分布式锁
+                log.error(CoreMsg.REDIS_EXCEPTION_LOCK.getMessage());
+                return null;
+            }
+
+            // 如果获得锁 则 再次检查缓存里有没有， 如果有则直接退出， 没有的话才发起数据库请求
+            roleModel = CacheUtil.getTimed(RoleModel.class, cacheKey);
+            if (roleModel != null){
+                return roleModel;
+            }
+
+            // 查询数据库
+            ResultVo<RoleModel> resultVo = userRoleRefApi.getDefRoleByUserId(userId);
+            if(resultVo.isSuccess()){
+                roleModel = resultVo.getData();
+                // 存入缓存
+                CacheUtil.put(cacheKey, roleModel);
+            }
+        }catch (Exception e){
+            log.error(e.getMessage(),e);
+        }finally {
+            // 释放锁
+            DistributedLockUtil.unlock(cacheKey);
+        }
+
+        if(roleModel == null){
+            // 设置空变量 用于防止穿透判断
+            CacheUtil.putNilFlag(cacheKey);
+            return null;
+        }
+
+        return roleModel;
+    }
+
+
+    /**
+     * 根据 userId 获得用户默认组织
+     * @param userId 用户ID
+     * @return List
+     */
+    public static UserOrgRefModel getUserDefOrgByUserId(String userId){
+
+        // 判断 工具类是否初始化完成
+        ThrowExceptionUtil.isThrowException(!IS_INIT,
+                CoreMsg.OTHER_EXCEPTION_UTILS_INIT);
+
+        // 缓存Key
+        String cacheKey = PREFIX_ID_DEF_ORG + userId;
+
+        // 先从缓存里拿
+        UserOrgRefModel orgModel = CacheUtil.getTimed(UserOrgRefModel.class, cacheKey);
+        if (orgModel != null){
+            return orgModel;
+        }
+
+        // 拿不到 --------
+        // 防止缓存穿透判断
+        boolean hasNilFlag = CacheUtil.hasNilFlag(cacheKey);
+        if(hasNilFlag){
+            return null;
+        }
+
+        try {
+            // 分布式加锁
+            if(!DistributedLockUtil.lock(cacheKey)){
+                // 无法申领分布式锁
+                log.error(CoreMsg.REDIS_EXCEPTION_LOCK.getMessage());
+                return null;
+            }
+
+            // 如果获得锁 则 再次检查缓存里有没有， 如果有则直接退出， 没有的话才发起数据库请求
+            orgModel = CacheUtil.getTimed(UserOrgRefModel.class, cacheKey);
+            if (orgModel != null){
+                return orgModel;
+            }
+
+            // 查询数据库
+            ResultVo<UserOrgRefModel> resultVo = userOrgRefApi.getDefOrgByUserId(userId);
+            if(resultVo.isSuccess()){
+                orgModel = resultVo.getData();
+                // 存入缓存
+                CacheUtil.put(cacheKey, orgModel);
+            }
+        }catch (Exception e){
+            log.error(e.getMessage(),e);
+        }finally {
+            // 释放锁
+            DistributedLockUtil.unlock(cacheKey);
+        }
+
+        if(orgModel == null){
+            // 设置空变量 用于防止穿透判断
+            CacheUtil.putNilFlag(cacheKey);
+            return null;
+        }
+
+        return orgModel;
+    }
+
 
     // ============== 刷新缓存 ==============
 
@@ -537,6 +762,50 @@ public class UserUtil {
     }
 
     /**
+     * 刷新用户默认角色 - 删就完了
+     * @param userId 用户ID
+     * @return boolean
+     */
+    public static boolean refreshUserDefRole(String userId){
+        // 判断 工具类是否初始化完成
+        ThrowExceptionUtil.isThrowException(!IS_INIT,
+                CoreMsg.OTHER_EXCEPTION_UTILS_INIT);
+
+        if(StringUtils.isEmpty(userId)){
+            return true;
+        }
+
+        // 计数器
+        int count = 0;
+
+        RoleModel roleModel = CacheUtil.getTimed(RoleModel.class, PREFIX_ID_DEF_ROLE + userId);
+        boolean hasNilFlag = CacheUtil.hasNilFlag(PREFIX_ID_DEF_ROLE + userId);
+
+        // 只要不为空 则执行刷新
+        if (hasNilFlag){
+            count++;
+            // 清除空拦截
+            boolean tmp = CacheUtil.delNilFlag(PREFIX_ID_DEF_ROLE + userId);
+            if(tmp){
+                count--;
+            }
+        }
+
+        if(roleModel != null){
+            count++;
+            // 先删除
+            boolean tmp = CacheUtil.del(PREFIX_ID_DEF_ROLE + userId);
+            if(tmp){
+                count--;
+            }
+        }
+
+        return count == 0;
+    }
+
+
+
+    /**
      * 刷新用户权限 - 删就完了
      * @param userId 用户ID
      * @return boolean
@@ -575,6 +844,90 @@ public class UserUtil {
 
         return count == 0;
     }
+
+    /**
+     * 刷新用户组织 - 删就完了
+     * @param userId 用户ID
+     * @return boolean
+     */
+    public static boolean refreshUserOrgs(String userId){
+        // 判断 工具类是否初始化完成
+        ThrowExceptionUtil.isThrowException(!IS_INIT,
+                CoreMsg.OTHER_EXCEPTION_UTILS_INIT);
+
+        if(StringUtils.isEmpty(userId)){
+            return true;
+        }
+
+        // 计数器
+        int count = 0;
+
+        UserOrgRefWebModel orgRefModel = CacheUtil.getTimed(UserOrgRefWebModel.class, PREFIX_ID_ORGS + userId);
+        boolean hasNilFlag = CacheUtil.hasNilFlag(PREFIX_ID_ORGS + userId);
+
+        // 只要不为空 则执行刷新
+        if (hasNilFlag){
+            count++;
+            // 清除空拦截
+            boolean tmp = CacheUtil.delNilFlag(PREFIX_ID_ORGS + userId);
+            if(tmp){
+                count--;
+            }
+        }
+
+        if(orgRefModel != null){
+            count++;
+            // 先删除
+            boolean tmp = CacheUtil.del(PREFIX_ID_ORGS + userId);
+            if(tmp){
+                count--;
+            }
+        }
+        return count == 0;
+    }
+
+    /**
+     * 刷新用户默认组织 - 删就完了
+     * @param userId 用户ID
+     * @return boolean
+     */
+    public static boolean refreshUserDefOrg(String userId){
+        // 判断 工具类是否初始化完成
+        ThrowExceptionUtil.isThrowException(!IS_INIT,
+                CoreMsg.OTHER_EXCEPTION_UTILS_INIT);
+
+        if(StringUtils.isEmpty(userId)){
+            return true;
+        }
+
+        // 计数器
+        int count = 0;
+
+        UserOrgRefModel orgModel = CacheUtil.getTimed(UserOrgRefModel.class, PREFIX_ID_DEF_ORG + userId);
+        boolean hasNilFlag = CacheUtil.hasNilFlag(PREFIX_ID_DEF_ORG + userId);
+
+        // 只要不为空 则执行刷新
+        if (hasNilFlag){
+            count++;
+            // 清除空拦截
+            boolean tmp = CacheUtil.delNilFlag(PREFIX_ID_DEF_ORG + userId);
+            if(tmp){
+                count--;
+            }
+        }
+
+        if(orgModel != null){
+            count++;
+            // 先删除
+            boolean tmp = CacheUtil.del(PREFIX_ID_DEF_ORG + userId);
+            if(tmp){
+                count--;
+            }
+        }
+
+        return count == 0;
+    }
+
 
     /**
      * 刷新用户菜单 - 删就完了
@@ -692,7 +1045,10 @@ public class UserUtil {
      * 初始化
      */
     @Autowired
-    public void init(GlobalProperties globalProperties, UserApi userApi){
+    public void init(GlobalProperties globalProperties,
+                     UserApi userApi,
+                     UserRoleRefApi userRoleRefApi,
+                     UserOrgRefApi userOrgRefApi){
         if(globalProperties != null && globalProperties.getAuth() != null
                 && globalProperties.getAuth().getToken() != null
             ){
@@ -701,6 +1057,10 @@ public class UserUtil {
         }
 
         UserUtil.userApi = userApi;
+
+        UserUtil.userRoleRefApi = userRoleRefApi;
+
+        UserUtil.userOrgRefApi = userOrgRefApi;
 
         IS_INIT = true;
     }

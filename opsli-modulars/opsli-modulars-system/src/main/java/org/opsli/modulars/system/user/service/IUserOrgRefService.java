@@ -43,4 +43,18 @@ public interface IUserOrgRefService {
      */
     List<UserOrgRefModel> findListByUserId(String userId);
 
+    /**
+     * 根据用户ID 获得当前默认组织ID
+     * @param userId 用户ID
+     * @return List
+     */
+    String getDefOrgId(String userId);
+
+    /**
+     * 根据用户ID 获得当前组织对象
+     * @param userId 用户ID
+     * @return List
+     */
+    UserOrgRefModel getDefOrgByUserId(String userId);
+
 }

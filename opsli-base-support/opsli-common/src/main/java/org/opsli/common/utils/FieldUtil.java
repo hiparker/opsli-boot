@@ -17,6 +17,12 @@ package org.opsli.common.utils;
 
 import org.springframework.util.StringUtils;
 
+import java.io.Serializable;
+import java.lang.invoke.SerializedLambda;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.function.Function;
+
 /**
  * 字段处理工具类
  *
@@ -101,8 +107,56 @@ public final class FieldUtil {
         return str;
     }
 
+
+    /**
+     * 获得字段名称
+     * @param fn 方法
+     * @param <T> 泛型
+     * @return String
+     */
+    public static <T> String getFileName(SFunction<T, ?> fn) {
+        // 从function取出序列化方法
+        Method writeReplaceMethod;
+        try {
+            writeReplaceMethod = fn.getClass().getDeclaredMethod("writeReplace");
+        } catch (NoSuchMethodException e) {
+            throw new RuntimeException(e);
+        }
+
+        // 从序列化方法取出序列化的lambda信息
+        boolean isAccessible = writeReplaceMethod.isAccessible();
+        writeReplaceMethod.setAccessible(true);
+        SerializedLambda serializedLambda;
+        try {
+            serializedLambda = (SerializedLambda) writeReplaceMethod.invoke(fn);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            throw new RuntimeException(e);
+        }
+        writeReplaceMethod.setAccessible(isAccessible);
+
+        // 从lambda信息取出method、field、class等
+        String fieldName = serializedLambda.getImplMethodName().substring("get".length());
+        fieldName = fieldName.replaceFirst(fieldName.charAt(0) + "", (fieldName.charAt(0) + "").toLowerCase());
+//        Field field;
+//        try {
+//            field = Class.forName(serializedLambda.getImplClass().replace("/", ".")).getDeclaredField(fieldName);
+//        } catch (ClassNotFoundException | NoSuchFieldException e) {
+//            throw new RuntimeException(e);
+//        }
+
+        return fieldName;
+    }
+
+
     // ====================
 
-    private FieldUtil(){}
+    /**
+     * 使Function获取序列化能力
+     */
+    @FunctionalInterface
+    public interface SFunction<T, R> extends Function<T, R>, Serializable {
 
+    }
+
+    private FieldUtil(){}
 }

@@ -15,22 +15,31 @@
  */
 package org.opsli.modulars.system.user.web;
 
+import cn.hutool.core.convert.Convert;
+import com.baomidou.mybatisplus.extension.service.IService;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.opsli.api.base.result.ResultVo;
 import org.opsli.api.web.system.user.UserRoleRefApi;
+import org.opsli.api.wrapper.system.menu.MenuModel;
+import org.opsli.api.wrapper.system.role.RoleModel;
 import org.opsli.api.wrapper.system.user.UserModel;
 import org.opsli.api.wrapper.system.user.UserRoleRefModel;
 import org.opsli.common.annotation.ApiRestController;
 import org.opsli.common.exception.ServiceException;
 import org.opsli.core.autoconfigure.properties.GlobalProperties;
 import org.opsli.core.msg.CoreMsg;
+import org.opsli.core.utils.OrgUtil;
 import org.opsli.core.utils.UserUtil;
 import org.opsli.modulars.system.SystemMsg;
 import org.opsli.modulars.system.user.service.IUserRoleRefService;
+import org.opsli.modulars.system.user.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.List;
 
 
 /**
@@ -53,6 +62,27 @@ public class UserRoleRefRestController implements UserRoleRefApi {
 
 
     /**
+     * 根据 userId 获得用户角色Id集合
+     * @param userId 用户Id
+     * @return ResultVo
+     */
+    @ApiOperation(value = "根据 userId 获得用户角色Id集合", notes = "根据 userId 获得用户角色Id集合")
+    @Override
+    public ResultVo<UserRoleRefModel> getRoles(String userId) {
+
+        List<String> roleIdList = iUserRoleRefService.getRoleIdList(userId);
+        String defRoleId = iUserRoleRefService.getDefRoleId(userId);
+
+        UserRoleRefModel userRoleRefModel = UserRoleRefModel.builder()
+                .userId(userId)
+                .roleIds(Convert.toStrArray(roleIdList))
+                .defRoleId(defRoleId)
+                .build();
+
+        return ResultVo.success(userRoleRefModel);
+    }
+
+    /**
      * 设置角色
      * @param model 模型
      * @return ResultVo
@@ -63,8 +93,7 @@ public class UserRoleRefRestController implements UserRoleRefApi {
         // 演示模式 不允许操作
         this.demoError();
 
-        boolean ret = iUserRoleRefService.setRoles(model.getUserId(),
-                model.getRoleIds());
+        boolean ret = iUserRoleRefService.setRoles(model);
         if(ret){
             return ResultVo.success();
         }
@@ -73,6 +102,58 @@ public class UserRoleRefRestController implements UserRoleRefApi {
                 SystemMsg.EXCEPTION_USER_ROLES_ERROR.getMessage()
                 );
     }
+
+    /**
+     * 根据 userId 获得用户角色
+     * @param userId 用户Id
+     * @return ResultVo
+     */
+    @Override
+    public ResultVo<List<String>> getRolesByUserId(String userId) {
+        List<String> roleCodeList = iUserRoleRefService.getRoleCodeList(userId);
+        return ResultVo.success(roleCodeList);
+    }
+
+    /**
+     * 根据 userId 获得用户默认角色
+     * @param userId 用户Id
+     * @return ResultVo
+     */
+    @Override
+    public ResultVo<RoleModel> getDefRoleByUserId(String userId) {
+        RoleModel defRoleByUserId = iUserRoleRefService.getDefRoleByUserId(userId);
+        return ResultVo.success(defRoleByUserId);
+    }
+
+    /**
+     * 根据 userId 获得用户权限
+     * @param userId 用户Id
+     * @return ResultVo
+     */
+    @Override
+    public ResultVo<List<String>> getAllPerms(String userId) {
+        List<String> allPerms = iUserRoleRefService.getAllPerms(userId);
+        return ResultVo.success(allPerms);
+    }
+
+
+    /**
+     * 根据 userId 获得用户菜单
+     * @param userId 用户Id
+     * @return ResultVo
+     */
+    @Override
+    public ResultVo<List<MenuModel>> getMenuListByUserId(String userId) {
+        List<MenuModel> menuModelList = iUserRoleRefService.getMenuListByUserId(userId);
+        return ResultVo.success(menuModelList);
+    }
+
+
+
+
+
+
+
 
 
     /**

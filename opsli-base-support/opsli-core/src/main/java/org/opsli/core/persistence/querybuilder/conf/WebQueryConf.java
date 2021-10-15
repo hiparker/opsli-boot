@@ -15,6 +15,10 @@
  */
 package org.opsli.core.persistence.querybuilder.conf;
 
+import org.apache.poi.ss.formula.functions.T;
+import org.opsli.common.utils.FieldUtil;
+
+import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -34,29 +38,30 @@ public class WebQueryConf {
 
 
     /**
-     * 判断是否包含 Key
-     * @param key key
+     * 存放
+     * @param fieldFn 字段
      * @param value 值
      */
-    public void pub(String key, String value){
-        queryMap.putIfAbsent(key, value);
+    public void pub(FieldUtil.SFunction<T, ?> fieldFn, String value){
+        String fileName = FieldUtil.getFileName(fieldFn);
+        queryMap.putIfAbsent(fileName, value);
     }
 
     /**
-     * 判断是否包含 Key
-     * @param key key
+     * 获取
+     * @param field 字段
      */
-    public String get(String key){
-        return queryMap.get(key);
+    public String get(String field){
+        return queryMap.get(field);
     }
 
     /**
-     * 判断是否包含 Key
-     * @param key key
+     * 判断是否包含 field
+     * @param field 字段
      * @return boolean
      */
-    public boolean hashKey(String key){
-        return queryMap.containsKey(key);
+    public boolean hashKey(String field){
+        return queryMap.containsKey(field);
     }
 
 }

@@ -17,6 +17,7 @@ package org.opsli.api.web.system.user;
 
 import org.opsli.api.base.result.ResultVo;
 import org.opsli.api.wrapper.system.menu.MenuModel;
+import org.opsli.api.wrapper.system.role.RoleModel;
 import org.opsli.api.wrapper.system.user.UserInfo;
 import org.opsli.api.wrapper.system.user.UserModel;
 import org.opsli.api.wrapper.system.user.UserOrgRefWebModel;
@@ -235,38 +236,6 @@ public interface UserApi {
     //@GetMapping("/getUserByUsername")
     ResultVo<UserModel> getUserByUsername(String username);
 
-    /**
-     * 根据 userId 获得用户角色
-     * @param userId 用户Id
-     * @return ResultVo
-     */
-    //@GetMapping("/getRolesByUserId")
-    ResultVo<List<String>> getRolesByUserId(String userId);
-
-    /**
-     * 根据 userId 获得用户权限
-     * @param userId 用户Id
-     * @return ResultVo
-     */
-    //@GetMapping("/queryAllPerms")
-    ResultVo<List<String>> getAllPerms(String userId);
-
-    /**
-     * 根据 userId 获得用户菜单
-     * @param userId 用户Id
-     * @return ResultVo
-     */
-    //@GetMapping("/queryAllPerms")
-    ResultVo<List<MenuModel>> getMenuListByUserId(String userId);
-
-
-    /**
-     * 当前登陆用户信息
-     *
-     * @param userId 用户ID
-     * @return ResultVo
-     */
-    ResultVo<UserOrgRefWebModel> getOrgInfoByUserId(String userId);
 
 
 }

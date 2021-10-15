@@ -53,5 +53,5 @@ public interface MyBatisConstants {
     /** 多租户字段 */
     String FIELD_TENANT = "tenantId";
     /** 组织字段 */
-    String FIELD_ORG_GROUP = "org_group";
+    String FIELD_ORG_GROUP = "orgIds";
 }

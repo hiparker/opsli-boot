@@ -17,6 +17,7 @@ package org.opsli.api.wrapper.system.user;
 
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.opsli.common.annotation.validator.Validator;
@@ -34,6 +35,7 @@ import java.io.Serializable;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @ExcelIgnoreUnannotated
+@Builder
 public class UserRoleRefModel implements Serializable {
 
     /** 用户ID */
@@ -45,5 +47,10 @@ public class UserRoleRefModel implements Serializable {
     /** 角色数组 */
     @ApiModelProperty(value = "权限数组")
     private String[] roleIds;
+
+    /** 默认角色ID */
+    @ApiModelProperty(value = "默认角色")
+    @Validator({ValidatorType.IS_NOT_NULL})
+    private String defRoleId;
 
 }

@@ -15,16 +15,13 @@
  */
 package org.opsli.modulars.system.user.service;
 
-import org.opsli.api.wrapper.system.menu.MenuModel;
-import org.opsli.api.wrapper.system.user.UserWebModel;
 import org.opsli.api.wrapper.system.user.UserModel;
 import org.opsli.api.wrapper.system.user.UserPassword;
+import org.opsli.api.wrapper.system.user.UserWebModel;
 import org.opsli.core.base.service.interfaces.CrudServiceInterface;
 import org.opsli.core.persistence.Page;
 import org.opsli.modulars.system.user.entity.SysUser;
 import org.opsli.modulars.system.user.entity.SysUserWeb;
-
-import java.util.List;
 
 
 /**
@@ -41,41 +38,6 @@ public interface IUserService extends CrudServiceInterface<SysUser, UserModel> {
      * @return UserModel
      */
     UserModel queryByUserName(String username);
-
-    /**
-     * 根据用户ID 获得当前角色编码集合
-     * @param userId 用户ID
-     * @return List
-     */
-    List<String> getRoleCodeList(String userId);
-
-    /**
-     * 根据用户ID 获得当前角色Id集合
-     * @param userId 用户ID
-     * @return List
-     */
-    List<String> getRoleIdList(String userId);
-
-    /**
-     * 根据用户ID 获得权限
-     * @param userId 用户ID
-     * @return List
-     */
-    List<String> getAllPerms(String userId);
-
-    /**
-     * 根据用户ID 获得菜单集合
-     * @param userId 用户ID
-     * @return List
-     */
-    List<MenuModel> getMenuListByUserId(String userId);
-
-    /**
-     * 根据用户ID 获得全部菜单集合
-     * @param userId 用户ID
-     * @return List
-     */
-    List<MenuModel> getMenuAllListByUserId(String userId);
 
 
     /**

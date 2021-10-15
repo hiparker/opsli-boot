@@ -139,6 +139,13 @@ public class LoginRestController {
                 // 用户暂无角色菜单，请设置后登录
                 throw new TokenException(TokenMsg.EXCEPTION_USER_MENU_NOT_NULL);
             }
+
+            // 检测用户是否有角色权限
+            List<String> userAllPermsList = UserUtil.getUserAllPermsByUserId(user.getId());
+            if(CollUtil.isEmpty(userAllPermsList)){
+                // 用户暂无角色菜单，请设置后登录
+                throw new TokenException(TokenMsg.EXCEPTION_USER_PERMS_NOT_NULL);
+            }
         }
 
         // 失败次数超过 验证次数阈值 开启验证码验证

@@ -60,9 +60,18 @@ public class RoleModel extends ApiWrapper {
     @ValidatorLenMax(1)
     private String izLock;
 
+
+    /** 授权数据范围 */
+    @ApiModelProperty(value = "授权数据范围")
+    @ExcelProperty(value = "授权数据范围", order = 4)
+    @ExcelInfo(dictType = "role_data_scope")
+    @Validator({ValidatorType.IS_NOT_NULL})
+    @ValidatorLenMax(5)
+    private String dataScope;
+
     /** 备注 */
     @ApiModelProperty(value = "备注")
-    @ExcelProperty(value = "备注", order = 4)
+    @ExcelProperty(value = "备注", order = 5)
     @ExcelInfo
     @ValidatorLenMax(255)
     private String remark;

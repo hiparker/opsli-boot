@@ -38,41 +38,6 @@ public interface UserMapper extends BaseMapper<SysUser> {
 
 
     /**
-     * 根据用户ID 获得当前角色编码集合
-     * @param userId 用户ID
-     * @return List
-     */
-    List<String> getRoleCodeList(String userId);
-
-    /**
-     * 根据用户ID 获得当前角色Id集合
-     * @param userId 用户ID
-     * @return List
-     */
-    List<String> getRoleIdList(String userId);
-
-    /**
-     * 根据用户ID 获得权限
-     * @param userId 用户ID
-     * @return List
-     */
-    List<String> queryAllPerms(String userId);
-
-    /**
-     * 根据用户ID 获得菜单集合
-     * @param userId 用户ID
-     * @return List
-     */
-    List<SysMenu> findMenuListByUserId(String userId);
-
-    /**
-     * 根据用户ID 获得全部菜单集合
-     * @param userId 用户ID
-     * @return List
-     */
-    List<SysMenu> findMenuAllListByUserId(String userId);
-
-    /**
      * 修改密码
      * @param userPassword 账号密码
      * @return boolean

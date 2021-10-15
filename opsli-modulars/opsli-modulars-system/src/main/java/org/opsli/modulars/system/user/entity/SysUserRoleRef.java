@@ -49,5 +49,7 @@ public class SysUserRoleRef implements Serializable {
     /** 角色ID */
     private String roleId;
 
+    /** 是否默认 */
+    private String izDef;
 
 }

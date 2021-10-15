@@ -39,8 +39,11 @@ public class SysRole extends BaseEntity {
     /** 角色名称 */
     private String roleName;
 
-    /** 是否内置数据 0否  1是*/
+    /** 是否内置数据 0否  1是 */
     private String izLock;
+
+    /** 授权数据范围 */
+    private String dataScope;
 
     /** 备注 */
     @TableField(updateStrategy = FieldStrategy.IGNORED)
