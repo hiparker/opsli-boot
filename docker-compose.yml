@@ -13,7 +13,7 @@ services:
       - -Xms2048m
       - -XX:+UseG1GC
       - -XX:MaxGCPauseMillis=200
-      - --spring.profiles.active=beta
+      - --spring.profiles.active=test
     privileged: true
     volumes:
       - /www/wwwroot/demo.opsli.bedebug.com/backend/var:/usr/local/opsli/opsli-boot/var #挂载目录
