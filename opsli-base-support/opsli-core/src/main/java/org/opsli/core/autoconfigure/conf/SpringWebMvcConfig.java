@@ -17,7 +17,9 @@ package org.opsli.core.autoconfigure.conf;
 
 import lombok.extern.slf4j.Slf4j;
 import org.opsli.common.annotation.ApiRestController;
+import org.opsli.core.api.ApiRequestMappingHandlerMapping;
 import org.opsli.core.autoconfigure.properties.ApiPathProperties;
+import org.springframework.boot.autoconfigure.web.servlet.WebMvcRegistrations;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.cors.CorsConfiguration;
@@ -25,6 +27,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 import org.springframework.web.servlet.config.annotation.PathMatchConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 import javax.annotation.Resource;
 
@@ -36,10 +39,19 @@ import javax.annotation.Resource;
  */
 @Slf4j
 @Configuration
-public class SpringWebMvcConfig implements WebMvcConfigurer {
+public class SpringWebMvcConfig implements WebMvcConfigurer, WebMvcRegistrations {
 
 	@Resource
 	private ApiPathProperties apiPathProperties;
+
+	/**
+	 * 重写RequestMappingHandlerMapping，自定义匹配的处理器
+	 * @return RequestMappingHandlerMapping
+	 */
+	@Override
+	public RequestMappingHandlerMapping getRequestMappingHandlerMapping() {
+		return new ApiRequestMappingHandlerMapping();
+	}
 
 	/**
 	 * 配置 ApiRestController 生效

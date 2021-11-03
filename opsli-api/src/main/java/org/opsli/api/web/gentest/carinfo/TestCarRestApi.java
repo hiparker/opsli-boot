@@ -16,10 +16,7 @@
 package org.opsli.api.web.gentest.carinfo;
 
 import org.opsli.api.base.result.ResultVo;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -44,13 +41,15 @@ public interface TestCarRestApi {
     String TITLE = "汽车信息管理";
     /** 子标题 */
     String SUB_TITLE = "汽车信息";
+    /** URL 前缀 */
+    String URL_PREFIX = "/gentest/carinfo/{version}";
 
     /**
     * 汽车信息 查一条
     * @param model 模型
     * @return ResultVo
     */
-    @GetMapping("/get")
+    @GetMapping(URL_PREFIX + "/get")
     ResultVo<TestCarModel> get(TestCarModel model);
 
     /**
@@ -60,7 +59,7 @@ public interface TestCarRestApi {
     * @param request request
     * @return ResultVo
     */
-    @GetMapping("/findPage")
+    @GetMapping(URL_PREFIX + "/findPage")
     ResultVo<?> findPage(
         @RequestParam(name = "pageNo", defaultValue = "1") Integer pageNo,
         @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize,
@@ -72,7 +71,7 @@ public interface TestCarRestApi {
     * @param model 模型
     * @return ResultVo
     */
-    @PostMapping("/insert")
+    @PostMapping(URL_PREFIX + "/insert")
     ResultVo<?> insert(@RequestBody TestCarModel model);
 
     /**
@@ -80,7 +79,7 @@ public interface TestCarRestApi {
     * @param model 模型
     * @return ResultVo
     */
-    @PostMapping("/update")
+    @PostMapping(URL_PREFIX + "/update")
     ResultVo<?> update(@RequestBody TestCarModel model);
 
     /**
@@ -88,7 +87,7 @@ public interface TestCarRestApi {
     * @param id ID
     * @return ResultVo
     */
-    @PostMapping("/del")
+    @PostMapping(URL_PREFIX + "/del")
     ResultVo<?> del(String id);
 
     /**
@@ -96,7 +95,7 @@ public interface TestCarRestApi {
     * @param ids ID 数组
     * @return ResultVo
     */
-    @PostMapping("/delAll")
+    @PostMapping(URL_PREFIX + "/delAll")
     ResultVo<?> delAll(String ids);
 
     /**
@@ -112,7 +111,7 @@ public interface TestCarRestApi {
     * @param request request
     * @param response response
     */
-    @GetMapping("/exportExcel")
+    @GetMapping(URL_PREFIX + "/exportExcel")
     void exportExcel(HttpServletRequest request, HttpServletResponse response);
 
     /**
@@ -120,14 +119,14 @@ public interface TestCarRestApi {
     * @param request 文件流 request
     * @return ResultVo
     */
-    @PostMapping("/importExcel")
+    @PostMapping(URL_PREFIX + "/importExcel")
     ResultVo<?> importExcel(MultipartHttpServletRequest request);
 
     /**
     * 汽车信息 Excel 下载导入模版
     * @param response response
     */
-    @GetMapping("/importExcel/template")
+    @GetMapping(URL_PREFIX + "/importExcel/template")
     void importTemplate(HttpServletResponse response);
 
 }

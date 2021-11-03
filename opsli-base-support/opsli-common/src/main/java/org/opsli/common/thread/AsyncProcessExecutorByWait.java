@@ -16,21 +16,21 @@
 package org.opsli.common.thread;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.util.StrUtil;
 import com.google.common.collect.Maps;
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Function;
 
 /**
  * 多线程锁执行器
  * 用于当前方法中复杂业务多线程处理，等待线程执行完毕后 获得统一结果
+ * 2021年11月2日14:07:54 重构 多线程异步等待执行器
  *
  * @author 周鹏程
  * @date 2020-12-10 10:36
@@ -44,11 +44,15 @@ public class AsyncProcessExecutorByWait implements AsyncProcessExecutor {
     /** 线程Key */
     private final String key;
 
+    /** 任务执行计数器 */
+    private AtomicInteger count;
+
     /** 任务队列 */
-    private final List<Runnable> taskList;
+    private final List<Callable<Object>> taskList;
 
     /** 执行器 */
     private final AsyncProcessor processor;
+
 
     /**
      * 构造函数
@@ -56,7 +60,7 @@ public class AsyncProcessExecutorByWait implements AsyncProcessExecutor {
     public AsyncProcessExecutorByWait(){
         this.key = "def";
         taskList = new ArrayList<>();
-        processor = AsyncProcessExecutorByWait.getProcessor(this.key);
+        processor = getProcessor(this.key);
     }
 
     /**
@@ -66,17 +70,18 @@ public class AsyncProcessExecutorByWait implements AsyncProcessExecutor {
     public AsyncProcessExecutorByWait(String key){
         this.key = key;
         taskList = new ArrayList<>();
-        processor = AsyncProcessExecutorByWait.getProcessor(this.key);
+        processor = getProcessor(this.key);
     }
 
 
     /**
-     * 执行
+     * 放入执行任务
+     * 特殊处理 Runnable 转换为 Callable
      * @param task 任务
      */
     @Override
-    public AsyncProcessExecutorByWait put(final Runnable task){
-        taskList.add(task);
+    public AsyncProcessExecutor put(final Runnable task){
+        taskList.add(Executors.callable(task));
         return this;
     }
 
@@ -89,21 +94,25 @@ public class AsyncProcessExecutorByWait implements AsyncProcessExecutor {
             return true;
         }
 
-        // 锁
-        AsyncWaitLock lock = new AsyncWaitLock(this.taskList.size());
+        // 初始化锁参数
+        count = new AtomicInteger(this.taskList.size());
+        // 门闩 线程锁
+        CountDownLatch latch = new CountDownLatch(this.taskList.size());
 
-        for (Runnable task : this.taskList) {
-            // 多线程执行任务
-            boolean execute = this.execute(task, lock);
-            // 执行任务被拒绝 门闩减1 计数器不动 End
-            if(!execute){
-                lock.getLatch().countDown();
-            }
+        for (Callable<Object> task : this.taskList) {
+            // 回调减 门闩
+            processor.executeTaskAndCallback(task, (result)->{
+                if(result.getSuccess()){
+                    count.decrementAndGet();
+                }
+                latch.countDown();
+                return null;
+            });
         }
 
         // 线程锁 等待查询结果 结果完成后继续执行
         try {
-            lock.getLatch().await();
+            latch.await();
         }catch (Exception e){
             log.error(e.getMessage(), e);
         }finally {
@@ -111,55 +120,7 @@ public class AsyncProcessExecutorByWait implements AsyncProcessExecutor {
         }
 
         // 返回执行结果
-        return lock.getCount().get() == 0;
-    }
-
-    /**
-     * 执行 线程锁 等待查询结果 结果完成后继续执行
-     */
-    @Override
-    public boolean executeErrorCallback(Function<Runnable, Void> callback){
-        if(CollUtil.isEmpty(this.taskList)){
-            return true;
-        }
-
-        // 锁
-        AsyncWaitLock lock = new AsyncWaitLock(this.taskList.size());
-
-        for (Runnable task : this.taskList) {
-            // 多线程执行任务
-            boolean execute = this.execute(task, lock);
-            // 执行任务被拒绝 门闩减1 计数器不动 End
-            if(!execute){
-                // 线程池失败后 返回该 Runnable
-                callback.apply(task);
-
-                lock.getLatch().countDown();
-            }
-        }
-
-        // 线程锁 等待查询结果 结果完成后继续执行
-        try {
-            lock.getLatch().await();
-        }catch (Exception e){
-            log.error(e.getMessage(), e);
-        }finally {
-            this.taskList.clear();
-        }
-
-        // 返回执行结果
-        return lock.getCount().get() == 0;
-    }
-
-
-    /**
-     * 执行指定的任务
-     *
-     * @param task 任务
-     * @return boolean
-     */
-    private boolean execute(final Runnable task, final AsyncWaitLock lock) {
-        return processor.executeTask(new TaskWrapper(task, lock));
+        return count.get() == 0;
     }
 
     /**
@@ -170,82 +131,11 @@ public class AsyncProcessExecutorByWait implements AsyncProcessExecutor {
     private synchronized static AsyncProcessor getProcessor(String key){
         AsyncProcessor asyncProcessor = EXECUTOR_MAP.get(key);
         if(null == asyncProcessor){
-            asyncProcessor = new AsyncProcessor(key);
+            asyncProcessor = new AsyncProcessor();
+            asyncProcessor.init(key);
             EXECUTOR_MAP.put(key, asyncProcessor);
         }
         return asyncProcessor;
-    }
-
-    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    /**
-     * 线程锁对象
-     *
-     * @author Parker
-     * @date 2020-10-08 10:24
-     */
-    @Getter
-    public static class AsyncWaitLock {
-
-        /** 门闩 */
-        private final CountDownLatch latch;
-
-        /** 计数器 */
-        private final AtomicInteger count;
-
-        public AsyncWaitLock(int count){
-            // 初始化锁参数
-            this.count = new AtomicInteger(count);
-            // 门闩 线程锁
-            this.latch = new CountDownLatch(count);
-        }
-    }
-
-    /**
-     * Task 包装类<br>
-     * 此类型的意义是记录可能会被 Executor 吃掉的异常<br>
-     */
-    public static class TaskWrapper implements Runnable {
-
-        private final Runnable gift;
-        private final CountDownLatch latch;
-        private final AtomicInteger count;
-
-        public TaskWrapper(final Runnable target) {
-            this.gift = target;
-            this.count = null;
-            this.latch = null;
-        }
-
-        public TaskWrapper(final Runnable target, final AsyncWaitLock lock) {
-            if (lock == null) {
-                this.gift = null;
-                this.count = null;
-                this.latch = null;
-                return;
-            }
-
-            this.gift = target;
-            this.count = lock.getCount();
-            this.latch = lock.getLatch();
-        }
-
-        @Override
-        public void run() {
-            // 捕获异常，避免在 Executor 里面被吞掉了
-            if (gift != null) {
-                try {
-                    gift.run();
-                    // 标示已执行
-                    count.decrementAndGet();
-                } catch (Exception e) {
-                    String errMsg = StrUtil.format("线程池-包装的目标执行异常: {}", e.getMessage());
-                    log.error(errMsg, e);
-                } finally {
-                    latch.countDown();
-                }
-            }
-        }
     }
 
 }

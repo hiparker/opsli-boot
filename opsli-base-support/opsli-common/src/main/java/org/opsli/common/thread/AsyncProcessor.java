@@ -1,11 +1,16 @@
 package org.opsli.common.thread;
 
 import cn.hutool.core.util.StrUtil;
+import com.google.common.util.concurrent.*;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.concurrent.BasicThreadFactory;
+import org.opsli.common.thread.ThreadPoolFactory;
 
-import java.util.concurrent.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 
 /**
  * 自定义线程执行器 - 等待线程执行完毕不拒绝
@@ -17,19 +22,9 @@ import java.util.concurrent.*;
 public class AsyncProcessor {
 
     /**
-     * 默认最大并发数<br>
-     */
-    private static final int DEFAULT_MAX_CONCURRENT = Runtime.getRuntime().availableProcessors() * 2;
-
-    /**
      * 线程池名称格式
      */
-    private static final String THREAD_POOL_NAME = "AsyncProcessPool-{}-%d";
-
-    /**
-     * 默认队列大小
-     */
-    private static final int DEFAULT_SIZE = 1024;
+    private static final String THREAD_POOL_NAME = "AsyncProcessorWaitPool-{}-%d";
 
     /**
      * 默认线程池关闭等待时间 秒
@@ -37,59 +32,51 @@ public class AsyncProcessor {
     private static final int DEFAULT_WAIT_TIME = 10;
 
     /**
-     * 默认线程存活时间
+     * 线程池监听执行器
      */
-    private static final long DEFAULT_KEEP_ALIVE = 60L;
-
-    /**
-     * 执行器
-     */
-    private ExecutorService execute;
-
+    private ListeningExecutorService execute;
 
     /**
      * 初始化
+     * @param key 线程池标识
      */
-    public AsyncProcessor(String key){
+    public void init(String key){
         if(StringUtils.isBlank(key)){
             return;
         }
 
         // 线程工厂名称
         String formatThreadPoolName = StrUtil.format(THREAD_POOL_NAME, key);
-        BasicThreadFactory basicThreadFactory = new BasicThreadFactory.Builder()
-                .namingPattern(formatThreadPoolName)
-                .daemon(true).build();
 
         // 创建 Executor
         // 此处默认最大值改为处理器数量的 4 倍
         try {
-            // 执行队列
-            BlockingQueue<Runnable> executorQueue = new ArrayBlockingQueue<>(DEFAULT_SIZE);
-            execute = new ThreadPoolExecutor(DEFAULT_MAX_CONCURRENT, DEFAULT_MAX_CONCURRENT * 4, DEFAULT_KEEP_ALIVE,
-                    TimeUnit.SECONDS, executorQueue, basicThreadFactory);
+            // 监听执行器
+            execute = MoreExecutors.listeningDecorator(
+                    ThreadPoolFactory.createDefThreadPool(formatThreadPoolName));
+
             // 这里不会自动关闭线程， 当线程超过阈值时 抛异常
             // 关闭事件的挂钩
             Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-                log.info("AsyncProcessorWait 异步处理器关闭");
+                log.info("ProcessorWait 异步处理器关闭");
 
                 execute.shutdown();
 
                 try {
                     // 等待1秒执行关闭
                     if (!execute.awaitTermination(DEFAULT_WAIT_TIME, TimeUnit.SECONDS)) {
-                        log.error("AsyncProcessorWait 由于等待超时，异步处理器立即关闭");
+                        log.error("ProcessorWait 由于等待超时，异步处理器立即关闭");
                         execute.shutdownNow();
                     }
                 } catch (InterruptedException e) {
-                    log.error("AsyncProcessorWait 异步处理器关闭中断");
+                    log.error("ProcessorWait 异步处理器关闭中断");
                     execute.shutdownNow();
                 }
 
-                log.info("AsyncProcessorWait 异步处理器关闭完成");
+                log.info("ProcessorWait 异步处理器关闭完成");
             }));
         } catch (Exception e) {
-            log.error("AsyncProcessorWait 异步处理器初始化错误", e);
+            log.error("ProcessorWait 异步处理器初始化错误", e);
             throw new ExceptionInInitializerError(e);
         }
     }
@@ -99,8 +86,8 @@ public class AsyncProcessor {
      * 执行任务，不管是否成功<br>
      * 其实也就是包装以后的 {@link } 方法
      *
-     * @param task
-     * @return
+     * @param task 任务
+     * @return boolean
      */
     public boolean executeTask(Runnable task) {
         try {
@@ -117,14 +104,43 @@ public class AsyncProcessor {
      * 当提交失败时，会抛出 {@link }
      *
      * @param task 任务
-     * @return Future<T>
      */
-    public <T> Future<T> submitTask(Callable<T> task) {
-        try {
-            return execute.submit(task);
-        } catch (RejectedExecutionException e) {
-            log.error("AsyncProcessorWait 执行任务被拒绝", e);
-            throw new UnsupportedOperationException("AsyncProcessorWait 无法提交任务，已被拒绝", e);
-        }
+    public <T> void executeTaskAndCallback(Callable<T> task, Function<CallbackResult<T>, Void> callback) {
+        ListenableFuture<T> future = execute.submit(task);
+        Futures.addCallback(future, new FutureCallback<T>() {
+            @Override
+            public void onSuccess(T result) {
+                CallbackResult<T> callbackResult = new CallbackResult<>();
+                callbackResult.setSuccess(true);
+                callbackResult.setResult(result);
+                // 线程池失败后 返回该 Runnable
+                callback.apply(callbackResult);
+            }
+
+            @Override
+            public void onFailure(Throwable t) {
+                log.error("线程名称：{} - 执行异常信息：{}", Thread.currentThread().getName(), t.getMessage());
+                CallbackResult<T> callbackResult = new CallbackResult<>();
+                callbackResult.setSuccess(false);
+                callback.apply(callbackResult);
+            }
+        }, execute);
+    }
+
+    // =================
+
+    /**
+     * 回调结果
+     * @param <T>
+     */
+    @Data
+    public static class CallbackResult<T>{
+
+        /** 状态 */
+        private Boolean success;
+
+        /** 结果 */
+        private T result;
+
     }
 }

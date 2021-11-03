@@ -94,26 +94,6 @@ public class AsyncProcessExecutorByNormal implements AsyncProcessExecutor{
         return true;
     }
 
-    @Override
-    public boolean executeErrorCallback(Function<Runnable, Void> callback) {
-
-        if(CollUtil.isEmpty(this.taskList)){
-            return true;
-        }
-
-        for (Runnable task : this.taskList) {
-            // 多线程执行任务
-            boolean execute = this.execute(task);
-            // 执行任务被拒绝 门闩减1 计数器不动 End
-            if(!execute){
-                // 线程池失败后 返回该 Runnable
-                callback.apply(task);
-            }
-        }
-
-        return false;
-    }
-
     // ====================================
 
     /**
@@ -134,7 +114,8 @@ public class AsyncProcessExecutorByNormal implements AsyncProcessExecutor{
     private synchronized static AsyncProcessor getProcessor(String key){
         AsyncProcessor asyncProcessor = EXECUTOR_MAP.get(key);
         if(null == asyncProcessor){
-            asyncProcessor = new AsyncProcessor(key);
+            asyncProcessor = new AsyncProcessor();
+            asyncProcessor.init(key);
             EXECUTOR_MAP.put(key, asyncProcessor);
         }
         return asyncProcessor;
