@@ -982,9 +982,9 @@ public class UserUtil {
 
         UserModel user = getUser();
 
-        // 如果是超级管理员 则不进行租户处理
+        // 如果是超级管理员 则不进行租户处理 默认为0
         if(StringUtils.equals(SUPER_ADMIN, user.getUsername())){
-            return null;
+            return "0";
         }
         return user.getTenantId();
     }

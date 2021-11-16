@@ -32,6 +32,7 @@ import org.opsli.core.base.service.impl.CrudServiceImpl;
 import org.opsli.core.persistence.querybuilder.GenQueryBuilder;
 import org.opsli.core.persistence.querybuilder.QueryBuilder;
 import org.opsli.core.persistence.querybuilder.chain.QueryTenantHandler;
+import org.opsli.core.utils.UserUtil;
 import org.opsli.modulars.system.SystemMsg;
 import org.opsli.modulars.system.org.entity.SysOrg;
 import org.opsli.modulars.system.org.mapper.SysOrgMapper;
@@ -101,6 +102,11 @@ public class SysOrgServiceImpl extends CrudServiceImpl<SysOrgMapper, SysOrg, Sys
                             sysOrgModel.getId());
         }
 
+        // 刷新当前用户缓存
+        UserUtil.refreshUserOrgs(UserUtil.getUser().getId());
+        UserUtil.refreshUserDefOrg(UserUtil.getUser().getId());
+
+
         return super.insert(model);
     }
 
@@ -158,6 +164,10 @@ public class SysOrgServiceImpl extends CrudServiceImpl<SysOrgMapper, SysOrg, Sys
             // 如果没有被引用 则逐级修改
             this.updateChildrenParentIdsByParentId(sysOrgModel.getId());
         }
+
+        // 刷新当前用户缓存
+        UserUtil.refreshUserOrgs(UserUtil.getUser().getId());
+        UserUtil.refreshUserDefOrg(UserUtil.getUser().getId());
 
         // 修改
         return updateRet;
@@ -317,7 +327,8 @@ public class SysOrgServiceImpl extends CrudServiceImpl<SysOrgMapper, SysOrg, Sys
 
         // 如果有租户还在被引用 则不允许删除该租户
         QueryWrapper<SysOrg> queryWrapper = new QueryWrapper<>();
-        queryWrapper.in("org_id",
+        queryWrapper.eq("u.deleted", DictType.NO_YES_NO.getValue());
+        queryWrapper.in("ref.org_id",
                 orgIdList
         );
         Integer count = mapper.hasUse(queryWrapper);

@@ -15,7 +15,8 @@
         select
             count(0)
         from
-        sys_user_org_ref
+        sys_user_org_ref ref
+        left join sys_user u on u.id = ref.user_id
         ${ew.customSqlSegment}
     </select>
 

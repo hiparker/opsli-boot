@@ -149,10 +149,6 @@ public class UserOrgRefServiceImpl extends ServiceImpl<UserOrgRefMapper, SysUser
         boolean izExistOrg = false;
 
         if(!CollUtil.isEmpty(orgRefList)){
-            // 去重
-            orgRefList = ListDistinctUtil.distinct(
-                    orgRefList, Comparator.comparing(SysUserOrgRef::getId));
-
             // 批量保存
             izExistOrg = super.saveBatch(orgRefList);
         }
