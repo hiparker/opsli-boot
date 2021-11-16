@@ -35,8 +35,11 @@ import org.opsli.api.wrapper.system.user.*;
 import org.opsli.common.annotation.ApiRestController;
 import org.opsli.common.annotation.EnableLog;
 import org.opsli.common.annotation.RequiresPermissionsCus;
+import org.opsli.common.constants.MyBatisConstants;
+import org.opsli.common.enums.DictType;
 import org.opsli.common.exception.ServiceException;
 import org.opsli.common.exception.TokenException;
+import org.opsli.common.utils.FieldUtil;
 import org.opsli.common.utils.WrapperUtil;
 import org.opsli.core.base.controller.BaseRestController;
 import org.opsli.core.msg.TokenMsg;
@@ -322,8 +325,42 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
         Page<SysUserWeb, UserWebModel> page = new Page<>(pageNo, pageSize);
         QueryWrapper<SysUserWeb> queryWrapper = queryBuilder.build();
 
+        // 不查看 为租户管理员的用户
+        queryWrapper.notIn("iz_tenant_admin", DictType.NO_YES_YES.getValue());
+
         // 处理组织权限
         OrgUtil.handleOrgIdGroupCondition(orgIdGroup, queryWrapper);
+
+        page.setQueryWrapper(queryWrapper);
+        page = IService.findPageByCus(page);
+        // 密码防止分页泄露处理
+        for (UserWebModel userModel : page.getList()) {
+            userModel.setSecretKey(null);
+            userModel.setPassword(null);
+            userModel.setPasswordLevel(null);
+        }
+        return ResultVo.success(page.getPageData());
+    }
+
+    /**
+     * 用户信息 查询分页
+     * @param pageNo 当前页
+     * @param pageSize 每页条数
+     * @param request request
+     * @return ResultVo
+     */
+    @ApiOperation(value = "获得分页数据", notes = "获得分页数据 - 查询构造器")
+    @RequiresPermissions("system_set_tenant_admin")
+    @Override
+    public ResultVo<?> findPageByTenant(Integer pageNo, Integer pageSize,
+                                HttpServletRequest request) {
+
+        QueryBuilder<SysUserWeb> queryBuilder = new WebQueryBuilder<>(
+                SysUserWeb.class, request.getParameterMap());
+        Page<SysUserWeb, UserWebModel> page = new Page<>(pageNo, pageSize);
+        QueryWrapper<SysUserWeb> queryWrapper = queryBuilder.build();
+        // 只查看 为租户管理员的用户
+        queryWrapper.eq("iz_tenant_admin", DictType.NO_YES_YES.getValue());
 
         page.setQueryWrapper(queryWrapper);
         page = IService.findPageByCus(page);

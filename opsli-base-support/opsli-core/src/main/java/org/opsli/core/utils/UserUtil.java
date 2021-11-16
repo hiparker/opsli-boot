@@ -61,7 +61,7 @@ public class UserUtil {
     public static final String PREFIX_ID = "userId:";
     public static final String PREFIX_ID_ROLES = "userId:roles:";
     public static final String PREFIX_ID_DEF_ROLE = "userId:def_role:";
-    public static final String PREFIX_ID_ORGS = "userId:orgs";
+    public static final String PREFIX_ID_ORGS = "userId:orgs:";
     public static final String PREFIX_ID_DEF_ORG = "userId:def_org:";
     public static final String PREFIX_ID_PERMISSIONS = "userId:permissions:";
     public static final String PREFIX_ID_MENUS = "userId:menus:";

@@ -60,13 +60,13 @@ public class QueryTenantHandler implements QueryBuilderChain{
         boolean tenantFlag = ReflectUtil.hasField(entityClazz, MyBatisConstants.FIELD_TENANT);
         if(tenantFlag) {
             String tenantId = UserUtil.getTenantId();
-            UserModel user = UserUtil.getUser();
+            //UserModel user = UserUtil.getUser();
             // 超级管理员可以操作 无租户限制， 其余用户全部有租户限制
-            if(!UserUtil.SUPER_ADMIN.equals(user.getUsername()) &&
-                    StringUtils.isNotEmpty(tenantId)
-                ){
+//            if(!UserUtil.SUPER_ADMIN.equals(user.getUsername()) &&
+//                    StringUtils.isNotEmpty(tenantId)
+//                ){
                     wrapper.eq(FieldUtil.humpToUnderline(MyBatisConstants.FIELD_TENANT), tenantId);
-            }
+            //}
         }
         return wrapper;
     }
@@ -82,18 +82,18 @@ public class QueryTenantHandler implements QueryBuilderChain{
         boolean tenantFlag = ReflectUtil.hasField(entityClazz, MyBatisConstants.FIELD_TENANT);
         if(tenantFlag) {
             String tenantId = UserUtil.getTenantId();
-            UserModel user = UserUtil.getUser();
+            //UserModel user = UserUtil.getUser();
             // 超级管理员可以操作 无租户限制， 其余用户全部有租户限制
-            if(!UserUtil.SUPER_ADMIN.equals(user.getUsername()) &&
-                    StringUtils.isNotEmpty(tenantId)
-            ){
+//            if(!UserUtil.SUPER_ADMIN.equals(user.getUsername()) &&
+//                    StringUtils.isNotEmpty(tenantId)
+//            ){
 
                 String fieldName = webQueryConf.get(MyBatisConstants.FIELD_TENANT);
                 if(StringUtils.isEmpty(fieldName)){
                     fieldName = FieldUtil.humpToUnderline(MyBatisConstants.FIELD_TENANT);
                 }
                 wrapper.eq(fieldName, tenantId);
-            }
+            //}
         }
         return wrapper;
     }

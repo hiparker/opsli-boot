@@ -93,7 +93,6 @@ public class UserOrgRefServiceImpl extends ServiceImpl<UserOrgRefMapper, SysUser
         List<SysUserOrgRef> orgRefList = super.list(wrapper);
 
         if(CollUtil.isEmpty(orgRefList)){
-
             // 判断是否是超级管理员 如果是超级管理员 则默认享有全部权限
             if(StringUtils.equals(UserUtil.SUPER_ADMIN, userModel.getUsername())){
                 QueryWrapper<SysOrg> queryWrapper = new QueryWrapper<>();

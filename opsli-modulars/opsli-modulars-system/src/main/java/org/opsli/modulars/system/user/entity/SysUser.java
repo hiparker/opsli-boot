@@ -79,6 +79,9 @@ public class SysUser extends BaseEntity {
     /** 是否存在组织 */
     private String izExistOrg;
 
+    /** 是否租户管理员 */
+    private String izTenantAdmin;
+
     // ========================================
 
     /** 逻辑删除字段 */

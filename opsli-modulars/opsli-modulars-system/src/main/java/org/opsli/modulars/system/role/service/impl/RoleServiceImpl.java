@@ -144,35 +144,6 @@ public class RoleServiceImpl extends CrudServiceImpl<RoleMapper, SysRole, RoleMo
         return super.deleteAll(models);
     }
 
-    @Override
-    public List<SysRole> findList(QueryWrapper<SysRole> queryWrapper) {
-        // 如果没有租户修改能力 则默认增加租户限制
-        if(!UserUtil.isHasUpdateTenantPerms(UserUtil.getUser())){
-            // 数据处理责任链
-            queryWrapper = new QueryTenantHandler(
-                    new QueryDataPermsHandler()
-            ).handler(entityClazz, queryWrapper);
-        }
-
-        return super.list(queryWrapper);
-    }
-
-    @Override
-    public List<SysRole> findAllList() {
-        QueryBuilder<SysRole> queryBuilder = new GenQueryBuilder<>();
-        QueryWrapper<SysRole> queryWrapper = queryBuilder.build();
-
-        // 如果没有租户修改能力 则默认增加租户限制
-        if(!UserUtil.isHasUpdateTenantPerms(UserUtil.getUser())){
-            // 数据处理责任链
-            queryWrapper = new QueryTenantHandler(
-                    new QueryDataPermsHandler()
-            ).handler(entityClazz, queryWrapper);
-        }
-
-        return super.list(queryWrapper);
-    }
-
     /**
      * 唯一验证
      * @param model model
@@ -193,22 +164,15 @@ public class RoleServiceImpl extends CrudServiceImpl<RoleMapper, SysRole, RoleMo
             wrapper.notIn(MyBatisConstants.FIELD_ID, model.getId());
         }
 
-        UserModel currUser = UserUtil.getUser();
-        // 如果是超级管理员 需要特殊处理
+        // 如果租户ID 不为空 则直接判断租户
         if(StringUtils.isNotBlank(model.getTenantId())){
             wrapper.eq(FieldUtil.humpToUnderline(MyBatisConstants.FIELD_TENANT), model.getTenantId());
         }else {
-            // 如果是超级管理员 需要特殊处理
-            if(UserUtil.SUPER_ADMIN.equals(currUser.getUsername())){
-                // 角色分页 增加租户权限
-                wrapper.isNull(FieldUtil.humpToUnderline(MyBatisConstants.FIELD_TENANT));
-            }else {
-                // 租户检测
-                // 数据处理责任链
-                wrapper = new QueryTenantHandler(
-                        new QueryDataPermsHandler()
-                ).handler(entityClazz, wrapper);
-            }
+            // 租户检测
+            // 数据处理责任链
+            wrapper = new QueryTenantHandler(
+                    new QueryDataPermsHandler()
+            ).handler(entityClazz, wrapper);
         }
 
         return super.count(wrapper) == 0;
@@ -235,25 +199,16 @@ public class RoleServiceImpl extends CrudServiceImpl<RoleMapper, SysRole, RoleMo
             wrapper.notIn(MyBatisConstants.FIELD_ID, model.getId());
         }
 
-        UserModel currUser = UserUtil.getUser();
-        // 如果是超级管理员 需要特殊处理
+        // 如果租户ID 不为空 则直接判断租户
         if(StringUtils.isNotBlank(model.getTenantId())){
             wrapper.eq(FieldUtil.humpToUnderline(MyBatisConstants.FIELD_TENANT), model.getTenantId());
         }else {
-            // 如果是超级管理员 需要特殊处理
-            if(UserUtil.SUPER_ADMIN.equals(currUser.getUsername())){
-                // 角色分页 增加租户权限
-                wrapper.isNull(FieldUtil.humpToUnderline(MyBatisConstants.FIELD_TENANT));
-            }else {
-                // 租户检测
-                // 数据处理责任链
-                wrapper = new QueryTenantHandler(
-                        new QueryDataPermsHandler()
-                ).handler(entityClazz, wrapper);
-            }
+            // 租户检测
+            // 数据处理责任链
+            wrapper = new QueryTenantHandler(
+                    new QueryDataPermsHandler()
+            ).handler(entityClazz, wrapper);
         }
-
-
 
         return super.count(wrapper) == 0;
     }

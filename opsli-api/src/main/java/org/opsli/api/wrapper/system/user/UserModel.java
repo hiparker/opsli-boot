@@ -136,11 +136,19 @@ public class UserModel extends ApiWrapper {
     @ValidatorLenMax(20)
     private String tenantId;
 
+    /** 是否租户管理员 */
+    @ApiModelProperty(value = "是否租户管理员")
+    @ExcelIgnore
+    @ValidatorLenMax(1)
+    private String izTenantAdmin;
+
     /** 是否存在组织 */
     @JsonIgnore
     @ExcelIgnore
     @ValidatorLenMax(1)
     private String izExistOrg;
+
+
 
 
 }

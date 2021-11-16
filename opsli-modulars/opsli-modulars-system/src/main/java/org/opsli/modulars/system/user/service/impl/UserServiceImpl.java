@@ -98,6 +98,7 @@ public class UserServiceImpl extends CrudServiceImpl<UserMapper, SysUser, UserMo
             // 如果没有租户修改能力 则清空对应字段
             if(!UserUtil.isHasUpdateTenantPerms(UserUtil.getUser())){
                 model.setTenantId(null);
+                model.setIzTenantAdmin(null);
             }
         }
 
@@ -193,6 +194,7 @@ public class UserServiceImpl extends CrudServiceImpl<UserMapper, SysUser, UserMo
             // 如果没有租户修改能力 则清空对应字段
             if(!UserUtil.isHasUpdateTenantPerms(UserUtil.getUser())){
                 model.setTenantId(null);
+                model.setIzTenantAdmin(null);
             }
         }
 

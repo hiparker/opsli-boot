@@ -163,6 +163,22 @@ public interface UserApi {
     );
 
     /**
+     * 用户信息 根据租户Id 查询 查询分页
+     * @param pageNo 当前页
+     * @param pageSize 每页条数
+     * @param request request
+     * @return ResultVo
+     */
+    @GetMapping("/findPageByTenant")
+    ResultVo<?> findPageByTenant(
+            @RequestParam(name = "pageNo", defaultValue = "1") Integer pageNo,
+            @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize,
+            HttpServletRequest request
+    );
+
+
+
+    /**
      * 用户信息 新增
      * @param model 模型
      * @return ResultVo

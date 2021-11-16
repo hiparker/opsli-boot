@@ -68,12 +68,4 @@ public interface UserOrgRefApi {
     //@GetMapping("/getRolesByUserId")
     ResultVo<UserOrgRefModel> getDefOrgByUserId(String userId);
 
-    /**
-     * 当前登陆用户信息
-     *
-     * @param userId 用户ID
-     * @return ResultVo
-     */
-    ResultVo<UserOrgRefWebModel> getOrgInfoByUserId(String userId);
-
 }

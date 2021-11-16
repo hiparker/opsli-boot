@@ -64,9 +64,6 @@ public class UserOrgRefRestController implements UserOrgRefApi {
     @Autowired
     private IUserOrgRefService iUserOrgRefService;
 
-    @Autowired
-    private IUserService iUserService;
-
     @Override
     public ResultVo<List<UserOrgRefModel>> findListByUserId(String userId) {
         List<UserOrgRefModel> listByUserId = iUserOrgRefService.findListByUserId(userId);
@@ -102,76 +99,6 @@ public class UserOrgRefRestController implements UserOrgRefApi {
         UserOrgRefModel userOrgRefModel = iUserOrgRefService.getDefOrgByUserId(userId);
         return ResultVo.success(userOrgRefModel);
     }
-
-    /**
-     * 用户组织机构
-     * @param userId 用户ID
-     * @return ResultVo
-     */
-    @ApiOperation(value = "用户组织机构", notes = "用户组织机构")
-    @Override
-    public ResultVo<UserOrgRefWebModel> getOrgInfoByUserId(String userId) {
-        UserOrgRefWebModel org = null;
-        // 不写SQL了 直接分页 第一页 取第一条
-        QueryBuilder<SysUserWeb> queryBuilder = new GenQueryBuilder<>();
-        Page<SysUserWeb, UserWebModel> page = new Page<>(1, 1);
-        QueryWrapper<SysUserWeb> queryWrapper = queryBuilder.build();
-        queryWrapper.eq(
-                "a.id",
-                userId
-        );
-        page.setQueryWrapper(queryWrapper);
-        page = iUserService.findPageByCus(page);
-        List<UserWebModel> list = page.getList();
-        if(CollUtil.isNotEmpty(list)){
-            UserWebModel userWebModel = list.get(0);
-            if(userWebModel != null){
-//                org  = userAndOrgModel.getOrg();
-//                if(org != null){
-//
-//                    org.setUserId(userId);
-
-//                    List<String> orgIds = Lists.newArrayListWithCapacity(3);
-//                    orgIds.add(org.getCompanyId());
-//                    orgIds.add(org.getDepartmentId());
-//                    orgIds.add(org.getPostId());
-//                    QueryWrapper<SysOrg> orgQueryWrapper = new QueryWrapper<>();
-//                    orgQueryWrapper.in(
-//                            FieldUtil.humpToUnderline(MyBatisConstants.FIELD_ID),
-//                            orgIds);
-//                    List<SysOrg> orgList = iSysOrgService.findList(orgQueryWrapper);
-//                    if(CollUtil.isNotEmpty(orgList)){
-//                        Map<String, SysOrg> tmp = Maps.newHashMap();
-//                        for (SysOrg sysOrg : orgList) {
-//                            tmp.put(sysOrg.getId(), sysOrg);
-//                        }
-//
-//                        // 设置 名称
-//                        SysOrg company = tmp.get(org.getCompanyId());
-//                        if(company != null){
-//                            org.setCompanyName(company.getOrgName());
-//                        }
-//
-//                        SysOrg department = tmp.get(org.getDepartmentId());
-//                        if(department != null){
-//                            org.setDepartmentName(department.getOrgName());
-//                        }
-//
-//                        SysOrg post = tmp.get(org.getPostId());
-//                        if(post != null){
-//                            org.setPostName(post.getOrgName());
-//                        }
-//                    }
-
-//                }
-            }
-        }
-        return ResultVo.success(org);
-    }
-
-
-
-
 
 
     /**
