@@ -93,8 +93,10 @@ public class UserOrgRefServiceImpl extends ServiceImpl<UserOrgRefMapper, SysUser
         List<SysUserOrgRef> orgRefList = super.list(wrapper);
 
         if(CollUtil.isEmpty(orgRefList)){
-            // 判断是否是超级管理员 如果是超级管理员 则默认享有全部权限
-            if(StringUtils.equals(UserUtil.SUPER_ADMIN, userModel.getUsername())){
+            // 判断是否是超级管理员 和 租户管理员 如果是超级管理员 则默认享有全部权限
+            if(StringUtils.equals(UserUtil.SUPER_ADMIN, userModel.getUsername()) ||
+                    DictType.NO_YES_YES.getValue().equals(userModel.getIzTenantAdmin())
+                ){
                 QueryWrapper<SysOrg> queryWrapper = new QueryWrapper<>();
                 queryWrapper.eq(
                         FieldUtil.humpToUnderline(MyBatisConstants.FIELD_PARENT_ID), PARENT_ID
