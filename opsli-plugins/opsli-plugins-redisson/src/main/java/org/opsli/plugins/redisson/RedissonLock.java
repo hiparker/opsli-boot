@@ -113,6 +113,9 @@ public class RedissonLock {
      */
     public boolean isLock(String lockName) {
         RLock rLock = redisson.getLock(PREFIX + lockName);
+        if(null == rLock){
+            return false;
+        }
         return rLock.isLocked();
     }
 
@@ -123,6 +126,9 @@ public class RedissonLock {
      */
     public boolean isHeldByCurrentThread(String lockName) {
         RLock rLock = redisson.getLock(PREFIX + lockName);
+        if(null == rLock){
+            return false;
+        }
         return rLock.isHeldByCurrentThread();
     }
 
