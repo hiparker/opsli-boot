@@ -101,7 +101,9 @@ public class UserOrgRefServiceImpl extends ServiceImpl<UserOrgRefMapper, SysUser
                 queryWrapper.eq(
                         FieldUtil.humpToUnderline(MyBatisConstants.FIELD_PARENT_ID), PARENT_ID
                 );
-                List<SysOrg> orgList = iSysOrgService.findList(queryWrapper);
+
+                // 注意 之前这儿会有死循环数据权限查询问题
+                List<SysOrg> orgList = iSysOrgService.list(queryWrapper);
                 List<SysOrgModel> sysOrgModels = WrapperUtil.transformInstance(orgList, SysOrgModel.class);
                 for (SysOrgModel orgModel : sysOrgModels) {
                     SysUserOrgRef orgRef = this.createOrgRef(userId, orgModel, DictType.NO_YES_NO.getValue());
