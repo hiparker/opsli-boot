@@ -49,6 +49,7 @@ public enum SystemMsg implements BaseMsg {
     EXCEPTION_ROLE_UNIQUE(20200,"角色编号或名称重复，该角色已存在！"),
     EXCEPTION_ROLE_ID_NOT_NULL(20201,"角色Id不可为空"),
     EXCEPTION_ROLE_PERMS_ERROR(20202,"角色权限设置失败"),
+    EXCEPTION_ROLE_USED(20203,"角色删除失败, 被删除角色正在被其他用户使用"),
 
 
 
@@ -68,7 +69,8 @@ public enum SystemMsg implements BaseMsg {
     EXCEPTION_USER_ILLEGAL_PARAMETER(20311,"非法参数"),
     EXCEPTION_USER_HANDLE_SELF(20312,"不可操作自身"),
     EXCEPTION_USER_HANDLE_SUPER_ADMIN(20313,"不可操作超管账号"),
-
+    EXCEPTION_USER_SWITCH_TENANT_NOT_HAS_ADMIN(20314,"此租户不存在管理员，不能切换"),
+    EXCEPTION_USER_SWITCH_NOT_ALLOWED(20315,"不允许切换租户"),
 
     /**
      * 租户

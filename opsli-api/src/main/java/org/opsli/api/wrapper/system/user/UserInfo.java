@@ -99,4 +99,8 @@ public class UserInfo extends ApiWrapper {
     @ApiModelProperty(value = "密码强度")
     private String passwordLevel;
 
+    /** 多租户字段 */
+    @ApiModelProperty(value = "多租户ID")
+    private String tenantId;
+
 }

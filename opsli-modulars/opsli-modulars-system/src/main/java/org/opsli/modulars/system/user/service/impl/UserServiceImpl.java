@@ -99,6 +99,7 @@ public class UserServiceImpl extends CrudServiceImpl<UserMapper, SysUser, UserMo
             if(!UserUtil.isHasUpdateTenantPerms(UserUtil.getUser())){
                 model.setTenantId(null);
                 model.setIzTenantAdmin(null);
+                model.setEnableSwitchTenant(null);
             }
         }
 

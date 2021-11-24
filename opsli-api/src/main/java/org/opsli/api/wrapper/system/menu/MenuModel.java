@@ -103,4 +103,10 @@ public class MenuModel extends ApiWrapper {
     @Validator({ValidatorType.IS_NOT_NULL})
     private String alwaysShow;
 
+    /** 标签 */
+    @ApiModelProperty(value = "标签")
+    @ExcelIgnore
+    @Validator({ValidatorType.IS_NOT_NULL})
+    private String label;
+
 }

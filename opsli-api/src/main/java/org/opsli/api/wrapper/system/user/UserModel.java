@@ -148,7 +148,20 @@ public class UserModel extends ApiWrapper {
     @ValidatorLenMax(1)
     private String izExistOrg;
 
+    /** 允许切换租户（0 不允许 1 允许） */
+    @ApiModelProperty(value = "是否允许切换运营商")
+    @ExcelIgnore
+    private String enableSwitchTenant;
 
+    /** 切换后的租户id*/
+    @JsonIgnore
+    @ExcelIgnore
+    private String switchTenantId;
+
+    /** 切换后的租户管理员*/
+    @JsonIgnore
+    @ExcelIgnore
+    private String switchTenantUserId;
 
 
 }

@@ -61,9 +61,10 @@ public interface IUserRoleRefService {
     /**
      * 根据用户ID 获得全部菜单集合
      * @param userId 用户ID
+     * @param label 标签
      * @return List
      */
-    List<MenuModel> getMenuAllListByUserId(String userId);
+    List<MenuModel> getMenuAllListByUserId(String userId, String label);
 
     /**
      * 根据角色ID 获得当前用户Id集合
@@ -71,6 +72,20 @@ public interface IUserRoleRefService {
      * @return List
      */
     List<String> getUserIdListByRoleId(String roleId);
+
+    /**
+     * 根据角色ID 获得当前用户Id集合
+     * @param roleIds 角色ID 数组
+     * @return List
+     */
+    List<String> getUserIdListByRoleIds(String[] roleIds);
+
+    /**
+     * 根据租户ID 获得当前租户 下 数据权限为全部数据的 所有用户ID
+     * @param tenantId 角色ID
+     * @return List
+     */
+    List<String> getUserIdListByTenantIdAndAllData(String tenantId);
 
     /**
      * 根据菜单ID 获得当前用户Id集合
@@ -99,5 +114,21 @@ public interface IUserRoleRefService {
      * @return boolean
      */
     boolean setRoles(UserRoleRefModel model);
+
+
+    /**
+     * 判断角色是否 有用户使用
+     * @param roleId 角色ID
+     * @return boolean
+     */
+    boolean isRoleUsed(String roleId);
+
+    /**
+     * 判断角色是否 有用户使用
+     * @param roleIds 角色ID 数组
+     * @return boolean
+     */
+    boolean isRoleUsed(String[] roleIds);
+
 
 }

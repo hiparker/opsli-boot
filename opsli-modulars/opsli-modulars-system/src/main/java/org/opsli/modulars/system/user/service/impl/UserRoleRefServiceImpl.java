@@ -17,6 +17,8 @@ package org.opsli.modulars.system.user.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
+import cn.hutool.core.convert.Convert;
+import cn.hutool.core.util.ArrayUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.common.collect.Lists;
@@ -26,8 +28,10 @@ import org.opsli.api.wrapper.system.menu.MenuModel;
 import org.opsli.api.wrapper.system.role.RoleModel;
 import org.opsli.api.wrapper.system.user.UserModel;
 import org.opsli.api.wrapper.system.user.UserRoleRefModel;
+import org.opsli.common.constants.MyBatisConstants;
 import org.opsli.common.enums.DictType;
 import org.opsli.common.exception.ServiceException;
+import org.opsli.common.utils.FieldUtil;
 import org.opsli.common.utils.ListDistinctUtil;
 import org.opsli.common.utils.WrapperUtil;
 import org.opsli.core.msg.CoreMsg;
@@ -101,7 +105,7 @@ public class UserRoleRefServiceImpl extends ServiceImpl<UserRoleRefMapper, SysUs
             QueryWrapper<SysMenu> queryWrapper = queryBuilder.build();
             queryWrapper.notIn("parent_id", -1);
             queryWrapper.eq("type", '2');
-            queryWrapper.eq("hidden", '0');
+            queryWrapper.eq("hidden", DictType.NO_YES_NO.getValue());
             List<SysMenu> menuList = iMenuService.findList(queryWrapper);
             for (SysMenu sysMenu : menuList) {
                 perms.add(sysMenu.getPermissions());
@@ -129,7 +133,8 @@ public class UserRoleRefServiceImpl extends ServiceImpl<UserRoleRefMapper, SysUs
             QueryWrapper<SysMenu> queryWrapper = queryBuilder.build();
             queryWrapper.notIn("parent_id", -1);
             queryWrapper.in("type", '1', '3');
-            queryWrapper.eq("hidden", '0');
+            queryWrapper.eq("hidden", DictType.NO_YES_NO.getValue());
+            queryWrapper.like("label",DictType.MENU_LABEL_SYSTEM.getValue());
             menuList = iMenuService.findList(queryWrapper);
         }else{
             menuList = mapper.findMenuListByUserId(userId);
@@ -143,7 +148,7 @@ public class UserRoleRefServiceImpl extends ServiceImpl<UserRoleRefMapper, SysUs
     }
 
     @Override
-    public List<MenuModel> getMenuAllListByUserId(String userId) {
+    public List<MenuModel> getMenuAllListByUserId(String userId, String label) {
 
         UserModel userModel = iUserService.get(userId);
         if(userModel == null){
@@ -156,7 +161,8 @@ public class UserRoleRefServiceImpl extends ServiceImpl<UserRoleRefMapper, SysUs
             QueryBuilder<SysMenu> queryBuilder = new GenQueryBuilder<>();
             QueryWrapper<SysMenu> queryWrapper = queryBuilder.build();
             queryWrapper.notIn("parent_id", -1);
-            queryWrapper.eq("hidden", '0');
+            queryWrapper.eq("hidden", DictType.NO_YES_NO.getValue());
+            queryWrapper.like("label", label);
             menuList = iMenuService.findList(queryWrapper);
         }else{
             menuList = mapper.findMenuAllListByUserId(userId);
@@ -175,7 +181,45 @@ public class UserRoleRefServiceImpl extends ServiceImpl<UserRoleRefMapper, SysUs
 
     @Override
     public List<String> getUserIdListByRoleId(String roleId) {
-        List<String> users = mapper.getUserIdListByRoleId(roleId);
+        QueryWrapper<SysUserRoleRef> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq(
+                FieldUtil.humpToUnderline(MyBatisConstants.FIELD_DELETE_LOGIC), DictType.NO_YES_NO.getValue());
+        queryWrapper.eq("role_id", roleId);
+
+        List<String> users = mapper.getUserIdList(queryWrapper);
+        if(CollUtil.isEmpty(users)){
+            return ListUtil.empty();
+        }
+
+        // 去重
+        return ListDistinctUtil.distinct(users);
+    }
+
+    @Override
+    public List<String> getUserIdListByRoleIds(String[] roleIds) {
+        QueryWrapper<SysUserRoleRef> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq(
+                FieldUtil.humpToUnderline(MyBatisConstants.FIELD_DELETE_LOGIC), DictType.NO_YES_NO.getValue());
+        queryWrapper.in("role_id", Convert.toList(roleIds));
+
+        List<String> users = mapper.getUserIdList(queryWrapper);
+        if(CollUtil.isEmpty(users)){
+            return ListUtil.empty();
+        }
+
+        // 去重
+        return ListDistinctUtil.distinct(users);
+    }
+
+    @Override
+    public List<String> getUserIdListByTenantIdAndAllData(String tenantId) {
+        QueryWrapper<SysUserRoleRef> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq(
+                FieldUtil.humpToUnderline(MyBatisConstants.FIELD_DELETE_LOGIC), DictType.NO_YES_NO.getValue());
+        queryWrapper.eq("c.tenantId", tenantId);
+        queryWrapper.eq("c.data_scope", "3");
+
+        List<String> users = mapper.getUserIdList(queryWrapper);
         if(CollUtil.isEmpty(users)){
             return ListUtil.empty();
         }
@@ -251,6 +295,30 @@ public class UserRoleRefServiceImpl extends ServiceImpl<UserRoleRefMapper, SysUs
         }
 
         return true;
+    }
+
+    @Override
+    public boolean isRoleUsed(String roleId) {
+        if(StringUtils.isBlank(roleId)){
+            return false;
+        }
+
+        QueryWrapper<SysUserRoleRef> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("role_id", roleId);
+
+        return this.count(queryWrapper) == 0;
+    }
+
+    @Override
+    public boolean isRoleUsed(String[] roleIds) {
+        if(ArrayUtil.isEmpty(roleIds)){
+            return false;
+        }
+
+        QueryWrapper<SysUserRoleRef> queryWrapper = new QueryWrapper<>();
+        queryWrapper.in("role_id", Convert.toList(roleIds));
+
+        return this.count(queryWrapper) == 0;
     }
 
 

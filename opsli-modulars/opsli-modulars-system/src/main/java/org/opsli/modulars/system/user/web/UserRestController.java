@@ -31,6 +31,7 @@ import org.opsli.api.web.system.user.UserApi;
 import org.opsli.api.wrapper.system.menu.MenuModel;
 import org.opsli.api.wrapper.system.options.OptionsModel;
 import org.opsli.api.wrapper.system.role.RoleModel;
+import org.opsli.api.wrapper.system.tenant.TenantModel;
 import org.opsli.api.wrapper.system.user.*;
 import org.opsli.common.annotation.ApiRestController;
 import org.opsli.common.annotation.EnableLog;
@@ -49,8 +50,10 @@ import org.opsli.core.persistence.querybuilder.QueryBuilder;
 import org.opsli.core.persistence.querybuilder.WebQueryBuilder;
 import org.opsli.core.utils.OptionsUtil;
 import org.opsli.core.utils.OrgUtil;
+import org.opsli.core.utils.TenantUtil;
 import org.opsli.core.utils.UserUtil;
 import org.opsli.modulars.system.SystemMsg;
+import org.opsli.modulars.system.tenant.entity.SysTenant;
 import org.opsli.modulars.system.user.entity.SysUser;
 import org.opsli.modulars.system.user.entity.SysUserWeb;
 import org.opsli.modulars.system.user.service.IUserRoleRefService;
@@ -59,6 +62,7 @@ import org.opsli.plugins.oss.OssStorageFactory;
 import org.opsli.plugins.oss.service.BaseOssStorageService;
 import org.opsli.plugins.oss.service.OssStorageService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
@@ -523,5 +527,86 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
         return ResultVo.success(userModel);
     }
 
+
+    /**
+     * 切换租户
+     * @param tenantId 租户ID
+     * @return ResultVo
+     */
+    @ApiOperation(value = "切换租户", notes = "切换租户")
+    @GetMapping("/switchTenant")
+    public ResultVo<?> switchTenant(String tenantId) {
+        UserModel currUser = UserUtil.getUser();
+        if (!DictType.NO_YES_YES.getValue().equals(currUser.getEnableSwitchTenant())){
+            // 不允许切换租户
+            throw new ServiceException(SystemMsg.EXCEPTION_USER_SWITCH_NOT_ALLOWED);
+        }
+
+        // 验证租户是否生效
+        TenantModel tenant = TenantUtil.getTenant(tenantId);
+        if(tenant == null){
+            throw new ServiceException(TokenMsg.EXCEPTION_LOGIN_TENANT_NOT_USABLE);
+        }
+
+        // 被切换租户的 管理员用户 取一个
+        SysUser isSwitchedUser = IService.getOne(new QueryWrapper<SysUser>()
+                .eq("iz_tenant_admin", DictType.NO_YES_YES.getValue())
+                .eq(FieldUtil.humpToUnderline(MyBatisConstants.FIELD_DELETE_LOGIC), DictType.NO_YES_NO.getValue())
+                .eq(FieldUtil.humpToUnderline(MyBatisConstants.FIELD_TENANT), tenantId)
+                .last("limit 1")
+        );
+
+        if (isSwitchedUser == null){
+            // 此租户不存在管理员，不能切换
+            throw new ServiceException(SystemMsg.EXCEPTION_USER_SWITCH_TENANT_NOT_HAS_ADMIN);
+        }
+
+        // 检测用户是否有角色
+        List<String> roleModelList = UserUtil.getUserRolesByUserId(isSwitchedUser.getId());
+        if(CollUtil.isEmpty(roleModelList)){
+            // 用户暂无角色，请设置后登录
+            throw new ServiceException(TokenMsg.EXCEPTION_USER_ROLE_NOT_NULL);
+        }
+
+        // 检测用户是否有角色菜单
+        List<MenuModel> menuModelList = UserUtil.getMenuListByUserId(isSwitchedUser.getId());
+        if(CollUtil.isEmpty(menuModelList)){
+            // 用户暂无角色菜单，请设置后登录
+            throw new ServiceException(TokenMsg.EXCEPTION_USER_MENU_NOT_NULL);
+        }
+
+        // 检测用户是否有角色权限
+        List<String> userAllPermsList = UserUtil.getUserAllPermsByUserId(isSwitchedUser.getId());
+        if(CollUtil.isEmpty(userAllPermsList)){
+            // 用户暂无角色菜单，请设置后登录
+            throw new ServiceException(TokenMsg.EXCEPTION_USER_PERMS_NOT_NULL);
+        }
+
+        // 更新 当前用户缓存
+        currUser.setSwitchTenantId(tenantId);
+        currUser.setSwitchTenantUserId(isSwitchedUser.getId());
+
+        return UserUtil.updateUser(currUser)
+                ? ResultVo.success("切换租户成功")
+                : ResultVo.error("切换租户失败");
+    }
+
+
+    /**
+     * 切换回自己账户
+     * @return ResultVo
+     */
+    @ApiOperation(value = "切换回自己账户", notes = "切换回自己账户")
+    @GetMapping("/switchOneself")
+    public ResultVo<?> switchOneself() {
+        UserModel currUser = UserUtil.getUser();
+
+        currUser.setSwitchTenantId(null);
+        currUser.setSwitchTenantUserId(null);
+
+        return UserUtil.updateUser(currUser)
+                ? ResultVo.success("切换成功")
+                : ResultVo.error("切换失败");
+    }
 
 }

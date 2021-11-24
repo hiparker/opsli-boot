@@ -59,14 +59,14 @@ public class QueryTenantHandler implements QueryBuilderChain{
         // 自身责任 -- 判断多租户
         boolean tenantFlag = ReflectUtil.hasField(entityClazz, MyBatisConstants.FIELD_TENANT);
         if(tenantFlag) {
-            String tenantId = UserUtil.getTenantId();
-            //UserModel user = UserUtil.getUser();
-            // 超级管理员可以操作 无租户限制， 其余用户全部有租户限制
-//            if(!UserUtil.SUPER_ADMIN.equals(user.getUsername()) &&
-//                    StringUtils.isNotEmpty(tenantId)
-//                ){
-                    wrapper.eq(FieldUtil.humpToUnderline(MyBatisConstants.FIELD_TENANT), tenantId);
-            //}
+            UserModel currUser = UserUtil.getUser();
+
+            // 切换运营商后 组织ID 不同
+            String tenantId = StringUtils.isNotEmpty(currUser.getSwitchTenantId())
+                    ? currUser.getSwitchTenantId()
+                    : currUser.getTenantId();
+
+            wrapper.eq(FieldUtil.humpToUnderline(MyBatisConstants.FIELD_TENANT), tenantId);
         }
         return wrapper;
     }
@@ -81,19 +81,18 @@ public class QueryTenantHandler implements QueryBuilderChain{
         // 自身责任 -- 判断多租户
         boolean tenantFlag = ReflectUtil.hasField(entityClazz, MyBatisConstants.FIELD_TENANT);
         if(tenantFlag) {
-            String tenantId = UserUtil.getTenantId();
-            //UserModel user = UserUtil.getUser();
-            // 超级管理员可以操作 无租户限制， 其余用户全部有租户限制
-//            if(!UserUtil.SUPER_ADMIN.equals(user.getUsername()) &&
-//                    StringUtils.isNotEmpty(tenantId)
-//            ){
+            UserModel currUser = UserUtil.getUser();
 
-                String fieldName = webQueryConf.get(MyBatisConstants.FIELD_TENANT);
-                if(StringUtils.isEmpty(fieldName)){
-                    fieldName = FieldUtil.humpToUnderline(MyBatisConstants.FIELD_TENANT);
-                }
-                wrapper.eq(fieldName, tenantId);
-            //}
+            // 切换运营商后 组织ID 不同
+            String tenantId = StringUtils.isNotEmpty(currUser.getSwitchTenantId())
+                    ? currUser.getSwitchTenantId()
+                    : currUser.getTenantId();
+
+            String fieldName = webQueryConf.get(MyBatisConstants.FIELD_TENANT);
+            if(StringUtils.isEmpty(fieldName)){
+                fieldName = FieldUtil.humpToUnderline(MyBatisConstants.FIELD_TENANT);
+            }
+            wrapper.eq(fieldName, tenantId);
         }
         return wrapper;
     }

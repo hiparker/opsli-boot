@@ -23,20 +23,24 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.opsli.api.wrapper.system.org.SysOrgModel;
+import org.opsli.api.wrapper.system.user.UserModel;
 import org.opsli.common.constants.MyBatisConstants;
 import org.opsli.common.enums.DictType;
 import org.opsli.common.exception.ServiceException;
 import org.opsli.common.utils.FieldUtil;
 import org.opsli.core.base.entity.HasChildren;
 import org.opsli.core.base.service.impl.CrudServiceImpl;
+import org.opsli.core.msg.CoreMsg;
 import org.opsli.core.persistence.querybuilder.GenQueryBuilder;
 import org.opsli.core.persistence.querybuilder.QueryBuilder;
 import org.opsli.core.persistence.querybuilder.chain.QueryTenantHandler;
+import org.opsli.core.utils.TenantUtil;
 import org.opsli.core.utils.UserUtil;
 import org.opsli.modulars.system.SystemMsg;
 import org.opsli.modulars.system.org.entity.SysOrg;
 import org.opsli.modulars.system.org.mapper.SysOrgMapper;
 import org.opsli.modulars.system.org.service.ISysOrgService;
+import org.opsli.modulars.system.user.service.IUserRoleRefService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -63,6 +67,8 @@ public class SysOrgServiceImpl extends CrudServiceImpl<SysOrgMapper, SysOrg, Sys
 
     @Autowired(required = false)
     private SysOrgMapper mapper;
+    @Autowired
+    private IUserRoleRefService iUserRoleRefService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -102,10 +108,20 @@ public class SysOrgServiceImpl extends CrudServiceImpl<SysOrgMapper, SysOrg, Sys
                             sysOrgModel.getId());
         }
 
-        // 刷新当前用户缓存
-        UserUtil.refreshUserOrgs(UserUtil.getUser().getId());
-        UserUtil.refreshUserDefOrg(UserUtil.getUser().getId());
-
+        // 清理缓存 清除当前租户下 所有角色的数据范围为 全部数据的 用户缓存
+        // 如果是超级管理员体系 下的用户 还需要清空超级管理员的 缓存
+        if(TenantUtil.SUPER_ADMIN_TENANT_ID.equals(UserUtil.getTenantId())){
+            UserModel superAdmin = UserUtil.getUserByUserName(UserUtil.SUPER_ADMIN);
+            if(null != superAdmin){
+                // 清除缓存
+                this.clearCache(Collections.singletonList(superAdmin.getId()));
+            }
+        }
+        // 用户ID 集合
+        List<String> userIdList =
+                iUserRoleRefService.getUserIdListByTenantIdAndAllData(UserUtil.getTenantId());
+        // 清除缓存
+        this.clearCache(userIdList);
 
         return super.insert(model);
     }
@@ -335,6 +351,34 @@ public class SysOrgServiceImpl extends CrudServiceImpl<SysOrgMapper, SysOrg, Sys
         if(count !=null && count > 0){
             // 该组织正在被其他用户绑定，无法操作
             throw new ServiceException(SystemMsg.EXCEPTION_ORG_USE);
+        }
+    }
+
+    /**
+     * 清除缓存
+     * @param userIdList 用户ID 集合
+     */
+    private void clearCache(List<String> userIdList){
+        if(CollUtil.isNotEmpty(userIdList)){
+            int cacheCount = 0;
+            for (String userId : userIdList) {
+                cacheCount += 2;
+                boolean tmp;
+                // 清空当期用户缓存 组织
+                tmp = UserUtil.refreshUserOrgs(userId);
+                if(tmp){
+                    cacheCount--;
+                }
+                tmp = UserUtil.refreshUserDefOrg(userId);
+                if(tmp){
+                    cacheCount--;
+                }
+            }
+            // 判断删除状态
+            if(cacheCount != 0){
+                // 删除缓存失败
+                throw new ServiceException(CoreMsg.CACHE_DEL_EXCEPTION);
+            }
         }
     }
 }

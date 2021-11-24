@@ -101,11 +101,11 @@ public class MenuRestController extends BaseRestController<SysMenu, MenuModel, I
      */
     @ApiOperation(value = "根据 获得用户 菜单 - 权限", notes = "根据 获得用户 菜单 - 权限")
     @Override
-    public ResultVo<?> getMenuAndPermsTree() {
+    public ResultVo<?> getMenuAndPermsTree(String label) {
         UserModel user = UserUtil.getUser();
 
         // 获得当前用户菜单
-        List<MenuModel> menuModelList = iUserRoleRefService.getMenuAllListByUserId(user.getId());
+        List<MenuModel> menuModelList = iUserRoleRefService.getMenuAllListByUserId(user.getId(), label);
 
         // 这里有坑 如果 为 菜单数据 且 组件(Component)地址为空 不会跳转到主页 也不报错
         // 修复菜单问题导致无法跳转主页
@@ -200,6 +200,9 @@ public class MenuRestController extends BaseRestController<SysMenu, MenuModel, I
 
     /**
      * 获得列表菜单树 懒加载
+     *
+     * @param label 标签
+     * @param parentId 父节点ID
      * @return ResultVo
      */
     @ApiOperation(value = "获得列表菜单树 懒加载", notes = "获得列表菜单树 懒加载")

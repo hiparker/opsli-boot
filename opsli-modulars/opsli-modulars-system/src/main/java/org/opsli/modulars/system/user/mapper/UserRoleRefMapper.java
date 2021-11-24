@@ -15,8 +15,11 @@
  */
 package org.opsli.modulars.system.user.mapper;
 
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.core.toolkit.Constants;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import org.opsli.modulars.system.menu.entity.SysMenu;
 import org.opsli.modulars.system.user.entity.SysUserRoleRef;
 
@@ -67,11 +70,12 @@ public interface UserRoleRefMapper extends BaseMapper<SysUserRoleRef> {
     List<SysMenu> findMenuAllListByUserId(String userId);
 
     /**
-     * 根据角色ID 获得当前用户Id集合
-     * @param roleId 角色ID
+     * 根据条件 获得当前用户Id集合
+     *
+     * @param wrapper wrapper
      * @return List
      */
-    List<String> getUserIdListByRoleId(String roleId);
+    List<String> getUserIdList(@Param(Constants.WRAPPER) Wrapper<?> wrapper);
 
     /**
      * 根据菜单ID 获得当前用户Id集合

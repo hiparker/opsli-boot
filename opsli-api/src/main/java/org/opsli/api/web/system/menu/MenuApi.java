@@ -59,6 +59,7 @@ public interface MenuApi {
 
     /**
      * 懒加载列表菜单
+     *
      * @param parentId 父节点ID
      * @return ResultVo
      */
@@ -84,10 +85,12 @@ public interface MenuApi {
 
     /**
      * 根据 获得用户 菜单 - 权限
+     *
+     * @param label 标签
      * @return ResultVo
      */
     @GetMapping("/getMenuAndPermsTree")
-    ResultVo<?> getMenuAndPermsTree();
+    ResultVo<?> getMenuAndPermsTree(String label);
 
     /**
      * 获得集合

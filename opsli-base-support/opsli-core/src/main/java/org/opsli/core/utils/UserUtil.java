@@ -660,6 +660,51 @@ public class UserUtil {
     // ============== 刷新缓存 ==============
 
     /**
+     * 获得当前系统登陆用户
+     * @return UserModel
+     */
+    public static boolean updateUser(UserModel user){
+        if(null == user){
+            return false;
+        }
+
+        // 先清空缓存
+        boolean flag = refreshUser(user);
+        if(!flag){
+            return false;
+        }
+
+        // 缓存Key
+        String cacheKey = PREFIX_ID + user.getId();
+        try {
+            // 存入缓存
+            CacheUtil.put(cacheKey, user);
+        }catch (Exception e){
+            log.error(e.getMessage(), e);
+        }
+
+        try {
+            // 分布式加锁
+            if(!DistributedLockUtil.lock(cacheKey)){
+                // 无法申领分布式锁
+                log.error(CoreMsg.REDIS_EXCEPTION_LOCK.getMessage());
+                return false;
+            }
+
+            // 存入缓存
+            flag = CacheUtil.put(cacheKey, user);
+        }catch (Exception e){
+            flag = false;
+            log.error(e.getMessage(), e);
+        }finally {
+            // 释放锁
+            DistributedLockUtil.unlock(cacheKey);
+        }
+
+        return flag;
+    }
+
+    /**
      * 刷新用户 - 删就完了
      * @param user 用户
      * @return boolean
@@ -984,7 +1029,7 @@ public class UserUtil {
 
         // 如果是超级管理员 则不进行租户处理 默认为0
         if(StringUtils.equals(SUPER_ADMIN, user.getUsername())){
-            return "0";
+            return TenantUtil.SUPER_ADMIN_TENANT_ID;
         }
         return user.getTenantId();
     }

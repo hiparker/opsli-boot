@@ -42,6 +42,9 @@ public class SysRole extends BaseEntity {
     /** 是否内置数据 0否  1是 */
     private String izLock;
 
+    /** 标签 */
+    private String label;
+
     /** 授权数据范围 */
     private String dataScope;
 

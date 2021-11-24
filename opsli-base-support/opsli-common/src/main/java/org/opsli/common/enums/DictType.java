@@ -28,6 +28,10 @@ public enum DictType {
     NO_YES_NO("no_yes","0", "否"),
     NO_YES_YES("no_yes","1", "是"),
 
+    /** 菜单 标签 */
+    MENU_LABEL_SYSTEM("menu_role_type","0", "系统模块"),
+    MENU_LABEL_FUNCTION("menu_role_type","1", "功能模块"),
+
     /** 菜单 */
     MENU_MENU("menu_type","1", "菜单"),
     MENU_BUTTON("menu_type","2", "按钮"),

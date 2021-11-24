@@ -44,6 +44,9 @@ public class TenantUtil {
     /** 前缀 */
     public static final String PREFIX_CODE = "tenant:id:";
 
+    /** 超级管理员 租户ID */
+    public static final String SUPER_ADMIN_TENANT_ID = "0";
+
     /** 租户 Api */
     private static TenantApi tenantApi;
 

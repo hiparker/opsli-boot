@@ -107,8 +107,13 @@ public class QueryDataPermsHandler implements QueryBuilderChain{
         // 1. 当前用户
         UserModel currUser = UserUtil.getUser();
 
+        String userId = StringUtils.isNotEmpty(currUser.getSwitchTenantUserId())
+                ? currUser.getSwitchTenantUserId()
+                : currUser.getId();
+
+
         // 2. 当前用户 组织机构集合
-        List<UserOrgRefModel> userOrgRefModelList = UserUtil.getOrgListByUserId(currUser.getId());
+        List<UserOrgRefModel> userOrgRefModelList = UserUtil.getOrgListByUserId(userId);
         List<String> orgIdGroupList = Lists.newArrayListWithCapacity(userOrgRefModelList.size());
         for (UserOrgRefModel userOrgRefModel : userOrgRefModelList) {
             orgIdGroupList.add(userOrgRefModel.getOrgIds());
@@ -123,7 +128,7 @@ public class QueryDataPermsHandler implements QueryBuilderChain{
             conditionType = ConditionType.ALL;
         }else{
             // 如果不是超级管理员 则获得当前用户的默认角色下的 授权数据权限类型
-            RoleModel defRole = UserUtil.getUserDefRoleByUserId(currUser.getId());
+            RoleModel defRole = UserUtil.getUserDefRoleByUserId(userId);
             if(null != defRole){
                 conditionType = ConditionType.getConditionType(defRole.getDataScope());
             }
@@ -164,7 +169,7 @@ public class QueryDataPermsHandler implements QueryBuilderChain{
                     });
                 }else {
                     // 查自身
-                    wra.eq(FieldUtil.humpToUnderline(MyBatisConstants.FIELD_CREATE_BY), currUser.getId());
+                    wra.eq(FieldUtil.humpToUnderline(MyBatisConstants.FIELD_CREATE_BY), userId);
                 }
             });
         }

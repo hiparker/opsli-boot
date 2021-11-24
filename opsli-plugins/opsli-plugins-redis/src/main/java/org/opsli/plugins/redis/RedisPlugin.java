@@ -22,6 +22,7 @@ import org.opsli.plugins.redis.pushsub.entity.BaseSubMessage;
 import org.opsli.plugins.redis.scripts.RedisScriptCache;
 import org.opsli.plugins.redis.scripts.enums.RedisScriptsEnum;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.connection.RedisStringCommands;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -1507,6 +1508,20 @@ public class RedisPlugin {
 								   String destKey) {
 		return redisTemplate.opsForZSet().intersectAndStore(key, otherKeys,
 				destKey);
+	}
+
+	/**
+	 * 批量获取数据 pipeline 技术
+	 *
+	 */
+	public List<Object> getPileLineList(List<String> cacheList) {
+		return redisTemplate.executePipelined((RedisConnection connection) -> {
+			connection.openPipeline();
+			for (String key : cacheList) {
+				connection.hGetAll(key.getBytes());
+			}
+			return null;
+		});
 	}
 
 	// ===================== 消息发布 =====================
