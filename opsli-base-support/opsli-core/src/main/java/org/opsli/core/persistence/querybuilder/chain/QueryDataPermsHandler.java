@@ -164,7 +164,7 @@ public class QueryDataPermsHandler implements QueryBuilderChain{
                     });
                 }else {
                     // 查自身
-                    wra.in(FieldUtil.humpToUnderline(MyBatisConstants.FIELD_CREATE_BY), currUser.getId());
+                    wra.eq(FieldUtil.humpToUnderline(MyBatisConstants.FIELD_CREATE_BY), currUser.getId());
                 }
             });
         }
