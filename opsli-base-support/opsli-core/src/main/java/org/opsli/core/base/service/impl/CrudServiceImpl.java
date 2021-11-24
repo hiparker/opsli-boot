@@ -34,6 +34,7 @@ import org.opsli.core.persistence.querybuilder.GenQueryBuilder;
 import org.opsli.core.persistence.querybuilder.QueryBuilder;
 import org.opsli.core.persistence.querybuilder.chain.QueryDataPermsHandler;
 import org.opsli.core.persistence.querybuilder.chain.QueryTenantHandler;
+import org.opsli.core.persistence.querybuilder.conf.WebQueryConf;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
@@ -212,23 +213,17 @@ public abstract class CrudServiceImpl<M extends BaseMapper<T>, T extends BaseEnt
     @Override
     public List<T> findList(QueryWrapper<T> queryWrapper) {
         // 数据处理责任链
-        queryWrapper = new QueryTenantHandler(
-                new QueryDataPermsHandler()
-        ).handler(entityClazz, queryWrapper);
+        QueryWrapper<T> qWrapper = this.addHandler(entityClazz, queryWrapper);
 
-        return super.list(queryWrapper);
+        return super.list(qWrapper);
     }
 
     @Override
     public List<T> findAllList() {
-        QueryBuilder<T> queryBuilder = new GenQueryBuilder<>();
-        QueryWrapper<T> queryWrapper = queryBuilder.build();
         // 数据处理责任链
-        queryWrapper = new QueryTenantHandler(
-                new QueryDataPermsHandler()
-        ).handler(entityClazz, queryWrapper);
+        QueryWrapper<T> qWrapper = this.addHandler(entityClazz);
 
-        return super.list(queryWrapper);
+        return super.list(qWrapper);
     }
 
     @Override
@@ -300,6 +295,46 @@ public abstract class CrudServiceImpl<M extends BaseMapper<T>, T extends BaseEnt
         return WrapperUtil.transformInstance(models, entityClazz);
     }
 
+    /**
+     * 增加处理器
+     * @param qClass 处理对象Class
+     * @param <Q> 泛型
+     * @return 查询对象包装器
+     */
+    protected <Q extends BaseEntity> QueryWrapper<Q> addHandler(Class<Q> qClass){
+        QueryWrapper<Q> qQueryWrapper = new QueryWrapper<>();
+        return addHandler(qClass, qQueryWrapper);
+    }
+
+    /**
+     * 增加处理器
+     * @param qClass 处理对象Class
+     * @param qQueryWrapper 查询对象包装器
+     * @param <Q> 泛型
+     * @return 查询对象包装器
+     */
+    protected <Q extends BaseEntity> QueryWrapper<Q> addHandler(Class<Q> qClass, QueryWrapper<Q> qQueryWrapper){
+        // 数据处理责任链
+        return  new QueryTenantHandler(
+                new QueryDataPermsHandler()
+        ).handler(qClass, qQueryWrapper);
+    }
+
+    /**
+     * 增加处理器
+     * @param qClass 处理对象Class
+     * @param qQueryWrapper 查询对象包装器
+     * @param <Q> 泛型
+     * @return 查询对象包装器
+     */
+    protected <Q extends BaseEntity> QueryWrapper<Q> addHandler(Class<Q> qClass,
+                                                                WebQueryConf conf,
+                                                                QueryWrapper<Q> qQueryWrapper){
+        // 数据处理责任链
+        return  new QueryTenantHandler(
+                new QueryDataPermsHandler()
+        ).handler(qClass, conf, qQueryWrapper);
+    }
 
     // ======================== 初始化 ========================
 

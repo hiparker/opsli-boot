@@ -16,7 +16,6 @@
 package org.opsli.modulars.system.user.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.RandomUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -24,10 +23,7 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.github.pagehelper.PageInfo;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
-import org.opsli.api.base.warpper.ApiWrapper;
-import org.opsli.api.wrapper.system.menu.MenuModel;
 import org.opsli.api.wrapper.system.options.OptionsModel;
-import org.opsli.api.wrapper.system.role.RoleModel;
 import org.opsli.api.wrapper.system.user.UserModel;
 import org.opsli.api.wrapper.system.user.UserPassword;
 import org.opsli.api.wrapper.system.user.UserRoleRefModel;
@@ -37,19 +33,15 @@ import org.opsli.common.enums.DictType;
 import org.opsli.common.exception.ServiceException;
 import org.opsli.common.utils.CheckStrength;
 import org.opsli.common.utils.FieldUtil;
-import org.opsli.common.utils.ListDistinctUtil;
 import org.opsli.common.utils.WrapperUtil;
 import org.opsli.core.base.service.impl.CrudServiceImpl;
 import org.opsli.core.msg.CoreMsg;
 import org.opsli.core.persistence.Page;
 import org.opsli.core.persistence.querybuilder.GenQueryBuilder;
 import org.opsli.core.persistence.querybuilder.QueryBuilder;
-import org.opsli.core.persistence.querybuilder.chain.QueryDataPermsHandler;
-import org.opsli.core.persistence.querybuilder.chain.QueryTenantHandler;
 import org.opsli.core.utils.OptionsUtil;
 import org.opsli.core.utils.UserUtil;
 import org.opsli.modulars.system.SystemMsg;
-import org.opsli.modulars.system.menu.entity.SysMenu;
 import org.opsli.modulars.system.menu.service.IMenuService;
 import org.opsli.modulars.system.role.entity.SysRole;
 import org.opsli.modulars.system.role.service.IRoleService;
@@ -64,7 +56,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 
@@ -457,9 +448,7 @@ public class UserServiceImpl extends CrudServiceImpl<UserMapper, SysUser, UserMo
         // 如果没有租户修改能力 则默认增加租户限制
         if(!UserUtil.isHasUpdateTenantPerms(UserUtil.getUser())){
             // 数据处理责任链
-            queryWrapper = new QueryTenantHandler(
-                    new QueryDataPermsHandler()
-            ).handler(entityClazz, queryWrapper);
+            queryWrapper = super.addHandler(entityClazz, queryWrapper);
         }
 
         return super.list(queryWrapper);
@@ -472,9 +461,7 @@ public class UserServiceImpl extends CrudServiceImpl<UserMapper, SysUser, UserMo
         // 如果没有租户修改能力 则默认增加租户限制
         if(!UserUtil.isHasUpdateTenantPerms(UserUtil.getUser())){
             // 数据处理责任链
-            queryWrapper = new QueryTenantHandler(
-                    new QueryDataPermsHandler()
-            ).handler(entityClazz, queryWrapper);
+            queryWrapper = super.addHandler(entityClazz, queryWrapper);
         }
         return super.list(queryWrapper);
     }
@@ -606,9 +593,7 @@ public class UserServiceImpl extends CrudServiceImpl<UserMapper, SysUser, UserMo
         // 如果没有租户修改能力 则默认增加租户限制
         if(!UserUtil.isHasUpdateTenantPerms(UserUtil.getUser())){
             // 数据处理责任链
-            queryWrapper = new QueryTenantHandler(
-                    new QueryDataPermsHandler()
-            ).handler(SysUserWeb.class, queryWrapper);
+            queryWrapper = super.addHandler(SysUserWeb.class, queryWrapper);
         }
 
 
@@ -671,9 +656,7 @@ public class UserServiceImpl extends CrudServiceImpl<UserMapper, SysUser, UserMo
 
         // 租户检测
         // 数据处理责任链
-        wrapper = new QueryTenantHandler(
-                new QueryDataPermsHandler()
-        ).handler(entityClazz, wrapper);
+        wrapper = super.addHandler(entityClazz, wrapper);
 
         return super.count(wrapper) == 0;
     }

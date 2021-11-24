@@ -17,21 +17,15 @@ package org.opsli.modulars.system.role.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
-import cn.hutool.core.util.ArrayUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
 import org.opsli.api.wrapper.system.role.RoleModel;
-import org.opsli.api.wrapper.system.user.UserModel;
 import org.opsli.common.constants.MyBatisConstants;
 import org.opsli.common.exception.ServiceException;
 import org.opsli.common.utils.FieldUtil;
 import org.opsli.core.base.service.impl.CrudServiceImpl;
 import org.opsli.core.msg.CoreMsg;
-import org.opsli.core.persistence.querybuilder.GenQueryBuilder;
-import org.opsli.core.persistence.querybuilder.QueryBuilder;
-import org.opsli.core.persistence.querybuilder.chain.QueryDataPermsHandler;
-import org.opsli.core.persistence.querybuilder.chain.QueryTenantHandler;
 import org.opsli.core.utils.UserUtil;
 import org.opsli.modulars.system.SystemMsg;
 import org.opsli.modulars.system.role.entity.SysRole;
@@ -205,9 +199,7 @@ public class RoleServiceImpl extends CrudServiceImpl<RoleMapper, SysRole, RoleMo
         }else {
             // 租户检测
             // 数据处理责任链
-            wrapper = new QueryTenantHandler(
-                    new QueryDataPermsHandler()
-            ).handler(entityClazz, wrapper);
+            wrapper = super.addHandler(entityClazz, wrapper);
         }
 
         return super.count(wrapper) == 0;
@@ -240,9 +232,7 @@ public class RoleServiceImpl extends CrudServiceImpl<RoleMapper, SysRole, RoleMo
         }else {
             // 租户检测
             // 数据处理责任链
-            wrapper = new QueryTenantHandler(
-                    new QueryDataPermsHandler()
-            ).handler(entityClazz, wrapper);
+            wrapper = super.addHandler(entityClazz, wrapper);
         }
 
         return super.count(wrapper) == 0;
