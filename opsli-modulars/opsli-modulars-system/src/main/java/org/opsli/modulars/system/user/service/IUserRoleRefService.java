@@ -89,10 +89,17 @@ public interface IUserRoleRefService {
 
     /**
      * 根据菜单ID 获得当前用户Id集合
-     * @param roleId 角色ID
+     * @param menuId 菜单ID
      * @return List
      */
-    List<String> getUserIdListByMenuId(String roleId);
+    List<String> getUserIdListByMenuId(String menuId);
+
+    /**
+     * 根据菜单ID集合 获得当前用户Id集合
+     * @param menuIdList 菜单ID 集合
+     * @return List
+     */
+    List<String> getUserIdListByMenuIdList(List<String> menuIdList);
 
     /**
      * 根据用户ID 获得当前默认角色ID

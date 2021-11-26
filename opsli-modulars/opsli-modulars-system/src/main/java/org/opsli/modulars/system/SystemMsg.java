@@ -36,6 +36,8 @@ public enum SystemMsg implements BaseMsg {
      */
     EXCEPTION_MENU_PERMISSIONS_UNIQUE(20050,"权限重复，该权限编号已存在"),
     EXCEPTION_MENU_HANDLE_SELF(20051,"不可操作自身"),
+    EXCEPTION_MENU_NULL(20052,"未找到菜单"),
+
 
     /**
      * 数据字典

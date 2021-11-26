@@ -97,6 +97,7 @@ public enum MenuFactory {
         menu.setUrl(subModuleName);
         menu.setType(DictType.MENU_MENU.getValue());
         menu.setSortNo(1);
+        menu.setLabel(DictType.MENU_LABEL_SYSTEM.getValue());
         menu.setComponent("views/modules/"+model.getModuleName()+"/"+model.getSubModuleName()+"/index");
 
         return menu;

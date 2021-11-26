@@ -16,6 +16,7 @@
 package org.opsli.api.wrapper.system.menu;
 
 import com.alibaba.excel.annotation.ExcelIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -39,6 +40,11 @@ public class MenuModel extends ApiWrapper {
     @ExcelIgnore
     @ValidatorLenMax(20)
     private String parentId;
+
+    /** 父级主键 ID集合 */
+    @ApiModelProperty(value = "父级主键")
+    @ExcelIgnore
+    private String parentIds;
 
     /** 权限编号 */
     @ApiModelProperty(value = "权限编号")

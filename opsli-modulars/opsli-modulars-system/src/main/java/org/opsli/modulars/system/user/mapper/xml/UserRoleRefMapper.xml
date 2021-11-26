@@ -106,6 +106,16 @@
         ${ew.customSqlSegment}
     </select>
 
+    <select id="getUserIdListByMenu"  resultType="String">
+        select
+            b.user_id
+        from
+        sys_role_menu_ref a
+        join sys_user_role_ref b on b.role_id = a.role_id
+        join sys_menu menu on menu.id = a.menu_id
+        ${ew.customSqlSegment}
+    </select>
+
     <select id="getUserIdListByMenuId"  resultType="String">
         select
             b.user_id

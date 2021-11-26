@@ -78,6 +78,14 @@ public interface UserRoleRefMapper extends BaseMapper<SysUserRoleRef> {
     List<String> getUserIdList(@Param(Constants.WRAPPER) Wrapper<?> wrapper);
 
     /**
+     * 根据条件 获得当前用户Id集合
+     *
+     * @param wrapper wrapper
+     * @return List
+     */
+    List<String> getUserIdListByMenu(@Param(Constants.WRAPPER) Wrapper<?> wrapper);
+
+    /**
      * 根据菜单ID 获得当前用户Id集合
      * @param menuId 菜单ID
      * @return List

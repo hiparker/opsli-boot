@@ -36,6 +36,9 @@ public class SysMenu extends BaseEntity {
     /** 父级主键 */
     private String parentId;
 
+    /** 父级主键 集合 */
+    private String parentIds;
+
     /** 权限编号 */
     private String permissions;
 

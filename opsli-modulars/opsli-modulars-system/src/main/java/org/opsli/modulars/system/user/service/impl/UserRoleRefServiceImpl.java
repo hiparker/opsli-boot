@@ -229,8 +229,31 @@ public class UserRoleRefServiceImpl extends ServiceImpl<UserRoleRefMapper, SysUs
     }
 
     @Override
-    public List<String> getUserIdListByMenuId(String roleId) {
-        List<String> users = mapper.getUserIdListByMenuId(roleId);
+    public List<String> getUserIdListByMenuId(String menuId) {
+        QueryWrapper<SysMenu> queryWrapper = new QueryWrapper<>();
+        queryWrapper
+                .eq("menu.deleted", DictType.NO_YES_NO.getValue())
+                .notIn("menu.parent_id", -1)
+                .eq("a.menu_id", menuId);
+
+        List<String> users = mapper.getUserIdListByMenu(queryWrapper);
+        if(CollUtil.isEmpty(users)){
+            return ListUtil.empty();
+        }
+
+        // 去重
+        return ListDistinctUtil.distinct(users);
+    }
+
+    @Override
+    public List<String> getUserIdListByMenuIdList(List<String> menuIdList) {
+        QueryWrapper<SysMenu> queryWrapper = new QueryWrapper<>();
+        queryWrapper
+                .eq("menu.deleted", DictType.NO_YES_NO.getValue())
+                .notIn("menu.parent_id", -1)
+                .in("a.menu_id", menuIdList);
+
+        List<String> users = mapper.getUserIdListByMenu(queryWrapper);
         if(CollUtil.isEmpty(users)){
             return ListUtil.empty();
         }
