@@ -111,8 +111,11 @@ public class LoginRestController {
         // 如果验证成功， 则清除锁定信息
         UserTokenUtil.clearLockAccount(form.getUsername());
 
-        // 如果不是超级管理员
-        if(!StringUtils.equals(UserUtil.SUPER_ADMIN, user.getUsername())){
+        // 如果不是超级管理员 并且不是系统系统用户 则进行验证
+        if(!StringUtils.equals(UserUtil.SUPER_ADMIN, user.getUsername()) &&
+                !TenantUtil.SUPER_ADMIN_TENANT_ID.equals(user.getTenantId())
+            ){
+
             // 账号锁定验证
             if(StringUtils.isEmpty(user.getEnable()) ||
                     DictType.NO_YES_NO.getValue().equals(user.getEnable())){
