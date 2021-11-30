@@ -92,7 +92,8 @@ public class JwtRealm extends AuthorizingRealm implements FlagRealm {
         }
 
         // 4. 如果不是超级管理员
-        if(!StringUtils.equals(UserUtil.SUPER_ADMIN, user.getUsername())){
+        if(!StringUtils.equals(UserUtil.SUPER_ADMIN, user.getUsername())  &&
+                !TenantUtil.SUPER_ADMIN_TENANT_ID.equals(user.getTenantId()) ){
             // 4.1 账号锁定验证
             if(StringUtils.isEmpty(user.getEnable()) ||
                     DictType.NO_YES_NO.getValue().equals(user.getEnable())){

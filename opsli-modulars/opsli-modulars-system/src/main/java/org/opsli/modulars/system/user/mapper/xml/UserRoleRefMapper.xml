@@ -4,19 +4,22 @@
 
     <select id="queryAllPerms" resultType="String">
         select
-        a.permissions
+            a.permissions
         from
         sys_menu a,
         sys_role_menu_ref b,
         sys_user_role_ref c
         where
-        a.id = b.menu_id
-        and a.hidden = '0'
-        and a.deleted = '0'
-        and b.role_id = c.role_id
-        <!-- 2 表示按钮 -->
-        and a.type = '2'
-        and c.user_id = #{userId}
+            a.id = b.menu_id
+            and a.hidden = '0'
+            and a.deleted = '0'
+            and b.role_id = c.role_id
+            <!-- 2 表示按钮 -->
+            and a.type = '2'
+            and c.user_id = #{userId}
+            <!-- 0:系统模块 1:功能模块 -->
+            and a.label like CONCAT('%',#{label}, '%')
+        group by a.id
     </select>
 
     <select id="getRoleIdList"  resultType="String">
@@ -42,17 +45,17 @@
     <!--  根据用户id查询菜单列表-->
     <select id="findMenuListByUserId" resultType="SysMenu">
         select
-        c.id,
-        c.parent_Id,
-        c.permissions,
-        c.menu_name,
-        c.redirect,
-        c.type,
-        c.icon,
-        c.url,
-        c.component,
-        c.always_show,
-        c.sort_no
+            c.id,
+            c.parent_Id,
+            c.permissions,
+            c.menu_name,
+            c.redirect,
+            c.type,
+            c.icon,
+            c.url,
+            c.component,
+            c.always_show,
+            c.sort_no
         from
         sys_user_role_ref a,
         sys_role_menu_ref b,
@@ -67,7 +70,8 @@
         and c.deleted = '0'
         and c.hidden = '0'
         <!-- 0:系统模块 1:功能模块 -->
-        and c.label like '%1%'
+        and c.label like CONCAT('%',#{label}, '%')
+        group by c.id
     </select>
 
     <!--  根据用户id查询菜单列表-->
@@ -89,12 +93,15 @@
             sys_role_menu_ref b,
             sys_menu c
         where
-            a.role_Id = b.role_Id
+          a.role_Id = b.role_Id
           and b.menu_id = c.id
           and c.parent_id != -1
-            and a.user_id = #{userId}
+          and a.user_id = #{userId}
           and c.deleted = '0'
           and c.hidden = '0'
+          <!-- 0:系统模块 1:功能模块 -->
+          and c.label like CONCAT('%',#{label}, '%')
+        group by c.id
     </select>
 
     <select id="getUserIdList"  resultType="String">

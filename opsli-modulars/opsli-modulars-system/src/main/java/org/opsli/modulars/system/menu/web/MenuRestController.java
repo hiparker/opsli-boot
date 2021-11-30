@@ -73,7 +73,7 @@ import java.util.Map;
  */
 @Api(tags = MenuApi.TITLE)
 @Slf4j
-@ApiRestController("/system/menu")
+@ApiRestController("/system/menu/{ver}")
 public class MenuRestController extends BaseRestController<SysMenu, MenuModel, IMenuService>
         implements MenuApi {
 

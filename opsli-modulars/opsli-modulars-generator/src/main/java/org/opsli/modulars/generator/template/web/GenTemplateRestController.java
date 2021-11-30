@@ -53,9 +53,7 @@ import org.opsli.modulars.generator.template.service.IGenTemplateService;
  */
 @Api(tags = GenTemplateRestApi.TITLE)
 @Slf4j
-
-@ApiRestController("/generator/template")
-
+@ApiRestController("/generator/template/{ver}")
 public class GenTemplateRestController extends BaseRestController<GenTemplate, GenTemplateModel, IGenTemplateService>
     implements GenTemplateRestApi {
 

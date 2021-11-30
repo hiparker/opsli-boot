@@ -66,7 +66,7 @@ import java.util.Set;
  */
 @Api(tags = SysOrgRestApi.TITLE)
 @Slf4j
-@ApiRestController("/system/org")
+@ApiRestController("/system/org/{ver}")
 public class SysOrgRestController extends BaseRestController<SysOrg, SysOrgModel, ISysOrgService>
     implements SysOrgRestApi {
 

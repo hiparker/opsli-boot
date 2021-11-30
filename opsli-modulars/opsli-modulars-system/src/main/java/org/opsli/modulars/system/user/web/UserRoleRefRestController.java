@@ -50,7 +50,7 @@ import java.util.List;
  */
 @Api(tags = UserRoleRefApi.TITLE)
 @Slf4j
-@ApiRestController("/system/user/roles")
+@ApiRestController("/system/user/roles/{ver}")
 public class UserRoleRefRestController implements UserRoleRefApi {
 
     /** 配置类 */

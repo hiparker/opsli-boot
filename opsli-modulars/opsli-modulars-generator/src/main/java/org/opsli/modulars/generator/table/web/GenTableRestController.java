@@ -57,7 +57,7 @@ import java.util.Map;
  */
 @Api(tags = TableApi.TITLE)
 @Slf4j
-@ApiRestController("/generator/table")
+@ApiRestController("/generator/table/{ver}")
 public class GenTableRestController extends BaseRestController<GenTable, GenTableModel, IGenTableService>
         implements TableApi {
 

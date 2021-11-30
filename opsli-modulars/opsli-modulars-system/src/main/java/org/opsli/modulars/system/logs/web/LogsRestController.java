@@ -42,7 +42,7 @@ import javax.servlet.http.HttpServletRequest;
  */
 @Api(tags = LogsApi.TITLE)
 @Slf4j
-@ApiRestController("/system/logs")
+@ApiRestController("/system/logs/{ver}")
 public class LogsRestController extends BaseRestController<SysLogs, LogsModel, ILogsService>
         implements LogsApi {
 

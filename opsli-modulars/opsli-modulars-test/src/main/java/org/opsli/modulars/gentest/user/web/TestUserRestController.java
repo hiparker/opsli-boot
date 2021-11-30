@@ -48,7 +48,7 @@ import java.lang.reflect.Method;
  */
 @Api(tags = TestUserRestApi.TITLE)
 @Slf4j
-@ApiRestController("/gentest/user")
+@ApiRestController("/gentest/user/{ver}")
 public class TestUserRestController extends BaseRestController<TestUser, TestUserModel, ITestUserService>
     implements TestUserRestApi {
 

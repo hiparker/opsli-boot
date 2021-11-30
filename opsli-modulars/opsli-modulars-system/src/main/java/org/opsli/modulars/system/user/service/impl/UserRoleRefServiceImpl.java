@@ -37,6 +37,7 @@ import org.opsli.common.utils.WrapperUtil;
 import org.opsli.core.msg.CoreMsg;
 import org.opsli.core.persistence.querybuilder.GenQueryBuilder;
 import org.opsli.core.persistence.querybuilder.QueryBuilder;
+import org.opsli.core.utils.TenantUtil;
 import org.opsli.core.utils.UserUtil;
 import org.opsli.modulars.system.SystemMsg;
 import org.opsli.modulars.system.menu.entity.SysMenu;
@@ -106,12 +107,19 @@ public class UserRoleRefServiceImpl extends ServiceImpl<UserRoleRefMapper, SysUs
             queryWrapper.notIn("parent_id", -1);
             queryWrapper.eq("type", '2');
             queryWrapper.eq("hidden", DictType.NO_YES_NO.getValue());
+            queryWrapper.like("label",DictType.MENU_LABEL_SYSTEM.getValue());
             List<SysMenu> menuList = iMenuService.findList(queryWrapper);
             for (SysMenu sysMenu : menuList) {
                 perms.add(sysMenu.getPermissions());
             }
         }else{
-            perms = mapper.queryAllPerms(userId);
+            if(TenantUtil.SUPER_ADMIN_TENANT_ID.equals(userModel.getTenantId())){
+                perms = mapper.queryAllPerms(
+                        userId, DictType.MENU_LABEL_SYSTEM.getValue());
+            }else {
+                perms = mapper.queryAllPerms(
+                        userId, DictType.MENU_LABEL_FUNCTION.getValue());
+            }
         }
 
         // 去重
@@ -137,7 +145,13 @@ public class UserRoleRefServiceImpl extends ServiceImpl<UserRoleRefMapper, SysUs
             queryWrapper.like("label",DictType.MENU_LABEL_SYSTEM.getValue());
             menuList = iMenuService.findList(queryWrapper);
         }else{
-            menuList = mapper.findMenuListByUserId(userId);
+            if(TenantUtil.SUPER_ADMIN_TENANT_ID.equals(userModel.getTenantId())){
+                menuList = mapper.findMenuListByUserId(
+                        userId, DictType.MENU_LABEL_SYSTEM.getValue());
+            }else {
+                menuList = mapper.findMenuListByUserId(
+                        userId, DictType.MENU_LABEL_FUNCTION.getValue());
+            }
         }
 
         // 去重处理 这里不放在SQL 是为了保证数据库兼容性
@@ -165,7 +179,11 @@ public class UserRoleRefServiceImpl extends ServiceImpl<UserRoleRefMapper, SysUs
             queryWrapper.like("label", label);
             menuList = iMenuService.findList(queryWrapper);
         }else{
-            menuList = mapper.findMenuAllListByUserId(userId);
+            if(TenantUtil.SUPER_ADMIN_TENANT_ID.equals(userModel.getTenantId())){
+                menuList = mapper.findMenuAllListByUserId(userId, label);
+            }else {
+                menuList = mapper.findMenuAllListByUserId(userId, label);
+            }
         }
 
         if(CollUtil.isEmpty(menuList)){
@@ -182,8 +200,7 @@ public class UserRoleRefServiceImpl extends ServiceImpl<UserRoleRefMapper, SysUs
     @Override
     public List<String> getUserIdListByRoleId(String roleId) {
         QueryWrapper<SysUserRoleRef> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq(
-                FieldUtil.humpToUnderline(MyBatisConstants.FIELD_DELETE_LOGIC), DictType.NO_YES_NO.getValue());
+        queryWrapper.eq("b.deleted", DictType.NO_YES_NO.getValue());
         queryWrapper.eq("role_id", roleId);
 
         List<String> users = mapper.getUserIdList(queryWrapper);
@@ -214,7 +231,7 @@ public class UserRoleRefServiceImpl extends ServiceImpl<UserRoleRefMapper, SysUs
     public List<String> getUserIdListByTenantIdAndAllData(String tenantId) {
         QueryWrapper<SysUserRoleRef> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("b.deleted", DictType.NO_YES_NO.getValue());
-        queryWrapper.eq("c.tenantId", tenantId);
+        queryWrapper.eq("c.tenant_id", tenantId);
         queryWrapper.eq("c.data_scope", "3");
 
         List<String> users = mapper.getUserIdList(queryWrapper);

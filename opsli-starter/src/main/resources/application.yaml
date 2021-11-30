@@ -12,7 +12,7 @@ server:
     ## 专门针对 Controller层接口路径前缀全局配置
     api:
       path:
-        global-prefix: /api/v1
+        global-prefix: /api
   compression:
     enabled: true
     min-response-size: 1024
@@ -163,8 +163,8 @@ opsli:
     url-patterns: "/*"
     # 排除过滤URL
     url-exclusion:
-      - "/api/v1/generator/template/insertAndDetail"
-      - "/api/v1/generator/template/updateAndDetail"
+      - "/api/generator/template/v1/insertAndDetail"
+      - "/api/generator/template/v1/updateAndDetail"
       - "/static/files/"
       - "/doc.html"
 

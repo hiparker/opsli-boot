@@ -49,7 +49,7 @@ import java.lang.reflect.Method;
  */
 @Api(tags = "角色管理")
 @Slf4j
-@ApiRestController("/system/role")
+@ApiRestController("/system/role/{ver}")
 public class RoleRestController extends BaseRestController<SysRole, RoleModel, IRoleService>
         implements RoleApi {
 

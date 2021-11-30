@@ -60,7 +60,7 @@ import java.util.Map;
  */
 @Api(tags = OptionsApi.TITLE)
 @Slf4j
-@ApiRestController("/system/options")
+@ApiRestController("/system/options/{ver}")
 public class SysOptionsRestController extends BaseRestController<SysOptions, OptionsModel, ISysOptionsService>
     implements OptionsApi {
 

@@ -1,4 +1,0 @@
-ALTER TABLE `opsli-boot`.`creater_table_column`
-MODIFY COLUMN `field_length` int(11) NULL DEFAULT NULL COMMENT '字段长度' AFTER `field_type`,
-MODIFY COLUMN `field_precision` int(11) NULL DEFAULT NULL COMMENT '字段精度' AFTER `field_length`,
-MODIFY COLUMN `sort` int(6) NOT NULL COMMENT '排序（升序）' AFTER `dict_type_code`;

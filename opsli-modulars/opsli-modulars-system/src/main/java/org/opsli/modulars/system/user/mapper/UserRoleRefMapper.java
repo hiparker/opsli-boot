@@ -51,23 +51,26 @@ public interface UserRoleRefMapper extends BaseMapper<SysUserRoleRef> {
     /**
      * 根据用户ID 获得权限
      * @param userId 用户ID
+     * @param label 标签
      * @return List
      */
-    List<String> queryAllPerms(String userId);
+    List<String> queryAllPerms(@Param("userId") String userId, @Param("label") String label);
 
     /**
      * 根据用户ID 获得菜单集合
      * @param userId 用户ID
+     * @param label 标签
      * @return List
      */
-    List<SysMenu> findMenuListByUserId(String userId);
+    List<SysMenu> findMenuListByUserId(@Param("userId") String userId, @Param("label") String label);
 
     /**
      * 根据用户ID 获得全部菜单集合
      * @param userId 用户ID
+     * @param label 标签
      * @return List
      */
-    List<SysMenu> findMenuAllListByUserId(String userId);
+    List<SysMenu> findMenuAllListByUserId(@Param("userId") String userId, @Param("label") String label);
 
     /**
      * 根据条件 获得当前用户Id集合

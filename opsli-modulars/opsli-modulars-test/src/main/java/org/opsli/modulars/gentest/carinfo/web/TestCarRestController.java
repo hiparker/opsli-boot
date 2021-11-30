@@ -47,7 +47,7 @@ import org.opsli.api.web.gentest.carinfo.TestCarRestApi;
  */
 @Api(tags = TestCarRestApi.TITLE)
 @Slf4j
-@ApiRestController("/gentest/carinfo")
+@ApiRestController("/gentest/carinfo/{ver}")
 public class TestCarRestController extends BaseRestController<TestCar, TestCarModel, ITestCarService>
     implements TestCarRestApi {
 

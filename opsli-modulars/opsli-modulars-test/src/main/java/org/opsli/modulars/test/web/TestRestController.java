@@ -32,7 +32,7 @@ import java.lang.reflect.Method;
  */
 @Api(tags = "测试类")
 @Slf4j
-@ApiRestController("/test")
+@ApiRestController("/test/{ver}")
 public class TestRestController extends BaseRestController<TestEntity, TestModel, ITestService>
         implements TestRestApi {
 

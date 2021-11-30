@@ -41,15 +41,13 @@ public interface TestCarRestApi {
     String TITLE = "汽车信息管理";
     /** 子标题 */
     String SUB_TITLE = "汽车信息";
-    /** URL 前缀 */
-    String URL_PREFIX = "/gentest/carinfo/{version}";
 
     /**
     * 汽车信息 查一条
     * @param model 模型
     * @return ResultVo
     */
-    @GetMapping(URL_PREFIX + "/get")
+    @GetMapping("/get")
     ResultVo<TestCarModel> get(TestCarModel model);
 
     /**
@@ -59,7 +57,7 @@ public interface TestCarRestApi {
     * @param request request
     * @return ResultVo
     */
-    @GetMapping(URL_PREFIX + "/findPage")
+    @GetMapping("/findPage")
     ResultVo<?> findPage(
         @RequestParam(name = "pageNo", defaultValue = "1") Integer pageNo,
         @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize,
@@ -71,7 +69,7 @@ public interface TestCarRestApi {
     * @param model 模型
     * @return ResultVo
     */
-    @PostMapping(URL_PREFIX + "/insert")
+    @PostMapping("/insert")
     ResultVo<?> insert(@RequestBody TestCarModel model);
 
     /**
@@ -79,7 +77,7 @@ public interface TestCarRestApi {
     * @param model 模型
     * @return ResultVo
     */
-    @PostMapping(URL_PREFIX + "/update")
+    @PostMapping("/update")
     ResultVo<?> update(@RequestBody TestCarModel model);
 
     /**
@@ -87,7 +85,7 @@ public interface TestCarRestApi {
     * @param id ID
     * @return ResultVo
     */
-    @PostMapping(URL_PREFIX + "/del")
+    @PostMapping("/del")
     ResultVo<?> del(String id);
 
     /**
@@ -95,7 +93,7 @@ public interface TestCarRestApi {
     * @param ids ID 数组
     * @return ResultVo
     */
-    @PostMapping(URL_PREFIX + "/delAll")
+    @PostMapping("/delAll")
     ResultVo<?> delAll(String ids);
 
     /**
@@ -111,7 +109,7 @@ public interface TestCarRestApi {
     * @param request request
     * @param response response
     */
-    @GetMapping(URL_PREFIX + "/exportExcel")
+    @GetMapping("/exportExcel")
     void exportExcel(HttpServletRequest request, HttpServletResponse response);
 
     /**
@@ -119,14 +117,14 @@ public interface TestCarRestApi {
     * @param request 文件流 request
     * @return ResultVo
     */
-    @PostMapping(URL_PREFIX + "/importExcel")
+    @PostMapping("/importExcel")
     ResultVo<?> importExcel(MultipartHttpServletRequest request);
 
     /**
     * 汽车信息 Excel 下载导入模版
     * @param response response
     */
-    @GetMapping(URL_PREFIX + "/importExcel/template")
+    @GetMapping("/importExcel/template")
     void importTemplate(HttpServletResponse response);
 
 }
