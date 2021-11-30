@@ -107,9 +107,7 @@ public class QueryDataPermsHandler implements QueryBuilderChain{
         // 1. 当前用户
         UserModel currUser = UserUtil.getUser();
 
-        String userId = StringUtils.isNotEmpty(currUser.getSwitchTenantUserId())
-                ? currUser.getSwitchTenantUserId()
-                : currUser.getId();
+        String userId = currUser.getId();
 
 
         // 2. 当前用户 组织机构集合

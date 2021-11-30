@@ -108,6 +108,34 @@ public class UserUtil {
             // Token失效，请重新登录
             throw new TokenException(TokenMsg.EXCEPTION_TOKEN_LOSE_EFFICACY);
         }
+
+        return user;
+    }
+
+    /**
+     * 获得当前系统登陆用户
+     * @return UserModel
+     */
+    public static UserModel getUserBySource(){
+        // 判断 工具类是否初始化完成
+        ThrowExceptionUtil.isThrowException(!IS_INIT,
+                CoreMsg.OTHER_EXCEPTION_UTILS_INIT);
+
+        String token = TokenThreadLocal.get();
+
+        // 如果还是没获取到token 则抛出异常
+        if(StringUtils.isEmpty(token)){
+            // Token失效，请重新登录
+            throw new TokenException(TokenMsg.EXCEPTION_TOKEN_LOSE_EFFICACY);
+        }
+
+        String userId = UserTokenUtil.getUserIdByToken(token);
+        UserModel user = getUserBySource(userId);
+        if(user == null){
+            // Token失效，请重新登录
+            throw new TokenException(TokenMsg.EXCEPTION_TOKEN_LOSE_EFFICACY);
+        }
+
         return user;
     }
 
@@ -117,6 +145,25 @@ public class UserUtil {
      * @return UserModel
      */
     public static UserModel getUser(String userId){
+        return getUser(userId, false);
+    }
+
+    /**
+     * 根据ID 获得用户 (不会去递归查找用户)
+     * @param userId 用户ID
+     * @return UserModel
+     */
+    public static UserModel getUserBySource(String userId){
+        return getUser(userId, true);
+    }
+
+    /**
+     * 根据ID 获得用户
+     * @param userId 用户ID
+     * @param isRecursion 是否递归触发
+     * @return UserModel
+     */
+    private static UserModel getUser(String userId, boolean isRecursion){
         // 判断 工具类是否初始化完成
         ThrowExceptionUtil.isThrowException(!IS_INIT,
                 CoreMsg.OTHER_EXCEPTION_UTILS_INIT);
@@ -127,6 +174,14 @@ public class UserUtil {
         // 先从缓存里拿
         UserModel userModel = CacheUtil.getTimed(UserModel.class, cacheKey);
         if (userModel != null){
+            // 如果不是递归触发 可进入一次
+            if(!isRecursion){
+                // 如果是 切换租户权限 则进行新一轮判断
+                // 注意不要陷入递归死循环 只保障循环一次
+                if (StringUtils.isNotBlank(userModel.getSwitchTenantUserId())){
+                    userModel = getUser(userModel.getSwitchTenantUserId(), true);
+                }
+            }
             return userModel;
         }
 
@@ -174,6 +229,15 @@ public class UserUtil {
             // 设置空变量 用于防止穿透判断
             CacheUtil.putNilFlag(cacheKey);
             return null;
+        }
+
+        // 如果不是递归触发 可进入一次
+        if(!isRecursion){
+            // 如果是 切换租户权限 则进行新一轮判断
+            // 注意不要陷入递归死循环 只保障循环一次
+            if (StringUtils.isNotBlank(userModel.getSwitchTenantUserId())){
+                userModel = getUser(userModel.getSwitchTenantUserId(), true);
+            }
         }
 
         return userModel;
@@ -253,6 +317,13 @@ public class UserUtil {
         ThrowExceptionUtil.isThrowException(!IS_INIT,
                 CoreMsg.OTHER_EXCEPTION_UTILS_INIT);
 
+        // 处理 切换租户
+        UserModel currUser = getUser(userId);
+        if (null != currUser &&
+                StringUtils.isNotBlank(currUser.getSwitchTenantUserId())){
+            userId = currUser.getSwitchTenantUserId();
+        }
+
         // 缓存Key
         String cacheKey = PREFIX_ID_ROLES + userId;
 
@@ -321,6 +392,13 @@ public class UserUtil {
         ThrowExceptionUtil.isThrowException(!IS_INIT,
                 CoreMsg.OTHER_EXCEPTION_UTILS_INIT);
 
+        // 处理 切换租户
+        UserModel currUser = getUser(userId);
+        if (null != currUser &&
+                StringUtils.isNotBlank(currUser.getSwitchTenantUserId())){
+            userId = currUser.getSwitchTenantUserId();
+        }
+
         // 缓存Key
         String cacheKey = PREFIX_ID_PERMISSIONS + userId;
 
@@ -387,6 +465,13 @@ public class UserUtil {
         // 判断 工具类是否初始化完成
         ThrowExceptionUtil.isThrowException(!IS_INIT,
                 CoreMsg.OTHER_EXCEPTION_UTILS_INIT);
+
+        // 处理 切换租户
+        UserModel currUser = getUser(userId);
+        if (null != currUser &&
+                StringUtils.isNotBlank(currUser.getSwitchTenantUserId())){
+            userId = currUser.getSwitchTenantUserId();
+        }
 
         // 缓存Key
         String cacheKey = PREFIX_ID_ORGS + userId;
@@ -469,6 +554,13 @@ public class UserUtil {
         ThrowExceptionUtil.isThrowException(!IS_INIT,
                 CoreMsg.OTHER_EXCEPTION_UTILS_INIT);
 
+        // 处理 切换租户
+        UserModel currUser = getUser(userId);
+        if (null != currUser &&
+                StringUtils.isNotBlank(currUser.getSwitchTenantUserId())){
+            userId = currUser.getSwitchTenantUserId();
+        }
+
         // 缓存Key
         String cacheKey = PREFIX_ID_MENUS + userId;
 
@@ -538,6 +630,13 @@ public class UserUtil {
         ThrowExceptionUtil.isThrowException(!IS_INIT,
                 CoreMsg.OTHER_EXCEPTION_UTILS_INIT);
 
+        // 处理 切换租户
+        UserModel currUser = getUser(userId);
+        if (null != currUser &&
+                StringUtils.isNotBlank(currUser.getSwitchTenantUserId())){
+            userId = currUser.getSwitchTenantUserId();
+        }
+
         // 缓存Key
         String cacheKey = PREFIX_ID_DEF_ROLE + userId;
 
@@ -602,6 +701,13 @@ public class UserUtil {
         // 判断 工具类是否初始化完成
         ThrowExceptionUtil.isThrowException(!IS_INIT,
                 CoreMsg.OTHER_EXCEPTION_UTILS_INIT);
+
+        // 处理 切换租户
+        UserModel currUser = getUser(userId);
+        if (null != currUser &&
+                StringUtils.isNotBlank(currUser.getSwitchTenantUserId())){
+            userId = currUser.getSwitchTenantUserId();
+        }
 
         // 缓存Key
         String cacheKey = PREFIX_ID_DEF_ORG + userId;
@@ -718,8 +824,10 @@ public class UserUtil {
             return true;
         }
 
-        UserModel userModelById = CacheUtil.getTimed(UserModel.class, PREFIX_ID + user.getId());
-        UserModel userModelByUsername = CacheUtil.getTimed(UserModel.class, PREFIX_USERNAME + user.getUsername());
+        UserModel userModelById = CacheUtil.getTimed(
+                UserModel.class, PREFIX_ID + user.getId());
+        UserModel userModelByUsername = CacheUtil.getTimed(
+                UserModel.class, PREFIX_USERNAME + user.getUsername());
 
         boolean hasNilFlagById = CacheUtil.hasNilFlag(PREFIX_ID + user.getId());
         boolean hasNilFlagByName = CacheUtil.hasNilFlag(PREFIX_USERNAME + user.getUsername());

@@ -62,9 +62,7 @@ public class QueryTenantHandler implements QueryBuilderChain{
             UserModel currUser = UserUtil.getUser();
 
             // 切换运营商后 组织ID 不同
-            String tenantId = StringUtils.isNotEmpty(currUser.getSwitchTenantId())
-                    ? currUser.getSwitchTenantId()
-                    : currUser.getTenantId();
+            String tenantId = currUser.getTenantId();
 
             wrapper.eq(FieldUtil.humpToUnderline(MyBatisConstants.FIELD_TENANT), tenantId);
         }
@@ -84,9 +82,7 @@ public class QueryTenantHandler implements QueryBuilderChain{
             UserModel currUser = UserUtil.getUser();
 
             // 切换运营商后 组织ID 不同
-            String tenantId = StringUtils.isNotEmpty(currUser.getSwitchTenantId())
-                    ? currUser.getSwitchTenantId()
-                    : currUser.getTenantId();
+            String tenantId = currUser.getTenantId();
 
             String fieldName = webQueryConf.get(MyBatisConstants.FIELD_TENANT);
             if(StringUtils.isEmpty(fieldName)){
@@ -94,6 +90,7 @@ public class QueryTenantHandler implements QueryBuilderChain{
             }
             wrapper.eq(fieldName, tenantId);
         }
+
         return wrapper;
     }
 

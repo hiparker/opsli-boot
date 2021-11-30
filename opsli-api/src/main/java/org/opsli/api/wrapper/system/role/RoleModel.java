@@ -52,14 +52,6 @@ public class RoleModel extends ApiWrapper {
     @ValidatorLenMax(50)
     private String roleName;
 
-    /** 是否内置数据 0否  1是*/
-    @ApiModelProperty(value = "是否内置数据 0否  1是")
-    @ExcelProperty(value = "是否内置数据", order = 3)
-    @ExcelInfo(dictType = "no_yes")
-    @Validator({ValidatorType.IS_NOT_NULL})
-    @ValidatorLenMax(1)
-    private String izLock;
-
     /** 标签 */
     @ApiModelProperty(value = "标签")
     @ExcelProperty(value = "标签", order = 4)

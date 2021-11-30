@@ -37,6 +37,10 @@ import org.opsli.plugins.excel.annotation.ExcelInfo;
 @EqualsAndHashCode(callSuper = false)
 public class UserWebModel extends ApiWrapper {
 
+    /** 角色名称 */
+    @ApiModelProperty(value = "角色名称")
+    @ExcelIgnore
+    private String roleNames;
 
     /** 登录账户 */
     @ApiModelProperty(value = "登录账户")
@@ -136,5 +140,9 @@ public class UserWebModel extends ApiWrapper {
     @ExcelIgnore
     @ValidatorLenMax(20)
     private String tenantId;
+
+    /** 允许切换租户（0 不允许 1 允许） */
+    @ApiModelProperty(value = "是否允许切换运营商")
+    private String enableSwitchTenant;
 
 }

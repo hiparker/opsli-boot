@@ -15,7 +15,9 @@
  */
 package org.opsli.api.wrapper.system.user;
 
+import com.alibaba.excel.annotation.ExcelIgnore;
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -102,5 +104,17 @@ public class UserInfo extends ApiWrapper {
     /** 多租户字段 */
     @ApiModelProperty(value = "多租户ID")
     private String tenantId;
+
+    /** 允许切换租户（0 不允许 1 允许） */
+    @ApiModelProperty(value = "是否允许切换运营商")
+    private String enableSwitchTenant;
+
+    /** 切换后的租户id*/
+    @ApiModelProperty(value = "切换后的租户id")
+    private String switchTenantId;
+
+    /** 切换后的租户管理员*/
+    @ApiModelProperty(value = "切换后的租户管理员")
+    private String switchTenantUserId;
 
 }

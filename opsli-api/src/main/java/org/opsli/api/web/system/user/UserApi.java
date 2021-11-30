@@ -18,10 +18,7 @@ package org.opsli.api.web.system.user;
 import org.opsli.api.base.result.ResultVo;
 import org.opsli.api.wrapper.system.menu.MenuModel;
 import org.opsli.api.wrapper.system.role.RoleModel;
-import org.opsli.api.wrapper.system.user.UserInfo;
-import org.opsli.api.wrapper.system.user.UserModel;
-import org.opsli.api.wrapper.system.user.UserOrgRefWebModel;
-import org.opsli.api.wrapper.system.user.UserPassword;
+import org.opsli.api.wrapper.system.user.*;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -108,7 +105,7 @@ public interface UserApi {
      * @return ResultVo
      */
     @PostMapping("/updatePasswordById")
-    ResultVo<?> updatePasswordById(@RequestBody UserPassword userPassword);
+    ResultVo<?> updatePasswordById(@RequestBody ToUserPassword userPassword);
 
     /**
      * 重置密码 ID
@@ -243,6 +240,21 @@ public interface UserApi {
     @GetMapping("/importExcel/template")
     void importTemplate(HttpServletResponse response);
 
+
+    /**
+     * 切换租户
+     * @param tenantId 租户ID
+     * @return ResultVo
+     */
+    @PostMapping("/switchTenant")
+    ResultVo<?> switchTenant(String tenantId);
+
+    /**
+     * 切换回自己账户
+     * @return ResultVo
+     */
+    @PostMapping("/switchOneself")
+    ResultVo<?> switchOneself();
 
     /**
      * 根据 username 获得用户

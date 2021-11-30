@@ -30,7 +30,6 @@ import org.opsli.api.base.result.ResultVo;
 import org.opsli.api.web.system.user.UserApi;
 import org.opsli.api.wrapper.system.menu.MenuModel;
 import org.opsli.api.wrapper.system.options.OptionsModel;
-import org.opsli.api.wrapper.system.role.RoleModel;
 import org.opsli.api.wrapper.system.tenant.TenantModel;
 import org.opsli.api.wrapper.system.user.*;
 import org.opsli.common.annotation.ApiRestController;
@@ -45,15 +44,14 @@ import org.opsli.common.utils.WrapperUtil;
 import org.opsli.core.base.controller.BaseRestController;
 import org.opsli.core.msg.TokenMsg;
 import org.opsli.core.persistence.Page;
-import org.opsli.core.persistence.querybuilder.GenQueryBuilder;
 import org.opsli.core.persistence.querybuilder.QueryBuilder;
 import org.opsli.core.persistence.querybuilder.WebQueryBuilder;
+import org.opsli.core.persistence.querybuilder.conf.WebQueryConf;
 import org.opsli.core.utils.OptionsUtil;
 import org.opsli.core.utils.OrgUtil;
 import org.opsli.core.utils.TenantUtil;
 import org.opsli.core.utils.UserUtil;
 import org.opsli.modulars.system.SystemMsg;
-import org.opsli.modulars.system.tenant.entity.SysTenant;
 import org.opsli.modulars.system.user.entity.SysUser;
 import org.opsli.modulars.system.user.entity.SysUserWeb;
 import org.opsli.modulars.system.user.service.IUserRoleRefService;
@@ -62,7 +60,6 @@ import org.opsli.plugins.oss.OssStorageFactory;
 import org.opsli.plugins.oss.service.BaseOssStorageService;
 import org.opsli.plugins.oss.service.OssStorageService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
@@ -96,8 +93,8 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
     @ApiOperation(value = "当前登陆用户信息", notes = "当前登陆用户信息")
     @Override
     public ResultVo<UserInfo> getInfo(HttpServletRequest request) {
-        UserModel user = UserUtil.getUser();
-        return this.getInfoById(user.getId());
+        UserModel currUser = UserUtil.getUserBySource();
+        return this.getInfoById(currUser.getId());
     }
 
     /**
@@ -107,20 +104,31 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
     @ApiOperation(value = "当前登陆用户信息 By Id", notes = "当前登陆用户信息 By Id")
     @Override
     public ResultVo<UserInfo> getInfoById(String userId) {
-        UserModel user = UserUtil.getUser(userId);
-        if(user == null){
+        UserModel currUser = UserUtil.getUserBySource(userId);
+        if(currUser == null){
             throw new TokenException(TokenMsg.EXCEPTION_TOKEN_LOSE_EFFICACY);
         }
 
-        List<String> userRolesByUserId = UserUtil.getUserRolesByUserId(user.getId());
-        List<String> userAllPermsByUserId = UserUtil.getUserAllPermsByUserId(user.getId());
+        // 判断是否是 切换租户状态
+        String userIdTemp = currUser.getId();
+        if(StringUtils.isNotBlank(currUser.getSwitchTenantUserId())){
+            UserModel switchUser = UserUtil.getUser(currUser.getSwitchTenantUserId());
+            if(switchUser == null){
+                // 不允许切换租户
+                throw new ServiceException(SystemMsg.EXCEPTION_USER_SWITCH_NOT_ALLOWED);
+            }
+            userIdTemp = switchUser.getId();
+        }
 
-        UserInfo userInfo = WrapperUtil.transformInstance(user, UserInfo.class);
+        List<String> userRolesByUserId = UserUtil.getUserRolesByUserId(userIdTemp);
+        List<String> userAllPermsByUserId = UserUtil.getUserAllPermsByUserId(userIdTemp);
+
+        UserInfo userInfo = WrapperUtil.transformInstance(currUser, UserInfo.class);
         userInfo.setRoles(userRolesByUserId);
         userInfo.setPerms(userAllPermsByUserId);
 
         // 判断是否是超级管理员
-        if(StringUtils.equals(UserUtil.SUPER_ADMIN, user.getUsername())){
+        if(StringUtils.equals(UserUtil.SUPER_ADMIN, currUser.getUsername())){
             userInfo.setIzSuperAdmin(true);
         }
 
@@ -175,9 +183,9 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
         // 演示模式 不允许操作
         super.demoError();
 
-        UserModel user = UserUtil.getUser();
+        UserModel user = UserUtil.getUserBySource();
         userPassword.setUserId(user.getId());
-        IService.updatePassword(userPassword);
+        IService.updatePasswordByCheckOld(userPassword);
         return ResultVo.success();
     }
 
@@ -204,7 +212,7 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
             BaseOssStorageService.FileAttr fileAttr = ossStorageService.upload(
                     files.get(0).getInputStream(), "jpg");
 
-            UserModel user = UserUtil.getUser();
+            UserModel user = UserUtil.getUserBySource();
             // 更新头像至数据库
             UserModel userModel = new UserModel();
             userModel.setId(user.getId());
@@ -231,11 +239,11 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
     @RequiresPermissions("system_user_updatePassword")
     @EnableLog
     @Override
-    public ResultVo<?> updatePasswordById(UserPassword userPassword) {
+    public ResultVo<?> updatePasswordById(ToUserPassword userPassword) {
         // 演示模式 不允许操作
         super.demoError();
 
-        IService.updatePassword(userPassword);
+        IService.updatePasswordByNotCheckOld(userPassword);
         return ResultVo.success();
     }
 
@@ -325,7 +333,7 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
                                  String orgIdGroup,
                                  HttpServletRequest request) {
         QueryBuilder<SysUserWeb> queryBuilder = new WebQueryBuilder<>(
-                SysUserWeb.class, request.getParameterMap());
+                SysUserWeb.class, request.getParameterMap(), "a.update_time");
         Page<SysUserWeb, UserWebModel> page = new Page<>(pageNo, pageSize);
         QueryWrapper<SysUserWeb> queryWrapper = queryBuilder.build();
 
@@ -347,7 +355,7 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
     }
 
     /**
-     * 用户信息 查询分页
+     * 租户管理员信息 查询分页
      * @param pageNo 当前页
      * @param pageSize 每页条数
      * @param request request
@@ -358,16 +366,18 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
     @Override
     public ResultVo<?> findPageByTenant(Integer pageNo, Integer pageSize,
                                 HttpServletRequest request) {
+        // 转换字段
+        WebQueryConf conf = new WebQueryConf();
+        conf.pub(SysUserWeb::getTenantId, "a.tenant_id");
 
         QueryBuilder<SysUserWeb> queryBuilder = new WebQueryBuilder<>(
-                SysUserWeb.class, request.getParameterMap());
-        Page<SysUserWeb, UserWebModel> page = new Page<>(pageNo, pageSize);
-        QueryWrapper<SysUserWeb> queryWrapper = queryBuilder.build();
-        // 只查看 为租户管理员的用户
-        queryWrapper.eq("iz_tenant_admin", DictType.NO_YES_YES.getValue());
+                SysUserWeb.class, request.getParameterMap(),"a.update_time", conf);
 
-        page.setQueryWrapper(queryWrapper);
-        page = IService.findPageByCus(page);
+        Page<SysUserWeb, UserWebModel> page = new Page<>(pageNo, pageSize);
+
+        page.setQueryWrapper(queryBuilder.build());
+
+        page = IService.findPageByTenant(page);
         // 密码防止分页泄露处理
         for (UserWebModel userModel : page.getList()) {
             userModel.setSecretKey(null);
@@ -418,7 +428,7 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
     @EnableLog
     @Override
     public ResultVo<?> updateSelf(UserModel model) {
-        UserModel currUser = UserUtil.getUser();
+        UserModel currUser = UserUtil.getUserBySource();
         if(!StringUtils.equals(currUser.getId(), model.getId())){
             // 非法参数 防止其他用户 通过该接口 修改非自身用户数据
             throw new ServiceException(SystemMsg.EXCEPTION_USER_ILLEGAL_PARAMETER);
@@ -534,9 +544,9 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
      * @return ResultVo
      */
     @ApiOperation(value = "切换租户", notes = "切换租户")
-    @GetMapping("/switchTenant")
+    @Override
     public ResultVo<?> switchTenant(String tenantId) {
-        UserModel currUser = UserUtil.getUser();
+        UserModel currUser = UserUtil.getUserBySource();
         if (!DictType.NO_YES_YES.getValue().equals(currUser.getEnableSwitchTenant())){
             // 不允许切换租户
             throw new ServiceException(SystemMsg.EXCEPTION_USER_SWITCH_NOT_ALLOWED);
@@ -597,9 +607,13 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
      * @return ResultVo
      */
     @ApiOperation(value = "切换回自己账户", notes = "切换回自己账户")
-    @GetMapping("/switchOneself")
+    @Override
     public ResultVo<?> switchOneself() {
-        UserModel currUser = UserUtil.getUser();
+        UserModel currUser = UserUtil.getUserBySource();
+        if (!DictType.NO_YES_YES.getValue().equals(currUser.getEnableSwitchTenant())){
+            // 不允许切换租户
+            throw new ServiceException(SystemMsg.EXCEPTION_USER_SWITCH_NOT_ALLOWED);
+        }
 
         currUser.setSwitchTenantId(null);
         currUser.setSwitchTenantUserId(null);

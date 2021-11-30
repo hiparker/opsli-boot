@@ -32,6 +32,8 @@ import org.opsli.core.base.entity.BaseEntity;
 @EqualsAndHashCode(callSuper = false)
 public class SysUserWeb extends BaseEntity {
 
+    /** 角色名称 */
+    private String roleNames;
 
     /** 登录账户 */
     private String username;
@@ -75,6 +77,9 @@ public class SysUserWeb extends BaseEntity {
     /** 签名 */
     @TableField(updateStrategy = FieldStrategy.IGNORED)
     private String sign;
+
+    /** 允许切换租户（0 不允许 1 允许） */
+    private String enableSwitchTenant;
 
     // ========================================
 

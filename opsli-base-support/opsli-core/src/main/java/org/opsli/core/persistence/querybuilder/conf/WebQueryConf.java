@@ -42,8 +42,17 @@ public class WebQueryConf {
      * @param fieldFn 字段
      * @param value 值
      */
-    public void pub(FieldUtil.SFunction<T, ?> fieldFn, String value){
+    public <T> void pub(FieldUtil.SFunction<T, ?> fieldFn, String value){
         String fileName = FieldUtil.getFileName(fieldFn);
+        queryMap.putIfAbsent(fileName, value);
+    }
+
+    /**
+     * 存放
+     * @param fileName 字段
+     * @param value 值
+     */
+    public void pub(String fileName, String value){
         queryMap.putIfAbsent(fileName, value);
     }
 

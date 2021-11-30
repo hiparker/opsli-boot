@@ -15,6 +15,7 @@
  */
 package org.opsli.modulars.system.user.service;
 
+import org.opsli.api.wrapper.system.user.ToUserPassword;
 import org.opsli.api.wrapper.system.user.UserModel;
 import org.opsli.api.wrapper.system.user.UserPassword;
 import org.opsli.api.wrapper.system.user.UserWebModel;
@@ -41,11 +42,18 @@ public interface IUserService extends CrudServiceInterface<SysUser, UserModel> {
 
 
     /**
-     * 修改密码
+     * 修改密码 验证旧密码
      * @param userPassword 账户密码
      * @return boolean
      */
-    boolean updatePassword(UserPassword userPassword);
+    boolean updatePasswordByCheckOld(UserPassword userPassword);
+
+    /**
+     * 修改密码 不验证旧密码
+     * @param userPassword 账户密码
+     * @return boolean
+     */
+    boolean updatePasswordByNotCheckOld(ToUserPassword userPassword);
 
     /**
      * 重置密码
@@ -85,4 +93,11 @@ public interface IUserService extends CrudServiceInterface<SysUser, UserModel> {
      * @return  Page<T>
      */
     Page<SysUserWeb, UserWebModel> findPageByCus(Page<SysUserWeb, UserWebModel> page);
+
+    /**
+     * 查询分页数据 租户
+     * @param page 分页
+     * @return  Page<T>
+     */
+    Page<SysUserWeb, UserWebModel> findPageByTenant(Page<SysUserWeb, UserWebModel> page);
 }

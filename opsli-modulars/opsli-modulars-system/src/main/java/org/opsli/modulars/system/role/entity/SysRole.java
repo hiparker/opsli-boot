@@ -39,9 +39,6 @@ public class SysRole extends BaseEntity {
     /** 角色名称 */
     private String roleName;
 
-    /** 是否内置数据 0否  1是 */
-    private String izLock;
-
     /** 标签 */
     private String label;
 

@@ -198,8 +198,7 @@ public class UserRoleRefServiceImpl extends ServiceImpl<UserRoleRefMapper, SysUs
     @Override
     public List<String> getUserIdListByRoleIds(String[] roleIds) {
         QueryWrapper<SysUserRoleRef> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq(
-                FieldUtil.humpToUnderline(MyBatisConstants.FIELD_DELETE_LOGIC), DictType.NO_YES_NO.getValue());
+        queryWrapper.eq("b.deleted", DictType.NO_YES_NO.getValue());
         queryWrapper.in("role_id", Convert.toList(roleIds));
 
         List<String> users = mapper.getUserIdList(queryWrapper);
@@ -214,8 +213,7 @@ public class UserRoleRefServiceImpl extends ServiceImpl<UserRoleRefMapper, SysUs
     @Override
     public List<String> getUserIdListByTenantIdAndAllData(String tenantId) {
         QueryWrapper<SysUserRoleRef> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq(
-                FieldUtil.humpToUnderline(MyBatisConstants.FIELD_DELETE_LOGIC), DictType.NO_YES_NO.getValue());
+        queryWrapper.eq("b.deleted", DictType.NO_YES_NO.getValue());
         queryWrapper.eq("c.tenantId", tenantId);
         queryWrapper.eq("c.data_scope", "3");
 

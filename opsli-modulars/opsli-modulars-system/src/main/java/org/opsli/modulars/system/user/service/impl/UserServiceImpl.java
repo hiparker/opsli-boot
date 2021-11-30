@@ -24,10 +24,7 @@ import com.github.pagehelper.PageInfo;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
 import org.opsli.api.wrapper.system.options.OptionsModel;
-import org.opsli.api.wrapper.system.user.UserModel;
-import org.opsli.api.wrapper.system.user.UserPassword;
-import org.opsli.api.wrapper.system.user.UserRoleRefModel;
-import org.opsli.api.wrapper.system.user.UserWebModel;
+import org.opsli.api.wrapper.system.user.*;
 import org.opsli.common.constants.MyBatisConstants;
 import org.opsli.common.enums.DictType;
 import org.opsli.common.exception.ServiceException;
@@ -39,6 +36,7 @@ import org.opsli.core.msg.CoreMsg;
 import org.opsli.core.persistence.Page;
 import org.opsli.core.persistence.querybuilder.GenQueryBuilder;
 import org.opsli.core.persistence.querybuilder.QueryBuilder;
+import org.opsli.core.persistence.querybuilder.conf.WebQueryConf;
 import org.opsli.core.utils.OptionsUtil;
 import org.opsli.core.utils.UserUtil;
 import org.opsli.modulars.system.SystemMsg;
@@ -90,7 +88,7 @@ public class UserServiceImpl extends CrudServiceImpl<UserMapper, SysUser, UserMo
             if(!UserUtil.isHasUpdateTenantPerms(UserUtil.getUser())){
                 model.setTenantId(null);
                 model.setIzTenantAdmin(null);
-                model.setEnableSwitchTenant(null);
+                model.setEnableSwitchTenant(DictType.NO_YES_NO.getValue());
             }
         }
 
@@ -469,7 +467,7 @@ public class UserServiceImpl extends CrudServiceImpl<UserMapper, SysUser, UserMo
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public boolean updatePassword(UserPassword userPassword) {
+    public boolean updatePasswordByCheckOld(UserPassword userPassword) {
         UserModel userModel = super.get(userPassword.getUserId());
         // 如果为空则 不修改密码
         if(userModel == null){
@@ -506,6 +504,42 @@ public class UserServiceImpl extends CrudServiceImpl<UserMapper, SysUser, UserMo
 
         // 修改密码
         boolean ret = mapper.updatePassword(userPassword);
+
+        if(ret){
+            // 刷新用户缓存
+            this.clearCache(Collections.singletonList(userModel));
+        }
+
+        return ret;
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public boolean updatePasswordByNotCheckOld(ToUserPassword toUserPassword) {
+        UserModel userModel = super.get(toUserPassword.getUserId());
+        // 如果为空则 不修改密码
+        if(userModel == null){
+            return false;
+        }
+
+        // 设置随机新盐值
+        toUserPassword.setSalt(
+                RandomUtil.randomString(20)
+        );
+        // 获得密码强度
+        toUserPassword.setPasswordLevel(
+                CheckStrength.getPasswordLevel(toUserPassword.getNewPassword()).getCode()
+        );
+        // 处理密码
+        toUserPassword.setNewPassword(
+                UserUtil.handlePassword(toUserPassword.getNewPassword(),
+                        toUserPassword.getSalt())
+        );
+
+        // 修改密码
+        boolean ret = mapper.updatePassword(
+                WrapperUtil.transformInstance(toUserPassword, UserPassword.class)
+        );
 
         if(ret){
             // 刷新用户缓存
@@ -590,16 +624,9 @@ public class UserServiceImpl extends CrudServiceImpl<UserMapper, SysUser, UserMo
 
 
     private List<SysUserWeb> findListByCus(QueryWrapper<SysUserWeb> queryWrapper) {
-        // 如果没有租户修改能力 则默认增加租户限制
-        if(!UserUtil.isHasUpdateTenantPerms(UserUtil.getUser())){
-            // 数据处理责任链
-            queryWrapper = super.addHandler(SysUserWeb.class, queryWrapper);
-        }
-
-
         // 逻辑删除 查询未删除数据
-        queryWrapper.eq(
-                FieldUtil.humpToUnderline(MyBatisConstants.FIELD_DELETE_LOGIC), DictType.NO_YES_NO.getValue());
+        queryWrapper.eq("a.deleted", DictType.NO_YES_NO.getValue());
+
         // 按照ID 分组
         queryWrapper.groupBy("a.id","b.user_id");
         return mapper.findList(queryWrapper);
@@ -620,9 +647,15 @@ public class UserServiceImpl extends CrudServiceImpl<UserMapper, SysUser, UserMo
         // 不能查看自身
         queryWrapper.notIn("username", currUser.getUsername());
 
+        // 添加过滤权限
+        WebQueryConf conf = new WebQueryConf();
+        conf.pub(SysUserWeb::getTenantId, "a.tenant_id");
+        // 数据处理责任链
+        queryWrapper = super.addHandler(SysUserWeb.class, conf, queryWrapper);
+
         page.pageHelperBegin();
         try{
-            List<SysUserWeb> list = this.findListByCus(page.getQueryWrapper());
+            List<SysUserWeb> list = this.findListByCus(queryWrapper);
             PageInfo<SysUserWeb> pageInfo = new PageInfo<>(list);
             List<UserWebModel> es = WrapperUtil.transformInstance(pageInfo.getList(), UserWebModel.class);
             page.instance(pageInfo, es);
@@ -632,6 +665,35 @@ public class UserServiceImpl extends CrudServiceImpl<UserMapper, SysUser, UserMo
         return page;
     }
 
+
+    @Override
+    public Page<SysUserWeb, UserWebModel> findPageByTenant(Page<SysUserWeb, UserWebModel> page) {
+        UserModel currUser = UserUtil.getUser();
+
+        QueryWrapper<SysUserWeb> queryWrapper = page.getQueryWrapper();
+
+        // 如果不是超级管理员则 无法看到超级管理员账户
+        if(!UserUtil.SUPER_ADMIN.equals(currUser.getUsername())){
+            queryWrapper.notIn("username", UserUtil.SUPER_ADMIN);
+            page.setQueryWrapper(queryWrapper);
+        }
+
+        // 不能查看自身
+        queryWrapper.notIn("username", currUser.getUsername());
+        // 只查看 为租户管理员的用户
+        queryWrapper.eq("iz_tenant_admin", DictType.NO_YES_YES.getValue());
+
+        page.pageHelperBegin();
+        try{
+            List<SysUserWeb> list = this.findListByCus(queryWrapper);
+            PageInfo<SysUserWeb> pageInfo = new PageInfo<>(list);
+            List<UserWebModel> es = WrapperUtil.transformInstance(pageInfo.getList(), UserWebModel.class);
+            page.instance(pageInfo, es);
+        } finally {
+            page.pageHelperEnd();
+        }
+        return page;
+    }
 
 
     /**

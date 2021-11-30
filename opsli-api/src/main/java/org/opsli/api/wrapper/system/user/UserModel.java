@@ -43,7 +43,7 @@ public class UserModel extends ApiWrapper {
     @ExcelIgnore
     @Validator({ValidatorType.IS_NOT_NULL, ValidatorType.IS_GENERAL})
     @ValidatorLenMax(32)
-    @ValidatorLenMin(5)
+    @ValidatorLenMin(4)
     private String username;
 
     /** 登录密码 */
@@ -162,6 +162,5 @@ public class UserModel extends ApiWrapper {
     @JsonIgnore
     @ExcelIgnore
     private String switchTenantUserId;
-
 
 }

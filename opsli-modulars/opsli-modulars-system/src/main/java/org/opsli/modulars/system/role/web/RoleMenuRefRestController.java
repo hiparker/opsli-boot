@@ -23,7 +23,6 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.opsli.api.base.result.ResultVo;
 import org.opsli.api.web.system.role.RoleMenuRefApi;
 import org.opsli.api.wrapper.system.role.RoleMenuRefModel;
-import org.opsli.api.wrapper.system.role.RoleModel;
 import org.opsli.api.wrapper.system.user.UserModel;
 import org.opsli.common.annotation.ApiRestController;
 import org.opsli.common.annotation.EnableLog;
@@ -34,7 +33,6 @@ import org.opsli.core.utils.UserUtil;
 import org.opsli.modulars.system.SystemMsg;
 import org.opsli.modulars.system.menu.entity.SysMenu;
 import org.opsli.modulars.system.role.service.IRoleMenuRefService;
-import org.opsli.modulars.system.role.service.IRoleService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
@@ -53,15 +51,10 @@ import java.util.stream.Collectors;
 @ApiRestController("/system/role/perms")
 public class RoleMenuRefRestController implements RoleMenuRefApi {
 
-    /** 内置数据 */
-    private static final String LOCK_DATA = "1";
-
     /** 配置类 */
     @Autowired
     protected GlobalProperties globalProperties;
 
-    @Autowired
-    private IRoleService iRoleService;
     @Autowired
     private IRoleMenuRefService iRoleMenuRefService;
 
@@ -113,16 +106,6 @@ public class RoleMenuRefRestController implements RoleMenuRefApi {
         if(model == null){
             return ResultVo.error("设置权限失败");
         }
-
-        RoleModel roleModel = iRoleService.get(model.getRoleId());
-        // 内置数据 只有超级管理员可以修改
-        if(roleModel != null && LOCK_DATA.equals(roleModel.getIzLock()) ){
-            UserModel user = UserUtil.getUser();
-            if(!StringUtils.equals(UserUtil.SUPER_ADMIN, user.getUsername())){
-                throw new ServiceException(SystemMsg.EXCEPTION_LOCK_DATA);
-            }
-        }
-
 
         boolean ret = iRoleMenuRefService.setPerms(model.getRoleId(),
                 model.getPermsIds());

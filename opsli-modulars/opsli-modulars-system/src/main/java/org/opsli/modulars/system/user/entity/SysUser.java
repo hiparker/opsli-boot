@@ -82,6 +82,9 @@ public class SysUser extends BaseEntity {
     /** 是否租户管理员 */
     private String izTenantAdmin;
 
+    /** 允许切换租户（0 不允许 1 允许） */
+    private String enableSwitchTenant;
+
     // ========================================
 
     /** 逻辑删除字段 */

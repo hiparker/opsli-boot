@@ -19,6 +19,7 @@
         a.login_ip as loginIp,
         a.remark as remark,
         a.tenant_id as tenantId,
+        a.enable_switch_tenant as enableSwitchTenant,
 
         a.create_by as createBy,
         a.create_time as createTime,
@@ -29,16 +30,19 @@
 	</sql>
 
     <sql id="joinsColumns">
+        GROUP_CONCAT(r.role_name) as roleNames,
 	</sql>
 
     <sql id="joins">
         left join sys_user_org_ref b on b.user_id = a.id
+        left join sys_user_role_ref c on c.user_id = a.id
+        left join sys_role r on r.id = c.role_id
 	</sql>
 
     <select id="findList" parameterType="SysUser" resultType="SysUserWeb">
         select
-            <include refid="columns"></include>
             <include refid="joinsColumns"></include>
+            <include refid="columns"></include>
         from
         sys_user a
         <include refid="joins"></include>
