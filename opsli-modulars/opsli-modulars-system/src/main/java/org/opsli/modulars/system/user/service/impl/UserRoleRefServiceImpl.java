@@ -28,10 +28,8 @@ import org.opsli.api.wrapper.system.menu.MenuModel;
 import org.opsli.api.wrapper.system.role.RoleModel;
 import org.opsli.api.wrapper.system.user.UserModel;
 import org.opsli.api.wrapper.system.user.UserRoleRefModel;
-import org.opsli.common.constants.MyBatisConstants;
 import org.opsli.common.enums.DictType;
 import org.opsli.common.exception.ServiceException;
-import org.opsli.common.utils.FieldUtil;
 import org.opsli.common.utils.ListDistinctUtil;
 import org.opsli.common.utils.WrapperUtil;
 import org.opsli.core.msg.CoreMsg;
@@ -105,7 +103,7 @@ public class UserRoleRefServiceImpl extends ServiceImpl<UserRoleRefMapper, SysUs
             QueryBuilder<SysMenu> queryBuilder = new GenQueryBuilder<>();
             QueryWrapper<SysMenu> queryWrapper = queryBuilder.build();
             queryWrapper.notIn("parent_id", -1);
-            queryWrapper.eq("type", '2');
+            queryWrapper.eq("type", DictType.MENU_BUTTON.getValue());
             queryWrapper.eq("hidden", DictType.NO_YES_NO.getValue());
             queryWrapper.like("label",DictType.MENU_LABEL_SYSTEM.getValue());
             List<SysMenu> menuList = iMenuService.findList(queryWrapper);
@@ -140,7 +138,7 @@ public class UserRoleRefServiceImpl extends ServiceImpl<UserRoleRefMapper, SysUs
             QueryBuilder<SysMenu> queryBuilder = new GenQueryBuilder<>();
             QueryWrapper<SysMenu> queryWrapper = queryBuilder.build();
             queryWrapper.notIn("parent_id", -1);
-            queryWrapper.in("type", '1', '3');
+            queryWrapper.in("type", DictType.MENU_MENU.getValue(), DictType.MENU_EXTERNAL.getValue());
             queryWrapper.eq("hidden", DictType.NO_YES_NO.getValue());
             queryWrapper.like("label",DictType.MENU_LABEL_SYSTEM.getValue());
             menuList = iMenuService.findList(queryWrapper);
@@ -231,8 +229,8 @@ public class UserRoleRefServiceImpl extends ServiceImpl<UserRoleRefMapper, SysUs
     public List<String> getUserIdListByTenantIdAndAllData(String tenantId) {
         QueryWrapper<SysUserRoleRef> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("b.deleted", DictType.NO_YES_NO.getValue());
-        queryWrapper.eq("c.tenant_id", tenantId);
-        queryWrapper.eq("c.data_scope", "3");
+        queryWrapper.eq("b.tenant_id", tenantId);
+        queryWrapper.eq("c.data_scope", DictType.DATA_SCOPE_ALL.getValue());
 
         List<String> users = mapper.getUserIdList(queryWrapper);
         if(CollUtil.isEmpty(users)){

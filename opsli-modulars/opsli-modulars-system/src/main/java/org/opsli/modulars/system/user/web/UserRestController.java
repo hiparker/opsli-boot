@@ -30,6 +30,7 @@ import org.opsli.api.base.result.ResultVo;
 import org.opsli.api.web.system.user.UserApi;
 import org.opsli.api.wrapper.system.menu.MenuModel;
 import org.opsli.api.wrapper.system.options.OptionsModel;
+import org.opsli.api.wrapper.system.role.RoleModel;
 import org.opsli.api.wrapper.system.tenant.TenantModel;
 import org.opsli.api.wrapper.system.user.*;
 import org.opsli.common.annotation.ApiRestController;
@@ -120,12 +121,19 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
             userIdTemp = switchUser.getId();
         }
 
+
         List<String> userRolesByUserId = UserUtil.getUserRolesByUserId(userIdTemp);
         List<String> userAllPermsByUserId = UserUtil.getUserAllPermsByUserId(userIdTemp);
 
         UserInfo userInfo = WrapperUtil.transformInstance(currUser, UserInfo.class);
         userInfo.setRoles(userRolesByUserId);
         userInfo.setPerms(userAllPermsByUserId);
+
+        // 数据范围
+        RoleModel defRole = UserUtil.getUserDefRoleByUserId(userIdTemp);
+        if(null != defRole){
+            userInfo.setDataScope(defRole.getDataScope());
+        }
 
         // 判断是否是超级管理员
         if(StringUtils.equals(UserUtil.SUPER_ADMIN, currUser.getUsername())){
@@ -398,8 +406,8 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
     @Override
     public ResultVo<?> insert(UserModel model) {
         // 调用新增方法
-        IService.insert(model);
-        return ResultVo.success("新增用户信息成功");
+        UserModel userModel = IService.insert(model);
+        return ResultVo.success("新增用户信息成功", userModel);
     }
 
     /**

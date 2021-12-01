@@ -90,6 +90,7 @@ public enum SystemMsg implements BaseMsg {
     EXCEPTION_ORG_UNIQUE(20500,"组织机构编号重复，已存在"),
     EXCEPTION_ORG_USE(20501,"组织机构已被引用，不能操作"),
     EXCEPTION_ORG_USE_TENANT(20501,"组织机构已被引用，不能修改租户"),
+    EXCEPTION_ORG_NOT_PERMISSION(20502,"无组织机构新增权限"),
 
 
     /**

@@ -117,4 +117,8 @@ public class UserInfo extends ApiWrapper {
     @ApiModelProperty(value = "切换后的租户管理员")
     private String switchTenantUserId;
 
+    /** 数据范围*/
+    @ApiModelProperty(value = "数据范围")
+    private String dataScope;
+
 }

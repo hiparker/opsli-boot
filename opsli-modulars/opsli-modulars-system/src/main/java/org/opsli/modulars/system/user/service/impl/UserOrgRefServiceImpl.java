@@ -76,6 +76,31 @@ public class UserOrgRefServiceImpl extends ServiceImpl<UserOrgRefMapper, SysUser
     private ISysOrgService iSysOrgService;
 
     @Override
+    public List<String> getUserIdListByOrgIds(String orgIds){
+        List<String> conditionList = getParentIdsGroup(orgIds);
+        if(CollUtil.isEmpty(conditionList)){
+            return ListUtil.empty();
+        }
+
+        // 获得用户ID
+        QueryWrapper<SysUserOrgRef> queryWrapper = new QueryWrapper<>();
+        queryWrapper.in(
+                FieldUtil.humpToUnderline(MyBatisConstants.FIELD_ORG_GROUP), conditionList);
+        List<SysUserOrgRef> userOrgRefs = this.list(queryWrapper);
+        if(CollUtil.isEmpty(userOrgRefs)){
+            return ListUtil.empty();
+        }
+
+        List<String> userIdList = Lists.newArrayListWithCapacity(userOrgRefs.size());
+        for (SysUserOrgRef userOrgRef : userOrgRefs) {
+            userIdList.add(userOrgRef.getUserId());
+        }
+
+        // 去重
+        return ListDistinctUtil.distinct(userIdList);
+    }
+
+    @Override
     public List<UserOrgRefModel> findListByUserId(String userId) {
         if(StrUtil.isEmpty(userId)){
             return ListUtil.empty();
@@ -257,6 +282,26 @@ public class UserOrgRefServiceImpl extends ServiceImpl<UserOrgRefMapper, SysUser
                 throw new ServiceException(CoreMsg.CACHE_DEL_EXCEPTION);
             }
         }
+    }
+
+    /**
+     * 根据 父节点ID集合 获得 父节点ID组
+     * @param parentIds 父节点ID集合
+     * @return List
+     */
+    private List<String> getParentIdsGroup(String parentIds) {
+        if(StrUtil.isEmpty(parentIds)){
+            return ListUtil.empty();
+        }
+
+        List<String> parentIdList = StrUtil.split(parentIds, ',');
+        List<String> condition = Lists.newArrayListWithCapacity(parentIdList.size());
+        for (int i = 0; i < parentIdList.size(); i++) {
+            List<String> tempList = ListUtil.sub(parentIdList, 0, parentIdList.size() - i);
+            String parentIdsTemp = StrUtil.join(",", tempList);
+            condition.add(parentIdsTemp);
+        }
+        return condition;
     }
 
 }

@@ -201,7 +201,6 @@ public class MenuRestController extends BaseRestController<SysMenu, MenuModel, I
     /**
      * 获得列表菜单树 懒加载
      *
-     * @param label 标签
      * @param parentId 父节点ID
      * @return ResultVo
      */

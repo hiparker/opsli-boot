@@ -18,6 +18,7 @@ package org.opsli.api.wrapper.system.org;
 
 import com.alibaba.excel.annotation.ExcelIgnore;
 import com.alibaba.excel.annotation.ExcelProperty;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -51,9 +52,14 @@ public class SysOrgModel extends ApiWrapper {
     @ExcelInfo
     private String parentIds;
 
+    /** 组织机构ID组 xxx,xxx */
+    @ApiModelProperty(value = "组织机构ID组")
+    @JsonIgnore
+    private String orgIds;
+
     /** 组织机构编号 */
     @ApiModelProperty(value = "组织机构编号")
-    @ExcelProperty(value = "组织机构编号", order = 3)
+    @ExcelProperty(value = "组织机构编号", order = 4)
     @ExcelInfo
     @Validator({ValidatorType.IS_NOT_NULL, ValidatorType.IS_GENERAL})
     @ValidatorLenMax(120)
@@ -61,7 +67,7 @@ public class SysOrgModel extends ApiWrapper {
 
     /** 组织机构名称 */
     @ApiModelProperty(value = "组织机构名称")
-    @ExcelProperty(value = "组织机构名称", order = 4)
+    @ExcelProperty(value = "组织机构名称", order = 5)
     @ExcelInfo
     @Validator({ValidatorType.IS_NOT_NULL, ValidatorType.IS_GENERAL_WITH_CHINESE})
     @ValidatorLenMax(120)
@@ -69,14 +75,14 @@ public class SysOrgModel extends ApiWrapper {
 
     /** 排序 */
     @ApiModelProperty(value = "排序")
-    @ExcelProperty(value = "排序", order = 5)
+    @ExcelProperty(value = "排序", order = 6)
     @ExcelInfo
     @ValidatorLenMax(10)
     private Integer sortNo;
 
     /** 备注 */
     @ApiModelProperty(value = "备注")
-    @ExcelProperty(value = "备注", order = 6)
+    @ExcelProperty(value = "备注", order = 7)
     @ExcelInfo
     @ValidatorLenMax(255)
     private String remark;

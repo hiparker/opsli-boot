@@ -37,6 +37,13 @@ public enum DictType {
     MENU_BUTTON("menu_type","2", "按钮"),
     MENU_EXTERNAL("menu_type","3", "外链"),
 
+    /** 数据范围 */
+    DATA_SCOPE_SELF("role_data_scope","0", "仅本人数据"),
+    DATA_SCOPE_DEPT("role_data_scope","1", "本部门数据"),
+    DATA_SCOPE_DEPT_AND_UNDER("role_data_scope","2", "本部门及以下数据"),
+    DATA_SCOPE_ALL("role_data_scope","3", "全部数据"),
+
+
     ;
 
     private final String type;

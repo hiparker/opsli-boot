@@ -37,6 +37,13 @@ public interface IUserOrgRefService {
     boolean setOrg(UserOrgRefWebModel model);
 
     /**
+     * 根据 OrgIds 获得用户ID集合
+     * @param orgIds 组织ID 集合
+     * @return List
+     */
+    List<String> getUserIdListByOrgIds(String orgIds);
+
+    /**
      * 根据用户ID 获得组织列表
      * @param userId 用户ID
      * @return List

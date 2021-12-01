@@ -20,6 +20,8 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.google.common.collect.Lists;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.opsli.api.wrapper.system.org.SysOrgModel;
@@ -28,6 +30,7 @@ import org.opsli.common.constants.MyBatisConstants;
 import org.opsli.common.enums.DictType;
 import org.opsli.common.exception.ServiceException;
 import org.opsli.common.utils.FieldUtil;
+import org.opsli.common.utils.ListDistinctUtil;
 import org.opsli.core.base.entity.HasChildren;
 import org.opsli.core.base.service.impl.CrudServiceImpl;
 import org.opsli.core.msg.CoreMsg;
@@ -40,6 +43,7 @@ import org.opsli.modulars.system.SystemMsg;
 import org.opsli.modulars.system.org.entity.SysOrg;
 import org.opsli.modulars.system.org.mapper.SysOrgMapper;
 import org.opsli.modulars.system.org.service.ISysOrgService;
+import org.opsli.modulars.system.user.service.IUserOrgRefService;
 import org.opsli.modulars.system.user.service.IUserRoleRefService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -69,6 +73,8 @@ public class SysOrgServiceImpl extends CrudServiceImpl<SysOrgMapper, SysOrg, Sys
     private SysOrgMapper mapper;
     @Autowired
     private IUserRoleRefService iUserRoleRefService;
+    @Autowired
+    private IUserOrgRefService iUserOrgRefService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -117,13 +123,39 @@ public class SysOrgServiceImpl extends CrudServiceImpl<SysOrgMapper, SysOrg, Sys
                 this.clearCache(Collections.singletonList(superAdmin.getId()));
             }
         }
-        // 用户ID 集合
-        List<String> userIdList =
-                iUserRoleRefService.getUserIdListByTenantIdAndAllData(UserUtil.getTenantId());
-        // 清除缓存
-        this.clearCache(userIdList);
 
-        return super.insert(model);
+        // 更新 orgIds 字段
+        SysOrgModel insertModel = super.insert(model);
+        if(null != insertModel){
+            String orgIds = StrUtil.appendIfMissing(
+                    insertModel.getParentIds(), DELIMITER) +
+                    insertModel.getId();
+            UpdateWrapper<SysOrg> updateWrapper = new UpdateWrapper<>();
+            updateWrapper.eq(
+                    FieldUtil.humpToUnderline(MyBatisConstants.FIELD_ID), insertModel.getId());
+            updateWrapper.set(
+                    FieldUtil.humpToUnderline(MyBatisConstants.FIELD_ORG_GROUP), orgIds);
+            boolean updateFlag = this.update(updateWrapper);
+            if(!updateFlag){
+                // 手动触发回滚效果
+                throw new RuntimeException("更新OrgIds失败");
+            }
+
+            // 获得当前租户下 数据权限为全部数据的 用户ID 集合
+            List<String> userIdList = Lists.newArrayList();
+            List<String> userIdListByTenantId =
+                    iUserRoleRefService.getUserIdListByTenantIdAndAllData(UserUtil.getTenantId());
+            // 获得当前租户下 ordIds 分组后 所有用户ID 集合
+            List<String> userIdListByOrgIds = iUserOrgRefService.getUserIdListByOrgIds(orgIds);
+            // 组合ID
+            userIdList.addAll(userIdListByTenantId);
+            userIdList.addAll(userIdListByOrgIds);
+
+            // 清除缓存
+            this.clearCache(userIdList);
+        }
+
+        return insertModel;
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -134,6 +166,7 @@ public class SysOrgServiceImpl extends CrudServiceImpl<SysOrgMapper, SysOrg, Sys
         }
 
         model.setParentIds(null);
+        model.setOrgIds(null);
 
         // 唯一验证
         boolean verificationByCode = this.uniqueVerificationByCode(model);
@@ -156,6 +189,11 @@ public class SysOrgServiceImpl extends CrudServiceImpl<SysOrgMapper, SysOrg, Sys
                     StrUtil.appendIfMissing(
                             sysOrgModel.getParentIds(), DELIMITER) +
                             sysOrgModel.getId());
+            // 下级沿用上级OrgIds
+            model.setOrgIds(
+                    StrUtil.appendIfMissing(
+                            model.getParentIds(), DELIMITER) +
+                            model.getId());
         }
 
         SysOrgModel sysOrgModel = super.get(model);
@@ -181,9 +219,16 @@ public class SysOrgServiceImpl extends CrudServiceImpl<SysOrgMapper, SysOrg, Sys
             this.updateChildrenParentIdsByParentId(sysOrgModel.getId());
         }
 
-        // 刷新当前用户缓存
-        UserUtil.refreshUserOrgs(UserUtil.getUser().getId());
-        UserUtil.refreshUserDefOrg(UserUtil.getUser().getId());
+        // 获得当前租户下 数据权限为全部数据的 用户ID 集合
+        List<String> userIdList =
+                iUserRoleRefService.getUserIdListByTenantIdAndAllData(UserUtil.getTenantId());
+        // 获得当前租户下 ordIds 分组后 所有用户ID 集合
+        List<String> userIdListByOrgIds = iUserOrgRefService.getUserIdListByOrgIds(updateRet.getOrgIds());
+        // 组合ID
+        userIdList.addAll(userIdListByOrgIds);
+
+        // 清除缓存
+        this.clearCache(userIdList);
 
         // 修改
         return updateRet;
@@ -263,6 +308,12 @@ public class SysOrgServiceImpl extends CrudServiceImpl<SysOrgMapper, SysOrg, Sys
                             sysOrgModel.getParentIds(), DELIMITER) +
                             sysOrgModel.getId());
 
+            // 下级沿用上级OrgIds
+            sysOrg.setOrgIds(
+                    StrUtil.appendIfMissing(
+                            sysOrg.getParentIds(), DELIMITER) +
+                            sysOrg.getId());
+
             super.updateById(sysOrg);
             // 逐级删除子数据
             this.updateChildrenParentIdsByParentId(sysOrg.getId());
@@ -323,7 +374,10 @@ public class SysOrgServiceImpl extends CrudServiceImpl<SysOrgMapper, SysOrg, Sys
         if(CollUtil.isEmpty(parentIds)){
             return null;
         }
-        QueryWrapper<SysOrg> wrapper = new QueryWrapper<>();
+
+        // 添加 数据权限过滤器
+        QueryWrapper<SysOrg> wrapper = super.addHandler(SysOrg.class);
+
         wrapper.in(FieldUtil.humpToUnderline(MyBatisConstants.FIELD_PARENT_ID), parentIds)
                 .eq(MyBatisConstants.FIELD_DELETE_LOGIC,  DictType.NO_YES_NO.getValue())
                 .groupBy(FieldUtil.humpToUnderline(MyBatisConstants.FIELD_PARENT_ID));
@@ -360,8 +414,11 @@ public class SysOrgServiceImpl extends CrudServiceImpl<SysOrgMapper, SysOrg, Sys
      */
     private void clearCache(List<String> userIdList){
         if(CollUtil.isNotEmpty(userIdList)){
+            // 去重
+            List<String> distinctUserIdList = ListDistinctUtil.distinct(userIdList);
+
             int cacheCount = 0;
-            for (String userId : userIdList) {
+            for (String userId : distinctUserIdList) {
                 cacheCount += 2;
                 boolean tmp;
                 // 清空当期用户缓存 组织

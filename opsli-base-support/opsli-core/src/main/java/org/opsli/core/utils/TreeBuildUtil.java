@@ -23,6 +23,7 @@ import cn.hutool.core.lang.tree.Tree;
 import cn.hutool.core.lang.tree.TreeNodeConfig;
 import cn.hutool.core.lang.tree.TreeUtil;
 import cn.hutool.core.util.ObjectUtil;
+import com.google.common.collect.Lists;
 
 import java.util.List;
 import java.util.Map;
@@ -43,6 +44,8 @@ public enum TreeBuildUtil {
     /** 默认父节点ID */
     public static final String DEF_PARENT_ID = "0";
 
+    private static final String DEF_ID = "";
+
     /** 默认排除字段 */
     private static final List<String> DEF_EXCLUDE_FIELDS;
     static {
@@ -51,32 +54,51 @@ public enum TreeBuildUtil {
         DEF_EXCLUDE_FIELDS.add("izManual");
     }
 
+    /**
+     * 构建Tree
+     * @param dataList 数据集合
+     * @return List<Tree<Object>>
+     */
     public List<Tree<Object>> build(List<?> dataList){
         return this.build(dataList, DEF_PARENT_ID, null);
     }
 
+    /**
+     * 构建Tree
+     * @param dataList 数据集合
+     * @param parentId 父节点ID
+     * @return List<Tree<Object>>
+     */
     public List<Tree<Object>> build(List<?> dataList, String parentId){
         return this.build(dataList, parentId, null);
     }
 
+    /**
+     * 构建Tree
+     * @param dataList 数据集合
+     * @param config 配置
+     * @return List<Tree<Object>>
+     */
     public List<Tree<Object>> build(List<?> dataList, TreeNodeConfig config){
         return this.build(dataList, DEF_PARENT_ID, config);
     }
 
+    /**
+     * 构建Tree
+     * @param dataList 数据集合
+     * @param parentId 父节点ID
+     * @param config 配置
+     * @return List<Tree<Object>>
+     */
     public List<Tree<Object>> build(List<?> dataList, String parentId, TreeNodeConfig config){
         if(CollUtil.isEmpty(dataList)){
             return ListUtil.empty();
         }
 
-        boolean isMap = false;
-
         // 处理Map集合
         Object obj = dataList.get(0);
-        if(obj instanceof Map){
-            isMap = true;
-        }
 
-        if(!isMap){
+        if(!(obj instanceof Map)){
             // 处理Bean 验证
             boolean isBean = BeanUtil.isBean(obj.getClass());
             if(!isBean){
@@ -95,40 +117,112 @@ public enum TreeBuildUtil {
         excludeFields.add(config.getWeightKey());
 
         //转换器
-        final boolean finalIsMap = isMap;
         return TreeUtil.build(dataList, defParentId, treeConfig,
-                (treeNode, tree) -> {
-                    // 非空校验
-                    if(ObjectUtil.isEmpty(treeNode)){
-                        return;
-                    }
+                (treeNode, tree) -> handlerTreeNode(treeNode, tree, config, excludeFields));
+    }
 
-                    // Bean 对象转 Map
-                    Map<String, Object> beanMap;
-                    if(finalIsMap){
-                        beanMap = Convert.toMap(String.class, Object.class, treeNode);
-                    }else{
-                        beanMap = BeanUtil.beanToMap(treeNode);
-                    }
+    /**
+     * 构建Tree
+     * @param dataList 数据集合
+     * @return List<Tree<Object>>
+     */
+    public List<Tree<Object>> buildByLazy(List<?> dataList){
+        return this.buildByLazy(dataList, null);
+    }
 
-                    // 主要属性
-                    tree.setId(beanMap.get(config.getIdKey()));
-                    tree.setParentId(beanMap.get(config.getParentIdKey()));
-                    tree.setWeight(
-                            cast(
-                                    beanMap.get(config.getWeightKey())));
+    /**
+     * 构建Tree
+     * @param dataList 数据集合
+     * @param config 配置
+     * @return List<Tree<Object>>
+     */
+    public List<Tree<Object>> buildByLazy(List<?> dataList, TreeNodeConfig config){
+        if(CollUtil.isEmpty(dataList)){
+            return ListUtil.empty();
+        }
 
-                    // 扩展属性 ...
-                    for (Map.Entry<String, Object> entry : beanMap.entrySet()) {
-                        String key = entry.getKey();
-                        Object value = entry.getValue();
-                        // 排除字段
-                        if(excludeFields.contains(key)){
-                            continue;
-                        }
-                        tree.putExtra(key, value);
-                    }
-                });
+        // 处理Map集合
+        Object obj = dataList.get(0);
+        if(!(obj instanceof Map)){
+            // 处理Bean 验证
+            boolean isBean = BeanUtil.isBean(obj.getClass());
+            if(!isBean){
+                return ListUtil.empty();
+            }
+        }
+
+        // 默认值处理
+        final TreeNodeConfig treeConfig = ObjectUtil.defaultIfNull(config, TreeNodeConfig.DEFAULT_CONFIG);
+        List<String> excludeFields = ListUtil.list(false);
+        excludeFields.addAll(DEF_EXCLUDE_FIELDS);
+        excludeFields.add(config.getIdKey());
+        excludeFields.add(config.getParentIdKey());
+        excludeFields.add(config.getWeightKey());
+
+        //转换器
+        List<Tree<Object>> treeNodes = Lists.newArrayListWithCapacity(dataList.size());
+        for (Object model : dataList) {
+            Tree<Object> emptyNode = TreeUtil.createEmptyNode(DEF_ID);
+            // 处理对象数据
+            TreeBuildUtil.INSTANCE.handlerTreeNode(model, emptyNode, treeConfig, excludeFields);
+            treeNodes.add(emptyNode);
+        }
+
+        return treeNodes;
+    }
+
+
+    /**
+     * 处理 树节点
+     * @param config 配置
+     * @param excludeFields 忽略字段集合
+     * @param treeNode 树节点对象
+     * @param tree 树节点
+     */
+    private void handlerTreeNode(Object treeNode, Tree<Object> tree,
+                                 TreeNodeConfig config, List<String> excludeFields) {
+        // 非空校验
+        if(ObjectUtil.isEmpty(treeNode) || null == tree){
+            return;
+        }
+
+        // 初始化
+        if(null == config){
+            config = TreeNodeConfig.DEFAULT_CONFIG;
+        }
+        if(CollUtil.isEmpty(excludeFields)){
+            excludeFields = ListUtil.list(false);
+            excludeFields.addAll(DEF_EXCLUDE_FIELDS);
+            excludeFields.add(config.getIdKey());
+            excludeFields.add(config.getParentIdKey());
+            excludeFields.add(config.getWeightKey());
+        }
+
+        // Bean 对象转 Map
+        Map<String, Object> beanMap;
+        if(treeNode instanceof Map){
+            beanMap = Convert.toMap(String.class, Object.class, treeNode);
+        }else{
+            beanMap = BeanUtil.beanToMap(treeNode);
+        }
+
+        // 主要属性
+        tree.setId(beanMap.get(config.getIdKey()));
+        tree.setParentId(beanMap.get(config.getParentIdKey()));
+        tree.setWeight(
+                cast(
+                        beanMap.get(config.getWeightKey())));
+
+        // 扩展属性 ...
+        for (Map.Entry<String, Object> entry : beanMap.entrySet()) {
+            String key = entry.getKey();
+            Object value = entry.getValue();
+            // 排除字段
+            if(excludeFields.contains(key)){
+                continue;
+            }
+            tree.putExtra(key, value);
+        }
     }
 
 
@@ -139,7 +233,9 @@ public enum TreeBuildUtil {
      * @return T
      */
     private <T> Comparable<T> cast(T obj){
-        return (Comparable<T>) Convert.toInt(obj);
+        @SuppressWarnings("unchecked")
+        Comparable<T> comparable = (Comparable<T>) Convert.toInt(obj);
+        return comparable;
     }
 
 }

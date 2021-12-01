@@ -59,6 +59,9 @@ public class SysOrg extends BaseEntity {
     @TableLogic
     private String deleted;
 
+    /** 组织机构 */
+    private String orgIds;
+
     /** 多租户字段 */
     private String tenantId;
 
