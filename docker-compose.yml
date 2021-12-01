@@ -16,6 +16,6 @@ services:
       - --spring.profiles.active=test
     privileged: true
     volumes:
-      - /www/wwwroot/demo.opsli.bedebug.com/backend/var:/usr/local/opsli/opsli-boot/var #挂载目录
+      - /www/wwwroot/demo.opsli.bedebug.com/backend/logs:/usr/local/opsli/opsli-boot/logs #挂载目录
     ports:
       - "7000:7000"
