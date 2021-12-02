@@ -126,6 +126,9 @@ public class UserOrgRefServiceImpl extends ServiceImpl<UserOrgRefMapper, SysUser
                 queryWrapper.eq(
                         FieldUtil.humpToUnderline(MyBatisConstants.FIELD_PARENT_ID), PARENT_ID
                 );
+                queryWrapper.eq(
+                        FieldUtil.humpToUnderline(MyBatisConstants.FIELD_TENANT), userModel.getTenantId()
+                );
 
                 // 注意 之前这儿会有死循环数据权限查询问题
                 List<SysOrg> orgList = iSysOrgService.list(queryWrapper);

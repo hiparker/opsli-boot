@@ -93,7 +93,7 @@ public class SysOrgServiceImpl extends CrudServiceImpl<SysOrgMapper, SysOrg, Sys
         }
 
         // 如果上级ID 为空 则默认为 0
-        if(StringUtils.isEmpty(model.getParentId())){
+        if(StringUtils.isEmpty(model.getParentId()) || TOP_PARENT_ID.equals(model.getParentId())){
             model.setParentId(TOP_PARENT_ID);
             model.setParentIds(TOP_PARENT_ID);
         }
