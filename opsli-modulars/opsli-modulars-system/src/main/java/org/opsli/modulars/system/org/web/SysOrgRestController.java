@@ -50,6 +50,7 @@ import org.opsli.core.persistence.querybuilder.GenQueryBuilder;
 import org.opsli.core.persistence.querybuilder.QueryBuilder;
 import org.opsli.core.persistence.querybuilder.WebQueryBuilder;
 import org.opsli.core.utils.OrgUtil;
+import org.opsli.core.utils.TenantUtil;
 import org.opsli.core.utils.TreeBuildUtil;
 import org.opsli.core.utils.UserUtil;
 import org.opsli.modulars.system.SystemMsg;
@@ -327,12 +328,18 @@ public class SysOrgRestController extends BaseRestController<SysOrg, SysOrgModel
         // 如果新增的是 根节点数据 则需要验证权限
         if(null != model && TreeBuildUtil.DEF_PARENT_ID.equals(model.getParentId())){
             UserModel currUser = UserUtil.getUser();
-            RoleModel defRoleByUserId = UserUtil.getUserDefRoleByUserId(currUser.getId());
-            if(null == defRoleByUserId ||
-                    StringUtils.isEmpty(defRoleByUserId.getDataScope()) ||
-                    !DictType.DATA_SCOPE_ALL.getValue().equals(defRoleByUserId.getDataScope())){
-                // 无组织机构新增权限
-                throw new ServiceException(SystemMsg.EXCEPTION_ORG_NOT_PERMISSION);
+
+            // 如果不是超级管理员 和 租户管理员
+            if(!StringUtils.equals(UserUtil.SUPER_ADMIN, currUser.getUsername())  &&
+                    !TenantUtil.SUPER_ADMIN_TENANT_ID.equals(currUser.getTenantId()) ){
+
+                RoleModel defRoleByUserId = UserUtil.getUserDefRoleByUserId(currUser.getId());
+                if(null == defRoleByUserId ||
+                        StringUtils.isEmpty(defRoleByUserId.getDataScope()) ||
+                        !DictType.DATA_SCOPE_ALL.getValue().equals(defRoleByUserId.getDataScope())){
+                    // 无组织机构新增权限
+                    throw new ServiceException(SystemMsg.EXCEPTION_ORG_NOT_PERMISSION);
+                }
             }
         }
 

@@ -91,7 +91,7 @@ public class JwtRealm extends AuthorizingRealm implements FlagRealm {
                     TokenMsg.EXCEPTION_LOGIN_ACCOUNT_LOCKED);
         }
 
-        // 4. 如果不是超级管理员
+        // 4. 如果不是超级管理员 和 租户管理员
         if(!StringUtils.equals(UserUtil.SUPER_ADMIN, user.getUsername())  &&
                 !TenantUtil.SUPER_ADMIN_TENANT_ID.equals(user.getTenantId()) ){
             // 4.1 账号锁定验证
