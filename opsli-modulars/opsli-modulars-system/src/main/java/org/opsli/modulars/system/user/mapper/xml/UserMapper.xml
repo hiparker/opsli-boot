@@ -30,7 +30,7 @@
 	</sql>
 
     <sql id="joinsColumns">
-        GROUP_CONCAT(r.role_name) as roleNames,
+        GROUP_CONCAT(DISTINCT r.role_name) as roleNames,
 	</sql>
 
     <sql id="joins">
