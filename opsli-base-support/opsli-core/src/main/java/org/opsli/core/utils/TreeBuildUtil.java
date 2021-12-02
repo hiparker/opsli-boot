@@ -112,13 +112,13 @@ public enum TreeBuildUtil {
 
         List<String> excludeFields = ListUtil.list(false);
         excludeFields.addAll(DEF_EXCLUDE_FIELDS);
-        excludeFields.add(config.getIdKey());
-        excludeFields.add(config.getParentIdKey());
-        excludeFields.add(config.getWeightKey());
+        excludeFields.add(treeConfig.getIdKey());
+        excludeFields.add(treeConfig.getParentIdKey());
+        excludeFields.add(treeConfig.getWeightKey());
 
         //转换器
         return TreeUtil.build(dataList, defParentId, treeConfig,
-                (treeNode, tree) -> handlerTreeNode(treeNode, tree, config, excludeFields));
+                (treeNode, tree) -> handlerTreeNode(treeNode, tree, treeConfig, excludeFields));
     }
 
     /**
@@ -155,9 +155,9 @@ public enum TreeBuildUtil {
         final TreeNodeConfig treeConfig = ObjectUtil.defaultIfNull(config, TreeNodeConfig.DEFAULT_CONFIG);
         List<String> excludeFields = ListUtil.list(false);
         excludeFields.addAll(DEF_EXCLUDE_FIELDS);
-        excludeFields.add(config.getIdKey());
-        excludeFields.add(config.getParentIdKey());
-        excludeFields.add(config.getWeightKey());
+        excludeFields.add(treeConfig.getIdKey());
+        excludeFields.add(treeConfig.getParentIdKey());
+        excludeFields.add(treeConfig.getWeightKey());
 
         //转换器
         List<Tree<Object>> treeNodes = Lists.newArrayListWithCapacity(dataList.size());
