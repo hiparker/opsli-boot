@@ -177,11 +177,7 @@ public class UserRoleRefServiceImpl extends ServiceImpl<UserRoleRefMapper, SysUs
             queryWrapper.like("label", label);
             menuList = iMenuService.findList(queryWrapper);
         }else{
-            if(TenantUtil.SUPER_ADMIN_TENANT_ID.equals(userModel.getTenantId())){
-                menuList = mapper.findMenuAllListByUserId(userId, label);
-            }else {
-                menuList = mapper.findMenuAllListByUserId(userId, label);
-            }
+            menuList = mapper.findMenuAllListByUserId(userId, label);
         }
 
         if(CollUtil.isEmpty(menuList)){
