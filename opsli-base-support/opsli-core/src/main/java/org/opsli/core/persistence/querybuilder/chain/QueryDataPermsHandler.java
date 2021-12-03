@@ -15,6 +15,7 @@
  */
 package org.opsli.core.persistence.querybuilder.chain;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ReflectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.google.common.collect.Lists;
@@ -65,9 +66,8 @@ public class QueryDataPermsHandler implements QueryBuilderChain{
         // 自身责任 -- 判断组织
         boolean flag = ReflectUtil.hasField(entityClazz, MyBatisConstants.FIELD_ORG_GROUP);
         if(flag) {
-            String fieldName = FieldUtil.humpToUnderline(MyBatisConstants.FIELD_ORG_GROUP);
             // 处理查询条件
-            handleDataPermsCondition(fieldName, wrapper);
+            handleDataPermsCondition(null, wrapper);
         }
 
         return wrapper;
@@ -83,13 +83,8 @@ public class QueryDataPermsHandler implements QueryBuilderChain{
         // 自身责任 -- 判断组织
         boolean flag = ReflectUtil.hasField(entityClazz, MyBatisConstants.FIELD_ORG_GROUP);
         if(flag) {
-            String fieldName = webQueryConf.get(MyBatisConstants.FIELD_ORG_GROUP);
-            if(StringUtils.isEmpty(fieldName)){
-                fieldName = FieldUtil.humpToUnderline(MyBatisConstants.FIELD_ORG_GROUP);
-            }
-
             // 处理查询条件
-            handleDataPermsCondition(fieldName, wrapper);
+            handleDataPermsCondition(webQueryConf, wrapper);
         }
 
         return wrapper;
@@ -99,16 +94,32 @@ public class QueryDataPermsHandler implements QueryBuilderChain{
     /**
      * 处理 数据权限 条件
      *
-     * @param field 查询字段
+     * @param webQueryConf 字段配置
      * @param queryWrapper 组织集合
      */
-    private static <T extends BaseEntity> QueryWrapper<T> handleDataPermsCondition(String field, QueryWrapper<T> queryWrapper) {
+    private static <T extends BaseEntity> QueryWrapper<T> handleDataPermsCondition(
+            WebQueryConf webQueryConf, QueryWrapper<T> queryWrapper) {
+
+        // 创建人字段
+        String createByFiled = FieldUtil.humpToUnderline(MyBatisConstants.FIELD_CREATE_BY);
+        // 组织字段
+        String orgFiled = FieldUtil.humpToUnderline(MyBatisConstants.FIELD_ORG_GROUP);
+        if(null != webQueryConf){
+            if(StringUtils.isNotEmpty(webQueryConf.get(MyBatisConstants.FIELD_CREATE_BY))){
+                createByFiled = FieldUtil.humpToUnderline(
+                        webQueryConf.get(MyBatisConstants.FIELD_CREATE_BY)
+                );
+            }
+            if(StringUtils.isNotEmpty(webQueryConf.get(MyBatisConstants.FIELD_ORG_GROUP))){
+                orgFiled = FieldUtil.humpToUnderline(
+                        webQueryConf.get(MyBatisConstants.FIELD_ORG_GROUP)
+                );
+            }
+        }
 
         // 1. 当前用户
         UserModel currUser = UserUtil.getUser();
-
         String userId = currUser.getId();
-
 
         // 2. 当前用户 组织机构集合
         List<UserOrgRefModel> userOrgRefModelList = UserUtil.getOrgListByUserId(userId);
@@ -131,15 +142,18 @@ public class QueryDataPermsHandler implements QueryBuilderChain{
                 conditionType = ConditionType.getConditionType(defRole.getDataScope());
             }
         }
-
-        // 4. 如果查询字段为空 则默认
-        if(StringUtils.isBlank(field)){
-            field = FieldUtil.humpToUnderline(MyBatisConstants.FIELD_ORG_GROUP);
+        // 如果组织为空 则默认权限为查自己的数据
+        if(!ConditionType.SELF.equals(conditionType) &&
+                CollUtil.isEmpty(orgIdGroupList)){
+            conditionType = ConditionType.SELF;
         }
+
+
 
         // 常量
         final ConditionType finalConditionType = conditionType;
-        final String finalField = field;
+        final String finalOrgField = orgFiled;
+        final String finalCreateByField = createByFiled;
         final List<String> finalOrgIdGroupList = orgIdGroupList;
 
         // 查询 全部
@@ -149,7 +163,7 @@ public class QueryDataPermsHandler implements QueryBuilderChain{
             queryWrapper.and(wra -> {
                 // 查询 本部门
                 if(ConditionType.DEPT.equals(finalConditionType)){
-                    wra.in(finalField, finalOrgIdGroupList);
+                    wra.in(finalOrgField, finalOrgIdGroupList);
                 }
                 // 部门及以下
                 else if(ConditionType.DEPT_AND_BELOW.equals(finalConditionType)){
@@ -158,7 +172,7 @@ public class QueryDataPermsHandler implements QueryBuilderChain{
                         for (int i = 0; i < finalOrgIdGroupList.size(); i++) {
                             // 右模糊匹配
                             wraConfine.likeRight(
-                                    finalField, finalOrgIdGroupList.get(i));
+                                    finalOrgField, finalOrgIdGroupList.get(i));
 
                             if(i < finalOrgIdGroupList.size() - 1){
                                 wraConfine.or();
@@ -167,11 +181,10 @@ public class QueryDataPermsHandler implements QueryBuilderChain{
                     });
                 }else {
                     // 查自身
-                    wra.eq(FieldUtil.humpToUnderline(MyBatisConstants.FIELD_CREATE_BY), userId);
+                    wra.eq(finalCreateByField, userId);
                 }
             });
         }
-
 
         return queryWrapper;
     }
