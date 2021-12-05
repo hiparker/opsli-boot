@@ -22,6 +22,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import org.apache.commons.lang3.StringUtils;
 import org.opsli.api.wrapper.system.org.SysOrgModel;
 import org.opsli.api.wrapper.system.user.UserModel;
@@ -50,6 +51,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -159,30 +161,28 @@ public class UserOrgRefServiceImpl extends ServiceImpl<UserOrgRefMapper, SysUser
         wrapper.eq(userIdField, model.getUserId());
         boolean removeFlag = super.remove(wrapper);
 
-        // 设置组织
-        List<SysUserOrgRef> orgRefList = Lists.newArrayList();
+
+        // 保障唯一 Key=orgId, Val=Ref
+        Map<String, SysUserOrgRef> orgRefMap = Maps.newHashMap();
 
         SysOrgModel defModel = model.getDefModel();
         if(defModel != null){
             SysUserOrgRef orgRef = createOrgRef(
                     model.getUserId(), defModel, DictType.NO_YES_YES.getValue());
-            orgRefList.add(orgRef);
+            orgRefMap.put(defModel.getId(), orgRef);
         }
+
         List<SysOrgModel> orgModelList = model.getOrgModelList();
         if(!CollUtil.isEmpty(orgModelList)){
             for (SysOrgModel orgModel : orgModelList) {
                 SysUserOrgRef orgRef = createOrgRef(
                         model.getUserId(), orgModel, DictType.NO_YES_NO.getValue());
-                orgRefList.add(orgRef);
+                orgRefMap.putIfAbsent(orgModel.getId(), orgRef);
             }
         }
 
-        boolean izExistOrg = false;
-
-        if(!CollUtil.isEmpty(orgRefList)){
-            // 批量保存
-            izExistOrg = super.saveBatch(orgRefList);
-        }
+        // 批量保存
+        boolean izExistOrg = super.saveBatch(orgRefMap.values());
 
         // 修改用户组织状态
         this.updateUserOrgFlag(model.getUserId(), izExistOrg);
