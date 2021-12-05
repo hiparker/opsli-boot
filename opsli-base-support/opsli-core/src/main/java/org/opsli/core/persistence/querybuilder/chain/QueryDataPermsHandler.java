@@ -141,14 +141,13 @@ public class QueryDataPermsHandler implements QueryBuilderChain{
             if(null != defRole){
                 conditionType = ConditionType.getConditionType(defRole.getDataScope());
             }
-        }
-        // 如果组织为空 则默认权限为查自己的数据
-        if(!ConditionType.SELF.equals(conditionType) &&
-                CollUtil.isEmpty(orgIdGroupList)){
-            conditionType = ConditionType.SELF;
-        }
 
-
+            // 如果组织为空 则默认权限为查自己的数据
+            if(!ConditionType.SELF.equals(conditionType) &&
+                    CollUtil.isEmpty(orgIdGroupList)){
+                conditionType = ConditionType.SELF;
+            }
+        }
 
         // 常量
         final ConditionType finalConditionType = conditionType;
