@@ -6,12 +6,13 @@ package org.opsli.common.constants;
  * @author Parker
  * @date 2020-09-16 17:42
  */
-public interface TokenTypeConstants {
+public final class TokenTypeConstants {
 
     /** 系统内部TOKEN */
-    String TYPE_SYSTEM = "system";
+    public static final String TYPE_SYSTEM = "system";
 
     /** 外部TOKEN */
-    String TYPE_EXTERNAL = "external";
+    public static final String TYPE_EXTERNAL = "external";
 
+    private TokenTypeConstants(){}
 }

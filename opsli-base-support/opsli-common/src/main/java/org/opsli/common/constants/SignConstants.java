@@ -6,24 +6,26 @@ package org.opsli.common.constants;
  * @author Parker
  * @date 2020-09-16 17:42
  */
-public interface SignConstants {
+public final class SignConstants {
 
     /** 用户账号 */
-    String ACCOUNT = "account";
+    public static final String ACCOUNT = "account";
 
     /** 用户ID */
-    String USER_ID = "userId";
+    public static final String USER_ID = "userId";
 
     /** 租户ID */
-    String TENANT_ID = "tenantId";
+    public static final String TENANT_ID = "tenantId";
 
     /** 时间戳 */
-    String TIMESTAMP  = "timestamp";
+    public static final String TIMESTAMP  = "timestamp";
 
     /** 其他信息 */
-    String OTHER = "other";
+    public static final String OTHER = "other";
 
     /** 签名 类型 */
-    String TYPE = "type";
+    public static final String TYPE = "type";
+
+    private SignConstants(){}
 
 }

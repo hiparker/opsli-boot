@@ -23,35 +23,37 @@ package org.opsli.common.constants;
  * @author Parker
  * @date 2020-09-16 17:42
  */
-public interface MyBatisConstants {
+public final class MyBatisConstants {
 
 
     /** 逻辑删除值 */
-    String  LOGIC_DELETE_VALUE = "1";
+    public static final String  LOGIC_DELETE_VALUE = "1";
     /** 逻辑不删除值 */
-    String  LOGIC_NOT_DELETE_VALUE = "0";
+    public static final String  LOGIC_NOT_DELETE_VALUE = "0";
 
 
     /** ID */
-    String FIELD_ID = "id";
+    public static final String FIELD_ID = "id";
     /** PID */
-    String FIELD_PARENT_ID = "parentId";
+    public static final String FIELD_PARENT_ID = "parentId";
     /** PIDs */
-    String FIELD_PARENT_IDS = "parentIds";
+    public static final String FIELD_PARENT_IDS = "parentIds";
     /** 创建人 */
-    String FIELD_CREATE_BY = "createBy";
+    public static final String FIELD_CREATE_BY = "createBy";
     /** 更新时间 */
-    String FIELD_CREATE_TIME = "createTime";
+    public static final String FIELD_CREATE_TIME = "createTime";
     /** 更新人 */
-    String FIELD_UPDATE_BY = "updateBy";
+    public static final String FIELD_UPDATE_BY = "updateBy";
     /** 更新时间 */
-    String FIELD_UPDATE_TIME = "updateTime";
+    public static final String FIELD_UPDATE_TIME = "updateTime";
     /** 逻辑删除 */
-    String FIELD_DELETE_LOGIC = "deleted";
+    public static final String FIELD_DELETE_LOGIC = "deleted";
     /** 乐观锁 */
-    String FIELD_OPTIMISTIC_LOCK = "version";
+    public static final String FIELD_OPTIMISTIC_LOCK = "version";
     /** 多租户字段 */
-    String FIELD_TENANT = "tenantId";
+    public static final String FIELD_TENANT = "tenantId";
     /** 组织字段 */
-    String FIELD_ORG_GROUP = "orgIds";
+    public static final String FIELD_ORG_GROUP = "orgIds";
+
+    private MyBatisConstants(){}
 }

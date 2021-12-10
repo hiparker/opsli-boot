@@ -21,9 +21,11 @@ package org.opsli.common.constants;
  * @author Parker
  * @date 2020-09-16 17:42
  */
-public interface TokenConstants {
+public final class TokenConstants {
 
     /** ACCESS_TOKEN */
-    String ACCESS_TOKEN = "X-Token";
+    public static final String ACCESS_TOKEN = "X-Token";
 
+
+    private TokenConstants(){}
 }

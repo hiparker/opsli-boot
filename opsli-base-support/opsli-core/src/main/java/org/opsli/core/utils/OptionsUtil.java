@@ -27,12 +27,15 @@ import org.opsli.api.base.result.ResultVo;
 import org.opsli.api.web.system.options.OptionsApi;
 import org.opsli.api.wrapper.system.options.OptionsModel;
 import org.opsli.common.annotation.OptionDict;
+import org.opsli.common.constants.RedisConstants;
 import org.opsli.common.enums.OptionsType;
-import org.opsli.core.cache.local.CacheUtil;
+import org.opsli.core.cache.CacheUtil;
+import org.opsli.core.cache.SecurityCache;
 import org.opsli.core.msg.CoreMsg;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.core.annotation.Order;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Field;
@@ -54,9 +57,6 @@ import static org.opsli.common.constants.OrderConstants.UTIL_ORDER;
 @Lazy(false)
 public class OptionsUtil {
 
-    /** 前缀 */
-    public static final String PREFIX_CODE = "options:code";
-
     /** 参数 Api */
     private static OptionsApi optionsApi;
 
@@ -65,6 +65,8 @@ public class OptionsUtil {
 
     /** 增加初始状态开关 防止异常使用 */
     private static boolean IS_INIT;
+
+    private static RedisTemplate<String, Object> redisTemplate;
 
     /**
      * 根据 optionsType 枚举 获得参数
@@ -137,58 +139,18 @@ public class OptionsUtil {
                 CoreMsg.OTHER_EXCEPTION_UTILS_INIT);
 
         // 缓存Key
-        String cacheKey = PREFIX_CODE;
-        // 缓存Key + VALUE
-        String cacheKeyVal = cacheKey + ":" + optionCode;
+        String cacheKey = CacheUtil.formatKey(RedisConstants.PREFIX_OPTIONS_CODE);
 
-        // 先从缓存里拿
-        OptionsModel model = CacheUtil.getHash(OptionsModel.class, cacheKey, optionCode);
-        if (model != null){
-            return model;
-        }
-
-        // 拿不到 --------
-        // 防止缓存穿透判断
-        boolean hasNilFlag = CacheUtil.hasNilFlag(cacheKeyVal);
-        if(hasNilFlag){
-            return null;
-        }
-
-        try {
-            // 分布式加锁
-            if(!DistributedLockUtil.lock(cacheKeyVal)){
-                // 无法申领分布式锁
-                log.error(CoreMsg.REDIS_EXCEPTION_LOCK.getMessage());
-                return null;
-            }
-
-            // 如果获得锁 则 再次检查缓存里有没有， 如果有则直接退出， 没有的话才发起数据库请求
-            model = CacheUtil.getHash(OptionsModel.class, cacheKey, optionCode);
-            if (model != null){
-                return model;
-            }
-
+        Object cache = SecurityCache.hGet(redisTemplate, cacheKey, optionCode, (k) -> {
             // 查询数据库
             ResultVo<OptionsModel> resultVo = optionsApi.getByCode(optionCode);
-            if(resultVo.isSuccess()){
-                model = resultVo.getData();
-                // 存入缓存
-                CacheUtil.putHash(cacheKey, optionCode, model);
+            if(!resultVo.isSuccess()){
+                return null;
             }
-        }catch (Exception e){
-            log.error(e.getMessage(),e);
-        }finally {
-            // 释放锁
-            DistributedLockUtil.unlock(cacheKeyVal);
-        }
+            return resultVo.getData();
+        });
 
-        if(model == null){
-            // 设置空变量 用于防止穿透判断
-            CacheUtil.putNilFlag(cacheKeyVal);
-            return null;
-        }
-
-        return model;
+        return Convert.convert(OptionsModel.class, cache);
     }
 
     // ============== 刷新缓存 ==============
@@ -208,36 +170,10 @@ public class OptionsUtil {
         }
 
         // 缓存Key
-        String cacheKey = PREFIX_CODE;
-        // 缓存Key + VALUE
-        String cacheKeyVal = cacheKey + ":" + option.getOptionCode();
+        String cacheKey = CacheUtil.formatKey(RedisConstants.PREFIX_OPTIONS_CODE);
 
-        // 计数器
-        int count = 0;
-
-        OptionsModel model = CacheUtil.getHash(OptionsModel.class, cacheKey, option.getOptionCode());
-        boolean hasNilFlag = CacheUtil.hasNilFlag(cacheKeyVal);
-
-        // 只要不为空 则执行刷新
-        if (hasNilFlag){
-            count++;
-            // 清除空拦截
-            boolean tmp = CacheUtil.delNilFlag(cacheKeyVal);
-            if(tmp){
-                count--;
-            }
-        }
-
-        if(model != null){
-            count++;
-            // 先删除
-            boolean tmp = CacheUtil.delHash(cacheKey, option.getOptionCode());
-            if(tmp){
-                count--;
-            }
-        }
-
-        return count == 0;
+        // 删除缓存
+        return SecurityCache.hDel(redisTemplate, cacheKey, option.getOptionCode());
     }
 
     /**
@@ -292,9 +228,10 @@ public class OptionsUtil {
      * 初始化
      */
     @Autowired
-    public void init(OptionsApi optionsApi) {
+    public void init(OptionsApi optionsApi,
+                     RedisTemplate<String, Object> redisTemplate) {
         OptionsUtil.optionsApi = optionsApi;
-
+        OptionsUtil.redisTemplate = redisTemplate;
         IS_INIT = true;
     }
 }

@@ -35,7 +35,7 @@ import org.opsli.common.enums.LoginLimitRefuse;
 import org.opsli.common.exception.TokenException;
 import org.opsli.core.api.TokenThreadLocal;
 import org.opsli.core.autoconfigure.properties.GlobalProperties;
-import org.opsli.core.cache.local.CacheUtil;
+import org.opsli.core.cache.CacheUtil;
 import org.opsli.core.msg.CoreMsg;
 import org.opsli.core.msg.TokenMsg;
 import org.opsli.plugins.redis.RedisPlugin;

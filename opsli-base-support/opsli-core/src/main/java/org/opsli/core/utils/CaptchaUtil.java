@@ -23,7 +23,7 @@ import com.wf.captcha.SpecCaptcha;
 import com.wf.captcha.base.Captcha;
 import org.apache.commons.lang3.StringUtils;
 import org.opsli.common.exception.TokenException;
-import org.opsli.core.cache.local.CacheUtil;
+import org.opsli.core.cache.CacheUtil;
 import org.opsli.core.msg.CoreMsg;
 import org.opsli.core.msg.TokenMsg;
 import org.opsli.plugins.redis.RedisPlugin;

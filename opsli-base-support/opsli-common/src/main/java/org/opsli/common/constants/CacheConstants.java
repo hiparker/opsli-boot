@@ -21,14 +21,16 @@ package org.opsli.common.constants;
  * @author Parker
  * @date 2020-09-22 17:07
  */
-public interface CacheConstants {
+public final class CacheConstants {
 
-    String PREFIX_NAME = "opsli";
+    public static final String PREFIX_NAME = "opsli";
 
     /** Ehcache 缓存存放空间 */
-    String EHCACHE_SPACE = "timed";
+    public static final String EHCACHE_SPACE = "timed";
 
     /** 热数据前缀 */
-    String HOT_DATA_PREFIX = "hot_data";
+    public static final String HOT_DATA_PREFIX = "hot_data";
 
+
+    private CacheConstants(){}
 }

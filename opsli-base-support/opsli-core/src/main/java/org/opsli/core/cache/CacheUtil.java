@@ -13,11 +13,12 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.opsli.core.cache.local;
+package org.opsli.core.cache;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.RandomUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.core.util.XmlUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Lists;
@@ -738,6 +739,20 @@ public class CacheUtil {
         return PREFIX_NAME + cacheType.getName() + ":" +
                 key;
     }
+
+    /**
+     * 格式化Key
+     * @param key 缓存Key
+     * @return String
+     */
+    public static String formatKey(String key){
+        // 判断 工具类是否初始化完成
+        ThrowExceptionUtil.isThrowException(!IS_INIT,
+                CoreMsg.OTHER_EXCEPTION_UTILS_INIT);
+
+        return StrUtil.format(key, PREFIX_NAME);
+    }
+
 
     /**
      * 内部处理 普通 key

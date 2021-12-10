@@ -49,7 +49,7 @@ import org.opsli.core.autoconfigure.properties.GlobalProperties;
 import org.opsli.core.base.entity.BaseEntity;
 import org.opsli.core.base.entity.HasChildren;
 import org.opsli.core.base.service.interfaces.CrudServiceInterface;
-import org.opsli.core.cache.local.CacheUtil;
+import org.opsli.core.cache.CacheUtil;
 import org.opsli.core.msg.CoreMsg;
 import org.opsli.core.msg.TokenMsg;
 import org.opsli.core.security.shiro.realm.JwtRealm;

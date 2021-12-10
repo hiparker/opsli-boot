@@ -19,7 +19,8 @@ import cn.hutool.core.collection.CollUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.opsli.api.wrapper.system.user.UserModel;
-import org.opsli.core.cache.local.CacheUtil;
+import org.opsli.common.constants.RedisConstants;
+import org.opsli.core.cache.CacheUtil;
 import org.opsli.core.msg.CoreMsg;
 import org.opsli.plugins.redis.RedisPlugin;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,8 +49,6 @@ public class SearchHisUtil {
 
     /** 搜索历史缓存数据KEY */
     private static final int DEFAULT_COUNT = 10;
-    /** 缓存前缀 */
-    private static final String CACHE_PREFIX = "his:username:";
 
     /** Redis插件 */
     private static RedisPlugin redisPlugin;
@@ -79,7 +78,7 @@ public class SearchHisUtil {
         // 获得当前用户
         UserModel user = UserUtil.getUser();
 
-        String cacheKey = CacheUtil.getPrefixName() + CACHE_PREFIX + user.getUsername()  + ":" + key;
+        String cacheKey = CacheUtil.formatKey(RedisConstants.PREFIX_HIS_USERNAME + user.getUsername()  + ":" + key);
 
         return redisPlugin.zReverseRange(cacheKey, 0, count - 1);
     }
@@ -109,7 +108,7 @@ public class SearchHisUtil {
             }
 
 
-            String cacheKey = CacheUtil.getPrefixName() + CACHE_PREFIX + user.getUsername()  + ":" + key;
+            String cacheKey = CacheUtil.formatKey(RedisConstants.PREFIX_HIS_USERNAME + user.getUsername()  + ":" + key);
             String val = values[0];
 
             // 记录

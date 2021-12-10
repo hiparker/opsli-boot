@@ -29,7 +29,7 @@ import org.opsli.common.annotation.hotdata.EnableHotData;
 import org.opsli.common.annotation.hotdata.HotDataDel;
 import org.opsli.common.annotation.hotdata.HotDataPut;
 import org.opsli.common.constants.CacheConstants;
-import org.opsli.core.cache.local.CacheUtil;
+import org.opsli.core.cache.CacheUtil;
 import org.opsli.core.cache.pushsub.entity.CacheDataEntity;
 import org.opsli.core.cache.pushsub.enums.CacheHandleType;
 import org.opsli.core.cache.pushsub.msgs.CacheDataMsgFactory;

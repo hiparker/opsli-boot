@@ -15,16 +15,20 @@
  */
 package org.opsli.core.utils;
 
+import cn.hutool.core.convert.Convert;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.opsli.api.base.result.ResultVo;
 import org.opsli.api.web.system.menu.MenuApi;
 import org.opsli.api.wrapper.system.menu.MenuModel;
-import org.opsli.core.cache.local.CacheUtil;
+import org.opsli.common.constants.RedisConstants;
+import org.opsli.core.cache.CacheUtil;
+import org.opsli.core.cache.SecurityCache;
 import org.opsli.core.msg.CoreMsg;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.core.annotation.Order;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 import static org.opsli.common.constants.OrderConstants.UTIL_ORDER;
@@ -50,6 +54,8 @@ public class MenuUtil {
     /** 增加初始状态开关 防止异常使用 */
     private static boolean IS_INIT;
 
+    private static RedisTemplate<String, Object> redisTemplate;
+
     /**
      * 根据 权限 获得菜单
      * @param permissions 权限
@@ -60,57 +66,20 @@ public class MenuUtil {
         ThrowExceptionUtil.isThrowException(!IS_INIT,
                 CoreMsg.OTHER_EXCEPTION_UTILS_INIT);
 
+
         // 缓存Key
-        String cacheKey = PREFIX_CODE + permissions;
+        String cacheKey = CacheUtil.formatKey(RedisConstants.PREFIX_MENU_CODE + permissions);
 
-        // 先从缓存里拿
-        MenuModel menuModel = CacheUtil.getTimed(MenuModel.class, cacheKey);
-        if (menuModel != null){
-            return menuModel;
-        }
-
-        // 拿不到 --------
-        // 防止缓存穿透判断
-        boolean hasNilFlag = CacheUtil.hasNilFlag(cacheKey);
-        if(hasNilFlag){
-            return null;
-        }
-
-        try {
-            // 分布式加锁
-            if(!DistributedLockUtil.lock(cacheKey)){
-                // 无法申领分布式锁
-                log.error(CoreMsg.REDIS_EXCEPTION_LOCK.getMessage());
-                return null;
-            }
-
-            // 如果获得锁 则 再次检查缓存里有没有， 如果有则直接退出， 没有的话才发起数据库请求
-            menuModel = CacheUtil.getTimed(MenuModel.class, cacheKey);
-            if (menuModel != null){
-                return menuModel;
-            }
-
+        Object cache = SecurityCache.get(redisTemplate, cacheKey, (k) -> {
             // 查询数据库
             ResultVo<MenuModel> resultVo = menuApi.getByPermissions(permissions);
-            if(resultVo.isSuccess()){
-                menuModel = resultVo.getData();
-                // 存入缓存
-                CacheUtil.put(cacheKey, menuModel);
+            if(!resultVo.isSuccess()){
+                return null;
             }
-        }catch (Exception e){
-            log.error(e.getMessage(),e);
-        }finally {
-            // 释放锁
-            DistributedLockUtil.unlock(cacheKey);
-        }
+            return resultVo.getData();
+        }, true);
 
-        if(menuModel == null){
-            // 设置空变量 用于防止穿透判断
-            CacheUtil.putNilFlag(cacheKey);
-            return null;
-        }
-
-        return menuModel;
+        return Convert.convert(MenuModel.class, cache);
     }
 
 
@@ -130,35 +99,12 @@ public class MenuUtil {
             return true;
         }
 
-        // 计数器
-        int count = 0;
+        // 缓存Key
+        String cacheKey = CacheUtil.formatKey(RedisConstants.PREFIX_MENU_CODE + menu.getPermissions());
 
-        MenuModel model = CacheUtil.getTimed(MenuModel.class, PREFIX_CODE + menu.getPermissions());
-        boolean hasNilFlag = CacheUtil.hasNilFlag(PREFIX_CODE + menu.getPermissions());
-
-        // 只要不为空 则执行刷新
-        if (hasNilFlag){
-            count++;
-            // 清除空拦截
-            boolean tmp = CacheUtil.delNilFlag(PREFIX_CODE + menu.getPermissions());
-            if(tmp){
-                count--;
-            }
-        }
-
-        if(model != null){
-            count++;
-            // 先删除
-            boolean tmp = CacheUtil.del(PREFIX_CODE + menu.getPermissions());
-            if(tmp){
-                count--;
-            }
-        }
-
-        return count == 0;
+        // 删除缓存
+        return SecurityCache.remove(redisTemplate, cacheKey);
     }
-
-
 
 
     // =====================================
@@ -167,9 +113,10 @@ public class MenuUtil {
      * 初始化
      */
     @Autowired
-    public  void init(MenuApi menuApi) {
+    public  void init(MenuApi menuApi,
+                      RedisTemplate<String, Object> redisTemplate) {
         MenuUtil.menuApi = menuApi;
-
+        MenuUtil.redisTemplate = redisTemplate;
         IS_INIT = true;
     }
 

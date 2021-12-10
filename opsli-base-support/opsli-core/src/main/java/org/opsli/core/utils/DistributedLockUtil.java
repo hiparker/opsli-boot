@@ -16,7 +16,7 @@
 package org.opsli.core.utils;
 
 import lombok.extern.slf4j.Slf4j;
-import org.opsli.core.cache.local.CacheUtil;
+import org.opsli.core.cache.CacheUtil;
 import org.opsli.core.msg.CoreMsg;
 import org.opsli.plugins.redisson.RedissonLock;
 import org.springframework.beans.factory.annotation.Autowired;
