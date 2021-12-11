@@ -29,16 +29,18 @@ import org.opsli.api.wrapper.system.menu.MenuModel;
 import org.opsli.api.wrapper.system.role.RoleModel;
 import org.opsli.api.wrapper.system.user.UserModel;
 import org.opsli.api.wrapper.system.user.UserOrgRefModel;
-import org.opsli.api.wrapper.system.user.UserOrgRefWebModel;
+import org.opsli.common.constants.RedisConstants;
 import org.opsli.common.exception.TokenException;
 import org.opsli.core.api.TokenThreadLocal;
 import org.opsli.core.autoconfigure.properties.GlobalProperties;
 import org.opsli.core.cache.CacheUtil;
+import org.opsli.core.cache.SecurityCache;
 import org.opsli.core.msg.CoreMsg;
 import org.opsli.core.msg.TokenMsg;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.core.annotation.Order;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -57,16 +59,6 @@ import static org.opsli.common.constants.OrderConstants.UTIL_ORDER;
 @Lazy(false)
 public class UserUtil {
 
-    /** 前缀 */
-    public static final String PREFIX_ID = "userId:";
-    public static final String PREFIX_ID_ROLES = "userId:roles:";
-    public static final String PREFIX_ID_DEF_ROLE = "userId:def_role:";
-    public static final String PREFIX_ID_ORGS = "userId:orgs:";
-    public static final String PREFIX_ID_DEF_ORG = "userId:def_org:";
-    public static final String PREFIX_ID_PERMISSIONS = "userId:permissions:";
-    public static final String PREFIX_ID_MENUS = "userId:menus:";
-    public static final String PREFIX_USERNAME = "username:";
-
     /** 修改租户权限 */
     private static final String PERMS_TENANT = "system_user_tenant";
 
@@ -84,6 +76,8 @@ public class UserUtil {
 
     /** 增加初始状态开关 防止异常使用 */
     private static boolean IS_INIT;
+
+    private static RedisTemplate<String, Object> redisTemplate;
 
     /**
      * 获得当前系统登陆用户
@@ -169,67 +163,24 @@ public class UserUtil {
                 CoreMsg.OTHER_EXCEPTION_UTILS_INIT);
 
         // 缓存Key
-        String cacheKey = PREFIX_ID + userId;
+        String cacheKey = CacheUtil.formatKey(RedisConstants.PREFIX_USER_ID + userId);
 
-        // 先从缓存里拿
-        UserModel userModel = CacheUtil.getTimed(UserModel.class, cacheKey);
-        if (userModel != null){
-            // 如果不是递归触发 可进入一次
-            if(!isRecursion){
-                // 如果是 切换租户权限 则进行新一轮判断
-                // 注意不要陷入递归死循环 只保障循环一次
-                if (StringUtils.isNotBlank(userModel.getSwitchTenantUserId())){
-                    userModel = getUser(userModel.getSwitchTenantUserId(), true);
-                }
-            }
-            return userModel;
-        }
-
-        // 拿不到 --------
-        // 防止缓存穿透判断
-        boolean hasNilFlag = CacheUtil.hasNilFlag(cacheKey);
-        if(hasNilFlag){
-            return null;
-        }
-
-        try {
-            // 分布式加锁
-            if(!DistributedLockUtil.lock(cacheKey)){
-                // 无法申领分布式锁
-                log.error(CoreMsg.REDIS_EXCEPTION_LOCK.getMessage());
-                return null;
-            }
-
-            // 如果获得锁 则 再次检查缓存里有没有， 如果有则直接退出， 没有的话才发起数据库请求
-            userModel = CacheUtil.getTimed(UserModel.class, cacheKey);
-            if (userModel != null){
-                return userModel;
-            }
-
+        Object cache = SecurityCache.get(redisTemplate, cacheKey, (k) -> {
             // 查询数据库
             UserModel userModelTemp = new UserModel();
             userModelTemp.setId(userId);
             // 设置为系统内部调用 否则 会拿到 空值
             userModelTemp.setIzApi(true);
+
+            // 查询数据库
             ResultVo<UserModel> resultVo = userApi.get(userModelTemp);
-            if(resultVo.isSuccess()){
-                userModel = resultVo.getData();
-                // 存入缓存
-                CacheUtil.put(cacheKey, userModel);
+            if(!resultVo.isSuccess()){
+                return null;
             }
+            return resultVo.getData();
+        }, true);
 
-        }catch (Exception e){
-            log.error(e.getMessage(), e);
-        }finally {
-            // 释放锁
-            DistributedLockUtil.unlock(cacheKey);
-        }
-
-        if(userModel == null){
-            // 设置空变量 用于防止穿透判断
-            CacheUtil.putNilFlag(cacheKey);
-            return null;
-        }
+        UserModel userModel = Convert.convert(UserModel.class, cache);
 
         // 如果不是递归触发 可进入一次
         if(!isRecursion){
@@ -255,56 +206,18 @@ public class UserUtil {
                 CoreMsg.OTHER_EXCEPTION_UTILS_INIT);
 
         // 缓存Key
-        String cacheKey = PREFIX_USERNAME + userName;
+        String cacheKey = CacheUtil.formatKey(RedisConstants.PREFIX_USERNAME + userName);
 
-        // 先从缓存里拿
-        UserModel userModel = CacheUtil.getTimed(UserModel.class, cacheKey);
-        if (userModel != null){
-            return userModel;
-        }
-
-        // 拿不到 --------
-        // 防止缓存穿透判断
-        boolean hasNilFlag = CacheUtil.hasNilFlag(cacheKey);
-        if(hasNilFlag){
-            return null;
-        }
-
-        try {
-            // 分布式加锁
-            if(!DistributedLockUtil.lock(cacheKey)){
-                // 无法申领分布式锁
-                log.error(CoreMsg.REDIS_EXCEPTION_LOCK.getMessage());
-                return null;
-            }
-
-            // 如果获得锁 则 再次检查缓存里有没有， 如果有则直接退出， 没有的话才发起数据库请求
-            userModel = CacheUtil.getTimed(UserModel.class, cacheKey);
-            if (userModel != null) {
-                return userModel;
-            }
-
+        Object cache = SecurityCache.get(redisTemplate, cacheKey, (k) -> {
             // 查询数据库
             ResultVo<UserModel> resultVo = userApi.getUserByUsername(userName);
-            if (resultVo.isSuccess()) {
-                userModel = resultVo.getData();
-                // 存入缓存
-                CacheUtil.put(cacheKey, userModel);
+            if(!resultVo.isSuccess()){
+                return null;
             }
-        }catch (Exception e){
-            log.error(e.getMessage(), e);
-        }finally {
-            // 释放锁
-            DistributedLockUtil.unlock(cacheKey);
-        }
+            return resultVo.getData();
+        }, true);
 
-        if(userModel == null){
-            // 设置空变量 用于防止穿透判断
-            CacheUtil.putNilFlag(cacheKey);
-            return null;
-        }
-
-        return userModel;
+        return Convert.convert(UserModel.class, cache);
     }
 
     /**
@@ -325,59 +238,22 @@ public class UserUtil {
         }
 
         // 缓存Key
-        String cacheKey = PREFIX_ID_ROLES + userId;
+        String cacheKey = CacheUtil.formatKey(RedisConstants.PREFIX_USER_ID_AND_ROLES + userId);
 
-        List<String> roles;
-
-        // 先从缓存里拿
-        Object obj = CacheUtil.getTimed(cacheKey);
-        roles = Convert.toList(String.class, obj);
-        if(CollUtil.isNotEmpty(roles)){
-            return roles;
-        }
-
-        // 拿不到 --------
-        // 防止缓存穿透判断
-        boolean hasNilFlag = CacheUtil.hasNilFlag(cacheKey);
-        if(hasNilFlag){
-            return ListUtil.empty();
-        }
-
-        try {
-            // 分布式加锁
-            if(!DistributedLockUtil.lock(cacheKey)){
-                // 无法申领分布式锁
-                log.error(CoreMsg.REDIS_EXCEPTION_LOCK.getMessage());
-                return ListUtil.empty();
-            }
-
-            // 如果获得锁 则 再次检查缓存里有没有， 如果有则直接退出， 没有的话才发起数据库请求
-            obj = CacheUtil.getTimed(cacheKey);
-            roles = Convert.toList(String.class, obj);
-            if(CollUtil.isNotEmpty(roles)){
-                return roles;
-            }
-
+        final String finalUserId = userId;
+        Object cache = SecurityCache.get(redisTemplate, cacheKey, (k) -> {
             // 查询数据库
-            ResultVo<List<String>> resultVo = userRoleRefApi.getRolesByUserId(userId);
-            if(resultVo.isSuccess()){
-                roles = resultVo.getData();
-                // 存入缓存
-                CacheUtil.put(cacheKey, roles);
+            ResultVo<List<String>> resultVo = userRoleRefApi.getRolesByUserId(finalUserId);
+            if(!resultVo.isSuccess()){
+                return null;
             }
-        }catch (Exception e){
-            log.error(e.getMessage(), e);
-        }finally {
-            // 释放锁
-            DistributedLockUtil.unlock(cacheKey);
-        }
+            return resultVo.getData();
+        }, true);
 
-        if(CollUtil.isEmpty(roles)){
-            // 设置空变量 用于防止穿透判断
-            CacheUtil.putNilFlag(cacheKey);
+        List<String> roles = Convert.toList(String.class, cache);
+        if(null == roles){
             return ListUtil.empty();
         }
-
         return roles;
     }
 
@@ -399,60 +275,24 @@ public class UserUtil {
             userId = currUser.getSwitchTenantUserId();
         }
 
+
         // 缓存Key
-        String cacheKey = PREFIX_ID_PERMISSIONS + userId;
+        String cacheKey = CacheUtil.formatKey(RedisConstants.PREFIX_USER_ID_PERMISSIONS + userId);
 
-        List<String> permissions;
-
-        // 先从缓存里拿
-        Object obj = CacheUtil.getTimed(cacheKey);
-        permissions = Convert.toList(String.class, obj);
-        if(CollUtil.isNotEmpty(permissions)){
-            return permissions;
-        }
-
-        // 拿不到 --------
-        // 防止缓存穿透判断
-        boolean hasNilFlag = CacheUtil.hasNilFlag(cacheKey);
-        if(hasNilFlag){
-            return ListUtil.empty();
-        }
-
-        try {
-            // 分布式加锁
-            if(!DistributedLockUtil.lock(cacheKey)){
-                // 无法申领分布式锁
-                log.error(CoreMsg.REDIS_EXCEPTION_LOCK.getMessage());
-                return ListUtil.empty();
-            }
-
-            // 如果获得锁 则 再次检查缓存里有没有， 如果有则直接退出， 没有的话才发起数据库请求
-            obj = CacheUtil.getTimed(cacheKey);
-            permissions = Convert.toList(String.class, obj);
-            if(CollUtil.isNotEmpty(permissions)){
-                return permissions;
-            }
-
+        final String finalUserId = userId;
+        Object cache = SecurityCache.get(redisTemplate, cacheKey, (k) -> {
             // 查询数据库
-            ResultVo<List<String>> resultVo = userRoleRefApi.getAllPerms(userId);
-            if(resultVo.isSuccess()){
-                permissions = resultVo.getData();
-                // 存入缓存
-                CacheUtil.put(cacheKey, permissions);
+            ResultVo<List<String>> resultVo = userRoleRefApi.getAllPerms(finalUserId);
+            if(!resultVo.isSuccess()){
+                return null;
             }
-        }catch (Exception e){
-            log.error(e.getMessage(), e);
-        }finally {
-            // 释放锁
-            DistributedLockUtil.unlock(cacheKey);
-        }
+            return resultVo.getData();
+        }, true);
 
-        if(CollUtil.isEmpty(permissions)){
-            // 设置空变量 用于防止穿透判断
-            CacheUtil.putNilFlag(cacheKey);
+        List<String> permissions = Convert.toList(String.class, cache);
+        if(null == permissions){
             return ListUtil.empty();
         }
-
         return permissions;
     }
 
@@ -473,61 +313,24 @@ public class UserUtil {
             userId = currUser.getSwitchTenantUserId();
         }
 
+
         // 缓存Key
-        String cacheKey = PREFIX_ID_ORGS + userId;
+        String cacheKey = CacheUtil.formatKey(RedisConstants.PREFIX_USER_ID_ORGS + userId);
 
-        List<UserOrgRefModel> orgList;
-
-        // 先从缓存里拿
-        Object obj = CacheUtil.getTimed(cacheKey);
-        orgList = Convert.toList(UserOrgRefModel.class, obj);
-        if(CollUtil.isNotEmpty(orgList)){
-            return orgList;
-        }
-
-        // 拿不到 --------
-        // 防止缓存穿透判断
-        boolean hasNilFlag = CacheUtil.hasNilFlag(cacheKey);
-        if(hasNilFlag){
-            return ListUtil.empty();
-        }
-
-
-        try {
-            // 分布式加锁
-            if(!DistributedLockUtil.lock(cacheKey)){
-                // 无法申领分布式锁
-                log.error(CoreMsg.REDIS_EXCEPTION_LOCK.getMessage());
-                return ListUtil.empty();
-            }
-
-            // 如果获得锁 则 再次检查缓存里有没有， 如果有则直接退出， 没有的话才发起数据库请求
-            obj = CacheUtil.getTimed(cacheKey);
-            orgList = Convert.toList(UserOrgRefModel.class, obj);
-            if(CollUtil.isNotEmpty(orgList)){
-                return orgList;
-            }
-
+        final String finalUserId = userId;
+        Object cache = SecurityCache.get(redisTemplate, cacheKey, (k) -> {
             // 查询数据库
-            ResultVo<List<UserOrgRefModel>> resultVo = userOrgRefApi.findListByUserId(userId);
-            if(resultVo.isSuccess()){
-                orgList = resultVo.getData();
-                // 存入缓存
-                CacheUtil.put(cacheKey, orgList);
+            ResultVo<List<UserOrgRefModel>> resultVo = userOrgRefApi.findListByUserId(finalUserId);
+            if(!resultVo.isSuccess()){
+                return null;
             }
-        }catch (Exception e){
-            log.error(e.getMessage(), e);
-        }finally {
-            // 释放锁
-            DistributedLockUtil.unlock(cacheKey);
-        }
+            return resultVo.getData();
+        }, true);
 
-        if(CollUtil.isEmpty(orgList)){
-            // 设置空变量 用于防止穿透判断
-            CacheUtil.putNilFlag(cacheKey);
+        List<UserOrgRefModel> orgList = Convert.toList(UserOrgRefModel.class, cache);
+        if(null == orgList){
             return ListUtil.empty();
         }
-
         return orgList;
     }
 
@@ -561,61 +364,24 @@ public class UserUtil {
             userId = currUser.getSwitchTenantUserId();
         }
 
+
         // 缓存Key
-        String cacheKey = PREFIX_ID_MENUS + userId;
+        String cacheKey = CacheUtil.formatKey(RedisConstants.PREFIX_USER_ID_MENUS + userId);
 
-        List<MenuModel> menus;
-
-        // 先从缓存里拿
-        Object obj = CacheUtil.getTimed(cacheKey);
-        menus = Convert.toList(MenuModel.class, obj);
-        if(CollUtil.isNotEmpty(menus)){
-            return menus;
-        }
-
-        // 拿不到 --------
-        // 防止缓存穿透判断
-        boolean hasNilFlag = CacheUtil.hasNilFlag(cacheKey);
-        if(hasNilFlag){
-            return ListUtil.empty();
-        }
-
-
-        try {
-            // 分布式加锁
-            if(!DistributedLockUtil.lock(cacheKey)){
-                // 无法申领分布式锁
-                log.error(CoreMsg.REDIS_EXCEPTION_LOCK.getMessage());
-                return ListUtil.empty();
-            }
-
-            // 如果获得锁 则 再次检查缓存里有没有， 如果有则直接退出， 没有的话才发起数据库请求
-            obj = CacheUtil.getTimed(cacheKey);
-            menus = Convert.toList(MenuModel.class, obj);
-            if(CollUtil.isNotEmpty(menus)){
-                return menus;
-            }
-
+        final String finalUserId = userId;
+        Object cache = SecurityCache.get(redisTemplate, cacheKey, (k) -> {
             // 查询数据库
-            ResultVo<List<MenuModel>> resultVo = userRoleRefApi.getMenuListByUserId(userId);
-            if(resultVo.isSuccess()){
-                menus = resultVo.getData();
-                // 存入缓存
-                CacheUtil.put(cacheKey, menus);
+            ResultVo<List<MenuModel>> resultVo = userRoleRefApi.getMenuListByUserId(finalUserId);
+            if(!resultVo.isSuccess()){
+                return null;
             }
-        }catch (Exception e){
-            log.error(e.getMessage(), e);
-        }finally {
-            // 释放锁
-            DistributedLockUtil.unlock(cacheKey);
-        }
+            return resultVo.getData();
+        }, true);
 
-        if(CollUtil.isEmpty(menus)){
-            // 设置空变量 用于防止穿透判断
-            CacheUtil.putNilFlag(cacheKey);
+        List<MenuModel> menus = Convert.toList(MenuModel.class, cache);
+        if(null == menus){
             return ListUtil.empty();
         }
-
         return menus;
     }
 
@@ -637,57 +403,21 @@ public class UserUtil {
             userId = currUser.getSwitchTenantUserId();
         }
 
+
         // 缓存Key
-        String cacheKey = PREFIX_ID_DEF_ROLE + userId;
+        String cacheKey = CacheUtil.formatKey(RedisConstants.PREFIX_USER_ID_DEF_ROLE + userId);
 
-        // 先从缓存里拿
-        RoleModel roleModel = CacheUtil.getTimed(RoleModel.class, cacheKey);
-        if (roleModel != null){
-            return roleModel;
-        }
-
-        // 拿不到 --------
-        // 防止缓存穿透判断
-        boolean hasNilFlag = CacheUtil.hasNilFlag(cacheKey);
-        if(hasNilFlag){
-            return null;
-        }
-
-        try {
-            // 分布式加锁
-            if(!DistributedLockUtil.lock(cacheKey)){
-                // 无法申领分布式锁
-                log.error(CoreMsg.REDIS_EXCEPTION_LOCK.getMessage());
+        final String finalUserId = userId;
+        Object cache = SecurityCache.get(redisTemplate, cacheKey, (k) -> {
+            // 查询数据库
+            ResultVo<RoleModel> resultVo = userRoleRefApi.getDefRoleByUserId(finalUserId);
+            if(!resultVo.isSuccess()){
                 return null;
             }
+            return resultVo.getData();
+        }, true);
 
-            // 如果获得锁 则 再次检查缓存里有没有， 如果有则直接退出， 没有的话才发起数据库请求
-            roleModel = CacheUtil.getTimed(RoleModel.class, cacheKey);
-            if (roleModel != null){
-                return roleModel;
-            }
-
-            // 查询数据库
-            ResultVo<RoleModel> resultVo = userRoleRefApi.getDefRoleByUserId(userId);
-            if(resultVo.isSuccess()){
-                roleModel = resultVo.getData();
-                // 存入缓存
-                CacheUtil.put(cacheKey, roleModel);
-            }
-        }catch (Exception e){
-            log.error(e.getMessage(),e);
-        }finally {
-            // 释放锁
-            DistributedLockUtil.unlock(cacheKey);
-        }
-
-        if(roleModel == null){
-            // 设置空变量 用于防止穿透判断
-            CacheUtil.putNilFlag(cacheKey);
-            return null;
-        }
-
-        return roleModel;
+        return Convert.convert(RoleModel.class, cache);
     }
 
 
@@ -710,56 +440,19 @@ public class UserUtil {
         }
 
         // 缓存Key
-        String cacheKey = PREFIX_ID_DEF_ORG + userId;
+        String cacheKey = CacheUtil.formatKey(RedisConstants.PREFIX_USER_ID_DEF_ORG + userId);
 
-        // 先从缓存里拿
-        UserOrgRefModel orgModel = CacheUtil.getTimed(UserOrgRefModel.class, cacheKey);
-        if (orgModel != null){
-            return orgModel;
-        }
-
-        // 拿不到 --------
-        // 防止缓存穿透判断
-        boolean hasNilFlag = CacheUtil.hasNilFlag(cacheKey);
-        if(hasNilFlag){
-            return null;
-        }
-
-        try {
-            // 分布式加锁
-            if(!DistributedLockUtil.lock(cacheKey)){
-                // 无法申领分布式锁
-                log.error(CoreMsg.REDIS_EXCEPTION_LOCK.getMessage());
+        final String finalUserId = userId;
+        Object cache = SecurityCache.get(redisTemplate, cacheKey, (k) -> {
+            // 查询数据库
+            ResultVo<UserOrgRefModel> resultVo = userOrgRefApi.getDefOrgByUserId(finalUserId);
+            if(!resultVo.isSuccess()){
                 return null;
             }
+            return resultVo.getData();
+        }, true);
 
-            // 如果获得锁 则 再次检查缓存里有没有， 如果有则直接退出， 没有的话才发起数据库请求
-            orgModel = CacheUtil.getTimed(UserOrgRefModel.class, cacheKey);
-            if (orgModel != null){
-                return orgModel;
-            }
-
-            // 查询数据库
-            ResultVo<UserOrgRefModel> resultVo = userOrgRefApi.getDefOrgByUserId(userId);
-            if(resultVo.isSuccess()){
-                orgModel = resultVo.getData();
-                // 存入缓存
-                CacheUtil.put(cacheKey, orgModel);
-            }
-        }catch (Exception e){
-            log.error(e.getMessage(),e);
-        }finally {
-            // 释放锁
-            DistributedLockUtil.unlock(cacheKey);
-        }
-
-        if(orgModel == null){
-            // 设置空变量 用于防止穿透判断
-            CacheUtil.putNilFlag(cacheKey);
-            return null;
-        }
-
-        return orgModel;
+        return Convert.convert(UserOrgRefModel.class, cache);
     }
 
 
@@ -781,33 +474,11 @@ public class UserUtil {
         }
 
         // 缓存Key
-        String cacheKey = PREFIX_ID + user.getId();
-        try {
-            // 存入缓存
-            CacheUtil.put(cacheKey, user);
-        }catch (Exception e){
-            log.error(e.getMessage(), e);
-        }
+        String cacheKey = CacheUtil.formatKey(RedisConstants.PREFIX_USER_ID + user.getId());
+        // 存入缓存
+        SecurityCache.put(redisTemplate, cacheKey, user);
 
-        try {
-            // 分布式加锁
-            if(!DistributedLockUtil.lock(cacheKey)){
-                // 无法申领分布式锁
-                log.error(CoreMsg.REDIS_EXCEPTION_LOCK.getMessage());
-                return false;
-            }
-
-            // 存入缓存
-            flag = CacheUtil.put(cacheKey, user);
-        }catch (Exception e){
-            flag = false;
-            log.error(e.getMessage(), e);
-        }finally {
-            // 释放锁
-            DistributedLockUtil.unlock(cacheKey);
-        }
-
-        return flag;
+        return true;
     }
 
     /**
@@ -824,49 +495,22 @@ public class UserUtil {
             return true;
         }
 
-        UserModel userModelById = CacheUtil.getTimed(
-                UserModel.class, PREFIX_ID + user.getId());
-        UserModel userModelByUsername = CacheUtil.getTimed(
-                UserModel.class, PREFIX_USERNAME + user.getUsername());
-
-        boolean hasNilFlagById = CacheUtil.hasNilFlag(PREFIX_ID + user.getId());
-        boolean hasNilFlagByName = CacheUtil.hasNilFlag(PREFIX_USERNAME + user.getUsername());
+        String cacheKeyByUserId = CacheUtil.formatKey(RedisConstants.PREFIX_USER_ID + user.getId());
+        String cacheKeyByUsername = CacheUtil.formatKey(RedisConstants.PREFIX_USERNAME + user.getUsername());
 
         // 计数器
-        int count = 0;
-
-        if (hasNilFlagById){
-            count++;
+        int count = 2;
+        {
             // 清除空拦截
-            boolean tmp = CacheUtil.delNilFlag(PREFIX_ID + user.getId());
+            boolean tmp = SecurityCache.remove(redisTemplate, cacheKeyByUserId);
             if(tmp){
                 count--;
             }
         }
 
-        if (hasNilFlagByName){
-            count++;
+        {
             // 清除空拦截
-            boolean tmp = CacheUtil.delNilFlag(PREFIX_USERNAME + user.getUsername());
-            if(tmp){
-                count--;
-            }
-        }
-
-        // 只要有一个不为空 则执行刷新
-        if (userModelById != null){
-            count++;
-            // 先删除
-            boolean tmp = CacheUtil.del(PREFIX_ID + user.getId());
-            if(tmp){
-                count--;
-            }
-        }
-
-        if (userModelByUsername != null){
-            count++;
-            // 先删除
-            boolean tmp = CacheUtil.del(PREFIX_USERNAME + user.getUsername());
+            boolean tmp = SecurityCache.remove(redisTemplate, cacheKeyByUsername);
             if(tmp){
                 count--;
             }
@@ -886,32 +530,9 @@ public class UserUtil {
         ThrowExceptionUtil.isThrowException(!IS_INIT,
                 CoreMsg.OTHER_EXCEPTION_UTILS_INIT);
 
-        Object obj = CacheUtil.getTimed(PREFIX_ID_ROLES + userId);
-        boolean hasNilFlag = CacheUtil.hasNilFlag(PREFIX_ID_ROLES + userId);
+        String cacheKey = CacheUtil.formatKey(RedisConstants.PREFIX_USER_ID_AND_ROLES + userId);
 
-        // 计数器
-        int count = 0;
-
-        // 只要不为空 则执行刷新
-        if (hasNilFlag){
-            count++;
-            // 清除空拦截
-            boolean tmp = CacheUtil.delNilFlag(PREFIX_ID_ROLES + userId);
-            if(tmp){
-                count--;
-            }
-        }
-
-        if(obj != null){
-            count++;
-            // 先删除
-            boolean tmp = CacheUtil.del(PREFIX_ID_ROLES + userId);
-            if(tmp){
-                count--;
-            }
-        }
-
-        return count == 0;
+        return SecurityCache.remove(redisTemplate, cacheKey);
     }
 
     /**
@@ -928,32 +549,9 @@ public class UserUtil {
             return true;
         }
 
-        // 计数器
-        int count = 0;
+        String cacheKey = CacheUtil.formatKey(RedisConstants.PREFIX_USER_ID_DEF_ROLE + userId);
 
-        RoleModel roleModel = CacheUtil.getTimed(RoleModel.class, PREFIX_ID_DEF_ROLE + userId);
-        boolean hasNilFlag = CacheUtil.hasNilFlag(PREFIX_ID_DEF_ROLE + userId);
-
-        // 只要不为空 则执行刷新
-        if (hasNilFlag){
-            count++;
-            // 清除空拦截
-            boolean tmp = CacheUtil.delNilFlag(PREFIX_ID_DEF_ROLE + userId);
-            if(tmp){
-                count--;
-            }
-        }
-
-        if(roleModel != null){
-            count++;
-            // 先删除
-            boolean tmp = CacheUtil.del(PREFIX_ID_DEF_ROLE + userId);
-            if(tmp){
-                count--;
-            }
-        }
-
-        return count == 0;
+        return SecurityCache.remove(redisTemplate, cacheKey);
     }
 
 
@@ -968,34 +566,9 @@ public class UserUtil {
         ThrowExceptionUtil.isThrowException(!IS_INIT,
                 CoreMsg.OTHER_EXCEPTION_UTILS_INIT);
 
+        String cacheKey = CacheUtil.formatKey(RedisConstants.PREFIX_USER_ID_PERMISSIONS + userId);
 
-        Object obj = CacheUtil.getTimed(PREFIX_ID_PERMISSIONS + userId);
-        boolean hasNilFlag = CacheUtil.hasNilFlag(PREFIX_ID_PERMISSIONS + userId);
-
-        // 计数器
-        int count = 0;
-
-        // 只要不为空 则执行刷新
-        if (hasNilFlag){
-            count++;
-            // 清除空拦截
-            boolean tmp = CacheUtil.delNilFlag(PREFIX_ID_PERMISSIONS + userId);
-            if(tmp){
-                count--;
-            }
-        }
-
-        if(obj != null){
-            count++;
-            // 先删除
-            boolean tmp = CacheUtil.del(PREFIX_ID_PERMISSIONS + userId);
-            if(tmp){
-                count--;
-            }
-        }
-
-
-        return count == 0;
+        return SecurityCache.remove(redisTemplate, cacheKey);
     }
 
     /**
@@ -1012,31 +585,9 @@ public class UserUtil {
             return true;
         }
 
-        // 计数器
-        int count = 0;
+        String cacheKey = CacheUtil.formatKey(RedisConstants.PREFIX_USER_ID_ORGS + userId);
 
-        UserOrgRefWebModel orgRefModel = CacheUtil.getTimed(UserOrgRefWebModel.class, PREFIX_ID_ORGS + userId);
-        boolean hasNilFlag = CacheUtil.hasNilFlag(PREFIX_ID_ORGS + userId);
-
-        // 只要不为空 则执行刷新
-        if (hasNilFlag){
-            count++;
-            // 清除空拦截
-            boolean tmp = CacheUtil.delNilFlag(PREFIX_ID_ORGS + userId);
-            if(tmp){
-                count--;
-            }
-        }
-
-        if(orgRefModel != null){
-            count++;
-            // 先删除
-            boolean tmp = CacheUtil.del(PREFIX_ID_ORGS + userId);
-            if(tmp){
-                count--;
-            }
-        }
-        return count == 0;
+        return SecurityCache.remove(redisTemplate, cacheKey);
     }
 
     /**
@@ -1053,32 +604,9 @@ public class UserUtil {
             return true;
         }
 
-        // 计数器
-        int count = 0;
+        String cacheKey = CacheUtil.formatKey(RedisConstants.PREFIX_USER_ID_DEF_ORG + userId);
 
-        UserOrgRefModel orgModel = CacheUtil.getTimed(UserOrgRefModel.class, PREFIX_ID_DEF_ORG + userId);
-        boolean hasNilFlag = CacheUtil.hasNilFlag(PREFIX_ID_DEF_ORG + userId);
-
-        // 只要不为空 则执行刷新
-        if (hasNilFlag){
-            count++;
-            // 清除空拦截
-            boolean tmp = CacheUtil.delNilFlag(PREFIX_ID_DEF_ORG + userId);
-            if(tmp){
-                count--;
-            }
-        }
-
-        if(orgModel != null){
-            count++;
-            // 先删除
-            boolean tmp = CacheUtil.del(PREFIX_ID_DEF_ORG + userId);
-            if(tmp){
-                count--;
-            }
-        }
-
-        return count == 0;
+        return SecurityCache.remove(redisTemplate, cacheKey);
     }
 
 
@@ -1092,33 +620,9 @@ public class UserUtil {
         ThrowExceptionUtil.isThrowException(!IS_INIT,
                 CoreMsg.OTHER_EXCEPTION_UTILS_INIT);
 
+        String cacheKey = CacheUtil.formatKey(RedisConstants.PREFIX_USER_ID_MENUS + userId);
 
-        Object obj = CacheUtil.getTimed(PREFIX_ID_MENUS + userId);
-        boolean hasNilFlag = CacheUtil.hasNilFlag(PREFIX_ID_MENUS + userId);
-
-        // 计数器
-        int count = 0;
-
-        // 只要不为空 则执行刷新
-        if (hasNilFlag){
-            count++;
-            // 清除空拦截
-            boolean tmp = CacheUtil.delNilFlag(PREFIX_ID_MENUS + userId);
-            if(tmp){
-                count--;
-            }
-        }
-
-        if(obj != null){
-            count++;
-            // 先删除
-            boolean tmp = CacheUtil.del(PREFIX_ID_MENUS + userId);
-            if(tmp){
-                count--;
-            }
-        }
-
-        return count == 0;
+        return SecurityCache.remove(redisTemplate, cacheKey);
     }
 
     /**
@@ -1201,7 +705,8 @@ public class UserUtil {
     public void init(GlobalProperties globalProperties,
                      UserApi userApi,
                      UserRoleRefApi userRoleRefApi,
-                     UserOrgRefApi userOrgRefApi){
+                     UserOrgRefApi userOrgRefApi,
+                     RedisTemplate<String, Object> redisTemplate) {
         if(globalProperties != null && globalProperties.getAuth() != null
                 && globalProperties.getAuth().getToken() != null
             ){
@@ -1210,11 +715,9 @@ public class UserUtil {
         }
 
         UserUtil.userApi = userApi;
-
         UserUtil.userRoleRefApi = userRoleRefApi;
-
         UserUtil.userOrgRefApi = userOrgRefApi;
-
+        UserUtil.redisTemplate = redisTemplate;
         IS_INIT = true;
     }
 

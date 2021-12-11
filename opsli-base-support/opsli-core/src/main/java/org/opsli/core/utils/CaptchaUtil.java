@@ -98,8 +98,11 @@ public class CaptchaUtil {
         // 生成验证码
         Captcha captcha = captchaStrategy.createCaptcha();
 
+        // 缓存Key
+        String cacheKey = CacheUtil.formatKey(PREFIX + uuid);
+
         // 保存至缓存
-        boolean ret = redisPlugin.put(CacheUtil.getPrefixName() + PREFIX + uuid, captcha.text(), TIME_OUT);
+        boolean ret = redisPlugin.put(cacheKey, captcha.text(), TIME_OUT);
         if(ret){
             // 输出
             captcha.out(out);
@@ -127,8 +130,11 @@ public class CaptchaUtil {
             throw new TokenException(TokenMsg.EXCEPTION_CAPTCHA_CODE_NULL);
         }
 
+        // 缓存Key
+        String cacheKey = CacheUtil.formatKey(PREFIX + uuid);
+
         // 验证码
-        String codeTemp = (String) redisPlugin.get(CacheUtil.getPrefixName() + PREFIX + uuid);
+        String codeTemp = (String) redisPlugin.get(cacheKey);
         if (StringUtils.isEmpty(codeTemp)) {
             throw new TokenException(TokenMsg.EXCEPTION_CAPTCHA_NULL);
         }
@@ -156,8 +162,11 @@ public class CaptchaUtil {
             return false;
         }
 
+        // 缓存Key
+        String cacheKey = CacheUtil.formatKey(PREFIX + uuid);
+
         //删除验证码
-        return redisPlugin.del(CacheUtil.getPrefixName() + PREFIX + uuid);
+        return redisPlugin.del(cacheKey);
     }
 
     // ======================

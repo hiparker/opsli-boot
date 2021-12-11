@@ -1,10 +1,4 @@
 {
   "properties": [
-    {
-      "name": "spring.redis.pushsub.enable",
-      "type": "java.lang.Boolean",
-      "defaultValue": false,
-      "description": "开启消息订阅."
-    }
   ]
 }

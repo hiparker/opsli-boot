@@ -20,16 +20,18 @@ import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.comparator.CompareUtil;
 import cn.hutool.core.convert.Convert;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
 import org.opsli.core.cache.CacheUtil;
+import org.opsli.core.cache.SecurityCache;
 import org.opsli.core.msg.CoreMsg;
-import org.opsli.core.utils.DistributedLockUtil;
 import org.opsli.core.utils.ThrowExceptionUtil;
 import org.opsli.modulars.generator.template.service.IGenTemplateDetailService;
 import org.opsli.modulars.generator.template.wrapper.GenTemplateDetailModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.core.annotation.Order;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -53,10 +55,12 @@ public class GenTemplateUtil {
     private static boolean IS_INIT;
 
     /** 缓存前缀 NAME */
-    private static final String CACHE_PREFIX_NAME = "gen:template:";
+    private static final String CACHE_PREFIX_NAME = "hash#{}:gen:template:";
 
     /** 代码模板明细 Service */
     private static IGenTemplateDetailService genTemplateDetailService;
+
+    private static RedisTemplate<String, Object> redisTemplate;
 
     /**
      * 根据模板ID 模板明细列表
@@ -69,77 +73,21 @@ public class GenTemplateUtil {
                 CoreMsg.OTHER_EXCEPTION_UTILS_INIT);
 
         // 缓存Key
-        String cacheKey = CACHE_PREFIX_NAME + parentId;
+        String cacheKey = CacheUtil.formatKey(CACHE_PREFIX_NAME + parentId);
+
+        Map<String, Object> templateCache = SecurityCache.hGetAll(redisTemplate, cacheKey, (k) -> {
+            // 处理数据库查询数据
+            List<GenTemplateDetailModel> listByParent = genTemplateDetailService.findListByParent(parentId);
+            Map<String, Object> templateMap = Maps.newHashMapWithExpectedSize(listByParent.size());
+            for (GenTemplateDetailModel genTemplateDetailModel : listByParent) {
+                templateMap.put(genTemplateDetailModel.getId(), genTemplateDetailModel);
+            }
+            return templateMap;
+        });
+
 
         // 处理集合数据
-        List<GenTemplateDetailModel> wrapperModels = handleDictList(
-                    CacheUtil.getHashAll(cacheKey), parentId);
-        if(CollUtil.isNotEmpty(wrapperModels)){
-            return sortWrappers(wrapperModels);
-        }
-
-        // 防止缓存穿透判断
-        boolean hasNilFlag = CacheUtil.hasNilFlag(cacheKey);
-        if(hasNilFlag){
-            return sortWrappers(wrapperModels);
-        }
-
-        try {
-            // 分布式加锁
-            if(!DistributedLockUtil.lock(cacheKey)){
-                // 无法申领分布式锁
-                log.error(CoreMsg.REDIS_EXCEPTION_LOCK.getMessage());
-                return sortWrappers(wrapperModels);
-            }
-
-            // 如果获得锁 则 再次检查缓存里有没有， 如果有则直接退出， 没有的话才发起数据库请求
-            // 处理集合数据
-            wrapperModels = handleDictList(
-                    CacheUtil.getHashAll(cacheKey), parentId);
-            if(CollUtil.isNotEmpty(wrapperModels)){
-                return sortWrappers(wrapperModels);
-            }
-
-
-            List<GenTemplateDetailModel> listByParent = genTemplateDetailService.findListByParent(parentId);
-            // 处理数据库查询数据
-            if(CollUtil.isNotEmpty(listByParent)){
-                wrapperModels = listByParent;
-                // 计数器
-                int count = wrapperModels.size();
-                for (GenTemplateDetailModel model : wrapperModels) {
-                    // 保存至缓存
-                    boolean ret = GenTemplateUtil.put(model);
-                    if(ret){
-                        count--;
-                    }
-                }
-
-                // 回滚 清空缓存
-                if(count != 0){
-                    for (GenTemplateDetailModel model : wrapperModels) {
-                        GenTemplateUtil.del(model);
-                    }
-                }
-
-                return sortWrappers(wrapperModels);
-            }
-
-        }catch (Exception e){
-            log.error(e.getMessage(),e);
-        }finally {
-            // 释放锁
-            DistributedLockUtil.unlock(cacheKey);
-        }
-
-        // 如果值还是 为空 则赋默认值
-        if(CollUtil.isEmpty(wrapperModels)){
-            // 加入缓存防穿透
-            // 设置空变量 用于防止穿透判断
-            CacheUtil.putNilFlag(cacheKey);
-        }
-
-        // 排序
+        List<GenTemplateDetailModel> wrapperModels = handleDictList(templateCache);
         return sortWrappers(wrapperModels);
     }
 
@@ -150,8 +98,8 @@ public class GenTemplateUtil {
      */
     private static List<GenTemplateDetailModel> sortWrappers(List<GenTemplateDetailModel> wrapperModels) {
         // 非法判读
-        if(wrapperModels == null){
-            return null;
+        if(CollUtil.isEmpty(wrapperModels)){
+            return ListUtil.empty();
         }
 
         return ListUtil.sort(wrapperModels,
@@ -161,22 +109,6 @@ public class GenTemplateUtil {
 
     // ===============
 
-
-    /**
-     * 删除 字典
-     * @param model 字典模型
-     */
-    private static boolean put(GenTemplateDetailModel model){
-        // 判断 工具类是否初始化完成
-        ThrowExceptionUtil.isThrowException(!IS_INIT,
-                CoreMsg.OTHER_EXCEPTION_UTILS_INIT);
-
-        // 清除缓存
-        GenTemplateUtil.del(model);
-
-        return CacheUtil.putHash(CACHE_PREFIX_NAME + model.getParentId(),
-                model.getId(), model);
-    }
 
     /**
      * 删除 字典
@@ -192,36 +124,10 @@ public class GenTemplateUtil {
             return true;
         }
 
-        boolean hasNilFlag = CacheUtil.hasNilFlag(CACHE_PREFIX_NAME +
-                model.getParentId() + ":" + model.getId());
+        // 缓存Key
+        String cacheKey = CacheUtil.formatKey(CACHE_PREFIX_NAME + model.getParentId());
 
-        GenTemplateDetailModel templateDetailModel = CacheUtil.getHash(GenTemplateDetailModel.class,
-                CACHE_PREFIX_NAME + model.getParentId(),
-                model.getId());
-
-        // 计数器
-        int count = 0;
-        if (hasNilFlag){
-            count++;
-            // 清除空拦截
-            boolean tmp = CacheUtil.delNilFlag(CACHE_PREFIX_NAME +
-                    model.getParentId() + ":" + model.getId());
-            if(tmp){
-                count--;
-            }
-        }
-
-        if (templateDetailModel != null){
-            count++;
-            // 清除空拦截
-            boolean tmp = CacheUtil.delHash(CACHE_PREFIX_NAME +
-                    model.getParentId(), model.getId());
-            if(tmp){
-                count--;
-            }
-        }
-
-        return count == 0;
+        return SecurityCache.hDel(redisTemplate, cacheKey, model.getId());
     }
 
     /**
@@ -234,29 +140,18 @@ public class GenTemplateUtil {
         ThrowExceptionUtil.isThrowException(!IS_INIT,
                 CoreMsg.OTHER_EXCEPTION_UTILS_INIT);
 
-        List<GenTemplateDetailModel> wrapperList = GenTemplateUtil.getTemplateDetailList(parentId);
-        if(CollUtil.isEmpty(wrapperList)){
-            return true;
-        }
+        // 缓存Key
+        String cacheKey = CacheUtil.formatKey(CACHE_PREFIX_NAME + parentId);
 
-        // 计数器
-        int count = wrapperList.size();
-        for (GenTemplateDetailModel wrapperModel : wrapperList) {
-            boolean tmp = GenTemplateUtil.del(wrapperModel);
-            if(tmp){
-                count--;
-            }
-        }
-        return count == 0;
+        return SecurityCache.remove(redisTemplate, cacheKey);
     }
 
     /***
      * 处理返回模板明细集合
      * @param tempMap Map
-     * @param id 模板ID
      * @return List
      */
-    public static List<GenTemplateDetailModel> handleDictList(Map<String, Object> tempMap, String id){
+    public static List<GenTemplateDetailModel> handleDictList(Map<String, Object> tempMap){
         List<GenTemplateDetailModel> wrapperModels = Lists.newArrayList();
         if(CollUtil.isNotEmpty(tempMap)){
             for (Map.Entry<String, Object> entry : tempMap.entrySet()) {
@@ -278,8 +173,10 @@ public class GenTemplateUtil {
      * 初始化
      */
     @Autowired
-    public  void init(IGenTemplateDetailService genTemplateDetailService) {
+    public  void init(IGenTemplateDetailService genTemplateDetailService,
+                      RedisTemplate<String, Object> redisTemplate) {
         GenTemplateUtil.genTemplateDetailService = genTemplateDetailService;
+        GenTemplateUtil.redisTemplate = redisTemplate;
 
         IS_INIT = true;
     }

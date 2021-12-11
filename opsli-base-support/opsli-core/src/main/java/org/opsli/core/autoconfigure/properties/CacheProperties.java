@@ -32,7 +32,7 @@ import org.springframework.stereotype.Component;
 @EqualsAndHashCode(callSuper = false)
 public class CacheProperties {
 
-    public static final String PROP_PREFIX = "spring.cache-conf";
+    public static final String PROP_PREFIX = "spring.cache";
 
     /** 缓存前缀 */
     private String prefix;

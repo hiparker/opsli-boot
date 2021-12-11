@@ -45,9 +45,6 @@ import static org.opsli.common.constants.OrderConstants.UTIL_ORDER;
 @Lazy(false)
 public class MenuUtil {
 
-    /** 前缀 */
-    public static final String PREFIX_CODE = "menu:code:";
-
     /** 菜单 Api */
     private static MenuApi menuApi;
 

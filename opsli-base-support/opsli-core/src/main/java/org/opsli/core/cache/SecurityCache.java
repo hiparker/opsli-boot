@@ -1,8 +1,24 @@
+/**
+ * Copyright 2020 OPSLI 快速开发平台 https://www.opsli.com
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ */
 package org.opsli.core.cache;
 
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.RandomUtil;
+import cn.hutool.core.util.StrUtil;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.util.concurrent.Striped;
@@ -144,10 +160,12 @@ public final class SecurityCache {
 			throw new RuntimeException("入参[redisTemplate,key,val]必填");
 		}
 
+		String cacheKey = StrUtil.addPrefixIfNot(key, CACHE_PREFIX_KV);
+
 		// 判断是否为永久存储
 		if(isEden) {
 			redisTemplate.opsForValue()
-					.set("kv#" + key, val);
+					.set(cacheKey, val);
 		}else{
 			// 随机缓存失效时间 防止缓存雪崩
 			// 范围在当前时效的 1.2 - 2倍
@@ -159,7 +177,12 @@ public final class SecurityCache {
 			);
 
 			redisTemplate.opsForValue()
-					.set(CACHE_PREFIX_KV + key, val, timeout, TimeUnit.SECONDS);
+					.set(
+							cacheKey,
+							val,
+							timeout,
+							TimeUnit.SECONDS
+					);
 		}
 
 		// 清除本地记录
@@ -356,8 +379,10 @@ public final class SecurityCache {
 			throw new RuntimeException("入参[redisTemplate,key,cacheMap]必填");
 		}
 
+		String cacheKeyByHash = StrUtil.addPrefixIfNot(key, CACHE_PREFIX_HASH);
+
 		redisTemplate.opsForHash()
-				.putAll(CACHE_PREFIX_HASH + key, cacheMap);
+				.putAll(cacheKeyByHash, cacheMap);
 
 		// 清除本地记录
 		LFU_NULL_CACHE.invalidate(key);
@@ -378,8 +403,10 @@ public final class SecurityCache {
 			throw new RuntimeException("入参[redisTemplate,key,field,val]必填");
 		}
 
+		String cacheKeyByHash = StrUtil.addPrefixIfNot(key, CACHE_PREFIX_HASH);
+
 		redisTemplate.opsForHash()
-				.put(CACHE_PREFIX_HASH + key, field, val);
+				.put(cacheKeyByHash, field, val);
 
 		final String tempKey = key + "_" + field;
 		// 清除本地记录
@@ -431,8 +458,13 @@ public final class SecurityCache {
 
 		// 清除本地记录
 		LFU_NULL_CACHE.invalidate(key);
+
+		String cacheKeyByKv = StrUtil.addPrefixIfNot(key, CACHE_PREFIX_KV);
+		String cacheKeyByHash = StrUtil.addPrefixIfNot(key, CACHE_PREFIX_HASH);
+
 		// 清除缓存
-		redisTemplate.delete(key);
+		redisTemplate.delete(cacheKeyByKv);
+		redisTemplate.delete(cacheKeyByHash);
 		return true;
 	}
 
@@ -455,8 +487,10 @@ public final class SecurityCache {
 				return null;
 			}
 
+			String cacheKey = StrUtil.addPrefixIfNot(key, CACHE_PREFIX_KV);
+
 			// 从 缓存回调查询数据
-			cache = redisTemplate.opsForValue().get(CACHE_PREFIX_KV + key);
+			cache = redisTemplate.opsForValue().get(cacheKey);
 		}catch (Exception e){
 			log.error(e.getMessage(), e);
 		}
@@ -481,8 +515,10 @@ public final class SecurityCache {
 				return null;
 			}
 
+			String cacheKeyByHash = StrUtil.addPrefixIfNot(key, CACHE_PREFIX_HASH);
+
 			// 从 缓存回调查询数据
-			cache = redisTemplate.opsForHash().get(CACHE_PREFIX_HASH + key, field);
+			cache = redisTemplate.opsForHash().get(cacheKeyByHash, field);
 		}catch (Exception e){
 			log.error(e.getMessage(), e);
 		}
@@ -508,8 +544,10 @@ public final class SecurityCache {
 				return null;
 			}
 
+			String cacheKeyByHash = StrUtil.addPrefixIfNot(key, CACHE_PREFIX_HASH);
+
 			// 从 缓存回调查询数据
-			Map<Object, Object> entries = redisTemplate.opsForHash().entries(CACHE_PREFIX_HASH + key);
+			Map<Object, Object> entries = redisTemplate.opsForHash().entries(cacheKeyByHash);
 
 			// 如果补偿器不为空 则进行补偿判断
 			if(null != callbackSourceCount){
