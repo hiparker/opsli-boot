@@ -243,22 +243,7 @@ public class DictUtil {
         String cacheKeyByName = CacheUtil.formatKey(
                 RedisConstants.PREFIX_DICT_NAME + typeCode);
 
-        // 计数器
-        int count = 2;
-        {
-            boolean tmp = SecurityCache.remove(redisTemplate, cacheKeyByValue);
-            if(tmp){
-                count--;
-            }
-        }
-
-        {
-            boolean tmp = SecurityCache.remove(redisTemplate, cacheKeyByName);
-            if(tmp){
-                count--;
-            }
-        }
-        return count == 0;
+        return SecurityCache.removeMore(redisTemplate, cacheKeyByValue, cacheKeyByName);
     }
 
 

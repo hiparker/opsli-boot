@@ -413,6 +413,32 @@ public final class SecurityCache {
 		LFU_NULL_CACHE.invalidate(tempKey);
 	}
 
+
+	/**
+	 * 批量删除 Hash缓存
+	 * @param redisTemplate redisTemplate
+	 * @param key 主键
+	 * @param fields 字段
+	 * @return boolean
+	 */
+	public static boolean hDelMore(
+			final RedisTemplate<String, Object> redisTemplate,
+			final String key, final String... fields) {
+		if (null == redisTemplate || null == key
+				|| null == fields ) {
+			throw new RuntimeException("入参[redisTemplate,key,fields]必填");
+		}
+
+		int count = fields.length;
+		for (String field : fields) {
+			boolean isDel = hDel(redisTemplate, key, field);
+			if(isDel){
+				count--;
+			}
+		}
+		return 0 == count;
+	}
+
 	/**
 	 * 删除 Hash缓存
 	 * @param redisTemplate redisTemplate
@@ -423,7 +449,8 @@ public final class SecurityCache {
 	public static boolean hDel(
 			final RedisTemplate<String, Object> redisTemplate,
 			final String key, final String field) {
-		if (null == redisTemplate || null == key) {
+		if (null == redisTemplate || null == key
+				|| null == field ) {
 			throw new RuntimeException("入参[redisTemplate,key,field]必填");
 		}
 
@@ -443,6 +470,28 @@ public final class SecurityCache {
 		return 0 != redisTemplate.opsForHash().delete(key, field);
 	}
 
+
+	/**
+	 * 批量删除缓存
+	 * @param redisTemplate redisTemplate
+	 * @param keys 主键
+	 */
+	public static boolean removeMore(
+			final RedisTemplate<String, Object> redisTemplate,
+			final String... keys) {
+		if (null == redisTemplate || null == keys) {
+			throw new RuntimeException("入参[redisTemplate,keys]必填");
+		}
+
+		int count = keys.length;
+		for (String key : keys) {
+			boolean isRemove = remove(redisTemplate, key);
+			if(isRemove){
+				count--;
+			}
+		}
+		return 0 == count;
+	}
 
 	/**
 	 * 删除缓存

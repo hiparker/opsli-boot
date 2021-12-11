@@ -498,25 +498,8 @@ public class UserUtil {
         String cacheKeyByUserId = CacheUtil.formatKey(RedisConstants.PREFIX_USER_ID + user.getId());
         String cacheKeyByUsername = CacheUtil.formatKey(RedisConstants.PREFIX_USERNAME + user.getUsername());
 
-        // 计数器
-        int count = 2;
-        {
-            // 清除空拦截
-            boolean tmp = SecurityCache.remove(redisTemplate, cacheKeyByUserId);
-            if(tmp){
-                count--;
-            }
-        }
-
-        {
-            // 清除空拦截
-            boolean tmp = SecurityCache.remove(redisTemplate, cacheKeyByUsername);
-            if(tmp){
-                count--;
-            }
-        }
-
-        return count == 0;
+        return SecurityCache.removeMore(redisTemplate,
+                cacheKeyByUserId, cacheKeyByUsername);
     }
 
 
