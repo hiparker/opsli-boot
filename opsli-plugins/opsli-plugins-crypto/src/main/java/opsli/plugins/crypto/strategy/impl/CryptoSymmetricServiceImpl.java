@@ -18,8 +18,12 @@ package opsli.plugins.crypto.strategy.impl;
 import cn.hutool.core.codec.Base64;
 import cn.hutool.core.util.CharsetUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.crypto.Mode;
+import cn.hutool.crypto.Padding;
 import cn.hutool.crypto.SecureUtil;
 import cn.hutool.crypto.SmUtil;
+import cn.hutool.crypto.symmetric.AES;
+import cn.hutool.crypto.symmetric.DES;
 import cn.hutool.crypto.symmetric.SymmetricCrypto;
 import cn.hutool.json.JSONException;
 import cn.hutool.json.JSONUtil;
@@ -245,11 +249,11 @@ public class CryptoSymmetricServiceImpl implements CryptoSymmetricService {
                 byte[] keyBytes = Base64.decode(model.getPrivateKey());
                 switch (model.getCryptoType()) {
                     case AES:{
-                        tmp = SecureUtil.aes(keyBytes);
+                        tmp = new AES(Mode.ECB, Padding.PKCS5Padding, keyBytes);
                         break;
                     }
                     case DES:{
-                        tmp = SecureUtil.des(keyBytes);
+                        tmp = new DES(Mode.ECB, Padding.PKCS5Padding, keyBytes);
                         break;
                     }
                     case DE_SEDE:{

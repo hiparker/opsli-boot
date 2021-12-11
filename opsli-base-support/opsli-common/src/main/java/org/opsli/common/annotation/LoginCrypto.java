@@ -19,7 +19,9 @@ package org.opsli.common.annotation;
 import java.lang.annotation.*;
 
 /**
- * Api非对称加解密
+ * 登录加解密
+ * 入参 非对称 公钥加密 私钥解密
+ * 出参 对称 公要加密 公要解密
  *
  * @author Parker
  * @date 2021年5月18日14:46:02
@@ -27,15 +29,9 @@ import java.lang.annotation.*;
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-public @interface ApiCryptoAsymmetric {
+public @interface LoginCrypto {
 
     /** 加密启用状态 */
     boolean enable() default true;
-
-    /** 请求解密 */
-    boolean requestDecrypt() default true;
-
-    /** 返回加密 */
-    boolean responseEncrypt() default true;
 
 }
