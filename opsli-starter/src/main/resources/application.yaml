@@ -153,8 +153,8 @@ opsli:
     url-patterns: "/*"
     # 排除过滤URL
     url-exclusion:
-      - "/api/generator/template/v1/insertAndDetail"
-      - "/api/generator/template/v1/updateAndDetail"
+      - "/api/v1/generator/template/insertAndDetail"
+      - "/api/v1/generator/template/updateAndDetail"
       - "/static/files/"
       - "/doc.html"
 

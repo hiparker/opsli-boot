@@ -54,7 +54,7 @@ import java.util.List;
  */
 @Api(tags = UserOrgRefApi.TITLE)
 @Slf4j
-@ApiRestController("/system/user/org/{ver}")
+@ApiRestController("/{ver}/system/user/org")
 public class UserOrgRefRestController implements UserOrgRefApi {
 
     /** 配置类 */

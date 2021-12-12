@@ -71,7 +71,7 @@ import java.util.Set;
  */
 @Api(tags = SysAreaRestApi.TITLE)
 @Slf4j
-@ApiRestController("/system/area/{ver}")
+@ApiRestController("/{ver}/system/area")
 public class SysAreaRestController extends BaseRestController<SysArea, SysAreaModel, ISysAreaService>
     implements SysAreaRestApi {
 

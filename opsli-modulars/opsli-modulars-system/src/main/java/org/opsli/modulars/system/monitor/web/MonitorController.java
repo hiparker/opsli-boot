@@ -35,7 +35,7 @@ import java.util.Map;
  */
 @Api(tags = "系统监控")
 @Slf4j
-@ApiRestController("/system/monitor/{ver}")
+@ApiRestController("/{ver}/system/monitor")
 public class MonitorController {
 
     /**

@@ -82,7 +82,7 @@ import java.util.List;
  */
 @Api(tags = UserApi.TITLE)
 @Slf4j
-@ApiRestController("/system/user/{ver}")
+@ApiRestController("/{ver}/system/user")
 public class UserRestController extends BaseRestController<SysUser, UserModel, IUserService>
         implements UserApi {
 

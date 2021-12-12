@@ -52,7 +52,7 @@ import java.lang.reflect.Method;
  */
 @Api(tags = TenantApi.TITLE)
 @Slf4j
-@ApiRestController("/system/tenant/{ver}")
+@ApiRestController("/{ver}/system/tenant")
 public class TenantRestController extends BaseRestController<SysTenant, TenantModel, ITenantService>
         implements TenantApi {
 

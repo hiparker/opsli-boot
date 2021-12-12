@@ -40,7 +40,7 @@ import javax.servlet.http.HttpServletResponse;
  */
 @Api(tags = GenLogsApi.TITLE)
 @Slf4j
-@ApiRestController("/generator/logs/{ver}")
+@ApiRestController("/{ver}/generator/logs")
 public class GenLogsRestController extends BaseRestController<GenLogs, GenLogsModel, IGenLogsService>
         implements GenLogsApi {
 

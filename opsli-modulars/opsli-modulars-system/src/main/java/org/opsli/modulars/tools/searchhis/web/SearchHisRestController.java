@@ -36,7 +36,7 @@ import java.util.Set;
  */
 @Api(tags = "搜索历史记录")
 @Slf4j
-@ApiRestController("/tools/searchhis/{ver}")
+@ApiRestController("/{ver}/tools/searchhis")
 public class SearchHisRestController {
 
     /**

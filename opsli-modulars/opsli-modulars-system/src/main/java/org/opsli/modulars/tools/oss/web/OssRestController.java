@@ -13,7 +13,7 @@ import org.opsli.common.annotation.ApiRestController;
  */
 @Api(tags = "文件管理类")
 @Slf4j
-@ApiRestController("/tools/oss/{ver}")
+@ApiRestController("/{ver}/tools/oss")
 public class OssRestController {
 
 

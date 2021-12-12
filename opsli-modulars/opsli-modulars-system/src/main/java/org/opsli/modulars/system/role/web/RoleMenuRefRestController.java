@@ -48,7 +48,7 @@ import java.util.stream.Collectors;
  */
 @Api(tags = RoleMenuRefApi.TITLE)
 @Slf4j
-@ApiRestController("/system/role/perms/{ver}")
+@ApiRestController("/{ver}/system/role/perms")
 public class RoleMenuRefRestController implements RoleMenuRefApi {
 
     /** 配置类 */
