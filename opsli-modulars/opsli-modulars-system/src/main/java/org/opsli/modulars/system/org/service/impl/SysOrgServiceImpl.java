@@ -349,7 +349,6 @@ public class SysOrgServiceImpl extends CrudServiceImpl<SysOrgMapper, SysOrg, Sys
             return false;
         }
         QueryWrapper<SysOrg> wrapper = new QueryWrapper<>();
-        wrapper.eq(FieldUtil.humpToUnderline(MyBatisConstants.FIELD_TENANT), model.getTenantId());
         wrapper.eq("org_code", model.getOrgCode());
 
         // 重复校验排除自身
