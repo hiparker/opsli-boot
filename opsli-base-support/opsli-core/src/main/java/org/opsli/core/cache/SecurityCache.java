@@ -233,7 +233,7 @@ public final class SecurityCache {
 				cache = callbackSource.apply(null);
 				if(null == cache){
 					// 存储缓存状态
-					LFU_NULL_CACHE.put(key, CacheStatus.NOT_EXIST);
+					LFU_NULL_CACHE.put(tempKey, CacheStatus.NOT_EXIST);
 					return null;
 				}
 

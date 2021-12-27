@@ -80,8 +80,8 @@ public class Page<T extends BaseEntity,E extends ApiWrapper> extends PageSeriali
     /**
      * 分页函数 不统计 count
      */
-    public void pageHelperBegin(boolean countFlag){
-        PageHelper.startPage(this.pageNo,this.pageSize, countFlag);
+    public void pageHelperBegin(boolean isByCount){
+        PageHelper.startPage(this.pageNo,this.pageSize, isByCount);
     }
 
     /**
