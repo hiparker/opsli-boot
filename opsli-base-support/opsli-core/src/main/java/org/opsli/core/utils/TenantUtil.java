@@ -15,16 +15,19 @@
  */
 package org.opsli.core.utils;
 
+import cn.hutool.core.convert.Convert;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.opsli.api.base.result.ResultVo;
 import org.opsli.api.web.system.tenant.TenantApi;
 import org.opsli.api.wrapper.system.tenant.TenantModel;
-import org.opsli.core.cache.local.CacheUtil;
+import org.opsli.core.cache.CacheUtil;
+import org.opsli.core.cache.SecurityCache;
 import org.opsli.core.msg.CoreMsg;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.core.annotation.Order;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 import static org.opsli.common.constants.OrderConstants.UTIL_ORDER;
@@ -53,6 +56,8 @@ public class TenantUtil {
     /** 增加初始状态开关 防止异常使用 */
     private static boolean IS_INIT;
 
+    private static RedisTemplate<String, Object> redisTemplate;
+
     /**
      * 根据 tenantId 获得租户
      * @param tenantId 租户ID
@@ -64,56 +69,20 @@ public class TenantUtil {
                 CoreMsg.OTHER_EXCEPTION_UTILS_INIT);
 
         // 缓存Key
-        String cacheKey = PREFIX_CODE + tenantId;
+        String cacheKey = CacheUtil.formatKey(PREFIX_CODE + tenantId);
 
-        // 先从缓存里拿
-        TenantModel tenantModel = CacheUtil.getTimed(TenantModel.class, cacheKey);
-        if (tenantModel != null){
-            return tenantModel;
-        }
 
-        // 拿不到 --------
-        // 防止缓存穿透判断
-        boolean hasNilFlag = CacheUtil.hasNilFlag(cacheKey);
-        if(hasNilFlag){
-            return null;
-        }
-
-        try {
-            // 分布式加锁
-            if(!DistributedLockUtil.lock(cacheKey)){
-                // 无法申领分布式锁
-                log.error(CoreMsg.REDIS_EXCEPTION_LOCK.getMessage());
+        Object cache = SecurityCache.get(redisTemplate, cacheKey, (k) -> {
+            // 查询数据库
+            ResultVo<TenantModel> resultVo = tenantApi.getTenantByUsable(tenantId);
+            if(!resultVo.isSuccess()){
                 return null;
             }
 
-            // 如果获得锁 则 再次检查缓存里有没有， 如果有则直接退出， 没有的话才发起数据库请求
-            tenantModel = CacheUtil.getTimed(TenantModel.class, cacheKey);
-            if (tenantModel != null){
-                return tenantModel;
-            }
+            return resultVo.getData();
+        }, true);
 
-            // 查询数据库
-            ResultVo<TenantModel> resultVo = tenantApi.getTenantByUsable(tenantId);
-            if(resultVo.isSuccess()){
-                tenantModel = resultVo.getData();
-                // 存入缓存
-                CacheUtil.put(cacheKey, tenantModel);
-            }
-        }catch (Exception e){
-            log.error(e.getMessage(),e);
-        }finally {
-            // 释放锁
-            DistributedLockUtil.unlock(cacheKey);
-        }
-
-        if(tenantModel == null){
-            // 设置空变量 用于防止穿透判断
-            CacheUtil.putNilFlag(cacheKey);
-            return null;
-        }
-
-        return tenantModel;
+        return Convert.convert(TenantModel.class, cache);
     }
 
 
@@ -133,32 +102,10 @@ public class TenantUtil {
             return true;
         }
 
-        // 计数器
-        int count = 0;
+        // 缓存Key
+        String cacheKey = CacheUtil.formatKey(PREFIX_CODE + tenantId);
 
-        TenantModel tenantModel = CacheUtil.getTimed(TenantModel.class, PREFIX_CODE + tenantId);
-        boolean hasNilFlag = CacheUtil.hasNilFlag(PREFIX_CODE + tenantId);
-
-        // 只要不为空 则执行刷新
-        if (hasNilFlag){
-            count++;
-            // 清除空拦截
-            boolean tmp = CacheUtil.delNilFlag(PREFIX_CODE + tenantId);
-            if(tmp){
-                count--;
-            }
-        }
-
-        if(tenantModel != null){
-            count++;
-            // 先删除
-            boolean tmp = CacheUtil.del(PREFIX_CODE + tenantId);
-            if(tmp){
-                count--;
-            }
-        }
-
-        return count == 0;
+        return SecurityCache.remove(redisTemplate, cacheKey);
     }
 
 
@@ -168,9 +115,10 @@ public class TenantUtil {
      * 初始化
      */
     @Autowired
-    public void init(TenantApi tenantApi) {
+    public void init(TenantApi tenantApi,
+                     RedisTemplate<String, Object> redisTemplate) {
         TenantUtil.tenantApi = tenantApi;
-
+        TenantUtil.redisTemplate = redisTemplate;
         IS_INIT = true;
     }
 

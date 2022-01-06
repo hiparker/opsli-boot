@@ -54,21 +54,11 @@ spring:
   #  allow-bean-definition-overriding: true
 
   # 缓存配置项
-  cache-conf:
+  cache:
     # 前缀
     prefix: opsli
-  # 一级缓存 ---- EhCache 配置
-  cache:
-    # 是否启用本地缓存 (默认不启用， 如果业务对于缓存依赖较高可启用本地缓存作为一级缓存)
-    enable: false
-    # 加载配置文件
-    jcache:
-      config: classpath:config/ehcache-opsli.xml
   # 二级缓存  ---- Redis 配置
   redis:
-    # 开启消息订阅
-    pushsub:
-      enable: true
     lettuce:
       pool:
         max-active: 8   #最大连接数据库连接数,设 0 为没有限制
@@ -163,8 +153,8 @@ opsli:
     url-patterns: "/*"
     # 排除过滤URL
     url-exclusion:
-      - "/api/generator/template/v1/insertAndDetail"
-      - "/api/generator/template/v1/updateAndDetail"
+      - "/api/v1/generator/template/insertAndDetail"
+      - "/api/v1/generator/template/updateAndDetail"
       - "/static/files/"
       - "/doc.html"
 

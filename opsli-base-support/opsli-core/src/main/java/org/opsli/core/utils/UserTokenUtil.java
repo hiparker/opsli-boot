@@ -28,6 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.opsli.api.base.result.ResultVo;
 import org.opsli.api.wrapper.system.user.UserModel;
+import org.opsli.common.constants.RedisConstants;
 import org.opsli.common.constants.SignConstants;
 import org.opsli.common.constants.TokenConstants;
 import org.opsli.common.constants.TokenTypeConstants;
@@ -35,7 +36,7 @@ import org.opsli.common.enums.LoginLimitRefuse;
 import org.opsli.common.exception.TokenException;
 import org.opsli.core.api.TokenThreadLocal;
 import org.opsli.core.autoconfigure.properties.GlobalProperties;
-import org.opsli.core.cache.local.CacheUtil;
+import org.opsli.core.cache.CacheUtil;
 import org.opsli.core.msg.CoreMsg;
 import org.opsli.core.msg.TokenMsg;
 import org.opsli.plugins.redis.RedisPlugin;
@@ -64,12 +65,6 @@ public class UserTokenUtil {
 
     /** token 缓存名 */
     public static final String TOKEN_NAME = TokenConstants.ACCESS_TOKEN;
-    /** 缓存前缀 */
-    private static final String TICKET_PREFIX = "ticket:";
-    /** 账号失败次数 */
-    public static final String ACCOUNT_SLIP_COUNT_PREFIX = "account:slip:count:";
-    /** 账号失败锁定KEY */
-    public static final String ACCOUNT_SLIP_LOCK_PREFIX = "account:slip:lock:";
     /** 限制登录数量 -1 为无限大 */
     public static final int ACCOUNT_LIMIT_INFINITE = -1;
     /** 登录配置信息 */
@@ -100,8 +95,8 @@ public class UserTokenUtil {
             // 如果当前登录开启 数量限制
             if(LOGIN_PROPERTIES.getLimitCount() > ACCOUNT_LIMIT_INFINITE){
                 // 当前用户已存在 Token数量
-                Long ticketLen = redisPlugin.sSize(CacheUtil.getPrefixName() +
-                        TICKET_PREFIX + user.getUsername());
+                Long ticketLen = redisPlugin.sSize(
+                        CacheUtil.formatKey(RedisConstants.PREFIX_TICKET + user.getUsername()));
                 if(ticketLen !=null && ticketLen >= LOGIN_PROPERTIES.getLimitCount()){
                     // 如果是拒绝后者 则直接抛出异常
                     if(LoginLimitRefuse.AFTER == LOGIN_PROPERTIES.getLimitRefuse()){
@@ -110,7 +105,9 @@ public class UserTokenUtil {
                     }
                     // 如果是拒绝前者 则弹出前者
                     else {
-                        redisPlugin.sPop(CacheUtil.getPrefixName() + TICKET_PREFIX + user.getUsername());
+                        redisPlugin.sPop(
+                                CacheUtil.formatKey(RedisConstants.PREFIX_TICKET + user.getUsername())
+                        );
                     }
                 }
             }
@@ -135,11 +132,13 @@ public class UserTokenUtil {
             // 在redis存一份 token 是为了防止 人为造假
             // 保存用户token
             Long saveLong = redisPlugin.sPut(
-                    CacheUtil.getPrefixName() + TICKET_PREFIX + user.getUsername(), signToken);
+                    CacheUtil.formatKey(RedisConstants.PREFIX_TICKET + user.getUsername()),
+                    signToken
+            );
             if(saveLong != null && saveLong > 0){
                 // 设置该用户全部token失效时间， 如果这时又有新设备登录 则续命
                 redisPlugin.expire(
-                        CacheUtil.getPrefixName() + TICKET_PREFIX + user.getUsername(),
+                        CacheUtil.formatKey(RedisConstants.PREFIX_TICKET + user.getUsername()),
                         JwtUtil.EXPIRE_MILLISECOND, TimeUnit.MILLISECONDS);
 
                 TokenRet tokenRet = new TokenRet();
@@ -249,11 +248,13 @@ public class UserTokenUtil {
             if(user != null){
                 // 删除Token信息
                 redisPlugin.sRemove(
-                        CacheUtil.getPrefixName() + TICKET_PREFIX + user.getUsername(), token);
+                        CacheUtil.formatKey(RedisConstants.PREFIX_TICKET + user.getUsername()),
+                        token);
 
                 // 如果缓存中 无该用户任何Token信息 则删除用户缓存
                 Long size = redisPlugin.sSize(
-                        CacheUtil.getPrefixName() + TICKET_PREFIX + user.getUsername());
+                        CacheUtil.formatKey(RedisConstants.PREFIX_TICKET + user.getUsername())
+                );
                 if(size == null || size == 0L) {
                     // 删除相关信息
                     UserUtil.refreshUser(user);
@@ -296,7 +297,8 @@ public class UserTokenUtil {
             String username = getUserNameByToken(token);
 
             boolean hashKey = redisPlugin.sHashKey(
-                    CacheUtil.getPrefixName() + TICKET_PREFIX + username, token);
+                    CacheUtil.formatKey(RedisConstants.PREFIX_TICKET + username),
+                    token);
             if(!hashKey){
                 return false;
             }
@@ -305,7 +307,7 @@ public class UserTokenUtil {
             if(BooleanUtil.isTrue(LOGIN_PROPERTIES.getReviveMode())){
                 // 设置该用户全部token失效时间， 如果这时又有新设备登录 则续命
                 redisPlugin.expire(
-                        CacheUtil.getPrefixName() + TICKET_PREFIX + username,
+                        CacheUtil.formatKey(RedisConstants.PREFIX_TICKET + username),
                         JwtUtil.EXPIRE_MILLISECOND, TimeUnit.MILLISECONDS);
             }
 
@@ -329,7 +331,7 @@ public class UserTokenUtil {
 
         // 判断账号是否临时锁定
         Long loseTimeMillis = (Long) redisPlugin.get(
-                CacheUtil.getPrefixName() + ACCOUNT_SLIP_LOCK_PREFIX + username);
+                CacheUtil.formatKey(RedisConstants.PREFIX_ACCOUNT_SLIP_LOCK + username));
         if(loseTimeMillis != null){
             Date currDate = DateUtil.date();
             DateTime loseDate = DateUtil.date(loseTimeMillis);
@@ -364,18 +366,19 @@ public class UserTokenUtil {
 
         // 如果失败次数 超过阈值 则锁定账号
         Long slipNum = redisPlugin.increment(
-                CacheUtil.getPrefixName() + ACCOUNT_SLIP_COUNT_PREFIX + username);
+                CacheUtil.formatKey(RedisConstants.PREFIX_ACCOUNT_SLIP_COUNT + username));
         if (slipNum != null){
             // 设置失效时间为 5分钟
             redisPlugin.expire(
-                    CacheUtil.getPrefixName() + ACCOUNT_SLIP_COUNT_PREFIX + username, LOGIN_PROPERTIES.getSlipLockSpeed());
+                    CacheUtil.formatKey(RedisConstants.PREFIX_ACCOUNT_SLIP_COUNT + username),
+                    LOGIN_PROPERTIES.getSlipLockSpeed());
 
             // 如果确认 都失败 则存入临时缓存
             if(slipNum >= LOGIN_PROPERTIES.getSlipCount()){
                 long currentTimeMillis = System.currentTimeMillis();
                 // 存入Redis
                 redisPlugin.put(
-                        CacheUtil.getPrefixName() + ACCOUNT_SLIP_LOCK_PREFIX + username,
+                        CacheUtil.formatKey(RedisConstants.PREFIX_ACCOUNT_SLIP_LOCK + username),
                         currentTimeMillis, LOGIN_PROPERTIES.getSlipLockSpeed());
             }
         }
@@ -396,7 +399,7 @@ public class UserTokenUtil {
 
         long count = 0L;
         Object obj = redisPlugin.get(
-                CacheUtil.getPrefixName() + ACCOUNT_SLIP_COUNT_PREFIX + username);
+                CacheUtil.formatKey(RedisConstants.PREFIX_ACCOUNT_SLIP_COUNT + username));
         if(obj != null){
             try {
                 count = Convert.convert(Long.class, obj);
@@ -418,10 +421,10 @@ public class UserTokenUtil {
 
         // 删除失败次数记录
         redisPlugin.del(
-                CacheUtil.getPrefixName() + ACCOUNT_SLIP_COUNT_PREFIX + username);
+                CacheUtil.formatKey(RedisConstants.PREFIX_ACCOUNT_SLIP_COUNT + username));
         // 删除失败次数记录
         redisPlugin.del(
-                CacheUtil.getPrefixName() + ACCOUNT_SLIP_LOCK_PREFIX + username);
+                CacheUtil.formatKey(RedisConstants.PREFIX_ACCOUNT_SLIP_LOCK + username));
     }
 
 

@@ -21,18 +21,20 @@ package org.opsli.common.constants;
  * @author Parker
  * @date 2021年3月10日15:50:16
  */
-public interface MenuConstants {
+public final class MenuConstants {
 
     /** 菜单根节点ID */
-    String GEN_ID = "0";
+    public static final String GEN_ID = "0";
 
     /** 菜单类型 */
-    String MENU = "1";
+    public static final String MENU = "1";
 
     /** 按钮类型 */
-    String BUTTON = "2";
+    public static final String BUTTON = "2";
 
     /** 外链类型 */
-    String EXTERNAL = "3";
+    public static final String EXTERNAL = "3";
+
+    private MenuConstants(){}
 
 }

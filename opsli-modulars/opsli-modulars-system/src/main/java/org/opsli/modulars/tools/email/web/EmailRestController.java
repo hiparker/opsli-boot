@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RequestBody;
  */
 @Api(tags = "邮件类")
 @Slf4j
-@ApiRestController("/tools/email/{ver}")
+@ApiRestController("/{ver}/tools/email")
 public class EmailRestController {
 
     @Autowired

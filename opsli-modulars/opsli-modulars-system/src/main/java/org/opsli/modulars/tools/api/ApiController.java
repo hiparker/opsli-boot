@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.GetMapping;
  * @date 2021年10月27日12:50:00
  */
 @Api(tags = "API-测试版本控制")
-@ApiRestController("/tools/api/{ver}")
+@ApiRestController("/{ver}/tools/api")
 public class ApiController {
 
     @ApiOperation(value = "测试正常接口", notes = "测试正常接口")

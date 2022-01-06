@@ -16,7 +16,7 @@
 package org.opsli.core.utils;
 
 import lombok.extern.slf4j.Slf4j;
-import org.opsli.core.cache.local.CacheUtil;
+import org.opsli.core.cache.CacheUtil;
 import org.opsli.core.msg.CoreMsg;
 import org.opsli.plugins.redisson.RedissonLock;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,7 +60,9 @@ public class DistributedLockUtil {
         boolean isLock = true;
         // 分布式上锁
         if(REDISSON_LOCK != null){
-            isLock = REDISSON_LOCK.tryLock(CacheUtil.getPrefixName() + lockName, LEASE_TIME);
+            // 缓存Key
+            String cacheKey = CacheUtil.formatKey(lockName);
+            isLock = REDISSON_LOCK.tryLock(cacheKey, LEASE_TIME);
         }
         return isLock;
     }
@@ -76,7 +78,9 @@ public class DistributedLockUtil {
 
         // 释放锁
         if(REDISSON_LOCK != null){
-            REDISSON_LOCK.unlockByThread(CacheUtil.getPrefixName() + lockName);
+            // 缓存Key
+            String cacheKey = CacheUtil.formatKey(lockName);
+            REDISSON_LOCK.unlockByThread(cacheKey);
         }
     }
 

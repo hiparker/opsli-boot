@@ -26,7 +26,7 @@ import org.opsli.api.wrapper.system.menu.MenuModel;
 import org.opsli.api.wrapper.system.options.OptionsModel;
 import org.opsli.api.wrapper.system.tenant.TenantModel;
 import org.opsli.api.wrapper.system.user.UserModel;
-import org.opsli.common.annotation.ApiCryptoAsymmetric;
+import org.opsli.common.annotation.LoginCrypto;
 import org.opsli.common.annotation.Limiter;
 import org.opsli.common.enums.DictType;
 import org.opsli.common.thread.AsyncProcessExecutor;
@@ -73,7 +73,7 @@ public class LoginRestController {
      * 登录 登录数据加密
      */
     @Limiter
-    @ApiCryptoAsymmetric(responseEncrypt = false)
+    @LoginCrypto
     @ApiOperation(value = "登录", notes = "登录")
     @PostMapping("/system/login")
     public ResultVo<UserTokenUtil.TokenRet> login(@RequestBody LoginForm form, HttpServletRequest request){

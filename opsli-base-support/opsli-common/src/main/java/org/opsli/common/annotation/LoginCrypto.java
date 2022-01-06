@@ -13,25 +13,25 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.opsli.core.cache.pushsub.enums;
+package org.opsli.common.annotation;
+
+
+import java.lang.annotation.*;
 
 /**
- * 用户缓存操作类型
+ * 登录加解密
+ * 入参 非对称 公钥加密 私钥解密
+ * 出参 对称 公要加密 公要解密
  *
  * @author Parker
- * @date 2020-09-16
+ * @date 2021年5月18日14:46:02
  */
-public enum UserModelType {
+@Target(ElementType.METHOD)
+@Retention(RetentionPolicy.RUNTIME)
+@Documented
+public @interface LoginCrypto {
 
-    /** 用户模型 */
-    USER_MODEL,
-    /** 用户角色集合模型 */
-    USER_ROLES_MODEL,
-    /** 用户权限集合模型 */
-    USER_PERMS_MODEL,
-    /** 用户菜单集合模型 */
-    USER_MENU_MODEL,
-
-    ;
+    /** 加密启用状态 */
+    boolean enable() default true;
 
 }

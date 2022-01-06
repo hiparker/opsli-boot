@@ -59,7 +59,7 @@ import java.util.List;
  */
 @Api(tags = DictApi.TITLE)
 @Slf4j
-@ApiRestController("/system/dict/{ver}")
+@ApiRestController("/{ver}/system/dict")
 public class DictRestController extends BaseRestController<SysDict, DictModel, IDictService>
         implements DictApi {
 

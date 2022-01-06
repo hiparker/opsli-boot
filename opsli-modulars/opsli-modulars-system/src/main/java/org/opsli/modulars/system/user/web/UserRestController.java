@@ -17,6 +17,7 @@ package org.opsli.modulars.system.user.web;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
+import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.excel.util.CollectionUtils;
@@ -61,6 +62,7 @@ import org.opsli.plugins.oss.OssStorageFactory;
 import org.opsli.plugins.oss.service.BaseOssStorageService;
 import org.opsli.plugins.oss.service.OssStorageService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
@@ -80,7 +82,7 @@ import java.util.List;
  */
 @Api(tags = UserApi.TITLE)
 @Slf4j
-@ApiRestController("/system/user/{ver}")
+@ApiRestController("/{ver}/system/user")
 public class UserRestController extends BaseRestController<SysUser, UserModel, IUserService>
         implements UserApi {
 
@@ -215,10 +217,14 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
         }
 
         try {
+            MultipartFile multipartFile = files.get(0);
+            Resource resource = multipartFile.getResource();
+            String filename = resource.getFilename();
+
             // 调用OSS 服务保存头像
             OssStorageService ossStorageService = OssStorageFactory.INSTANCE.getHandle();
             BaseOssStorageService.FileAttr fileAttr = ossStorageService.upload(
-                    files.get(0).getInputStream(), "jpg");
+                    multipartFile.getInputStream(), FileUtil.extName(filename));
 
             UserModel user = UserUtil.getUserBySource();
             // 更新头像至数据库

@@ -21,13 +21,15 @@ package org.opsli.common.constants;
  * @author Parker
  * @date 2021年3月10日15:50:16
  */
-public interface TreeConstants {
+public final class TreeConstants {
 
     /** 是否包含子集 */
-    String HAS_CHILDREN = "hasChildren";
+    public static final String HAS_CHILDREN = "hasChildren";
 
 
     /** 是否是叶子节点 */
-    String IS_LEAF = "isLeaf";
+    public static final String IS_LEAF = "isLeaf";
 
+
+    private TreeConstants(){}
 }
