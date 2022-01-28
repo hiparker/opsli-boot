@@ -338,7 +338,7 @@ public class UserRoleRefServiceImpl extends ServiceImpl<UserRoleRefMapper, SysUs
         QueryWrapper<SysUserRoleRef> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("role_id", roleId);
 
-        return this.count(queryWrapper) == 0;
+        return this.count(queryWrapper) > 0;
     }
 
     @Override
@@ -350,7 +350,7 @@ public class UserRoleRefServiceImpl extends ServiceImpl<UserRoleRefMapper, SysUs
         QueryWrapper<SysUserRoleRef> queryWrapper = new QueryWrapper<>();
         queryWrapper.in("role_id", Convert.toList(roleIds));
 
-        return this.count(queryWrapper) == 0;
+        return this.count(queryWrapper) > 0;
     }
 
 
