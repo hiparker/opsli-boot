@@ -243,10 +243,13 @@ public class SysOrgRestController extends BaseRestController<SysOrg, SysOrgModel
         }
 
         QueryWrapper<SysOrg> wrapperByEmpty = queryBuilder.build();
-        wrapperByEmpty.in(FieldUtil.humpToUnderline(MyBatisConstants.FIELD_ID), genOrgIdSet);
-        // 如果传入ID 则不包含自身
+        if(CollUtil.isNotEmpty(genOrgIdSet)){
+            wrapperByEmpty.in(
+                    FieldUtil.humpToUnderline(MyBatisConstants.FIELD_ID), genOrgIdSet);
+        }        // 如果传入ID 则不包含自身
         if(StringUtils.isNotEmpty(id)){
-            wrapperByEmpty.notIn(FieldUtil.humpToUnderline(MyBatisConstants.FIELD_ID), id);
+            wrapperByEmpty.notIn(
+                    FieldUtil.humpToUnderline(MyBatisConstants.FIELD_ID), id);
         }
 
         // 获得父节点组织

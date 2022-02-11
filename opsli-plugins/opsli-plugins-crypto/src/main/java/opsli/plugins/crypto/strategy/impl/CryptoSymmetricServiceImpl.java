@@ -44,7 +44,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 /**
- * 非对称加密
+ * 对称加密
  *
  * @author Parker
  * @date 2021年5月18日10:53:27
