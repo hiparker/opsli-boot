@@ -271,7 +271,11 @@ public class SysOrgRestController extends BaseRestController<SysOrg, SysOrgModel
 
         }
         // 排除父节点ID
-        wrapper.notIn(FieldUtil.humpToUnderline(MyBatisConstants.FIELD_ID), genOrgIdSet);
+        if(CollUtil.isNotEmpty(genOrgIdSet)){
+            wrapperByEmpty.in(
+                    FieldUtil.humpToUnderline(MyBatisConstants.FIELD_ID), genOrgIdSet);
+        }
+
         // 获得子节点组织
         List<SysOrg> childList = IService.findList(wrapper);
         if(CollUtil.isNotEmpty(childList)){
