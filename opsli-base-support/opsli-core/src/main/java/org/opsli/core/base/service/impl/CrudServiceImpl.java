@@ -228,9 +228,11 @@ public abstract class CrudServiceImpl<M extends BaseMapper<T>, T extends BaseEnt
 
     @Override
     public Page<T,E> findPage(Page<T,E> page) {
+        // 数据处理责任链
+        QueryWrapper<T> qWrapper = this.addHandler(entityClazz, page.getQueryWrapper());
         page.pageHelperBegin();
         try{
-            List<T> list = this.findList(page.getQueryWrapper());
+            List<T> list = super.list(qWrapper);
             PageInfo<T> pageInfo = new PageInfo<>(list);
             List<E> es = transformTs2Ms(pageInfo.getList());
             page.instance(pageInfo, es);
@@ -242,9 +244,11 @@ public abstract class CrudServiceImpl<M extends BaseMapper<T>, T extends BaseEnt
 
     @Override
     public Page<T,E> findPageNotCount(Page<T,E> page) {
+        // 数据处理责任链
+        QueryWrapper<T> qWrapper = this.addHandler(entityClazz, page.getQueryWrapper());
         page.pageHelperBegin(false);
         try{
-            List<T> list = this.findList(page.getQueryWrapper());
+            List<T> list = super.list(qWrapper);
             PageInfo<T> pageInfo = new PageInfo<>(list);
             List<E> es = transformTs2Ms(pageInfo.getList());
             page.instance(pageInfo, es);
