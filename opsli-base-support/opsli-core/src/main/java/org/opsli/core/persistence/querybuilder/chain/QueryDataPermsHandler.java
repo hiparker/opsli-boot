@@ -145,7 +145,10 @@ public class QueryDataPermsHandler implements QueryBuilderChain{
             // 如果组织为空 则默认权限为查自己的数据
             if(!ConditionType.SELF.equals(conditionType) &&
                     CollUtil.isEmpty(orgIdGroupList)){
-                conditionType = ConditionType.SELF;
+                // 如果不是 查看全部数据 需要默认角色权限为只查自己
+                if(!ConditionType.ALL.equals(conditionType)){
+                    conditionType = ConditionType.SELF;
+                }
             }
         }
 
