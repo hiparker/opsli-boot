@@ -19,12 +19,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.opsli.common.annotation.ApiRestController;
 import org.opsli.core.api.ApiRequestMappingHandlerMapping;
 import org.opsli.core.autoconfigure.properties.ApiPathProperties;
+import org.opsli.core.filters.interceptor.UserAuthInterceptor;
 import org.springframework.boot.autoconfigure.web.servlet.WebMvcRegistrations;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.PathMatchConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
@@ -83,4 +85,10 @@ public class SpringWebMvcConfig implements WebMvcConfigurer, WebMvcRegistrations
 		return new CorsFilter(urlBasedCorsConfigurationSource);
 	}
 
+	@Override
+	public void addInterceptors(InterceptorRegistry registry) {
+		// 加载特定拦截器
+		registry.addInterceptor(new UserAuthInterceptor());
+		WebMvcConfigurer.super.addInterceptors(registry);
+	}
 }

@@ -31,10 +31,10 @@ import org.opsli.api.wrapper.system.user.UserModel;
 import org.opsli.api.wrapper.system.user.UserOrgRefModel;
 import org.opsli.common.constants.RedisConstants;
 import org.opsli.common.exception.TokenException;
-import org.opsli.core.api.TokenThreadLocal;
 import org.opsli.core.autoconfigure.properties.GlobalProperties;
 import org.opsli.core.cache.CacheUtil;
 import org.opsli.core.cache.SecurityCache;
+import org.opsli.core.holder.UserContextHolder;
 import org.opsli.core.msg.CoreMsg;
 import org.opsli.core.msg.TokenMsg;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -88,7 +88,8 @@ public class UserUtil {
         ThrowExceptionUtil.isThrowException(!IS_INIT,
                 CoreMsg.OTHER_EXCEPTION_UTILS_INIT);
 
-        String token = TokenThreadLocal.get();
+        String token = UserContextHolder.getToken().orElseThrow(() -> new TokenException(
+                TokenMsg.EXCEPTION_TOKEN_LOSE_EFFICACY));
 
         // 如果还是没获取到token 则抛出异常
         if(StringUtils.isEmpty(token)){
@@ -115,7 +116,8 @@ public class UserUtil {
         ThrowExceptionUtil.isThrowException(!IS_INIT,
                 CoreMsg.OTHER_EXCEPTION_UTILS_INIT);
 
-        String token = TokenThreadLocal.get();
+        String token = UserContextHolder.getToken().orElseThrow(() -> new TokenException(
+                TokenMsg.EXCEPTION_TOKEN_LOSE_EFFICACY));
 
         // 如果还是没获取到token 则抛出异常
         if(StringUtils.isEmpty(token)){

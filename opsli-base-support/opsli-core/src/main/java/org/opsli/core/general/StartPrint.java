@@ -72,13 +72,24 @@ public class StartPrint {
      * 打印启动日志
      */
     public void errorPrint(){
+        this.errorPrint(null);
+    }
+
+    /**
+     * 失败
+     * 打印启动日志
+     */
+    public void errorPrint(String errorMsg){
         // 睡一秒打印
         ThreadUtil.sleep(1, TimeUnit.SECONDS);
         String printStr =
                 "\n----------------------------------------------------------\n" +
-                systemName + " 框架启动失败! 请检查相关配置！\n" +
-                "----------------------------------------------------------\n";
-        Console.log(printStr);
+                        systemName + " 框架启动失败! 请检查相关配置！\n" +
+                        "----------------------------------------------------------\n";
+        Console.error(printStr);
+        if(StringUtils.isNotEmpty(errorMsg)){
+            Console.error(errorMsg);
+        }
     }
 
 

@@ -34,9 +34,9 @@ import org.opsli.common.constants.TokenConstants;
 import org.opsli.common.constants.TokenTypeConstants;
 import org.opsli.common.enums.LoginLimitRefuse;
 import org.opsli.common.exception.TokenException;
-import org.opsli.core.api.TokenThreadLocal;
 import org.opsli.core.autoconfigure.properties.GlobalProperties;
 import org.opsli.core.cache.CacheUtil;
+import org.opsli.core.holder.UserContextHolder;
 import org.opsli.core.msg.CoreMsg;
 import org.opsli.core.msg.TokenMsg;
 import org.opsli.plugins.redis.RedisPlugin;
@@ -162,7 +162,10 @@ public class UserTokenUtil {
      * @return String
      */
     public static String getUserIdByToken() {
-        return getUserIdByToken(TokenThreadLocal.get());
+        String token = UserContextHolder.getToken().orElseThrow(() -> new TokenException(
+                TokenMsg.EXCEPTION_TOKEN_LOSE_EFFICACY));
+
+        return getUserIdByToken(token);
     }
     /**
      * 根据 Token 获得用户ID
@@ -186,7 +189,9 @@ public class UserTokenUtil {
      * @return String
      */
     public static String getUserNameByToken() {
-        return getUserNameByToken(TokenThreadLocal.get());
+        String token = UserContextHolder.getToken().orElseThrow(() -> new TokenException(
+                TokenMsg.EXCEPTION_TOKEN_LOSE_EFFICACY));
+        return getUserNameByToken(token);
     }
     /**
      * 根据 Token 获得 用户名
@@ -209,7 +214,9 @@ public class UserTokenUtil {
      * @return String
      */
     public static String getTenantIdByToken() {
-        return getTenantIdByToken(TokenThreadLocal.get());
+        String token = UserContextHolder.getToken().orElseThrow(() -> new TokenException(
+                TokenMsg.EXCEPTION_TOKEN_LOSE_EFFICACY));
+        return getTenantIdByToken(token);
     }
 
     /**

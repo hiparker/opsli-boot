@@ -13,9 +13,9 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.opsli.core.api;
+package org.opsli.core.holder;
 
-
+import com.alibaba.ttl.TransmittableThreadLocal;
 import org.apache.commons.lang3.StringUtils;
 import org.opsli.core.utils.UserTokenUtil;
 import org.springframework.web.context.request.RequestAttributes;
@@ -23,27 +23,32 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Optional;
 
 /**
- * 用于存放当前线程下 Token
+ * 用户认证信息上下文
  *
- * @author parker
- * @date 2020-09-15
+ * @author 周鹏程
+ * @date 2021年12月22日16:22:59
  */
-public class TokenThreadLocal {
+public final class UserContextHolder {
 
-    /** 临时线程存储 token 容器 */
-    private static final ThreadLocal<String> TOKEN_DATA = new ThreadLocal<>();
+    /**
+     * 存储用户上下文信息
+     * 采用父子线程共享缓存
+     */
+    public static final ThreadLocal<String> THREAD_LOCAL = new TransmittableThreadLocal<>();
 
-    public static void put(String token) {
-        if (TOKEN_DATA.get() == null) {
-            TOKEN_DATA.set(token);
-        }
-    }
+    /**
+     * 获取当前上下文用户
+     * 推荐用法,避免空指针:
+     * LoginUserInfo loginUserInfo = UserContextHolder.get().orElseThrow(() -> new BusinessException("提示未登录即可"));
+     *
+     * @return Optional<LoginUserInfo>
+     */
+    public static Optional<String> getToken() {
 
-    public static String get() {
-
-        String token = TOKEN_DATA.get();
+        String token = THREAD_LOCAL.get();
 
         // 2021-03-10
         // 这里纠正 Token 在被多聚合项目 aop切面 remove后 无法获得Token bug
@@ -59,12 +64,24 @@ public class TokenThreadLocal {
             }catch (Exception ignored){}
         }
 
-        return token;
+        return Optional.ofNullable(token);
     }
 
-    public static void remove() {
-        try {
-            TOKEN_DATA.remove();
-        }catch (Exception ignored){}
+
+    public static void setToken(String token) {
+        if (THREAD_LOCAL.get() == null) {
+            THREAD_LOCAL.set(token);
+        }
     }
+
+    public static void clear() {
+        THREAD_LOCAL.remove();
+    }
+
+
+    /**
+     * 私有化构造函数
+     */
+    private UserContextHolder(){}
+
 }

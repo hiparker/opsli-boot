@@ -26,17 +26,16 @@ import org.opsli.api.wrapper.system.menu.MenuModel;
 import org.opsli.api.wrapper.system.options.OptionsModel;
 import org.opsli.api.wrapper.system.tenant.TenantModel;
 import org.opsli.api.wrapper.system.user.UserModel;
-import org.opsli.common.annotation.LoginCrypto;
 import org.opsli.common.annotation.Limiter;
-import org.opsli.common.enums.DictType;
-import org.opsli.common.thread.AsyncProcessExecutor;
-import org.opsli.common.thread.AsyncProcessExecutorFactory;
-import org.opsli.core.utils.ValidatorUtil;
-import org.opsli.core.api.TokenThreadLocal;
+import org.opsli.common.annotation.LoginCrypto;
 import org.opsli.common.enums.AlertType;
+import org.opsli.common.enums.DictType;
 import org.opsli.common.enums.OptionsType;
 import org.opsli.common.exception.TokenException;
+import org.opsli.common.thread.AsyncProcessExecutor;
+import org.opsli.common.thread.AsyncProcessExecutorFactory;
 import org.opsli.common.utils.IPUtil;
+import org.opsli.core.holder.UserContextHolder;
 import org.opsli.core.msg.TokenMsg;
 import org.opsli.core.utils.*;
 import org.opsli.modulars.system.login.entity.LoginForm;
@@ -53,6 +52,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * 登陆 / 登出 / 验证码
@@ -160,6 +160,9 @@ public class LoginRestController {
         //生成token，并保存到Redis
         ResultVo<UserTokenUtil.TokenRet> resultVo = UserTokenUtil.createToken(user);
         if(resultVo.isSuccess()){
+            // 保存Token 到当前线程缓存
+            UserContextHolder.setToken(resultVo.getData().getToken());
+
             AsyncProcessExecutor normalExecutor = AsyncProcessExecutorFactory.createNormalExecutor();
             // 异步保存IP
             normalExecutor.put(()->{
@@ -167,6 +170,12 @@ public class LoginRestController {
                 String clientIpAddress = IPUtil.getClientIdBySingle(request);
                 user.setLoginIp(clientIpAddress);
                 iUserService.updateLoginIp(user);
+
+                // TODO
+                // 记录用户登录日志 如果系统较大 可考虑 Elastic 的 filebeat
+                // 小系统 直接存在 mysql就好
+
+
             });
             normalExecutor.execute();
         }
@@ -181,7 +190,9 @@ public class LoginRestController {
     @ApiOperation(value = "登出", notes = "登出")
     @PostMapping("/system/logout")
     public ResultVo<?> logout() {
-        String token = TokenThreadLocal.get();
+        String token = UserContextHolder.getToken().orElseThrow(() -> new TokenException(
+                TokenMsg.EXCEPTION_TOKEN_LOSE_EFFICACY));
+
         // 登出失败，没有授权Token
         if(StringUtils.isEmpty(token)){
             return ResultVo.error(TokenMsg.EXCEPTION_LOGOUT_ERROR.getMessage());
