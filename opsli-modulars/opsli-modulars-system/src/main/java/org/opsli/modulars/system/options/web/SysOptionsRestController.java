@@ -74,10 +74,7 @@ public class SysOptionsRestController extends BaseRestController<SysOptions, Opt
     @RequiresPermissions("system_options_select")
     @Override
     public ResultVo<OptionsModel> get(OptionsModel model) {
-        // 如果系统内部调用 则直接查数据库
-        if(model != null && model.getIzApi() != null && model.getIzApi()){
-            model = IService.get(model);
-        }
+        model = IService.get(model);
         return ResultVo.success(model);
     }
 

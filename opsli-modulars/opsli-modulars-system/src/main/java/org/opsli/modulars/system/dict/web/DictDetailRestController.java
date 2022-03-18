@@ -72,10 +72,7 @@ public class DictDetailRestController extends BaseRestController<SysDictDetail, 
     @ApiOperation(value = "获得单条字典明细数据", notes = "获得单条字典明细数据 - ID")
     @Override
     public ResultVo<DictDetailModel> get(DictDetailModel model) {
-        // 如果系统内部调用 则直接查数据库
-        if(model != null && model.getIzApi() != null && model.getIzApi()){
-            model = IService.get(model);
-        }
+        model = IService.get(model);
         return ResultVo.success(model);
     }
 

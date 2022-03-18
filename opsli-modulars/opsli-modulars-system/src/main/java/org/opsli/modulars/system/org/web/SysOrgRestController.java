@@ -311,10 +311,7 @@ public class SysOrgRestController extends BaseRestController<SysOrg, SysOrgModel
                 // 生成根节点组织
                 model = getGenOrgModel();
             }else{
-                // 如果系统内部调用 则直接查数据库
-                if (model.getIzApi() != null && model.getIzApi()){
-                    model = IService.get(model);
-                }
+                model = IService.get(model);
             }
         }
 

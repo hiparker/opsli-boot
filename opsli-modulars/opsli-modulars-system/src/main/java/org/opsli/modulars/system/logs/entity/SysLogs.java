@@ -39,6 +39,14 @@ public class SysLogs extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
 
+    /**
+     * 多租户字段
+     */
+    private String tenantId;
+    /**
+     * 组织机构ID组 xxx,xxx
+     */
+    private String orgIds;
 
     /** 日志类型（1：接入日志；2：错误日志） */
     private String type;

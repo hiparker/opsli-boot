@@ -70,10 +70,7 @@ public class GenTemplateRestController extends BaseRestController<GenTemplate, G
         // 判断代码生成器 是否启用
         GeneratorHandleUtil.judgeGeneratorEnable(super.globalProperties);
 
-        // 如果系统内部调用 则直接查数据库
-        if(model != null && model.getIzApi() != null && model.getIzApi()){
-            model = IService.get(model);
-        }
+        model = IService.get(model);
         return ResultVo.success(model);
     }
 

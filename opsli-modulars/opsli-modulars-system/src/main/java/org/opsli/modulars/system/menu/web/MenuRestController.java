@@ -284,10 +284,7 @@ public class MenuRestController extends BaseRestController<SysMenu, MenuModel, I
                 // 生成根节点菜单
                 model = getGenMenuModel();
             }else{
-                // 如果系统内部调用 则直接查数据库
-                if (model.getIzApi() != null && model.getIzApi()){
-                    model = IService.get(model);
-                }
+                model = IService.get(model);
             }
         }
 

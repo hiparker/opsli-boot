@@ -86,10 +86,7 @@ public class TenantRestController extends BaseRestController<SysTenant, TenantMo
     @RequiresPermissions("system_tenant_select")
     @Override
     public ResultVo<TenantModel> get(TenantModel model) {
-        // 如果系统内部调用 则直接查数据库
-        if(model != null && model.getIzApi() != null && model.getIzApi()){
-            model = IService.get(model);
-        }
+        model = IService.get(model);
         return ResultVo.success(model);
     }
 

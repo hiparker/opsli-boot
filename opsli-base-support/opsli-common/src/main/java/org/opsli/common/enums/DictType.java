@@ -43,6 +43,10 @@ public enum DictType {
     DATA_SCOPE_DEPT_AND_UNDER("role_data_scope","2", "本部门及以下数据"),
     DATA_SCOPE_ALL("role_data_scope","3", "全部数据"),
 
+    /** 登入登出日志类型 */
+    LOGIN_LOG_TYPE_LOGIN("login_log_type","1", "登入"),
+    LOGIN_LOG_TYPE_LOGOUT("login_log_type","2", "登出")
+
 
     ;
 

@@ -22,6 +22,7 @@ import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.opsli.api.base.result.ResultVo;
+import org.opsli.api.wrapper.system.logs.LoginLogsModel;
 import org.opsli.api.wrapper.system.menu.MenuModel;
 import org.opsli.api.wrapper.system.options.OptionsModel;
 import org.opsli.api.wrapper.system.tenant.TenantModel;
@@ -39,6 +40,8 @@ import org.opsli.core.holder.UserContextHolder;
 import org.opsli.core.msg.TokenMsg;
 import org.opsli.core.utils.*;
 import org.opsli.modulars.system.login.entity.LoginForm;
+import org.opsli.modulars.system.logs.factory.UserLoginLogFactory;
+import org.opsli.modulars.system.logs.service.ILoginLogsService;
 import org.opsli.modulars.system.user.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -68,6 +71,8 @@ public class LoginRestController {
 
     @Autowired
     private IUserService iUserService;
+    @Autowired
+    private ILoginLogsService iLoginLogsService;
 
     /**
      * 登录 登录数据加密
@@ -171,11 +176,10 @@ public class LoginRestController {
                 user.setLoginIp(clientIpAddress);
                 iUserService.updateLoginIp(user);
 
-                // TODO
                 // 记录用户登录日志 如果系统较大 可考虑 Elastic 的 filebeat
                 // 小系统 直接存在 mysql就好
-
-
+                LoginLogsModel userLoginModel = UserLoginLogFactory.getUserLoginModel(request, user, true);
+                iLoginLogsService.insert(userLoginModel);
             });
             normalExecutor.execute();
         }
@@ -189,7 +193,7 @@ public class LoginRestController {
     @Limiter
     @ApiOperation(value = "登出", notes = "登出")
     @PostMapping("/system/logout")
-    public ResultVo<?> logout() {
+    public ResultVo<?> logout(HttpServletRequest request) {
         String token = UserContextHolder.getToken().orElseThrow(() -> new TokenException(
                 TokenMsg.EXCEPTION_TOKEN_LOSE_EFFICACY));
 
@@ -197,6 +201,18 @@ public class LoginRestController {
         if(StringUtils.isEmpty(token)){
             return ResultVo.error(TokenMsg.EXCEPTION_LOGOUT_ERROR.getMessage());
         }
+
+        // 异步记录信息
+        AsyncProcessExecutor normalExecutor = AsyncProcessExecutorFactory.createNormalExecutor();
+        UserModel user = UserUtil.getUser();
+        normalExecutor.put(()->{
+            // 记录用户登录日志 如果系统较大 可考虑 Elastic 的 filebeat
+            // 小系统 直接存在 mysql就好
+            LoginLogsModel userLoginModel = UserLoginLogFactory.getUserLoginModel(request, user, false);
+            iLoginLogsService.insert(userLoginModel);
+        });
+        normalExecutor.execute();
+
         UserTokenUtil.logout(token);
         return ResultVo.success(TokenMsg.EXCEPTION_LOGOUT_SUCCESS.getMessage());
     }

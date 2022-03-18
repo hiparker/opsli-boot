@@ -62,10 +62,7 @@ public class TestUserRestController extends BaseRestController<TestUser, TestUse
     @RequiresPermissions("gentest_user_select")
     @Override
     public ResultVo<TestUserModel> get(TestUserModel model) {
-        // 如果系统内部调用 则直接查数据库
-        if(model != null && model.getIzApi() != null && model.getIzApi()){
-            model = IService.get(model);
-        }
+        model = IService.get(model);
         return ResultVo.success(model);
     }
 
