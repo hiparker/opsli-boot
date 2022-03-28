@@ -116,22 +116,23 @@ public class LoginRestController {
         // 如果验证成功， 则清除锁定信息
         UserTokenUtil.clearLockAccount(form.getUsername());
 
-        // 如果不是超级管理员 并且不是系统系统用户 则进行验证
-        if(!StringUtils.equals(UserUtil.SUPER_ADMIN, user.getUsername()) &&
-                !TenantUtil.SUPER_ADMIN_TENANT_ID.equals(user.getTenantId())
-            ){
+        // 如果不是超级管理员 则要进行安全验证
+        if(!StringUtils.equals(UserUtil.SUPER_ADMIN, user.getUsername())){
+
+            // 如果不是 系统用户， 也就是租户用户 需要验证租户启用情况
+            if(!TenantUtil.SUPER_ADMIN_TENANT_ID.equals(user.getTenantId())){
+                // 验证租户是否生效
+                TenantModel tenant = TenantUtil.getTenant(user.getTenantId());
+                if(tenant == null){
+                    throw new TokenException(TokenMsg.EXCEPTION_LOGIN_TENANT_NOT_USABLE);
+                }
+            }
 
             // 账号锁定验证
             if(StringUtils.isEmpty(user.getEnable()) ||
                     DictType.NO_YES_NO.getValue().equals(user.getEnable())){
                 // 账号已被锁定,请联系管理员
                 throw new TokenException(TokenMsg.EXCEPTION_LOGIN_ACCOUNT_LOCKED);
-            }
-
-            // 验证租户是否生效
-            TenantModel tenant = TenantUtil.getTenant(user.getTenantId());
-            if(tenant == null){
-                throw new TokenException(TokenMsg.EXCEPTION_LOGIN_TENANT_NOT_USABLE);
             }
 
             // 检测用户是否有角色
