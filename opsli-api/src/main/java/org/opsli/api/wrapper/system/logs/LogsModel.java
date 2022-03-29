@@ -37,6 +37,18 @@ public class LogsModel extends ApiWrapper {
     public static final String TYPE_EXCEPTION = "2";
 
 
+    /**
+     * 多租户字段
+     */
+    @ApiModelProperty(value = "租户ID")
+    private String tenantId;
+
+    /**
+     * 组织机构ID组 xxx,xxx
+     */
+    @ApiModelProperty(value = "组织ID集合")
+    private String orgIds;
+
     /** 日志类型（1：接入日志；2：错误日志） */
     @ApiModelProperty(value = "日志类型")
     private String type;

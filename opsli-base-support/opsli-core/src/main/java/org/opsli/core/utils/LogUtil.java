@@ -27,6 +27,7 @@ import org.aspectj.lang.reflect.MethodSignature;
 import org.opsli.api.wrapper.system.logs.LogsModel;
 import org.opsli.api.wrapper.system.menu.MenuModel;
 import org.opsli.api.wrapper.system.user.UserModel;
+import org.opsli.api.wrapper.system.user.UserOrgRefModel;
 import org.opsli.common.annotation.EnableLog;
 import org.opsli.common.annotation.RequiresPermissionsCus;
 import org.opsli.common.utils.IPUtil;
@@ -117,6 +118,15 @@ public final class LogUtil {
             logsModel.setCreateBy(user.getId());
             logsModel.setUpdateBy(user.getId());
             logsModel.setIzManual(true);
+
+            // 如果组织IDs 为空则进行默认赋值
+            UserOrgRefModel userOrgRefModel = UserUtil.getUserDefOrgByUserId(user.getId());
+            if(null != userOrgRefModel){
+                logsModel.setOrgIds(userOrgRefModel.getOrgIds());
+            }
+
+            // 赋值 租户ID
+            logsModel.setTenantId(user.getTenantId());
 
             // 保存日志
             LogsThreadPool.process(logsModel);
