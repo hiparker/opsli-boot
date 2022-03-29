@@ -35,7 +35,7 @@ public final class UserLoginLogFactory {
 		loginInfo.setCreateBy(user.getId());
 		loginInfo.setUpdateBy(user.getId());
 		UserOrgRefModel orgByUserId = UserUtil.getUserDefOrgByUserId(user.getId());
-		loginInfo.setOrgIds(ObjectUtils.isEmpty(orgByUserId)? null : orgByUserId.getOrgIds() );
+		loginInfo.setOrgIds(ObjectUtils.isEmpty(orgByUserId)? "0" : orgByUserId.getOrgIds() );
 		loginInfo.setTenantId(StrUtil.blankToDefault(user.getTenantId(),null));
 
 		if(isLogin){
