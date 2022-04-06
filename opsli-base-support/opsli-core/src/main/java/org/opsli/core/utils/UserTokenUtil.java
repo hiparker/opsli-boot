@@ -337,8 +337,8 @@ public class UserTokenUtil {
 
 
         // 判断账号是否临时锁定
-        Long loseTimeMillis = (Long) redisPlugin.get(
-                CacheUtil.formatKey(RedisConstants.PREFIX_ACCOUNT_SLIP_LOCK + username));
+        Long loseTimeMillis = Convert.toLong(redisPlugin.get(
+                CacheUtil.formatKey(RedisConstants.PREFIX_ACCOUNT_SLIP_LOCK + username)));
         if(loseTimeMillis != null){
             Date currDate = DateUtil.date();
             DateTime loseDate = DateUtil.date(loseTimeMillis);
