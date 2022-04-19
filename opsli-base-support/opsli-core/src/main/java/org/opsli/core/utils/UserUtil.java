@@ -60,7 +60,7 @@ import static org.opsli.common.constants.OrderConstants.UTIL_ORDER;
 public class UserUtil {
 
     /** 修改租户权限 */
-    private static final String PERMS_TENANT = "system_user_tenant";
+    private static final String PERMS_TENANT = "system_set_tenant_admin";
 
     /** 用户Service */
     private static UserApi userApi;
