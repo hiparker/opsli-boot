@@ -243,10 +243,13 @@ public class SysOrgRestController extends BaseRestController<SysOrg, SysOrgModel
         }
 
         QueryWrapper<SysOrg> wrapperByEmpty = queryBuilder.build();
-        wrapperByEmpty.in(FieldUtil.humpToUnderline(MyBatisConstants.FIELD_ID), genOrgIdSet);
-        // 如果传入ID 则不包含自身
+        if(CollUtil.isNotEmpty(genOrgIdSet)){
+            wrapperByEmpty.in(
+                    FieldUtil.humpToUnderline(MyBatisConstants.FIELD_ID), genOrgIdSet);
+        }        // 如果传入ID 则不包含自身
         if(StringUtils.isNotEmpty(id)){
-            wrapperByEmpty.notIn(FieldUtil.humpToUnderline(MyBatisConstants.FIELD_ID), id);
+            wrapperByEmpty.notIn(
+                    FieldUtil.humpToUnderline(MyBatisConstants.FIELD_ID), id);
         }
 
         // 获得父节点组织
@@ -268,7 +271,11 @@ public class SysOrgRestController extends BaseRestController<SysOrg, SysOrgModel
 
         }
         // 排除父节点ID
-        wrapper.notIn(FieldUtil.humpToUnderline(MyBatisConstants.FIELD_ID), genOrgIdSet);
+        if(CollUtil.isNotEmpty(genOrgIdSet)){
+            wrapperByEmpty.in(
+                    FieldUtil.humpToUnderline(MyBatisConstants.FIELD_ID), genOrgIdSet);
+        }
+
         // 获得子节点组织
         List<SysOrg> childList = IService.findList(wrapper);
         if(CollUtil.isNotEmpty(childList)){
@@ -304,10 +311,7 @@ public class SysOrgRestController extends BaseRestController<SysOrg, SysOrgModel
                 // 生成根节点组织
                 model = getGenOrgModel();
             }else{
-                // 如果系统内部调用 则直接查数据库
-                if (model.getIzApi() != null && model.getIzApi()){
-                    model = IService.get(model);
-                }
+                model = IService.get(model);
             }
         }
 

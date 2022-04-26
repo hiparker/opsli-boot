@@ -5,7 +5,6 @@ import com.google.common.util.concurrent.*;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.opsli.common.thread.ThreadPoolFactory;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.RejectedExecutionException;

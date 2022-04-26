@@ -38,9 +38,9 @@ import javax.servlet.http.HttpServletRequest;
 public interface LogsApi {
 
     /** 标题 */
-    String TITLE = "日志管理";
+    String TITLE = "操作日志管理";
     /** 子标题 */
-    String SUB_TITLE = "日志";
+    String SUB_TITLE = "操作日志";
 
     /**
      * 日志 查一条
@@ -63,13 +63,6 @@ public interface LogsApi {
             @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize,
             HttpServletRequest request
     );
-
-    /**
-     * 清空一个月前的日志
-     * @return ResultVo
-     */
-    @PostMapping("/emptyByOneMonth")
-    ResultVo<?> emptyByOneMonth();
 
 
     /**

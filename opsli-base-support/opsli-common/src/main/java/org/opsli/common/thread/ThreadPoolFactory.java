@@ -1,12 +1,10 @@
 package org.opsli.common.thread;
 
 
+import com.alibaba.ttl.threadpool.TtlExecutors;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
-import java.util.concurrent.LinkedBlockingDeque;
-import java.util.concurrent.RejectedExecutionHandler;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 /**
  * 线程池工厂
@@ -41,7 +39,7 @@ public final class ThreadPoolFactory {
 	 * 创建默认的线程池
 	 * @return ThreadPoolExecutor
 	 */
-	public static ThreadPoolExecutor createDefThreadPool(){
+	public static ExecutorService createDefThreadPool(){
 		return createInitThreadPool(DEFAULT_MAX_CONCURRENT, DEFAULT_MAX_CONCURRENT * 4, DEFAULT_KEEP_ALIVE,
 				TimeUnit.SECONDS, DEFAULT_SIZE, DEFAULT_THREAD_POOL_NAME, new ThreadPoolExecutor.CallerRunsPolicy());
 	}
@@ -53,7 +51,7 @@ public final class ThreadPoolFactory {
 	 * @param poolName 线程池名称
 	 * @return ThreadPoolExecutor
 	 */
-	public static ThreadPoolExecutor createDefThreadPool(String poolName){
+	public static ExecutorService createDefThreadPool(String poolName){
 		return createInitThreadPool(DEFAULT_MAX_CONCURRENT, DEFAULT_MAX_CONCURRENT * 4, DEFAULT_KEEP_ALIVE,
 				TimeUnit.SECONDS, DEFAULT_SIZE, poolName, new ThreadPoolExecutor.CallerRunsPolicy());
 	}
@@ -65,7 +63,7 @@ public final class ThreadPoolFactory {
 	 * @param poolName 线程池名称
 	 * @return ThreadPoolExecutor
 	 */
-	public static ThreadPoolExecutor createDefThreadPool(int maxConcurrent, String poolName){
+	public static ExecutorService createDefThreadPool(int maxConcurrent, String poolName){
 		return createInitThreadPool(maxConcurrent, maxConcurrent * 4, DEFAULT_KEEP_ALIVE,
 				TimeUnit.SECONDS, DEFAULT_SIZE, poolName, new ThreadPoolExecutor.CallerRunsPolicy());
 	}
@@ -81,7 +79,7 @@ public final class ThreadPoolFactory {
 	 * @param handler 拒绝处理策略
 	 * @return ThreadPoolExecutor
 	 */
-	public static ThreadPoolExecutor createInitThreadPool(final int coreConcurrent,
+	public static ExecutorService createInitThreadPool(final int coreConcurrent,
 														  final int maxConcurrent,
 														  final long keepAlive,
 														  final TimeUnit timeUnit,
@@ -89,11 +87,11 @@ public final class ThreadPoolFactory {
 														  final String poolName,
 														  final RejectedExecutionHandler handler
 														  ){
-		return new ThreadPoolExecutor(coreConcurrent, maxConcurrent, keepAlive, timeUnit,
+		return TtlExecutors.getTtlExecutorService(new ThreadPoolExecutor(coreConcurrent, maxConcurrent, keepAlive, timeUnit,
 				new LinkedBlockingDeque<>(queueSize),
 				new ThreadFactoryBuilder().setNameFormat(poolName).build(),
 				handler
-		);
+		));
 	}
 
 	private ThreadPoolFactory(){}

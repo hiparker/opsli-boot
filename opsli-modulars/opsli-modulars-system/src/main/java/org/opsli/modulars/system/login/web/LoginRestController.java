@@ -22,24 +22,26 @@ import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.opsli.api.base.result.ResultVo;
+import org.opsli.api.wrapper.system.logs.LoginLogsModel;
 import org.opsli.api.wrapper.system.menu.MenuModel;
 import org.opsli.api.wrapper.system.options.OptionsModel;
 import org.opsli.api.wrapper.system.tenant.TenantModel;
 import org.opsli.api.wrapper.system.user.UserModel;
-import org.opsli.common.annotation.LoginCrypto;
 import org.opsli.common.annotation.Limiter;
-import org.opsli.common.enums.DictType;
-import org.opsli.common.thread.AsyncProcessExecutor;
-import org.opsli.common.thread.AsyncProcessExecutorFactory;
-import org.opsli.core.utils.ValidatorUtil;
-import org.opsli.core.api.TokenThreadLocal;
+import org.opsli.common.annotation.LoginCrypto;
 import org.opsli.common.enums.AlertType;
+import org.opsli.common.enums.DictType;
 import org.opsli.common.enums.OptionsType;
 import org.opsli.common.exception.TokenException;
+import org.opsli.common.thread.AsyncProcessExecutor;
+import org.opsli.common.thread.AsyncProcessExecutorFactory;
 import org.opsli.common.utils.IPUtil;
+import org.opsli.core.holder.UserContextHolder;
 import org.opsli.core.msg.TokenMsg;
 import org.opsli.core.utils.*;
 import org.opsli.modulars.system.login.entity.LoginForm;
+import org.opsli.modulars.system.logs.factory.UserLoginLogFactory;
+import org.opsli.modulars.system.logs.service.ILoginLogsService;
 import org.opsli.modulars.system.user.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -53,6 +55,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * 登陆 / 登出 / 验证码
@@ -68,6 +71,8 @@ public class LoginRestController {
 
     @Autowired
     private IUserService iUserService;
+    @Autowired
+    private ILoginLogsService iLoginLogsService;
 
     /**
      * 登录 登录数据加密
@@ -111,22 +116,23 @@ public class LoginRestController {
         // 如果验证成功， 则清除锁定信息
         UserTokenUtil.clearLockAccount(form.getUsername());
 
-        // 如果不是超级管理员 并且不是系统系统用户 则进行验证
-        if(!StringUtils.equals(UserUtil.SUPER_ADMIN, user.getUsername()) &&
-                !TenantUtil.SUPER_ADMIN_TENANT_ID.equals(user.getTenantId())
-            ){
+        // 如果不是超级管理员 则要进行安全验证
+        if(!StringUtils.equals(UserUtil.SUPER_ADMIN, user.getUsername())){
+
+            // 如果不是 系统用户， 也就是租户用户 需要验证租户启用情况
+            if(!TenantUtil.SUPER_ADMIN_TENANT_ID.equals(user.getTenantId())){
+                // 验证租户是否生效
+                TenantModel tenant = TenantUtil.getTenant(user.getTenantId());
+                if(tenant == null){
+                    throw new TokenException(TokenMsg.EXCEPTION_LOGIN_TENANT_NOT_USABLE);
+                }
+            }
 
             // 账号锁定验证
             if(StringUtils.isEmpty(user.getEnable()) ||
                     DictType.NO_YES_NO.getValue().equals(user.getEnable())){
                 // 账号已被锁定,请联系管理员
                 throw new TokenException(TokenMsg.EXCEPTION_LOGIN_ACCOUNT_LOCKED);
-            }
-
-            // 验证租户是否生效
-            TenantModel tenant = TenantUtil.getTenant(user.getTenantId());
-            if(tenant == null){
-                throw new TokenException(TokenMsg.EXCEPTION_LOGIN_TENANT_NOT_USABLE);
             }
 
             // 检测用户是否有角色
@@ -160,6 +166,9 @@ public class LoginRestController {
         //生成token，并保存到Redis
         ResultVo<UserTokenUtil.TokenRet> resultVo = UserTokenUtil.createToken(user);
         if(resultVo.isSuccess()){
+            // 保存Token 到当前线程缓存
+            UserContextHolder.setToken(resultVo.getData().getToken());
+
             AsyncProcessExecutor normalExecutor = AsyncProcessExecutorFactory.createNormalExecutor();
             // 异步保存IP
             normalExecutor.put(()->{
@@ -167,6 +176,11 @@ public class LoginRestController {
                 String clientIpAddress = IPUtil.getClientIdBySingle(request);
                 user.setLoginIp(clientIpAddress);
                 iUserService.updateLoginIp(user);
+
+                // 记录用户登录日志 如果系统较大 可考虑 Elastic 的 filebeat
+                // 小系统 直接存在 mysql就好
+                LoginLogsModel userLoginModel = UserLoginLogFactory.getUserLoginModel(request, user, true);
+                iLoginLogsService.insert(userLoginModel);
             });
             normalExecutor.execute();
         }
@@ -180,12 +194,26 @@ public class LoginRestController {
     @Limiter
     @ApiOperation(value = "登出", notes = "登出")
     @PostMapping("/system/logout")
-    public ResultVo<?> logout() {
-        String token = TokenThreadLocal.get();
+    public ResultVo<?> logout(HttpServletRequest request) {
+        String token = UserContextHolder.getToken().orElseThrow(() -> new TokenException(
+                TokenMsg.EXCEPTION_TOKEN_LOSE_EFFICACY));
+
         // 登出失败，没有授权Token
         if(StringUtils.isEmpty(token)){
             return ResultVo.error(TokenMsg.EXCEPTION_LOGOUT_ERROR.getMessage());
         }
+
+        // 异步记录信息
+        AsyncProcessExecutor normalExecutor = AsyncProcessExecutorFactory.createNormalExecutor();
+        UserModel user = UserUtil.getUser();
+        normalExecutor.put(()->{
+            // 记录用户登录日志 如果系统较大 可考虑 Elastic 的 filebeat
+            // 小系统 直接存在 mysql就好
+            LoginLogsModel userLoginModel = UserLoginLogFactory.getUserLoginModel(request, user, false);
+            iLoginLogsService.insert(userLoginModel);
+        });
+        normalExecutor.execute();
+
         UserTokenUtil.logout(token);
         return ResultVo.success(TokenMsg.EXCEPTION_LOGOUT_SUCCESS.getMessage());
     }

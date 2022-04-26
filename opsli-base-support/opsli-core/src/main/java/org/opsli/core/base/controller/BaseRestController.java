@@ -55,6 +55,8 @@ import org.opsli.core.utils.UserUtil;
 import org.opsli.plugins.excel.exception.ExcelPluginException;
 import org.opsli.plugins.excel.listener.BatchExcelListener;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
@@ -91,6 +93,18 @@ public abstract class BaseRestController <T extends BaseEntity, E extends ApiWra
     /** 子类Service */
     @Autowired(required = false)
     protected S IService;
+
+    /**
+     * 默认 直接设置 传入数据的
+     * 根据id 从缓存 直接查询 数据对象
+     *
+     * @param id id
+     * @return E
+     */
+    @ModelAttribute
+    public E get(@RequestParam(required=false) String id) {
+        return IService.get(id);
+    }
 
     /**
      * Excel 导入

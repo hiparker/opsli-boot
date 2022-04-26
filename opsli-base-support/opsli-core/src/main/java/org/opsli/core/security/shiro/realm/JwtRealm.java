@@ -3,7 +3,10 @@ package org.opsli.core.security.shiro.realm;
 import cn.hutool.core.collection.CollUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.shiro.authc.*;
+import org.apache.shiro.authc.AuthenticationException;
+import org.apache.shiro.authc.AuthenticationInfo;
+import org.apache.shiro.authc.AuthenticationToken;
+import org.apache.shiro.authc.SimpleAuthenticationInfo;
 import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
@@ -11,8 +14,8 @@ import org.apache.shiro.subject.PrincipalCollection;
 import org.opsli.api.wrapper.system.tenant.TenantModel;
 import org.opsli.api.wrapper.system.user.UserModel;
 import org.opsli.common.enums.DictType;
-import org.opsli.core.api.TokenThreadLocal;
 import org.opsli.common.exception.TokenException;
+import org.opsli.core.holder.UserContextHolder;
 import org.opsli.core.msg.TokenMsg;
 import org.opsli.core.security.shiro.token.JwtToken;
 import org.opsli.core.utils.TenantUtil;
@@ -119,7 +122,8 @@ public class JwtRealm extends AuthorizingRealm implements FlagRealm {
     public static void authToken()
             throws TokenException {
 
-        String accessToken = TokenThreadLocal.get();
+        String accessToken = UserContextHolder.getToken().orElseThrow(() -> new TokenException(
+                TokenMsg.EXCEPTION_TOKEN_LOSE_EFFICACY));
 
         // 1. 校验 token 是否有效
         boolean verify = UserTokenUtil.verify(accessToken);
@@ -151,7 +155,8 @@ public class JwtRealm extends AuthorizingRealm implements FlagRealm {
             return;
         }
 
-        String accessToken = TokenThreadLocal.get();
+        String accessToken = UserContextHolder.getToken().orElseThrow(() -> new TokenException(
+                TokenMsg.EXCEPTION_TOKEN_LOSE_EFFICACY));
 
         // 查询 用户信息
         String userId = UserTokenUtil.getUserIdByToken(accessToken);

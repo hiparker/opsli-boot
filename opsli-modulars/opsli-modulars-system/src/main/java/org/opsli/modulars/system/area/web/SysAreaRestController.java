@@ -87,10 +87,7 @@ public class SysAreaRestController extends BaseRestController<SysArea, SysAreaMo
     @RequiresPermissions("system_area_select")
     @Override
     public ResultVo<SysAreaModel> get(SysAreaModel model) {
-        // 如果系统内部调用 则直接查数据库
-        if(model != null && model.getIzApi() != null && model.getIzApi()){
-            model = IService.get(model);
-        }
+        model = IService.get(model);
         return ResultVo.success(model);
     }
 

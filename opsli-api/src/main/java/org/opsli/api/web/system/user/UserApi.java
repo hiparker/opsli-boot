@@ -128,11 +128,11 @@ public interface UserApi {
 
     /**
      * 上传头像
-     * @param request 文件流 request
+     * @param userAvatarModel 图片地址
      * @return ResultVo
      */
     @PostMapping("/updateAvatar")
-    ResultVo<?> updateAvatar(MultipartHttpServletRequest request);
+    ResultVo<?> updateAvatar(@RequestBody UserAvatarModel userAvatarModel);
 
 
     /**

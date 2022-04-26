@@ -56,10 +56,7 @@ public class LogsRestController extends BaseRestController<SysLogs, LogsModel, I
     @RequiresPermissions("devops_logs_select")
     @Override
     public ResultVo<LogsModel> get(LogsModel model) {
-        // 如果系统内部调用 则直接查数据库
-        if(model != null && model.getIzApi() != null && model.getIzApi()){
-            model = IService.get(model);
-        }
+        model = IService.get(model);
         return ResultVo.success(model);
     }
 
@@ -81,20 +78,6 @@ public class LogsRestController extends BaseRestController<SysLogs, LogsModel, I
         page = IService.findPage(page);
 
         return ResultVo.success(page.getPageData());
-    }
-
-
-    /**
-     * 日志 清空一个月前的日志
-     * @return ResultVo
-     */
-    @ApiOperation(value = "清空一个月前的日志", notes = "清空一个月前的日志")
-    @RequiresPermissions("devops_logs_delete")
-    @EnableLog
-    @Override
-    public ResultVo<?> emptyByOneMonth(){
-        IService.emptyByOneMonth();
-        return ResultVo.success("清空日志成功");
     }
 
 
