@@ -63,6 +63,7 @@ import org.opsli.plugins.oss.service.BaseOssStorageService;
 import org.opsli.plugins.oss.service.OssStorageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
@@ -201,44 +202,20 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
 
     /**
      * 上传头像
-     * @param request 文件流 request
+     * @param userAvatarModel 图片地址
      * @return ResultVo
      */
     @ApiOperation(value = "上传头像", notes = "上传头像")
     @Override
-    public ResultVo<?> updateAvatar(MultipartHttpServletRequest request) {
-        Iterator<String> itr = request.getFileNames();
-        String uploadedFile = itr.next();
-        List<MultipartFile> files = request.getFiles(uploadedFile);
-        if (CollectionUtils.isEmpty(files)) {
-            // 请选择文件
-            return ResultVo.error(SystemMsg.EXCEPTION_USER_FILE_NULL.getCode(),
-                    SystemMsg.EXCEPTION_USER_FILE_NULL.getMessage());
-        }
-
-        try {
-            MultipartFile multipartFile = files.get(0);
-            Resource resource = multipartFile.getResource();
-            String filename = resource.getFilename();
-
-            // 调用OSS 服务保存头像
-            OssStorageService ossStorageService = OssStorageFactory.INSTANCE.getHandle();
-            BaseOssStorageService.FileAttr fileAttr = ossStorageService.upload(
-                    multipartFile.getInputStream(), FileUtil.extName(filename));
-
-            UserModel user = UserUtil.getUserBySource();
-            // 更新头像至数据库
-            UserModel userModel = new UserModel();
-            userModel.setId(user.getId());
-            userModel.setAvatar(fileAttr.getFileStoragePath());
-            IService.updateAvatar(userModel);
-            // 刷新用户信息
-            UserUtil.refreshUser(user);
-        }catch (IOException e){
-            log.error(e.getMessage(), e);
-            return ResultVo.error("更新头像失败，请稍后再试");
-        }
-
+    public ResultVo<?> updateAvatar(UserAvatarModel userAvatarModel) {
+        UserModel user = UserUtil.getUserBySource();
+        // 更新头像至数据库
+        UserModel userModel = new UserModel();
+        userModel.setId(user.getId());
+        userModel.setAvatar(userAvatarModel.getImgUrl());
+        IService.updateAvatar(userModel);
+        // 刷新用户信息
+        UserUtil.refreshUser(user);
         return ResultVo.success();
     }
 

@@ -1,8 +1,27 @@
 package org.opsli.modulars.tools.oss.web;
 
+import cn.hutool.core.io.FileUtil;
+import com.alibaba.excel.util.CollectionUtils;
+import com.baomidou.mybatisplus.extension.service.IService;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.opsli.api.base.result.ResultVo;
+import org.opsli.api.wrapper.system.user.UserModel;
 import org.opsli.common.annotation.ApiRestController;
+import org.opsli.core.utils.UserUtil;
+import org.opsli.modulars.system.SystemMsg;
+import org.opsli.plugins.oss.OssStorageFactory;
+import org.opsli.plugins.oss.service.BaseOssStorageService;
+import org.opsli.plugins.oss.service.OssStorageService;
+import org.springframework.core.io.Resource;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
+
+import java.io.IOException;
+import java.util.Iterator;
+import java.util.List;
 
 
 /**
@@ -16,6 +35,39 @@ import org.opsli.common.annotation.ApiRestController;
 @ApiRestController("/{ver}/tools/oss")
 public class OssRestController {
 
+    /**
+     * 文件上传
+     * @param request 文件流 request
+     * @return ResultVo
+     */
+    @ApiOperation(value = "文件上传", notes = "文件上传")
+    @PostMapping("/upload")
+    public ResultVo<?> upload(MultipartHttpServletRequest request) {
+        Iterator<String> itr = request.getFileNames();
+        String uploadedFile = itr.next();
+        List<MultipartFile> files = request.getFiles(uploadedFile);
+        if (CollectionUtils.isEmpty(files)) {
+            // 请选择文件
+            return ResultVo.error(SystemMsg.EXCEPTION_USER_FILE_NULL.getCode(),
+                    SystemMsg.EXCEPTION_USER_FILE_NULL.getMessage());
+        }
+
+        try {
+            MultipartFile multipartFile = files.get(0);
+            Resource resource = multipartFile.getResource();
+            String filename = resource.getFilename();
+
+            // 调用OSS 服务保存文件
+            OssStorageService ossStorageService = OssStorageFactory.INSTANCE.getHandle();
+            BaseOssStorageService.FileAttr fileAttr = ossStorageService.upload(
+                    multipartFile.getInputStream(), FileUtil.extName(filename));
+
+            return ResultVo.success(fileAttr);
+        }catch (IOException e){
+            log.error(e.getMessage(), e);
+        }
+        return ResultVo.error();
+    }
 
 
 }
