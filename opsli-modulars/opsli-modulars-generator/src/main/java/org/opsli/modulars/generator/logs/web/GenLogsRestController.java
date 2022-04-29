@@ -18,6 +18,7 @@ package org.opsli.modulars.generator.logs.web;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.beanutils.BeanUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.opsli.api.base.result.ResultVo;
 import org.opsli.common.annotation.ApiRestController;
@@ -28,7 +29,10 @@ import org.opsli.modulars.generator.logs.entity.GenLogs;
 import org.opsli.modulars.generator.logs.service.IGenLogsService;
 import org.opsli.modulars.generator.logs.wrapper.GenLogsModel;
 import org.opsli.plugins.generator.utils.GeneratorHandleUtil;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 
@@ -57,13 +61,20 @@ public class GenLogsRestController extends BaseRestController<GenLogs, GenLogsMo
 
     /**
      * 代码生成 修改
-     * @param model 模型
      */
     @ApiOperation(value = "代码生成", notes = "代码生成")
     @RequiresPermissions("dev_generator_create")
     @EnableLog
     @Override
-    public void create(GenLogsModel model, HttpServletResponse response) {
+    public void create(HttpServletRequest request, HttpServletResponse response) {
+        // request 对象属性
+        GenLogsModel model = new GenLogsModel();
+        try {
+            BeanUtils.populate(model, request.getParameterMap());
+        }catch (Exception e){
+            log.error(e.getMessage(), e);
+        }
+
         // 判断代码生成器 是否启用
         GeneratorHandleUtil.judgeGeneratorEnable(super.globalProperties);
 

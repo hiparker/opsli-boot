@@ -101,6 +101,8 @@ public class MenuServiceImpl extends CrudServiceImpl<MenuMapper, SysMenu, MenuMo
             model.setParentId(MenuConstants.GEN_ID);
         }
 
+
+
         // 容错处理
         // 如果根结点为0 且 为菜单类型 判断首位是否为 / 如果没有则自动加 /
         if(MenuConstants.GEN_ID.equals(model.getParentId())){
@@ -113,7 +115,15 @@ public class MenuServiceImpl extends CrudServiceImpl<MenuMapper, SysMenu, MenuMo
         // 刷新缓存
         clearCache(Collections.singletonList(model));
 
-        return super.insert(model);
+        // 新增并更新 parent_ids
+        MenuModel menuModel = super.insert(model);
+        MenuModel newParentModel = getParentMenuModel(menuModel.getParentId());
+        String newParentIds = unWrap(
+                StrUtil.join(",",
+                        newParentModel.getParentIds(), menuModel.getId()), ',');
+        menuModel.setParentIds(newParentIds);
+        menuModel.setVersion(null);
+        return super.update(menuModel);
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -148,11 +158,11 @@ public class MenuServiceImpl extends CrudServiceImpl<MenuMapper, SysMenu, MenuMo
         // 去除 两边的[,] 然后拼接 parentIds
         String ordParentIds = unWrap(
                 StrUtil.join(",",
-                        oldParentModel.getParentIds(), oldParentModel.getId(), sourceModel.getId()), ',');
+                        oldParentModel.getParentIds(), sourceModel.getId()), ',');
 
         String newParentIds = unWrap(
                 StrUtil.join(",",
-                        newParentModel.getParentIds(), newParentModel.getId(), model.getId()), ',');
+                        newParentModel.getParentIds(), model.getId()), ',');
 
         // 判断 上级是否发生变更 如果发生变更 则当前菜单 继承上级菜单的 label
         if(!sourceModel.getParentId().equals(model.getParentId())){
@@ -175,6 +185,7 @@ public class MenuServiceImpl extends CrudServiceImpl<MenuMapper, SysMenu, MenuMo
                 // 内部修改 防止版本行锁出现问题
                 sysMenu.setVersion(null);
             }
+
             this.saveOrUpdateBatch(menuList);
         }
 
@@ -224,8 +235,8 @@ public class MenuServiceImpl extends CrudServiceImpl<MenuMapper, SysMenu, MenuMo
         if(TreeBuildUtil.DEF_PARENT_ID.equals(parentId)){
             parentModel = new MenuModel();
             parentModel.setId(TreeBuildUtil.DEF_PARENT_ID);
-            parentModel.setParentId("");
-            parentModel.setParentIds("");
+            parentModel.setParentId(TreeBuildUtil.DEF_PARENT_ID);
+            parentModel.setParentIds(TreeBuildUtil.DEF_PARENT_ID);
             parentModel.setLabel(DictType.MENU_LABEL_SYSTEM.getValue());
         }else {
             parentModel = this.get(parentId);
