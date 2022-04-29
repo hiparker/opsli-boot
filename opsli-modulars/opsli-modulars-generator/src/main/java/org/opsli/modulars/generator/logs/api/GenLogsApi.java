@@ -20,6 +20,7 @@ import org.opsli.modulars.generator.logs.wrapper.GenLogsModel;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 
@@ -51,10 +52,9 @@ public interface GenLogsApi {
 
     /**
      * 代码生成 修改
-     * @param model 模型
      */
     @GetMapping("/create")
-    void create(GenLogsModel model, HttpServletResponse response);
+    void create(HttpServletRequest request, HttpServletResponse response);
 
     /**
      * 生成菜单
