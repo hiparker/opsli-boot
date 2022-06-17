@@ -377,7 +377,7 @@ public class SysOrgRestController extends BaseRestController<SysOrg, SysOrgModel
     * @return ResultVo
     */
     @ApiOperation(value = "删除组织机构数据", notes = "删除组织机构数据")
-    @RequiresPermissions("system_org_update")
+    @RequiresPermissions("system_org_delete")
     @EnableLog
     @Override
     public ResultVo<?> del(String id){
@@ -394,7 +394,7 @@ public class SysOrgRestController extends BaseRestController<SysOrg, SysOrgModel
     * @return ResultVo
     */
     @ApiOperation(value = "批量删除组织机构数据", notes = "批量删除组织机构数据")
-    @RequiresPermissions("system_org_update")
+    @RequiresPermissions("system_org_delete")
     @EnableLog
     @Override
     public ResultVo<?> delAll(String ids){

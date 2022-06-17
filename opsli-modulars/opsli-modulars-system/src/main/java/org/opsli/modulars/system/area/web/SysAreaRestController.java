@@ -202,7 +202,7 @@ public class SysAreaRestController extends BaseRestController<SysArea, SysAreaMo
     * @return ResultVo
     */
     @ApiOperation(value = "删除地域数据", notes = "删除地域数据")
-    @RequiresPermissions("system_area_update")
+    @RequiresPermissions("system_area_delete")
     @EnableLog
     @Override
     public ResultVo<?> del(String id){
@@ -219,7 +219,7 @@ public class SysAreaRestController extends BaseRestController<SysArea, SysAreaMo
     * @return ResultVo
     */
     @ApiOperation(value = "批量删除地域数据", notes = "批量删除地域数据")
-    @RequiresPermissions("system_area_update")
+    @RequiresPermissions("system_area_delete")
     @EnableLog
     @Override
     public ResultVo<?> delAll(String ids){
