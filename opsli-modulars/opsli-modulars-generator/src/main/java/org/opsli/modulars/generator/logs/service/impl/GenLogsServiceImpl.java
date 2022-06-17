@@ -116,6 +116,13 @@ public class GenLogsServiceImpl extends CrudServiceImpl<GenLogsMapper, GenLogs, 
             throw new GeneratorException(GeneratorMsg.EXCEPTION_CREATE_NULL);
         }
         model.setVersion(null);
+        // 强制设置为小写 保持权限统一
+        model.setModuleName(null==model.getModuleName()
+                ?null:model.getModuleName().toLowerCase());
+        model.setSubModuleName(null==model.getSubModuleName()
+                ?null:model.getSubModuleName().toLowerCase());
+
+
         GenLogsModel saveModel = this.save(model);
         if(saveModel != null){
             GenTableModel genTableModel = iGenTableService.get(saveModel.getTableId());
