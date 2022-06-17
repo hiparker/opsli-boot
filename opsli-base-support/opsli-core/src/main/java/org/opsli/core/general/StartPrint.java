@@ -20,6 +20,7 @@ import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.lang.Console;
 import cn.hutool.core.net.NetUtil;
 import cn.hutool.core.thread.ThreadUtil;
+import cn.hutool.core.util.StrUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.opsli.core.autoconfigure.properties.GlobalProperties;
@@ -98,7 +99,8 @@ public class StartPrint {
      * @return String
      */
     public String getBasePath(){
-        return NetUtil.getLocalhostStr() + ":" + serverPort + serverContextPath;
+        return NetUtil.getLocalhostStr() + ":" + serverPort
+                + StrUtil.addPrefixIfNot(serverContextPath, "/");
     }
 
     /**
@@ -107,7 +109,8 @@ public class StartPrint {
      */
     public String getRunTime(){
         //Level.MINUTE表示精确到分
-        return DateUtil.formatBetween(DateUtil.parseDateTime(starterDate), DateUtil.date(), BetweenFormatter.Level.MINUTE);
+        return DateUtil.formatBetween(DateUtil.parseDateTime(starterDate),
+                DateUtil.date(), BetweenFormatter.Level.MINUTE);
     }
 
     // ======================
