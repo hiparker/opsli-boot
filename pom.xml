@@ -73,19 +73,19 @@
         <redisson.version>3.15.4</redisson.version>
         <captcha.version>1.6.2</captcha.version>
         <shiro.redis.version>3.3.1</shiro.redis.version>
-        <bouncycastle.version>1.68</bouncycastle.version>
+        <bouncycastle.version>1.69</bouncycastle.version>
 
         <!-- 数据库相关 -->
         <druid.version>1.1.17</druid.version>
         <dynamic.version>2.5.4</dynamic.version>
-        <mysql.version>8.0.20</mysql.version>
+        <mysql.version>8.0.28</mysql.version>
         <sqlserver.version>4.0</sqlserver.version>
         <oracle.version>11.2.0.3</oracle.version>
         <postgresql.version>42.2.6</postgresql.version>
 
         <!-- 工具 -->
         <hutool.version>5.7.14</hutool.version>
-        <guava.version>29.0-jre</guava.version>
+        <guava.version>30.0-android</guava.version>
         <commons.io.version>2.8.0</commons.io.version>
         <commons.lang3.version>3.11</commons.lang3.version>
         <snakeyaml.version>1.27</snakeyaml.version>
@@ -343,39 +343,6 @@
             <groupId>com.upyun</groupId>
             <artifactId>java-sdk</artifactId>
             <version>4.2.2</version>
-            <scope>provided</scope>
-            <optional>true</optional>
-        </dependency>
-
-        <!-- 百度云 BOS -->
-        <dependency>
-            <groupId>com.baidubce</groupId>
-            <artifactId>bce-java-sdk</artifactId>
-            <version>0.10.162</version>
-            <scope>provided</scope>
-            <optional>true</optional>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.springframework</groupId>
-                    <artifactId>spring-core</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-
-        <!-- 腾讯云 COS -->
-        <dependency>
-            <groupId>com.qcloud</groupId>
-            <artifactId>cos_api</artifactId>
-            <version>5.6.38</version>
-            <scope>provided</scope>
-            <optional>true</optional>
-        </dependency>
-
-        <!-- 七牛云 Kodo -->
-        <dependency>
-            <groupId>com.qiniu</groupId>
-            <artifactId>qiniu-java-sdk</artifactId>
-            <version>7.4.0</version>
             <scope>provided</scope>
             <optional>true</optional>
         </dependency>
