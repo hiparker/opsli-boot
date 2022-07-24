@@ -146,6 +146,68 @@ public final class SecurityCache {
 	}
 
 	/**
+	 * 获得缓存 （自定义 TTL）
+	 * @param redisTemplate redisTemplate
+	 * @param key 主键
+	 * @param callbackSource 原数据回调
+	 * @return Object
+	 */
+	public static Object getByTtl(
+			final RedisTemplate<String, Object> redisTemplate,
+			final String key, final Function<String, Object> callbackSource, final int ttl){
+		if(null == redisTemplate || null == key || null == callbackSource){
+			throw new RuntimeException("入参[redisTemplate,key,callbackSource]必填");
+		}
+
+		// 先判断本地缓存是否存在 默认为存在（类似于伪布隆过滤）
+		if(isNonExist(key)){
+			return null;
+		}
+		// 缓存 Object 对象
+		Object cache = getCacheObject(redisTemplate, key);
+		// 如果缓存不为空 则直接返回
+		if(null != cache){
+			return cache;
+		}
+
+		// 如果还没查到缓存 则需要 穿透到 源数据查询
+		// 开启本地锁
+		@SuppressWarnings("UnstableApiUsage")
+		Lock lock = STRIPED.get(key);
+		try {
+			// 尝试获得锁
+			if(lock.tryLock(DEFAULT_LOCK_TIME, TimeUnit.SECONDS)){
+				// 先判断本地缓存是否存在 默认为存在（类似于伪布隆过滤）
+				if(isNonExist(key)){
+					return null;
+				}
+				// 梅开二度 如果查到后 直接返回
+				cache = getCacheObject(redisTemplate, key);
+				// 如果缓存不为空 则直接返回
+				if(null != cache){
+					return cache;
+				}
+
+				// 如果这时候还没有 则查询源数据
+				cache = callbackSource.apply(key);
+				if(null == cache){
+					// 存储缓存状态
+					LFU_NULL_CACHE.put(key, CacheStatus.NOT_EXIST);
+					return null;
+				}
+
+				// 存入 Redis缓存
+				put(redisTemplate, key, cache, ttl);
+			}
+		}catch (Exception e){
+			log.error(e.getMessage(), e);
+		}finally {
+			lock.unlock();
+		}
+		return cache;
+	}
+
+	/**
 	 * 存储缓存
 	 * @param redisTemplate redisTemplate
 	 * @param key 主键
@@ -199,7 +261,33 @@ public final class SecurityCache {
 		LFU_NULL_CACHE.invalidate(key);
 	}
 
+	/**
+	 * 存储缓存
+	 * @param redisTemplate redisTemplate
+	 * @param key 主键
+	 * @param val 值
+	 * @param seconds 过期秒数
+	 */
+	public static void put(
+			final RedisTemplate<String, Object> redisTemplate,
+			final String key, final Object val, final Integer seconds) {
+		if (null == redisTemplate || null == key || null == val) {
+			throw new RuntimeException("入参[redisTemplate,key,val]必填");
+		}
 
+		String cacheKey = StrUtil.addPrefixIfNot(key, CACHE_PREFIX_KV);
+
+		redisTemplate.opsForValue()
+				.set(
+						cacheKey,
+						val,
+						seconds,
+						TimeUnit.SECONDS
+				);
+
+		// 清除本地记录
+		LFU_NULL_CACHE.invalidate(key);
+	}
 
 	/**
 	 * 获得缓存 Hash
