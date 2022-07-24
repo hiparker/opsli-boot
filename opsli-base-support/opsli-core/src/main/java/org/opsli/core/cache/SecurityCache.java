@@ -95,6 +95,11 @@ public final class SecurityCache {
 			throw new RuntimeException("入参[redisTemplate,key,callbackSource]必填");
 		}
 
+		// 先判断本地缓存是否存在 默认为存在（类似于伪布隆过滤）
+		if(isNonExist(key)){
+			return null;
+		}
+
 		// 缓存 Object 对象
 		Object cache = getCacheObject(redisTemplate, key);
 		// 如果缓存不为空 则直接返回
@@ -109,6 +114,11 @@ public final class SecurityCache {
 		try {
 			// 尝试获得锁
 			if(lock.tryLock(DEFAULT_LOCK_TIME, TimeUnit.SECONDS)){
+				// 先判断本地缓存是否存在 默认为存在（类似于伪布隆过滤）
+				if(isNonExist(key)){
+					return null;
+				}
+
 				// 梅开二度 如果查到后 直接返回
 				cache = getCacheObject(redisTemplate, key);
 				// 如果缓存不为空 则直接返回
@@ -208,6 +218,10 @@ public final class SecurityCache {
 
 		final String tempKey = key + "_" + field;
 
+		// 先判断本地缓存是否存在 默认为存在（类似于伪布隆过滤）
+		if(isNonExist(tempKey)){
+			return null;
+		}
 		// 缓存 Object 对象
 		Object cache = getHashCacheObject(redisTemplate, key, field);
 		// 如果缓存不为空 则直接返回
@@ -222,6 +236,11 @@ public final class SecurityCache {
 		try {
 			// 尝试获得锁
 			if(lock.tryLock(DEFAULT_LOCK_TIME, TimeUnit.SECONDS)){
+				// 先判断本地缓存是否存在 默认为存在（类似于伪布隆过滤）
+				if(isNonExist(tempKey)){
+					return null;
+				}
+
 				// 梅开二度 如果查到后 直接返回
 				cache = getHashCacheObject(redisTemplate, key, field);
 				// 如果缓存不为空 则直接返回
@@ -324,6 +343,10 @@ public final class SecurityCache {
 			throw new RuntimeException("入参[redisTemplate,key,callbackSourceCount,callbackSource]必填");
 		}
 
+		// 先判断本地缓存是否存在 默认为存在（类似于伪布隆过滤）
+		if(isNonExist(key)){
+			return null;
+		}
 		// 缓存 Object 对象
 		Map<String, Object> cache = getAllHashCacheObject(redisTemplate, key, callbackSourceCount);
 		// 如果缓存不为空 则直接返回
@@ -338,6 +361,11 @@ public final class SecurityCache {
 		try {
 			// 尝试获得锁
 			if(lock.tryLock(DEFAULT_LOCK_TIME, TimeUnit.SECONDS)){
+				// 先判断本地缓存是否存在 默认为存在（类似于伪布隆过滤）
+				if(isNonExist(key)){
+					return null;
+				}
+
 				// 梅开二度 如果查到后 直接返回
 				cache = getAllHashCacheObject(redisTemplate, key, callbackSourceCount);
 				// 如果缓存不为空 则直接返回
@@ -529,13 +557,6 @@ public final class SecurityCache {
 	private static Object getCacheObject(RedisTemplate<String, Object> redisTemplate, String key) {
 		Object cache = null;
 		try {
-			// 先判断本地缓存是否存在 默认为存在（类似于伪布隆过滤）
-			CacheStatus cacheStatus = LFU_NULL_CACHE.get(key, () -> CacheStatus.EXIST);
-			// 如果不存在 则直接返回空
-			if(CacheStatus.NOT_EXIST.equals(cacheStatus)){
-				return null;
-			}
-
 			String cacheKey = StrUtil.addPrefixIfNot(key, CACHE_PREFIX_KV);
 
 			// 从 缓存回调查询数据
@@ -555,15 +576,6 @@ public final class SecurityCache {
 	private static Object getHashCacheObject(RedisTemplate<String, Object> redisTemplate, String key, String field) {
 		Object cache = null;
 		try {
-			final String tempKey = key + "_" + field;
-
-			// 先判断本地缓存是否存在 默认为存在（类似于伪布隆过滤）
-			CacheStatus cacheStatus = LFU_NULL_CACHE.get(tempKey, () -> CacheStatus.EXIST);
-			// 如果不存在 则直接返回空
-			if(CacheStatus.NOT_EXIST.equals(cacheStatus)){
-				return null;
-			}
-
 			String cacheKeyByHash = StrUtil.addPrefixIfNot(key, CACHE_PREFIX_HASH);
 
 			// 从 缓存回调查询数据
@@ -586,13 +598,6 @@ public final class SecurityCache {
 												final Function<String, Integer> callbackSourceCount) {
 		Map<String, Object> cache = null;
 		try {
-			// 先判断本地缓存是否存在 默认为存在（类似于伪布隆过滤）
-			CacheStatus cacheStatus = LFU_NULL_CACHE.get(key, () -> CacheStatus.EXIST);
-			// 如果不存在 则直接返回空
-			if(CacheStatus.NOT_EXIST.equals(cacheStatus)){
-				return null;
-			}
-
 			String cacheKeyByHash = StrUtil.addPrefixIfNot(key, CACHE_PREFIX_HASH);
 
 			// 从 缓存回调查询数据
@@ -617,6 +622,23 @@ public final class SecurityCache {
 			log.error(e.getMessage(), e);
 		}
 		return cache;
+	}
+
+	/**
+	 * 判断是否不存在
+	 * @param key  key
+	 * @return boolean
+	 */
+	private static boolean isNonExist(String key){
+		try {
+			// 先判断本地缓存是否存在 默认为存在（类似于伪布隆过滤）
+			CacheStatus cacheStatus = LFU_NULL_CACHE.get(key, () -> CacheStatus.EXIST);
+			// 如果不存在 则直接返回空
+			return CacheStatus.NOT_EXIST.equals(cacheStatus);
+		}catch (Exception e){
+			log.error(e.getMessage(), e);
+		}
+		return false;
 	}
 
 	/**
