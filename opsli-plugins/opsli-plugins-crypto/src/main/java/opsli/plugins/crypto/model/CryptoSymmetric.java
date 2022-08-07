@@ -15,7 +15,10 @@
  */
 package opsli.plugins.crypto.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import opsli.plugins.crypto.enums.CryptoSymmetricType;
 
 /**
@@ -25,6 +28,9 @@ import opsli.plugins.crypto.enums.CryptoSymmetricType;
  * @date 2021年5月17日15:59:52
  */
 @Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class CryptoSymmetric {
 
     /** 加解密类别 */

@@ -44,6 +44,8 @@ public enum SmsMsgCodeEnum implements BaseMsg {
     CODE_ERROR_SMS_TEMPLATE_CODE_NULL(310002, "模版编号不可为空"),
     CODE_ERROR_SMS_TEMPLATE_PARAM_NULL(310003, "模版参数不可为空"),
     CODE_ERROR_SMS_PHONE_NUMBERS_NULL(310004, "手机号不可为空"),
+    CODE_ERROR_SMS_ACCESS_KEY_NULL(310001, "ACCESS_KEY 不可为空"),
+    CODE_ERROR_SMS_ACCESS_KEY_SECRET_NULL(310001, "ACCESS_KEY_SECRET 不可为空"),
 
     CODE_ERROR_SMS_INIT(310010, "初始化参数异常"),
     EXCEPTION_IS_PHONE(98010,"不是座机号码+手机号码（CharUtil中国）+ 400 + 800电话 + 手机号号码（香港）! "),

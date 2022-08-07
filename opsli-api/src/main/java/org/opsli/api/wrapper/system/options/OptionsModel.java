@@ -38,8 +38,8 @@ import org.opsli.plugins.excel.annotation.ExcelInfo;
 @EqualsAndHashCode(callSuper = false)
 public class OptionsModel extends ApiWrapper {
 
-    
-    
+
+
     /** 参数编号 */
     @ApiModelProperty(value = "参数编号")
     @ExcelProperty(value = "参数编号", order = 1)
@@ -57,21 +57,21 @@ public class OptionsModel extends ApiWrapper {
 
     /** 参数值 */
     @ApiModelProperty(value = "参数值")
-    @ExcelProperty(value = "参数值", order = 3)
+    @ExcelProperty(value = "参数值", order = 4)
     @ExcelInfo
     @ValidatorLenMax(10000)
     private String optionValue;
 
     /** 是否内置数据 0否  1是*/
     @ApiModelProperty(value = "是否内置数据 0否  1是")
-    @ExcelProperty(value = "是否内置数据", order = 4)
+    @ExcelProperty(value = "是否内置数据", order = 5)
     @ExcelInfo(dictType = "no_yes")
     @ValidatorLenMax(1)
     private String izLock;
 
     /** 备注 */
     @ApiModelProperty(value = "备注")
-    @ExcelProperty(value = "备注", order = 5)
+    @ExcelProperty(value = "备注", order = 6)
     @ExcelInfo
     @ValidatorLenMax(255)
     private String remark;

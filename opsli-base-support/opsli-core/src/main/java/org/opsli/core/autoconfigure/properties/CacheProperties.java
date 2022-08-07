@@ -18,6 +18,7 @@ package org.opsli.core.autoconfigure.properties;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
 
 /**
@@ -26,7 +27,7 @@ import org.springframework.stereotype.Component;
  * @author Parker
  * @date 2020-09-15
  */
-@Component
+@Configuration
 @ConfigurationProperties(prefix = CacheProperties.PROP_PREFIX)
 @Data
 @EqualsAndHashCode(callSuper = false)

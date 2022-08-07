@@ -149,7 +149,7 @@ public interface OptionsApi {
      * @param optionCode 参数编号
      * @return ResultWrapper
      */
-    @GetMapping("/getByCode")
+    //@GetMapping("/getByCode")
     ResultWrapper<OptionsModel> getByCode(String optionCode);
 
     /**
@@ -163,7 +163,7 @@ public interface OptionsApi {
      * 系统参数 查询全部
      * @return ResultWrapper
      */
-    @GetMapping("/findAll")
+    //@GetMapping("/findAll")
     ResultWrapper<List<OptionsModel>> findAll();
 
     /**

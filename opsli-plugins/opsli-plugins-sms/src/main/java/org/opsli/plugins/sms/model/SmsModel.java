@@ -38,6 +38,12 @@ public class SmsModel implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
+	/** access_key */
+	private String accessKey;
+
+	/** access_key_secret */
+	private String accessKeySecret;
+
 	/** 手机号集合 */
 	List<String> tels;
 

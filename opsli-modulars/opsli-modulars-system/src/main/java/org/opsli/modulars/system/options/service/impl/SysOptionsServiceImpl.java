@@ -19,6 +19,7 @@ package org.opsli.modulars.system.options.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -39,6 +40,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -146,53 +148,49 @@ public class SysOptionsServiceImpl extends CrudServiceImpl<SysOptionsMapper, Sys
             throw new ServiceException(SystemMsg.EXCEPTION_OPTIONS_UPDATE);
         }
 
-        List<String> optionsCode = Lists.newArrayList();
-        optionsCode.addAll(params.keySet());
+        List<String> optionsCodeList = Lists.newArrayList();
+        optionsCodeList.addAll(params.keySet());
 
         // 获得所有的原始内容
         QueryWrapper<SysOptions> queryWrapper = new QueryWrapper<>();
-        queryWrapper.in("option_code", optionsCode);
+        queryWrapper.in("option_code", optionsCodeList);
         List<SysOptions> optionsList = this.findList(queryWrapper);
-        Map<String, OptionsModel> resourceDataDict = Maps.newHashMap();
+        Map<String, SysOptions> resourceDataDict = Maps.newHashMap();
         for (SysOptions option : optionsList) {
-            resourceDataDict.put(option.getOptionCode(),
-                    transformT2M(option)
-                    );
+            resourceDataDict.put(option.getOptionCode(), option);
         }
 
+        List<OptionsModel> updateOptionsModelList = new ArrayList<>();
         // 循环修改
         for (Map.Entry<String, String> entry : params.entrySet()) {
             String key = entry.getKey();
             String value = entry.getValue();
 
-            OptionsModel optionsModel = resourceDataDict.get(key);
-            if(optionsModel == null){
-                optionsModel = new OptionsModel();
-                // 新增参数
-
-                // 设置值
-                optionsModel.setIzApi(true);
-                optionsModel.setOptionCode(key);
-                optionsModel.setOptionValue(value);
-                optionsModel.setVersion(0);
-                // 强制设置为内置数据
-                optionsModel.setIzLock(DictType.NO_YES_YES.getValue());
-
-                // 更新
-                this.insert(optionsModel);
-            }else {
-                // 修改参数
-
-                // 设置值
-                optionsModel.setIzApi(true);
-                optionsModel.setOptionValue(value);
-                // 强制设置为内置数据
-                optionsModel.setIzLock(DictType.NO_YES_YES.getValue());
-
-                // 更新
-                this.update(optionsModel);
+            SysOptions options = resourceDataDict.get(key);
+            if(null == options){
+                options = new SysOptions();
             }
+
+            // 如果是 排除字段 且 传入参数为空 则 不处理
+            if(DictType.NO_YES_YES.getValue().equals(options.getIzExclude())
+                && StrUtil.isBlank(value)){
+                continue;
+            }
+
+            // 设置值
+            options.setIzApi(true);
+            options.setOptionValue(value);
+            // 强制设置为内置数据
+            options.setIzLock(DictType.NO_YES_YES.getValue());
+
+            // 更新
+            this.saveOrUpdate(options);
+
+            updateOptionsModelList.add(transformT2M(options));
         }
+
+        // 清除缓存
+        this.clearCache(updateOptionsModelList);
     }
 
     @Override

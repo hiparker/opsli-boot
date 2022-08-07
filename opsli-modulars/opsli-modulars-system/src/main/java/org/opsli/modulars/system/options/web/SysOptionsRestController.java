@@ -267,7 +267,7 @@ public class SysOptionsRestController extends BaseRestController<SysOptions, Opt
     }
 
     /**
-     * 系统参数 查询全部
+     * 系统参数 查询全部 对外查询
      * @return ResultWrapper
      */
     @Override
@@ -275,8 +275,12 @@ public class SysOptionsRestController extends BaseRestController<SysOptions, Opt
         QueryWrapper<SysOptions> queryWrapper = new QueryWrapper<>();
         // 查询内置数据
         queryWrapper.eq("iz_lock", DictType.NO_YES_YES.getValue());
+        // 查询不忽略的数据
+        queryWrapper.eq("iz_exclude", DictType.NO_YES_NO.getValue());
+
         // 数据库查询数据
         List<SysOptions> allList = IService.findList(queryWrapper);
+
         return ResultWrapper.getSuccessResultWrapper(
                 OptionsUtil.convertOptionsMap(
                         WrapperUtil.transformInstance(allList, OptionsModel.class))

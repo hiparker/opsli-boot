@@ -21,6 +21,8 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.opsli.core.autoconfigure.properties.GlobalProperties;
 import org.opsli.core.options.EmailConfigFactory;
+import org.opsli.core.options.SmsAliYunCaptchaConfigFactory;
+import org.opsli.core.options.SmsAliYunConfigFactory;
 import org.opsli.core.utils.EnjoyUtil;
 import org.opsli.core.utils.VerificationCodeUtil;
 import org.opsli.plugins.email.EmailPlugin;
@@ -43,11 +45,6 @@ import java.util.Map;
 @Component
 public class VerificationCodeBean {
     private static final String EMAIL_FTL = "/email/email_code.ftl";
-    /** TODO 短信签名 请修改 */
-    private static final String SMS_SIGN_NAME = "阿里云短信测试";
-    /** TODO 短信模版编号 请修改 */
-    private static final String SMS_TEMPLATE_CODE = "SMS_154950909";
-
     private final EmailPlugin emailPlugin;
     private final GlobalProperties globalProperties;
 
@@ -81,11 +78,19 @@ public class VerificationCodeBean {
         VerificationCodeUtil.VerificationCodeModel verificationCodeModel =
                 VerificationCodeUtil.createMobileCode(mobile, type);
 
+        SmsAliYunConfigFactory.SmsAliYunConfigOption aliYunConfigOption =
+                SmsAliYunConfigFactory.INSTANCE.getConfig();
+
+        SmsAliYunCaptchaConfigFactory.SmsAliYunCaptchaConfigOption aliYunCaptchaConfigOption =
+                SmsAliYunCaptchaConfigFactory.INSTANCE.getConfig();
+
         Map<String, String> templateParam = MapUtil.newHashMap(1);
         templateParam.put("code", verificationCodeModel.getVerificationCode());
         SmsModel smsModel = SmsModel.builder()
-                .signName(SMS_SIGN_NAME)
-                .templateCode(SMS_TEMPLATE_CODE)
+                .accessKey(aliYunConfigOption.getAccessKey())
+                .accessKeySecret(aliYunConfigOption.getAccessKeySecret())
+                .signName(aliYunCaptchaConfigOption.getSign())
+                .templateCode(aliYunCaptchaConfigOption.getTemplateCode())
                 .templateParam(templateParam)
                 .tels(Collections.singletonList(mobile))
                 .build();

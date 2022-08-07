@@ -21,13 +21,11 @@ import cn.hutool.core.util.StrUtil;
 import cn.javaer.aliyun.sms.SmsClient;
 import cn.javaer.aliyun.sms.SmsTemplate;
 import lombok.extern.slf4j.Slf4j;
-import org.opsli.plugins.sms.conf.AliYunSmsProperties;
 import org.opsli.plugins.sms.enums.SmsType;
 import org.opsli.plugins.sms.exceptions.SmsException;
 import org.opsli.plugins.sms.model.SmsModel;
 import org.opsli.plugins.sms.msg.SmsMsgCodeEnum;
 import org.opsli.plugins.sms.service.SmsService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -43,8 +41,6 @@ import java.util.Map;
 @Service
 public class AliYunSmsServiceImpl implements SmsService {
 
-    @Autowired
-    private AliYunSmsProperties aliyunSmsProperties;
 
     @Override
     public SmsType getType() {
@@ -54,28 +50,23 @@ public class AliYunSmsServiceImpl implements SmsService {
     @Override
     public void sendSms(SmsModel smsModel) {
         // 发送短信
-        this.sendSms(smsModel.getSignName(), smsModel.getTemplateCode(), smsModel.getTemplateParam(),
+        this.sendSms(smsModel.getAccessKey(), smsModel.getAccessKeySecret(), smsModel.getSignName(), smsModel.getTemplateCode(), smsModel.getTemplateParam(),
                 smsModel.getTels());
     }
 
     /**
      * 发送信息
+     * @param accessKey accessKey
+     * @param accessKeySecret accessKeySecret
      * @param templateCode SMS_153055065
      * @param templateParam {"code":"1111"}
      * @param phoneNumbers 支持对多个手机号码发送短信，手机号码之间以英文逗号（,）分隔。上限为1000个手机号码
      */
-    private void sendSms(String signName, String templateCode, Map<String, String> templateParam, List<String> phoneNumbers){
+    private void sendSms(String accessKey, String accessKeySecret, String signName, String templateCode, Map<String, String> templateParam, List<String> phoneNumbers){
         // 验证参数
-        verify(signName, templateCode, templateParam, phoneNumbers);
+        verify(accessKey, accessKeySecret, signName, templateCode, templateParam, phoneNumbers);
 
-        if(StrUtil.isEmpty(aliyunSmsProperties.getAccessKeyId()) ||
-                StrUtil.isEmpty(aliyunSmsProperties.getAccessKeySecret())){
-            // 初始化参数异常
-            throw new SmsException(SmsMsgCodeEnum.CODE_ERROR_SMS_INIT);
-        }
-
-        SmsClient smsClient = new SmsClient(aliyunSmsProperties.getAccessKeyId(),
-                aliyunSmsProperties.getAccessKeySecret());
+        SmsClient smsClient = new SmsClient(accessKey, accessKeySecret);
 
         // 发送信息
         SmsTemplate smsTemplate = SmsTemplate.builder()
@@ -94,7 +85,24 @@ public class AliYunSmsServiceImpl implements SmsService {
      * @param templateParam 模版参数
      * @param phoneNumbers 手机号
      */
-    private void verify(String signName, String templateCode, Map<String, String> templateParam, List<String> phoneNumbers){
+    private void verify(
+            String accessKey, String accessKeySecret,
+            String signName, String templateCode,
+            Map<String, String> templateParam, List<String> phoneNumbers){
+
+        if(StrUtil.isEmpty(accessKey)){
+            // accessKey不可为空
+            throw new SmsException(SmsMsgCodeEnum.CODE_ERROR_SMS_ACCESS_KEY_NULL);
+        }
+        if(StrUtil.isEmpty(accessKeySecret)){
+            // accessKeySecret不可为空
+            throw new SmsException(SmsMsgCodeEnum.CODE_ERROR_SMS_ACCESS_KEY_SECRET_NULL);
+        }
+        if(StrUtil.isEmpty(signName)){
+            // 签名不可为空
+            throw new SmsException(SmsMsgCodeEnum.CODE_ERROR_SMS_SIG_NAME_NULL);
+        }
+
         if(StrUtil.isEmpty(signName)){
             // 签名不可为空
             throw new SmsException(SmsMsgCodeEnum.CODE_ERROR_SMS_SIG_NAME_NULL);
