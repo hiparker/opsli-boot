@@ -23,45 +23,34 @@ import cn.hutool.core.lang.Snowflake;
 import cn.hutool.core.lang.tree.Tree;
 import cn.hutool.core.lang.tree.TreeNodeConfig;
 import cn.hutool.core.util.IdUtil;
-import cn.hutool.core.util.ReflectUtil;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.opsli.api.base.result.ResultVo;
+import org.opsli.api.base.result.ResultWrapper;
 import org.opsli.api.web.system.area.SysAreaRestApi;
 import org.opsli.api.wrapper.system.area.SysAreaModel;
 import org.opsli.common.annotation.ApiRestController;
-import org.opsli.common.annotation.EnableLog;
-import org.opsli.common.annotation.RequiresPermissionsCus;
 import org.opsli.common.constants.MyBatisConstants;
-import org.opsli.common.constants.TreeConstants;
 import org.opsli.common.utils.FieldUtil;
 import org.opsli.core.base.controller.BaseRestController;
-import org.opsli.core.base.entity.HasChildren;
-import org.opsli.core.persistence.querybuilder.QueryBuilder;
-import org.opsli.core.persistence.querybuilder.WebQueryBuilder;
+import org.opsli.core.log.annotation.OperateLogger;
+import org.opsli.core.log.enums.ModuleEnum;
+import org.opsli.core.log.enums.OperationTypeEnum;
 import org.opsli.core.utils.TreeBuildUtil;
 import org.opsli.modulars.system.area.entity.SysArea;
 import org.opsli.modulars.system.area.service.ISysAreaService;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.web.multipart.MultipartHttpServletRequest;
+import org.springframework.security.access.prepost.PreAuthorize;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.InputStream;
-import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * 地域表 Controller
@@ -81,24 +70,24 @@ public class SysAreaRestController extends BaseRestController<SysArea, SysAreaMo
     /**
     * 地域 查一条
     * @param model 模型
-    * @return ResultVo
+    * @return ResultWrapper
     */
     @ApiOperation(value = "获得单条地域", notes = "获得单条地域 - ID")
-    @RequiresPermissions("system_area_select")
+    @PreAuthorize("hasAuthority('system_area_select')")
     @Override
-    public ResultVo<SysAreaModel> get(SysAreaModel model) {
+    public ResultWrapper<SysAreaModel> get(SysAreaModel model) {
         model = IService.get(model);
-        return ResultVo.success(model);
+        return ResultWrapper.getSuccessResultWrapper(model);
     }
 
     /**
      * 获得组织树树
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @ApiOperation(value = "获得菜单树", notes = "获得菜单树")
-    @RequiresPermissions("system_area_select")
+    @PreAuthorize("hasAuthority('system_area_select')")
     @Override
-    public ResultVo<?> findTree(String parentId) {
+    public ResultWrapper<?> findTree(String parentId) {
 
         QueryWrapper<SysArea> wrapper = new QueryWrapper<>();
         wrapper.eq(FieldUtil.humpToUnderline(MyBatisConstants.FIELD_PARENT_ID), parentId);
@@ -121,7 +110,7 @@ public class SysAreaRestController extends BaseRestController<SysArea, SysAreaMo
         super.handleTreeHasChildren(treeNodes,
                 (parentIds)-> IService.hasChildren(parentIds));
 
-        return ResultVo.success(treeNodes);
+        return ResultWrapper.getSuccessResultWrapper(treeNodes);
     }
 
     /**
@@ -130,12 +119,12 @@ public class SysAreaRestController extends BaseRestController<SysArea, SysAreaMo
      * @param deep 层级
      *
      *
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @ApiOperation(value = "获取全量地域列表", notes = "获取全量地域列表")
-    @RequiresPermissions("system_area_select")
+    @PreAuthorize("hasAuthority('system_area_select')")
     @Override
-    public ResultVo<?> findTreeAll(Integer deep) {
+    public ResultWrapper<?> findTreeAll(Integer deep) {
 
         List<SysArea> dataList =  IService.findList(new QueryWrapper<>());
 
@@ -156,124 +145,86 @@ public class SysAreaRestController extends BaseRestController<SysArea, SysAreaMo
         super.handleTreeHasChildren(treeNodes,
                 (parentIds)-> IService.hasChildren(parentIds));
 
-        return ResultVo.success(treeNodes);
+        return ResultWrapper.getSuccessResultWrapper(treeNodes);
     }
 
     /**
     * 地域 新增
     * @param model 模型
-    * @return ResultVo
+    * @return ResultWrapper
     */
     @ApiOperation(value = "新增地域数据", notes = "新增地域数据")
-    @RequiresPermissions("system_area_insert")
-    @EnableLog
+    @PreAuthorize("hasAuthority('system_area_insert')")
+    @OperateLogger(description = "新增地域数据",
+            module = ModuleEnum.MODULE_AREA, operationType = OperationTypeEnum.INSERT, db = true)
     @Override
-    public ResultVo<?> insert(SysAreaModel model) {
+    public ResultWrapper<?> insert(SysAreaModel model) {
         // 演示模式 不允许操作
         super.demoError();
 
         // 调用新增方法
         IService.insert(model);
-        return ResultVo.success("新增地域成功");
+        return ResultWrapper.getSuccessResultWrapperByMsg("新增地域成功");
     }
 
     /**
     * 地域 修改
     * @param model 模型
-    * @return ResultVo
+    * @return ResultWrapper
     */
     @ApiOperation(value = "修改地域数据", notes = "修改地域数据")
-    @RequiresPermissions("system_area_update")
-    @EnableLog
+    @PreAuthorize("hasAuthority('system_area_update')")
+    @OperateLogger(description = "修改地域数据",
+            module = ModuleEnum.MODULE_AREA, operationType = OperationTypeEnum.UPDATE, db = true)
     @Override
-    public ResultVo<?> update(SysAreaModel model) {
+    public ResultWrapper<?> update(SysAreaModel model) {
         // 演示模式 不允许操作
         super.demoError();
 
         // 调用修改方法
         IService.update(model);
-        return ResultVo.success("修改地域成功");
+        return ResultWrapper.getSuccessResultWrapperByMsg("修改地域成功");
     }
 
 
     /**
     * 地域 删除
     * @param id ID
-    * @return ResultVo
+    * @return ResultWrapper
     */
     @ApiOperation(value = "删除地域数据", notes = "删除地域数据")
-    @RequiresPermissions("system_area_delete")
-    @EnableLog
+    @PreAuthorize("hasAuthority('system_area_delete')")
+    @OperateLogger(description = "删除地域数据",
+            module = ModuleEnum.MODULE_AREA, operationType = OperationTypeEnum.DELETE, db = true)
     @Override
-    public ResultVo<?> del(String id){
+    public ResultWrapper<?> del(String id){
         // 演示模式 不允许操作
         super.demoError();
 
         IService.delete(id);
-        return ResultVo.success("删除地域成功");
+        return ResultWrapper.getSuccessResultWrapperByMsg("删除地域成功");
     }
 
     /**
     * 地域 批量删除
     * @param ids ID 数组
-    * @return ResultVo
+    * @return ResultWrapper
     */
     @ApiOperation(value = "批量删除地域数据", notes = "批量删除地域数据")
-    @RequiresPermissions("system_area_delete")
-    @EnableLog
+    @PreAuthorize("hasAuthority('system_area_delete')")
+    @OperateLogger(description = "批量删除地域数据",
+            module = ModuleEnum.MODULE_AREA, operationType = OperationTypeEnum.DELETE, db = true)
     @Override
-    public ResultVo<?> delAll(String ids){
+    public ResultWrapper<?> delAll(String ids){
         // 演示模式 不允许操作
         super.demoError();
 
         String[] idArray = Convert.toStrArray(ids);
         IService.deleteAll(idArray);
 
-        return ResultVo.success("批量删除地域成功");
+        return ResultWrapper.getSuccessResultWrapperByMsg("批量删除地域成功");
     }
 
-
-    /**
-    * 地域 Excel 导出
-    * @param request request
-    * @param response response
-    */
-    @ApiOperation(value = "导出Excel", notes = "导出Excel")
-    @RequiresPermissionsCus("system_area_export")
-    @EnableLog
-    @Override
-    public void exportExcel(HttpServletRequest request, HttpServletResponse response) {
-        // 当前方法
-        Method method = ReflectUtil.getMethodByName(this.getClass(), "exportExcel");
-        QueryBuilder<SysArea> queryBuilder = new WebQueryBuilder<>(entityClazz, request.getParameterMap());
-        super.excelExport(SysAreaRestApi.SUB_TITLE, queryBuilder.build(), response, method);
-    }
-
-    /**
-    * 地域 Excel 导入
-    * @param request 文件流 request
-    * @return ResultVo
-    */
-    @ApiOperation(value = "导入Excel", notes = "导入Excel")
-    @RequiresPermissions("system_area_import")
-    @EnableLog
-    @Override
-    public ResultVo<?> importExcel(MultipartHttpServletRequest request) {
-        return super.importExcel(request);
-    }
-
-    /**
-    * 地域 Excel 下载导入模版
-    * @param response response
-    */
-    @ApiOperation(value = "导出Excel模版", notes = "导出Excel模版")
-    @RequiresPermissionsCus("system_area_import")
-    @Override
-    public void importTemplate(HttpServletResponse response) {
-        // 当前方法
-        Method method = ReflectUtil.getMethodByName(this.getClass(), "importTemplate");
-        super.importTemplate(SysAreaRestApi.SUB_TITLE, response, method);
-    }
 
     // ==============================
 

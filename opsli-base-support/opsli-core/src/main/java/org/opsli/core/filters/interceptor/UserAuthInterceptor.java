@@ -27,7 +27,7 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * 用户权限拦截器,支持自解析 jwt token
  *
- * @author 周鹏程
+ * @author Parker
  * @date 2021年12月22日16:35:20
  */
 @Slf4j

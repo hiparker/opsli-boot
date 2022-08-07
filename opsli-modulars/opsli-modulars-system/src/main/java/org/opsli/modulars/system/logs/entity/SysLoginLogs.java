@@ -22,30 +22,24 @@ import org.opsli.core.base.entity.BaseEntity;
 /**
  * 登录日志信息
  *
- * @author 周鹏程
+ * @author Parker
  * @date 2022年3月18日17:45:18
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
 public class SysLoginLogs extends BaseEntity {
 
-
-    /**
-     * 多租户字段
-     */
+    /** 多租户字段 */
     private String tenantId;
     /**
      * 组织机构ID组 xxx,xxx
      */
     private String orgIds;
 
-    /**
-     * 用户名称
-     */
+    /** 用户名称 */
     private String username;
-    /**
-     * 真实姓名
-     */
+
+    /** 真实姓名 */
     private String realName;
 
     /**
@@ -55,13 +49,13 @@ public class SysLoginLogs extends BaseEntity {
      */
     private String type;
 
-    /**
-     * 操作IP地址
-     */
+    /** 操作IP地址 */
     private String remoteAddr;
-    /**
-     * 用户代理
-     */
+
+    /** 用户代理 */
     private String userAgent;
+
+    /** 登陆来源 */
+    private String loginFrom;
 
 }

@@ -17,17 +17,16 @@ package org.opsli.modulars.system.user.web;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
-import cn.hutool.core.io.FileUtil;
-import cn.hutool.core.util.ReflectUtil;
+import cn.hutool.core.util.DesensitizedUtil;
 import cn.hutool.core.util.StrUtil;
-import com.alibaba.excel.util.CollectionUtils;
+import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.opsli.api.base.result.ResultVo;
+import org.opsli.api.base.encrypt.EncryptModel;
+import org.opsli.api.base.result.ResultWrapper;
 import org.opsli.api.web.system.user.UserApi;
 import org.opsli.api.wrapper.system.menu.MenuModel;
 import org.opsli.api.wrapper.system.options.OptionsModel;
@@ -35,44 +34,36 @@ import org.opsli.api.wrapper.system.role.RoleModel;
 import org.opsli.api.wrapper.system.tenant.TenantModel;
 import org.opsli.api.wrapper.system.user.*;
 import org.opsli.common.annotation.ApiRestController;
-import org.opsli.common.annotation.EnableLog;
-import org.opsli.common.annotation.RequiresPermissionsCus;
 import org.opsli.common.constants.MyBatisConstants;
 import org.opsli.common.enums.DictType;
+import org.opsli.common.enums.VerificationTypeEnum;
 import org.opsli.common.exception.ServiceException;
 import org.opsli.common.exception.TokenException;
 import org.opsli.common.utils.FieldUtil;
 import org.opsli.common.utils.WrapperUtil;
 import org.opsli.core.base.controller.BaseRestController;
+import org.opsli.core.log.annotation.OperateLogger;
+import org.opsli.core.log.enums.ModuleEnum;
+import org.opsli.core.log.enums.OperationTypeEnum;
 import org.opsli.core.msg.TokenMsg;
 import org.opsli.core.persistence.Page;
 import org.opsli.core.persistence.querybuilder.QueryBuilder;
 import org.opsli.core.persistence.querybuilder.WebQueryBuilder;
 import org.opsli.core.persistence.querybuilder.conf.WebQueryConf;
-import org.opsli.core.utils.OptionsUtil;
-import org.opsli.core.utils.OrgUtil;
-import org.opsli.core.utils.TenantUtil;
-import org.opsli.core.utils.UserUtil;
+import org.opsli.core.utils.*;
 import org.opsli.modulars.system.SystemMsg;
 import org.opsli.modulars.system.user.entity.SysUser;
 import org.opsli.modulars.system.user.entity.SysUserWeb;
 import org.opsli.modulars.system.user.service.IUserRoleRefService;
 import org.opsli.modulars.system.user.service.IUserService;
-import org.opsli.plugins.oss.OssStorageFactory;
-import org.opsli.plugins.oss.service.BaseOssStorageService;
-import org.opsli.plugins.oss.service.OssStorageService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.Resource;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.multipart.MultipartFile;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.lang.reflect.Method;
-import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 
 
 /**
@@ -92,22 +83,22 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
 
     /**
      * 当前登陆用户信息
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @ApiOperation(value = "当前登陆用户信息", notes = "当前登陆用户信息")
     @Override
-    public ResultVo<UserInfo> getInfo(HttpServletRequest request) {
+    public ResultWrapper<UserInfo> getInfo(HttpServletRequest request) {
         UserModel currUser = UserUtil.getUserBySource();
         return this.getInfoById(currUser.getId());
     }
 
     /**
      * 当前登陆用户信息 By Id
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @ApiOperation(value = "当前登陆用户信息 By Id", notes = "当前登陆用户信息 By Id")
     @Override
-    public ResultVo<UserInfo> getInfoById(String userId) {
+    public ResultWrapper<UserInfo> getInfoById(String userId) {
         UserModel currUser = UserUtil.getUserBySource(userId);
         if(currUser == null){
             throw new TokenException(TokenMsg.EXCEPTION_TOKEN_LOSE_EFFICACY);
@@ -143,17 +134,21 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
             userInfo.setIzSuperAdmin(true);
         }
 
-        return ResultVo.success(userInfo);
+        // 脱敏
+        userInfo.setEmail(DesensitizedUtil.email(userInfo.getEmail()));
+        userInfo.setMobile(DesensitizedUtil.mobilePhone(userInfo.getMobile()));
+
+        return ResultWrapper.getSuccessResultWrapper(userInfo);
     }
 
 
     /**
      * 当前登陆用户组织机构
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @ApiOperation(value = "当前登陆用户组织机构", notes = "当前登陆用户组织机构")
     @Override
-    public ResultVo<?> getOrg() {
+    public ResultWrapper<?> getOrg() {
         UserModel user = UserUtil.getUser();
         return this.getOrgByUserId(user.getId());
     }
@@ -161,53 +156,136 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
     /**
      * 用户组织机构
      * @param userId 用户ID
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @ApiOperation(value = "用户组织机构", notes = "用户组织机构")
     @Override
-    public ResultVo<?> getOrgByUserId(String userId) {
+    public ResultWrapper<?> getOrgByUserId(String userId) {
         List<UserOrgRefModel> orgListByUserId = UserUtil.getOrgListByUserId(userId);
-        return ResultVo.success(orgListByUserId);
+        return ResultWrapper.getSuccessResultWrapper(orgListByUserId);
     }
 
     /**
      * 根据 userId 获得用户角色Id集合
      * @param userId 用户Id
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @ApiOperation(value = "根据 userId 获得用户角色Id集合", notes = "根据 userId 获得用户角色Id集合")
     @Override
-    public ResultVo<List<String>> getRoleIdsByUserId(String userId) {
+    public ResultWrapper<List<String>> getRoleIdsByUserId(String userId) {
         List<String> roleIdList = iUserRoleRefService.getRoleIdList(userId);
-        return ResultVo.success(roleIdList);
+        return ResultWrapper.getSuccessResultWrapper(roleIdList);
     }
 
 
 
     /**
      * 修改密码
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @ApiOperation(value = "修改密码", notes = "修改密码")
     @Override
-    public ResultVo<?> updatePassword(UserPassword userPassword) {
+    public ResultWrapper<?> updatePassword(EncryptModel encryptModel) {
         // 演示模式 不允许操作
         super.demoError();
+
+        Object asymmetricDecryptToObj = CryptoUtil.asymmetricDecryptToObj(encryptModel.getEncryptData());
+        // 转换模型
+        UserPassword userPassword = WrapperUtil.transformInstance(
+                                        asymmetricDecryptToObj, UserPassword.class);
+
+        // 验证对象
+        ValidatorUtil.verify(userPassword);
 
         UserModel user = UserUtil.getUserBySource();
         userPassword.setUserId(user.getId());
         IService.updatePasswordByCheckOld(userPassword);
-        return ResultVo.success();
+        return ResultWrapper.getSuccessResultWrapper();
+    }
+
+    /**
+     * 修改密码 忘记密码
+     * @return ResultWrapper
+     */
+    @Override
+    public ResultWrapper<?> updatePasswordByForget(EncryptModel encryptModel) {
+        // 演示模式 不允许操作
+        super.demoError();
+
+        Object asymmetricDecryptToObj = CryptoUtil.asymmetricDecryptToObj(encryptModel.getEncryptData());
+        // 转换模型
+        UpdateUserPasswordByForgetModel updateUserPasswordByForgetModel = WrapperUtil.transformInstance(
+                asymmetricDecryptToObj, UpdateUserPasswordByForgetModel.class);
+
+        // 验证授权是否正确
+        VerificationCodeUtil.checkCertificate(
+                VerificationTypeEnum.AUTH.getType(), updateUserPasswordByForgetModel.getCertificate());
+
+        UserModel userBySource = UserUtil.getUserBySource();
+
+        // 转换模型
+        ToUserPassword userPassword = new ToUserPassword();
+        userPassword.setUserId(userBySource.getId());
+        userPassword.setNewPassword(updateUserPasswordByForgetModel.getNewPassword());
+
+        IService.updatePasswordByNotCheckOld(userPassword);
+        return ResultWrapper.getSuccessResultWrapper();
+    }
+
+    /**
+     * 修改邮箱
+     * @return ResultWrapper
+     */
+    @ApiOperation(value = "修改邮箱", notes = "修改邮箱")
+    @Override
+    public ResultWrapper<?> updateEmail(EncryptModel encryptModel) {
+        // 演示模式 不允许操作
+        super.demoError();
+
+        Object asymmetricDecryptToObj = CryptoUtil.asymmetricDecryptToObj(encryptModel.getEncryptData());
+        // 转换模型
+        UpdateUserEmailModel updateUserEmailModel = WrapperUtil.transformInstance(
+                asymmetricDecryptToObj, UpdateUserEmailModel.class);
+
+        // 验证对象
+        ValidatorUtil.verify(updateUserEmailModel);
+
+        // 修改用户邮箱
+        IService.updateUserEmail(updateUserEmailModel);
+        return ResultWrapper.getSuccessResultWrapper();
+    }
+
+    /**
+     * 修改手机
+     * @return ResultWrapper
+     */
+    @ApiOperation(value = "修改手机", notes = "修改手机")
+    @Override
+    public ResultWrapper<?> updateMobile(EncryptModel encryptModel) {
+        // 演示模式 不允许操作
+        super.demoError();
+
+        Object asymmetricDecryptToObj = CryptoUtil.asymmetricDecryptToObj(encryptModel.getEncryptData());
+        // 转换模型
+        UpdateUserMobileModel updateUserMobileModel = WrapperUtil.transformInstance(
+                asymmetricDecryptToObj, UpdateUserMobileModel.class);
+
+        // 验证对象
+        ValidatorUtil.verify(updateUserMobileModel);
+
+        // 修改用户邮箱
+        IService.updateUserMobile(updateUserMobileModel);
+        return ResultWrapper.getSuccessResultWrapper();
     }
 
     /**
      * 上传头像
      * @param userAvatarModel 图片地址
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @ApiOperation(value = "上传头像", notes = "上传头像")
     @Override
-    public ResultVo<?> updateAvatar(UserAvatarModel userAvatarModel) {
+    public ResultWrapper<?> updateAvatar(UserAvatarModel userAvatarModel) {
         UserModel user = UserUtil.getUserBySource();
         // 更新头像至数据库
         UserModel userModel = new UserModel();
@@ -216,39 +294,55 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
         IService.updateAvatar(userModel);
         // 刷新用户信息
         UserUtil.refreshUser(user);
-        return ResultVo.success();
+        return ResultWrapper.getSuccessResultWrapper();
     }
 
     // ==================================================
-
 
     /**
      * 修改密码
      * @return ResultVo
      */
     @ApiOperation(value = "修改密码", notes = "修改密码")
-    @RequiresPermissions("system_user_updatePassword")
-    @EnableLog
+    @PreAuthorize("hasAuthority('system_user_updatePassword')")
+    @OperateLogger(description = "修改密码",
+            module = ModuleEnum.MODULE_USER, operationType = OperationTypeEnum.UPDATE, db = true)
     @Override
-    public ResultVo<?> updatePasswordById(ToUserPassword userPassword) {
+    public ResultWrapper<?> updatePasswordById(EncryptModel encryptModel) {
         // 演示模式 不允许操作
         super.demoError();
 
+        Object asymmetricDecryptToObj = CryptoUtil.asymmetricDecryptToObj(encryptModel.getEncryptData());
+        // 转换模型
+        ToUserPassword userPassword = WrapperUtil.transformInstance(
+                asymmetricDecryptToObj, ToUserPassword.class);
+
+        // 验证对象
+        ValidatorUtil.verify(userPassword);
+
         IService.updatePasswordByNotCheckOld(userPassword);
-        return ResultVo.success();
+        return ResultWrapper.getSuccessResultWrapper();
     }
 
     /**
      * 重置密码
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @ApiOperation(value = "重置密码", notes = "重置密码")
-    @RequiresPermissions("system_user_resetPassword")
-    @EnableLog
+    @PreAuthorize("hasAuthority('system_user_resetPassword')")
+    @OperateLogger(description = "重置密码",
+            module = ModuleEnum.MODULE_USER, operationType = OperationTypeEnum.UPDATE, db = true)
     @Override
-    public ResultVo<?> resetPasswordById(String userId) {
+    public ResultWrapper<?> resetPasswordById(EncryptModel encryptModel) {
         // 演示模式 不允许操作
         super.demoError();
+
+        Object asymmetricDecryptToObj = CryptoUtil.asymmetricDecryptToObj(encryptModel.getEncryptData());
+        // 转换模型
+        String userId = JSONUtil.parseObj(asymmetricDecryptToObj).getStr("userId");
+        if(StrUtil.isBlank(userId)){
+            throw new ServiceException(SystemMsg.EXCEPTION_USER_ILLEGAL_PARAMETER);
+        }
 
         // 配置文件默认密码
         String defPass = globalProperties.getAuth().getDefaultPass();
@@ -265,45 +359,57 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
 
         boolean resetPasswordFlag = IService.resetPassword(userPassword);
         if(!resetPasswordFlag){
-            return ResultVo.error("重置密码失败");
+            // 重制密码失败
+            return ResultWrapper.getCustomResultWrapper(SystemMsg.EXCEPTION_RESET_PASSWORD);
         }
 
-        return ResultVo.success("重置密码成功！默认密码为：" + defPass);
+        return ResultWrapper.getSuccessResultWrapperByMsg("重置密码成功！默认密码为：" + defPass);
     }
 
     /**
      * 变更账户状态
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @ApiOperation(value = "锁定账户", notes = "锁定账户")
-    @RequiresPermissions("system_user_enable")
-    @EnableLog
+    @PreAuthorize("hasAuthority('system_user_enable')")
+    @OperateLogger(description = "锁定账户",
+            module = ModuleEnum.MODULE_USER, operationType = OperationTypeEnum.UPDATE, db = true)
     @Override
-    public ResultVo<?> enableAccount(String userId, String enable) {
+    public ResultWrapper<?> enableAccount(EncryptModel encryptModel) {
         // 演示模式 不允许操作
         super.demoError();
 
+        Object asymmetricDecryptToObj = CryptoUtil.asymmetricDecryptToObj(encryptModel.getEncryptData());
+        // 转换模型
+        EnableUserModel enableUserModel = WrapperUtil.transformInstance(
+                asymmetricDecryptToObj, EnableUserModel.class);
+
+        // 验证对象
+        ValidatorUtil.verify(enableUserModel);
+
         // 变更账户状态
-        boolean lockAccountFlag = IService.enableAccount(userId, enable);
+        boolean lockAccountFlag = IService.enableAccount(
+                enableUserModel.getUserId(), enableUserModel.getEnabled());
         if(!lockAccountFlag){
-            return ResultVo.error("变更用户状态失败");
+            // 变更状态失败
+            return ResultWrapper.getCustomResultWrapper(SystemMsg.EXCEPTION_CHANGE_STATUS);
         }
-        return ResultVo.success();
+        return ResultWrapper.getSuccessResultWrapper();
     }
 
 
     /**
      * 用户信息 查一条
      * @param model 模型
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @ApiOperation(value = "获得单条用户信息", notes = "获得单条用户信息 - ID")
     // 因为工具类 使用到该方法 不做权限验证
-    //@RequiresPermissions("system_user_select")
+    //@PreAuthorize("hasAuthority('system_user_select')")
     @Override
-    public ResultVo<UserModel> get(UserModel model) {
+    public ResultWrapper<UserModel> get(UserModel model) {
         model = IService.get(model);
-        return ResultVo.success(model);
+        return ResultWrapper.getSuccessResultWrapper(model);
     }
 
     /**
@@ -312,12 +418,12 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
      * @param pageSize 每页条数
      * @param orgIdGroup 组织ID组
      * @param request request
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @ApiOperation(value = "获得分页数据", notes = "获得分页数据 - 查询构造器")
-    @RequiresPermissions("system_user_select")
+    @PreAuthorize("hasAuthority('system_user_select')")
     @Override
-    public ResultVo<?> findPage(Integer pageNo, Integer pageSize,
+    public ResultWrapper<?> findPage(Integer pageNo, Integer pageSize,
                                  String orgIdGroup,
                                  HttpServletRequest request) {
         QueryBuilder<SysUserWeb> queryBuilder = new WebQueryBuilder<>(
@@ -335,11 +441,10 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
         page = IService.findPageByCus(page);
         // 密码防止分页泄露处理
         for (UserWebModel userModel : page.getList()) {
-            userModel.setSecretKey(null);
             userModel.setPassword(null);
             userModel.setPasswordLevel(null);
         }
-        return ResultVo.success(page.getPageData());
+        return ResultWrapper.getSuccessResultWrapper(page.getPageData());
     }
 
     /**
@@ -347,12 +452,12 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
      * @param pageNo 当前页
      * @param pageSize 每页条数
      * @param request request
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @ApiOperation(value = "获得分页数据", notes = "获得分页数据 - 查询构造器")
-    @RequiresPermissions("system_set_tenant_admin")
+    @PreAuthorize("hasAuthority('system_set_tenant_admin')")
     @Override
-    public ResultVo<?> findPageByTenant(Integer pageNo, Integer pageSize,
+    public ResultWrapper<?> findPageByTenant(Integer pageNo, Integer pageSize,
                                 HttpServletRequest request) {
         // 转换字段
         WebQueryConf conf = new WebQueryConf();
@@ -368,153 +473,177 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
         page = IService.findPageByTenant(page);
         // 密码防止分页泄露处理
         for (UserWebModel userModel : page.getList()) {
-            userModel.setSecretKey(null);
             userModel.setPassword(null);
             userModel.setPasswordLevel(null);
         }
-        return ResultVo.success(page.getPageData());
+        return ResultWrapper.getSuccessResultWrapper(page.getPageData());
     }
 
     /**
      * 用户信息 新增
      * @param model 模型
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @ApiOperation(value = "新增用户信息", notes = "新增用户信息")
-    @RequiresPermissions("system_user_insert")
-    @EnableLog
+    @PreAuthorize("hasAuthority('system_user_insert')")
+    @OperateLogger(description = "新增用户信息",
+            module = ModuleEnum.MODULE_USER, operationType = OperationTypeEnum.INSERT, db = true)
     @Override
-    public ResultVo<?> insert(UserModel model) {
+    public ResultWrapper<?> insert(UserModel model) {
         // 调用新增方法
         UserModel userModel = IService.insert(model);
-        return ResultVo.success("新增用户信息成功", userModel);
+        return ResultWrapper.getSuccessResultWrapperByMsg("新增用户信息成功")
+                .setData(userModel);
     }
 
     /**
      * 用户信息 修改
      * @param model 模型
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @ApiOperation(value = "修改用户信息", notes = "修改用户信息")
-    @RequiresPermissions("system_user_update")
-    @EnableLog
+    @PreAuthorize("hasAuthority('system_user_update')")
+    @OperateLogger(description = "修改用户信息",
+            module = ModuleEnum.MODULE_USER, operationType = OperationTypeEnum.UPDATE, db = true)
     @Override
-    public ResultVo<?> update(UserModel model) {
+    public ResultWrapper<?> update(UserModel model) {
         // 演示模式 不允许操作
         super.demoError();
         // 调用修改方法
         IService.update(model);
-        return ResultVo.success("修改用户信息成功");
+        return ResultWrapper.getSuccessResultWrapperByMsg("修改用户信息成功");
     }
 
     /**
      * 用户信息 自身修改
      * @param model 模型
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @ApiOperation(value = "修改自身用户信息", notes = "修改自身用户信息")
-    @EnableLog
+    @OperateLogger(description = "修改自身用户信息",
+            module = ModuleEnum.MODULE_USER, operationType = OperationTypeEnum.UPDATE, db = true)
     @Override
-    public ResultVo<?> updateSelf(UserModel model) {
+    public ResultWrapper<?> updateSelf(UserModel model) {
         UserModel currUser = UserUtil.getUserBySource();
         if(!StringUtils.equals(currUser.getId(), model.getId())){
             // 非法参数 防止其他用户 通过该接口 修改非自身用户数据
             throw new ServiceException(SystemMsg.EXCEPTION_USER_ILLEGAL_PARAMETER);
         }
+
+        // 防止篡改手机号、邮箱号
+        model.setMobile(null);
+        model.setEmail(null);
+
         // 调用修改方法
         IService.update(model);
-        return ResultVo.success("修改用户信息成功");
+        return ResultWrapper.getSuccessResultWrapperByMsg("修改用户信息成功");
     }
 
     /**
      * 用户信息 删除
-     * @param id ID
-     * @return ResultVo
+     * @param encryptModel 加密 id ID
+     * @return ResultWrapper
      */
     @ApiOperation(value = "删除用户信息数据", notes = "删除用户信息数据")
-    @RequiresPermissions("system_user_delete")
-    @EnableLog
+    @PreAuthorize("hasAuthority('system_user_delete')")
+    @OperateLogger(description = "删除用户信息数据",
+            module = ModuleEnum.MODULE_USER, operationType = OperationTypeEnum.DELETE, db = true)
     @Override
-    public ResultVo<?> del(String id){
+    public ResultWrapper<?> del(EncryptModel encryptModel) {
         // 演示模式 不允许操作
         super.demoError();
 
+        Object asymmetricDecryptToObj = CryptoUtil.asymmetricDecryptToObj(encryptModel.getEncryptData());
+        // 转换模型
+        String id = JSONUtil.parseObj(asymmetricDecryptToObj).getStr("id");
+
         IService.delete(id);
 
-        return ResultVo.success("删除用户信息成功");
+        return ResultWrapper.getSuccessResultWrapperByMsg("删除用户信息成功");
     }
 
 
     /**
      * 用户信息 批量删除
-     * @param ids ID 数组
-     * @return ResultVo
+     * @param encryptModel 加密 ID 数组
+     * @return ResultWrapper
      */
     @ApiOperation(value = "批量删除用户信息数据", notes = "批量删除用户信息数据")
-    @RequiresPermissions("system_user_delete")
-    @EnableLog
+    @PreAuthorize("hasAuthority('system_user_delete')")
+    @OperateLogger(description = "批量删除用户信息数据",
+            module = ModuleEnum.MODULE_USER, operationType = OperationTypeEnum.DELETE, db = true)
     @Override
-    public ResultVo<?> delAll(String ids){
+    public ResultWrapper<?> delAll(EncryptModel encryptModel) {
         // 演示模式 不允许操作
         super.demoError();
+
+        Object asymmetricDecryptToObj = CryptoUtil.asymmetricDecryptToObj(encryptModel.getEncryptData());
+        // 转换模型
+        String ids = JSONUtil.parseObj(asymmetricDecryptToObj).getStr("ids");
 
         String[] idArray = Convert.toStrArray(ids);
         IService.deleteAll(idArray);
 
-        return ResultVo.success("批量删除用户信息成功");
+        return ResultWrapper.getSuccessResultWrapperByMsg("批量删除用户信息成功");
+    }
+
+
+    /**
+     * 用户信息 Excel 导出认证
+     *
+     * @param type 类型
+     * @param request request
+     */
+    @ApiOperation(value = "Excel 导出认证", notes = "Excel 导出认证")
+    @PreAuthorize("hasAnyAuthority('system_user_export', 'system_user_import')")
+    @Override
+    public ResultWrapper<String> exportExcelAuth(String type, HttpServletRequest request) {
+        Optional<String> certificateOptional =
+                super.excelExportAuth(type, UserApi.SUB_TITLE, request);
+        if(!certificateOptional.isPresent()){
+            return ResultWrapper.getErrorResultWrapper();
+        }
+        return ResultWrapper.getSuccessResultWrapper(certificateOptional.get());
     }
 
 
     /**
      * 用户信息 Excel 导出
-     * @param request request
      * @param response response
      */
     @ApiOperation(value = "导出Excel", notes = "导出Excel")
-    @RequiresPermissionsCus("system_user_export")
-    @EnableLog
+    @PreAuthorize("hasAuthority('system_user_export')")
+    @OperateLogger(description = "导出Excel",
+            module = ModuleEnum.MODULE_USER, operationType = OperationTypeEnum.SELECT, db = true)
     @Override
-    public void exportExcel(HttpServletRequest request, HttpServletResponse response) {
-        // 当前方法
-        Method method = ReflectUtil.getMethodByName(this.getClass(), "exportExcel");
-        QueryBuilder<SysUser> queryBuilder = new WebQueryBuilder<>(entityClazz, request.getParameterMap());
-        super.excelExport(UserApi.SUB_TITLE, queryBuilder.build(), response, method);
+    public void exportExcel(String certificate, HttpServletResponse response) {
+        // 导出Excel
+        super.excelExport(certificate, response);
     }
 
     /**
      * 用户信息 Excel 导入
      * @param request 文件流 request
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @ApiOperation(value = "导入Excel", notes = "导入Excel")
-    @RequiresPermissions("system_user_import")
-    @EnableLog
+    @PreAuthorize("hasAuthority('system_user_import')")
+    @OperateLogger(description = "用户信息 Excel 导入",
+            module = ModuleEnum.MODULE_USER, operationType = OperationTypeEnum.INSERT, db = true)
     @Override
-    public ResultVo<?> importExcel(MultipartHttpServletRequest request) {
+    public ResultWrapper<?> importExcel(MultipartHttpServletRequest request) {
         return super.importExcel(request);
     }
 
-    /**
-     * 用户信息 Excel 下载导入模版
-     * @param response response
-     */
-    @ApiOperation(value = "导出Excel模版", notes = "导出Excel模版")
-    @RequiresPermissionsCus("system_user_import")
-    @Override
-    public void importTemplate(HttpServletResponse response) {
-        // 当前方法
-        Method method = ReflectUtil.getMethodByName(this.getClass(), "importTemplate");
-        super.importTemplate(UserApi.SUB_TITLE, response, method);
-    }
 
     /**
      * 根据 username 获得用户
      * @param username 用户名
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @ApiOperation(value = "根据 username 获得用户", notes = "根据 username 获得用户")
     @Override
-    public ResultVo<UserModel> getUserByUsername(String username) {
+    public ResultWrapper<UserModel> getUserByUsername(String username) {
         UserModel userModel = IService.queryByUserName(username);
         if(userModel == null){
             // 暂无该用户
@@ -522,18 +651,43 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
                     StrUtil.format(SystemMsg.EXCEPTION_USER_NULL.getMessage(), username)
             );
         }
-        return ResultVo.success(userModel);
+        return ResultWrapper.getSuccessResultWrapper(userModel);
     }
 
+    @ApiOperation(value = "根据 手机号 获得用户", notes = "根据 手机号 获得用户")
+    @Override
+    public ResultWrapper<UserModel> getUserByMobile(String mobile) {
+        UserModel userModel = IService.queryByMobile(mobile);
+        if(userModel == null){
+            // 暂无该用户
+            throw new ServiceException(SystemMsg.EXCEPTION_USER_NULL.getCode(),
+                    StrUtil.format(SystemMsg.EXCEPTION_USER_NULL.getMessage(), mobile)
+            );
+        }
+        return ResultWrapper.getSuccessResultWrapper(userModel);
+    }
+
+    @ApiOperation(value = "根据 邮箱 获得用户", notes = "根据 邮箱 获得用户")
+    @Override
+    public ResultWrapper<UserModel> getUserByEmail(String email) {
+        UserModel userModel = IService.queryByEmail(email);
+        if(userModel == null){
+            // 暂无该用户
+            throw new ServiceException(SystemMsg.EXCEPTION_USER_NULL.getCode(),
+                    StrUtil.format(SystemMsg.EXCEPTION_USER_NULL.getMessage(), email)
+            );
+        }
+        return ResultWrapper.getSuccessResultWrapper(userModel);
+    }
 
     /**
      * 切换租户
      * @param tenantId 租户ID
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @ApiOperation(value = "切换租户", notes = "切换租户")
     @Override
-    public ResultVo<?> switchTenant(String tenantId) {
+    public ResultWrapper<?> switchTenant(String tenantId) {
         UserModel currUser = UserUtil.getUserBySource();
         if (!DictType.NO_YES_YES.getValue().equals(currUser.getEnableSwitchTenant())){
             // 不允许切换租户
@@ -585,18 +739,18 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
         currUser.setSwitchTenantUserId(isSwitchedUser.getId());
 
         return UserUtil.updateUser(currUser)
-                ? ResultVo.success("切换租户成功")
-                : ResultVo.error("切换租户失败");
+                ? ResultWrapper.getSuccessResultWrapperByMsg("切换租户成功")
+                : ResultWrapper.getErrorResultWrapper().setMsg("切换租户失败");
     }
 
 
     /**
      * 切换回自己账户
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @ApiOperation(value = "切换回自己账户", notes = "切换回自己账户")
     @Override
-    public ResultVo<?> switchOneself() {
+    public ResultWrapper<?> switchOneself() {
         UserModel currUser = UserUtil.getUserBySource();
         if (!DictType.NO_YES_YES.getValue().equals(currUser.getEnableSwitchTenant())){
             // 不允许切换租户
@@ -607,8 +761,8 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
         currUser.setSwitchTenantUserId(null);
 
         return UserUtil.updateUser(currUser)
-                ? ResultVo.success("切换成功")
-                : ResultVo.error("切换失败");
+                ? ResultWrapper.getSuccessResultWrapperByMsg("切换成功")
+                : ResultWrapper.getErrorResultWrapper().setMsg("切换失败");
     }
 
 }

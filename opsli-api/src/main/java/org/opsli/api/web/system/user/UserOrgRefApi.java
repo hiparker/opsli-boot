@@ -15,7 +15,7 @@
  */
 package org.opsli.api.web.system.user;
 
-import org.opsli.api.base.result.ResultVo;
+import org.opsli.api.base.result.ResultWrapper;
 import org.opsli.api.wrapper.system.org.SysOrgModel;
 import org.opsli.api.wrapper.system.user.UserOrgRefModel;
 import org.opsli.api.wrapper.system.user.UserOrgRefWebModel;
@@ -47,25 +47,25 @@ public interface UserOrgRefApi {
     /**
      * 设置角色
      * @param model 用户组织关联对象
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @PostMapping("/setOrg")
-    ResultVo<?> setOrg(@RequestBody UserOrgRefWebModel model);
+    ResultWrapper<?> setOrg(@RequestBody UserOrgRefWebModel model);
 
     /**
      * 根据用户ID 获得组织列表
      * @param userId 用户ID
      * @return List
      */
-    ResultVo<List<UserOrgRefModel>> findListByUserId(String userId);
+    ResultWrapper<List<UserOrgRefModel>> findListByUserId(String userId);
 
 
     /**
      * 根据 userId 获得用户默认组织
      * @param userId 用户Id
-     * @return ResultVo
+     * @return ResultWrapper
      */
     //@GetMapping("/getRolesByUserId")
-    ResultVo<UserOrgRefModel> getDefOrgByUserId(String userId);
+    ResultWrapper<UserOrgRefModel> getDefOrgByUserId(String userId);
 
 }

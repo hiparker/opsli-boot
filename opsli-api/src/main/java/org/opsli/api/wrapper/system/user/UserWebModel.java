@@ -64,12 +64,6 @@ public class UserWebModel extends ApiWrapper {
     @ValidatorLenMax(1)
     private String passwordLevel;
 
-    /** 盐值，密码秘钥 */
-    @ApiModelProperty(value = "盐值，密码秘钥")
-    @ExcelIgnore
-    @ValidatorLenMax(50)
-    private String secretKey;
-
     /** 启用状态 */
     @ApiModelProperty(value = "启用状态")
     @ExcelIgnore

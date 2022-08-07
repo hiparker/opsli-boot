@@ -2,14 +2,11 @@ package org.opsli.modulars.tools.oss.web;
 
 import cn.hutool.core.io.FileUtil;
 import com.alibaba.excel.util.CollectionUtils;
-import com.baomidou.mybatisplus.extension.service.IService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
-import org.opsli.api.base.result.ResultVo;
-import org.opsli.api.wrapper.system.user.UserModel;
+import org.opsli.api.base.result.ResultWrapper;
 import org.opsli.common.annotation.ApiRestController;
-import org.opsli.core.utils.UserUtil;
 import org.opsli.modulars.system.SystemMsg;
 import org.opsli.plugins.oss.OssStorageFactory;
 import org.opsli.plugins.oss.service.BaseOssStorageService;
@@ -38,18 +35,17 @@ public class OssRestController {
     /**
      * 文件上传
      * @param request 文件流 request
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @ApiOperation(value = "文件上传", notes = "文件上传")
     @PostMapping("/upload")
-    public ResultVo<?> upload(MultipartHttpServletRequest request) {
+    public ResultWrapper<?> upload(MultipartHttpServletRequest request) {
         Iterator<String> itr = request.getFileNames();
         String uploadedFile = itr.next();
         List<MultipartFile> files = request.getFiles(uploadedFile);
         if (CollectionUtils.isEmpty(files)) {
             // 请选择文件
-            return ResultVo.error(SystemMsg.EXCEPTION_USER_FILE_NULL.getCode(),
-                    SystemMsg.EXCEPTION_USER_FILE_NULL.getMessage());
+            return ResultWrapper.getCustomResultWrapper(SystemMsg.EXCEPTION_USER_FILE_NULL);
         }
 
         try {
@@ -62,11 +58,11 @@ public class OssRestController {
             BaseOssStorageService.FileAttr fileAttr = ossStorageService.upload(
                     multipartFile.getInputStream(), FileUtil.extName(filename));
 
-            return ResultVo.success(fileAttr);
+            return ResultWrapper.getSuccessResultWrapper(fileAttr);
         }catch (IOException e){
             log.error(e.getMessage(), e);
         }
-        return ResultVo.error();
+        return ResultWrapper.getErrorResultWrapper();
     }
 
 

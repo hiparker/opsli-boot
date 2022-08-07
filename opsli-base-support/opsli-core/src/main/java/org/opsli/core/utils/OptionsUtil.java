@@ -23,7 +23,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.opsli.api.base.result.ResultVo;
+import org.opsli.api.base.result.ResultWrapper;
 import org.opsli.api.web.system.options.OptionsApi;
 import org.opsli.api.wrapper.system.options.OptionsModel;
 import org.opsli.common.annotation.OptionDict;
@@ -143,8 +143,8 @@ public class OptionsUtil {
 
         Object cache = SecurityCache.hGet(redisTemplate, cacheKey, optionCode, (k) -> {
             // 查询数据库
-            ResultVo<OptionsModel> resultVo = optionsApi.getByCode(optionCode);
-            if(!resultVo.isSuccess()){
+            ResultWrapper<OptionsModel> resultVo = optionsApi.getByCode(optionCode);
+            if(!ResultWrapper.isSuccess(resultVo)){
                 return null;
             }
             return resultVo.getData();

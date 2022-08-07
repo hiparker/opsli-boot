@@ -21,7 +21,7 @@ import cn.hutool.core.convert.Convert;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
-import org.opsli.api.base.result.ResultVo;
+import org.opsli.api.base.result.ResultWrapper;
 import org.opsli.api.web.system.dict.DictDetailApi;
 import org.opsli.api.wrapper.system.dict.DictDetailModel;
 import org.opsli.api.wrapper.system.dict.DictWrapper;
@@ -77,8 +77,8 @@ public class DictUtil {
 
         Object cache = SecurityCache.hGet(redisTemplate, cacheKey, dictValue, (k) -> {
             // 查询数据库 并保存到缓存内
-            ResultVo<List<DictDetailModel>> resultVo = dictDetailApi.findListByTypeCode(typeCode);
-            if (!resultVo.isSuccess()) {
+            ResultWrapper<List<DictDetailModel>> resultVo = dictDetailApi.findListByTypeCode(typeCode);
+            if (!ResultWrapper.isSuccess(resultVo)) {
                 return null;
             }
 
@@ -117,8 +117,8 @@ public class DictUtil {
 
         Object cache = SecurityCache.hGet(redisTemplate, cacheKey, dictName, (k) -> {
             // 查询数据库 并保存到缓存内
-            ResultVo<List<DictDetailModel>> resultVo = dictDetailApi.findListByTypeCode(typeCode);
-            if (!resultVo.isSuccess()) {
+            ResultWrapper<List<DictDetailModel>> resultVo = dictDetailApi.findListByTypeCode(typeCode);
+            if (!ResultWrapper.isSuccess(resultVo)) {
                 return null;
             }
 
@@ -154,8 +154,8 @@ public class DictUtil {
 
         Map<String, Object> dictCacheMap = SecurityCache.hGetAll(redisTemplate, cacheKey, (k) -> {
             // 查询数据库 并保存到缓存内
-            ResultVo<List<DictDetailModel>> resultVo = dictDetailApi.findListByTypeCode(typeCode);
-            if (!resultVo.isSuccess()) {
+            ResultWrapper<List<DictDetailModel>> resultVo = dictDetailApi.findListByTypeCode(typeCode);
+            if (!ResultWrapper.isSuccess(resultVo)) {
                 return null;
             }
 
@@ -243,7 +243,7 @@ public class DictUtil {
         String cacheKeyByName = CacheUtil.formatKey(
                 RedisConstants.PREFIX_DICT_NAME + typeCode);
 
-        return SecurityCache.removeMore(redisTemplate, cacheKeyByValue, cacheKeyByName);
+        return SecurityCache.remove(redisTemplate, cacheKeyByValue, cacheKeyByName);
     }
 
 

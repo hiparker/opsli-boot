@@ -1,8 +1,9 @@
 package org.opsli.api.web.test;
 
-import org.opsli.api.base.result.ResultVo;
+import org.opsli.api.base.result.ResultWrapper;
 import org.opsli.api.wrapper.test.TestModel;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
@@ -28,93 +29,93 @@ public interface TestApi {
 
     /**
      * 发送邮件
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @GetMapping("/sendMail")
-    ResultVo<?> sendMail();
+    ResultWrapper<?> sendMail();
 
 
     /**
      * 发送 Redis 订阅消息
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @GetMapping("/sendMsg")
-    ResultVo<?> sendMsg();
+    ResultWrapper<?> sendMsg();
 
 
     /**
      * 发送 Redis 订阅消息
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @GetMapping("/redisTest")
-    ResultVo<?> redisTest();
+    ResultWrapper<?> redisTest();
 
 
     /**
      * 发起 Redis 分布式锁
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @GetMapping("/testLock")
-    ResultVo<?> testLock();
+    ResultWrapper<?> testLock();
 
     /**
      * 新增数据
      * @param entity entity
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @GetMapping("/insert")
-    ResultVo<TestModel> insert(TestModel entity);
+    ResultWrapper<TestModel> insert(TestModel entity);
 
     /**
      * 修改数据
      * @param entity entity
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @GetMapping("/update")
-    ResultVo<TestModel> update(TestModel entity);
+    ResultWrapper<TestModel> update(TestModel entity);
 
 
     /**
      * 查看对象
      * @param entity entity
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @GetMapping("/get")
-    ResultVo<TestModel> get(TestModel entity);
+    ResultWrapper<TestModel> get(TestModel entity);
 
 
     /**
      * 删除对象
      * @param id id
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @GetMapping("/del")
-    ResultVo<?> del(String id);
+    ResultWrapper<?> del(String id);
 
 
     /**
      * 删除全部对象
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @GetMapping("/delAll")
-    ResultVo<?> delAll();
+    ResultWrapper<?> delAll();
 
 
     /**
      * 查找一个集合
      * @param request request
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @GetMapping("/findList")
-    ResultVo<List<TestModel>> findList(HttpServletRequest request);
+    ResultWrapper<List<TestModel>> findList(HttpServletRequest request);
 
 
     /**
      * 查找一个全部集合
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @GetMapping("/findAllList")
-    ResultVo<List<TestModel>> findAllList();
+    ResultWrapper<List<TestModel>> findAllList();
 
 
     /**
@@ -123,10 +124,10 @@ public interface TestApi {
      * @param pageNo 当前页
      * @param pageSize 每页条数
      * @param request request
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @GetMapping("/findPage")
-    ResultVo<?> findPage(
+    ResultWrapper<?> findPage(
             @RequestParam(name = "pageNo", defaultValue = "1") Integer pageNo,
             @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize,
             HttpServletRequest request
@@ -134,29 +135,36 @@ public interface TestApi {
 
 
     /**
+     * Excel 导出认证
+     *
+     * @param type 类型
+     * @param request request
+     */
+    @GetMapping("/excel/auth/{type}")
+    ResultWrapper<String> exportExcelAuth(
+            @PathVariable("type") String type,
+            HttpServletRequest request);
+
+    /**
      * Excel 导出
      *
-     * @param request request
+     * @param certificate 凭证
      * @param response response
      */
-    @GetMapping("/exportExcel")
-    void exportExcel(HttpServletRequest request, HttpServletResponse response);
+    @GetMapping("/excel/export/{certificate}")
+    void exportExcel(
+            @PathVariable("certificate") String certificate,
+            HttpServletResponse response);
 
     /**
      * Excel 导入
      *
      * @param request request
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @PostMapping("/importExcel")
-    ResultVo<?> importExcel(MultipartHttpServletRequest request);
+    ResultWrapper<?> importExcel(MultipartHttpServletRequest request);
 
-    /**
-     * Excel 下载导入模版
-     *
-     * @param response response
-     */
-    @GetMapping("/importExcel/template")
-    void importTemplate(HttpServletResponse response);
+
 
 }

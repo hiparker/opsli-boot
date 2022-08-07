@@ -15,7 +15,7 @@
  */
 package org.opsli.modulars.generator.table.api;
 
-import org.opsli.api.base.result.ResultVo;
+import org.opsli.api.base.result.ResultWrapper;
 import org.opsli.modulars.generator.table.wrapper.GenTableAndColumnModel;
 import org.opsli.modulars.generator.table.wrapper.GenTableModel;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -48,20 +48,20 @@ public interface TableApi {
     /**
      * 表 查一条
      * @param model 模型
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @GetMapping("/get")
-    ResultVo<GenTableAndColumnModel> get(GenTableModel model);
+    ResultWrapper<GenTableAndColumnModel> get(GenTableModel model);
 
     /**
      * 表 查询分页
      * @param pageNo 当前页
      * @param pageSize 每页条数
      * @param request request
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @GetMapping("/findPage")
-    ResultVo<?> findPage(
+    ResultWrapper<?> findPage(
             @RequestParam(name = "pageNo", defaultValue = "1") Integer pageNo,
             @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize,
             HttpServletRequest request
@@ -70,79 +70,79 @@ public interface TableApi {
     /**
      * 表 新增
      * @param model 模型
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @PostMapping("/insert")
-    ResultVo<?> insert(@RequestBody GenTableAndColumnModel model);
+    ResultWrapper<?> insert(@RequestBody GenTableAndColumnModel model);
 
     /**
      * 表 修改
      * @param model 模型
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @PostMapping("/update")
-    ResultVo<?> update(@RequestBody GenTableAndColumnModel model);
+    ResultWrapper<?> update(@RequestBody GenTableAndColumnModel model);
 
     /**
      * 表 删除
      * @param id ID
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @PostMapping("/del")
-    ResultVo<?> del(String id);
+    ResultWrapper<?> del(String id);
 
     /**
      * 表 批量删除
      * @param ids ID 数组
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @PostMapping("/delAll")
-    ResultVo<?> delAll(String ids);
+    ResultWrapper<?> delAll(String ids);
 
     /**
      * 同步到数据库
      * @param id ID
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @PostMapping("/sync")
-    ResultVo<?> sync(String id);
+    ResultWrapper<?> sync(String id);
 
     /**
      * 获得当前数据库
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @GetMapping("/getTables")
-    ResultVo<?> getTables();
+    ResultWrapper<?> getTables();
 
     /**
      * 导入选中表
      *
      * @param tableNames 表名集合
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @PostMapping("/importTables")
-    ResultVo<?> importTables(String tableNames);
+    ResultWrapper<?> importTables(String tableNames);
 
     /**
      * 获得数据库类型下 字段类型
      * @return List
      */
     @GetMapping("/getFieldTypes")
-    ResultVo<List<String>> getFieldTypes();
+    ResultWrapper<List<String>> getFieldTypes();
 
     /**
      * 获得数据库类型下 全部类型对应Java类型
      * @return List
      */
     @GetMapping("/getJavaFieldTypes")
-    ResultVo<Map<String, String> > getJavaFieldTypes();
+    ResultWrapper<Map<String, String> > getJavaFieldTypes();
 
     /**
      * 获得全部类型对应Java类型集合（兜底String 类型）
      * @return List
      */
     @GetMapping("/getJavaFieldTypesBySafety")
-    ResultVo<Map<String, List<String>>> getJavaFieldTypesBySafety();
+    ResultWrapper<Map<String, List<String>>> getJavaFieldTypesBySafety();
 
 
 }

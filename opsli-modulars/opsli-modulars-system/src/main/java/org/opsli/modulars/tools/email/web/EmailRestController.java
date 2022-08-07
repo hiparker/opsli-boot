@@ -3,7 +3,7 @@ package org.opsli.modulars.tools.email.web;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
-import org.opsli.api.base.result.ResultVo;
+import org.opsli.api.base.result.ResultWrapper;
 import org.opsli.common.annotation.ApiRestController;
 import org.opsli.core.options.EmailConfigFactory;
 import org.opsli.plugins.email.EmailPlugin;
@@ -30,18 +30,18 @@ public class EmailRestController {
     /**
      * 测试发送邮件
      * @param model 模型
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @ApiOperation(value = "测试发送邮件", notes = "测试发送邮件")
     @PostMapping("/testSend")
-    public ResultVo<?> testSend(@RequestBody EmailModel model) {
+    public ResultWrapper<?> testSend(@RequestBody EmailModel model) {
         try {
             emailPlugin
                     .send(model.getTo(), model.getSubject(), model.getContent(),
                             EmailConfigFactory.INSTANCE.getConfig());
-            return ResultVo.success("邮件发送成功");
+            return ResultWrapper.getSuccessResultWrapperByMsg("邮件发送成功");
         }catch (Exception e){
-            return ResultVo.error("邮件发送失败 - " + e.getMessage());
+            return ResultWrapper.getErrorResultWrapper().setMsg("邮件发送失败 - " + e.getMessage());
         }
     }
 

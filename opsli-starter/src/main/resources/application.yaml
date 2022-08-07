@@ -8,7 +8,7 @@ server:
     # 对于 Tomcat 头文件不限制大小
     max-swallow-size: -1
   servlet:
-    context-path: /opsli-boot
+    #context-path: /opsli-boot
     ## 专门针对 Controller层接口路径前缀全局配置
     api:
       path:
@@ -160,6 +160,30 @@ opsli:
 
   # 认证
   auth:
+    # 凭证过期时间（天）-1 默认不过期，（如果要设置过期请先完成用户无需登录修改密码操作）
+    credentials-expired: -1
+    # 排除过滤URL
+    url-exclusion:
+      # 未登陆状态下可以访问
+      anonymous:
+        - "/captcha"
+        - "/system/slipCount"
+        - "/system/login"
+        - "/system/login-by-code"
+      # 无限制
+      permit-all:
+        - "/api/*/common/public-key"
+        - "/api/*/common/email/create-code"
+        - "/api/*/common/mobile/create-code"
+        - "/swagger-ui.html"
+        - "/doc.html"
+        - "/swagger-resources/**"
+        - "/webjars/**"
+        - "/app/**"
+        - "/swagger/**"
+        - "/v2/api-docs"
+        - "/druid/**"
+
     # 超级管理员账号
     super-admin: system
     # 重置默认密码 密码至少包含大小写字母，数字，且不少于6位
@@ -171,10 +195,6 @@ opsli:
       secret: 53c0e33c9d4c5538969abf2fcf48351d
       # 有效时间 （分钟） 2小时
       effective-time: 120
-      # 排除过滤URL
-      url-exclusion:
-        - "/static/files/**"
-        - "/test.html"
 
     # 登录设置
     login:

@@ -199,7 +199,7 @@ public class RoleServiceImpl extends CrudServiceImpl<RoleMapper, SysRole, RoleMo
         }else {
             // 租户检测
             // 数据处理责任链
-            wrapper = super.addHandler(entityClazz, wrapper);
+            wrapper = super.addHandler(this.getEntityClass(), wrapper);
         }
 
         return super.count(wrapper) == 0;
@@ -232,7 +232,7 @@ public class RoleServiceImpl extends CrudServiceImpl<RoleMapper, SysRole, RoleMo
         }else {
             // 租户检测
             // 数据处理责任链
-            wrapper = super.addHandler(entityClazz, wrapper);
+            wrapper = super.addHandler(this.getEntityClass(), wrapper);
         }
 
         return super.count(wrapper) == 0;

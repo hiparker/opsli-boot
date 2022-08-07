@@ -15,7 +15,8 @@
  */
 package org.opsli.core.autoconfigure.conf;
 
-import com.baomidou.mybatisplus.extension.plugins.OptimisticLockerInterceptor;
+import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
+import com.baomidou.mybatisplus.extension.plugins.inner.OptimisticLockerInnerInterceptor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.opsli.core.filters.interceptor.MybatisAutoFillInterceptor;
@@ -35,13 +36,20 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @Configuration
 public class MyBatisPlusConfig {
 
-	/***
-	 * 乐观锁
-	 * @return 拦截器
+	/**
+	 * 相关拦截器
 	 */
 	@Bean
-	public OptimisticLockerInterceptor optimisticLockerInterceptor(){
-		return new OptimisticLockerInterceptor();
+	public MybatisPlusInterceptor mybatisPlusInterceptor() {
+		MybatisPlusInterceptor mybatisPlusInterceptor = new MybatisPlusInterceptor();
+
+		// 乐观锁
+		mybatisPlusInterceptor.addInnerInterceptor(new OptimisticLockerInnerInterceptor());
+
+		// 防止全表更新与删除插件
+		//mybatisPlusInterceptor.addInnerInterceptor(new BlockAttackInnerInterceptor());
+
+		return mybatisPlusInterceptor;
 	}
 
 	/**

@@ -18,14 +18,14 @@ package org.opsli.modulars.system.logs.web;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.opsli.api.base.result.ResultVo;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.opsli.api.base.result.ResultWrapper;
 import org.opsli.api.web.system.logs.LoginLogsApi;
 import org.opsli.api.web.system.logs.LogsApi;
 import org.opsli.api.wrapper.system.logs.LoginLogsModel;
 import org.opsli.api.wrapper.system.logs.LogsModel;
 import org.opsli.common.annotation.ApiRestController;
-import org.opsli.common.annotation.EnableLog;
+
 import org.opsli.core.base.controller.BaseRestController;
 import org.opsli.core.persistence.Page;
 import org.opsli.core.persistence.querybuilder.QueryBuilder;
@@ -55,19 +55,19 @@ public class LoginLogsRestController extends BaseRestController<SysLoginLogs, Lo
      * @param pageNo 当前页
      * @param pageSize 每页条数
      * @param request request
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @ApiOperation(value = "获得分页数据", notes = "获得分页数据 - 查询构造器")
-    @RequiresPermissions("devops_login_logs_select")
+    @PreAuthorize("hasAuthority('devops_login_logs_select')")
     @Override
-    public ResultVo<?> findPage(Integer pageNo, Integer pageSize, HttpServletRequest request) {
+    public ResultWrapper<?> findPage(Integer pageNo, Integer pageSize, HttpServletRequest request) {
 
-        QueryBuilder<SysLoginLogs> queryBuilder = new WebQueryBuilder<>(entityClazz, request.getParameterMap());
+        QueryBuilder<SysLoginLogs> queryBuilder = new WebQueryBuilder<>(IService.getEntityClass(), request.getParameterMap());
         Page<SysLoginLogs, LoginLogsModel> page = new Page<>(pageNo, pageSize);
         page.setQueryWrapper(queryBuilder.build());
         page = IService.findPage(page);
 
-        return ResultVo.success(page.getPageData());
+        return ResultWrapper.getSuccessResultWrapper(page.getPageData());
     }
 
 }

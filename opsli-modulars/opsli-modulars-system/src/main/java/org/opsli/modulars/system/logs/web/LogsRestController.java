@@ -18,12 +18,12 @@ package org.opsli.modulars.system.logs.web;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.opsli.api.base.result.ResultVo;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.opsli.api.base.result.ResultWrapper;
 import org.opsli.api.web.system.logs.LogsApi;
 import org.opsli.api.wrapper.system.logs.LogsModel;
 import org.opsli.common.annotation.ApiRestController;
-import org.opsli.common.annotation.EnableLog;
+
 import org.opsli.core.base.controller.BaseRestController;
 import org.opsli.core.persistence.Page;
 import org.opsli.core.persistence.querybuilder.QueryBuilder;
@@ -50,14 +50,14 @@ public class LogsRestController extends BaseRestController<SysLogs, LogsModel, I
     /**
      * 日志 查一条
      * @param model 模型
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @ApiOperation(value = "获得单条日志", notes = "获得单条日志 - ID")
-    @RequiresPermissions("devops_logs_select")
+    @PreAuthorize("hasAuthority('devops_logs_select')")
     @Override
-    public ResultVo<LogsModel> get(LogsModel model) {
+    public ResultWrapper<LogsModel> get(LogsModel model) {
         model = IService.get(model);
-        return ResultVo.success(model);
+        return ResultWrapper.getSuccessResultWrapper(model);
     }
 
     /**
@@ -65,25 +65,25 @@ public class LogsRestController extends BaseRestController<SysLogs, LogsModel, I
      * @param pageNo 当前页
      * @param pageSize 每页条数
      * @param request request
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @ApiOperation(value = "获得分页数据", notes = "获得分页数据 - 查询构造器")
-    @RequiresPermissions("devops_logs_select")
+    @PreAuthorize("hasAuthority('devops_logs_select')")
     @Override
-    public ResultVo<?> findPage(Integer pageNo, Integer pageSize, HttpServletRequest request) {
+    public ResultWrapper<?> findPage(Integer pageNo, Integer pageSize, HttpServletRequest request) {
 
-        QueryBuilder<SysLogs> queryBuilder = new WebQueryBuilder<>(entityClazz, request.getParameterMap());
+        QueryBuilder<SysLogs> queryBuilder = new WebQueryBuilder<>(IService.getEntityClass(), request.getParameterMap());
         Page<SysLogs, LogsModel> page = new Page<>(pageNo, pageSize);
         page.setQueryWrapper(queryBuilder.build());
         page = IService.findPage(page);
 
-        return ResultVo.success(page.getPageData());
+        return ResultWrapper.getSuccessResultWrapper(page.getPageData());
     }
 
 
     @Override
-    public ResultVo<?> insert(LogsModel model) {
+    public ResultWrapper<?> insert(LogsModel model) {
         IService.insert(model);
-        return ResultVo.success("新增日志成功");
+        return ResultWrapper.getSuccessResultWrapperByMsg("新增日志成功");
     }
 }

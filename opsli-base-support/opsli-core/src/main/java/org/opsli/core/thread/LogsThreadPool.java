@@ -1,7 +1,7 @@
 package org.opsli.core.thread;
 
 import lombok.extern.slf4j.Slf4j;
-import org.opsli.api.base.result.ResultVo;
+import org.opsli.api.base.result.ResultWrapper;
 import org.opsli.api.web.system.logs.LogsApi;
 import org.opsli.api.wrapper.system.logs.LogsModel;
 import org.opsli.common.thread.AsyncProcessExecutor;
@@ -35,8 +35,8 @@ public class LogsThreadPool {
         AsyncProcessExecutor normalExecutor = AsyncProcessExecutorFactory.createNormalExecutor();
         normalExecutor.put(()->{
             // 存储临时 token
-            ResultVo<?> ret = logsApi.insert(logsModel);
-            if(!ret.isSuccess()){
+            ResultWrapper<?> ret = logsApi.insert(logsModel);
+            if(!ResultWrapper.isSuccess(ret)){
                 log.error(ret.getMsg());
             }
         });

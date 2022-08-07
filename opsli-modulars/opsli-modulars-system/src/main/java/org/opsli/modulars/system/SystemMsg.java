@@ -73,6 +73,13 @@ public enum SystemMsg implements BaseMsg {
     EXCEPTION_USER_HANDLE_SUPER_ADMIN(20313,"不可操作超管账号"),
     EXCEPTION_USER_SWITCH_TENANT_NOT_HAS_ADMIN(20314,"此租户不存在管理员，不能切换"),
     EXCEPTION_USER_SWITCH_NOT_ALLOWED(20315,"不允许切换租户"),
+    EXCEPTION_RESET_PASSWORD(20316,"重制密码失败"),
+    EXCEPTION_CHANGE_STATUS(20316,"变更用户状态失败"),
+    EXCEPTION_USER_EMAIL_EQ(20317,"新旧邮箱不可一致"),
+    EXCEPTION_USER_MOBILE_EQ(20318,"新旧手机不可一致"),
+    EXCEPTION_USER_MOBILE_UNIQUE(20319,"该手机号已被使用，请先解除原账号手机"),
+    EXCEPTION_USER_EMAIL_UNIQUE(20320,"该邮箱已被使用，请先解除原账号邮箱"),
+
 
     /**
      * 租户

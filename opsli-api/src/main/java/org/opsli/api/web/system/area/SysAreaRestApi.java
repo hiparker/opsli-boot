@@ -15,7 +15,7 @@
  */
 package org.opsli.api.web.system.area;
 
-import org.opsli.api.base.result.ResultVo;
+import org.opsli.api.base.result.ResultWrapper;
 import org.opsli.api.wrapper.system.area.SysAreaModel;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -48,80 +48,57 @@ public interface SysAreaRestApi {
     /**
     * 组织机构表 查一条
     * @param model 模型
-    * @return ResultVo
+    * @return ResultWrapper
     */
     @GetMapping("/get")
-    ResultVo<SysAreaModel> get(SysAreaModel model);
+    ResultWrapper<SysAreaModel> get(SysAreaModel model);
 
     /**
     * 组织树
     * @param parentId 父节点ID
-    * @return ResultVo
+    * @return ResultWrapper
     */
     @GetMapping("/findTree")
-    ResultVo<?> findTree(String parentId);
+    ResultWrapper<?> findTree(String parentId);
 
     /**
      * 组织树
      * @param deep 层级
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @GetMapping("/findTreeAll")
-    ResultVo<?> findTreeAll(@RequestParam(name = "deep", defaultValue = "3", required = false) Integer deep);
+    ResultWrapper<?> findTreeAll(@RequestParam(name = "deep", defaultValue = "3", required = false) Integer deep);
 
     /**
     * 组织机构表 新增
     * @param model 模型
-    * @return ResultVo
+    * @return ResultWrapper
     */
     @PostMapping("/insert")
-    ResultVo<?> insert(@RequestBody SysAreaModel model);
+    ResultWrapper<?> insert(@RequestBody SysAreaModel model);
 
     /**
     * 组织机构表 修改
     * @param model 模型
-    * @return ResultVo
+    * @return ResultWrapper
     */
     @PostMapping("/update")
-    ResultVo<?> update(@RequestBody SysAreaModel model);
+    ResultWrapper<?> update(@RequestBody SysAreaModel model);
 
     /**
     * 组织机构表 删除
     * @param id ID
-    * @return ResultVo
+    * @return ResultWrapper
     */
     @PostMapping("/del")
-    ResultVo<?> del(String id);
+    ResultWrapper<?> del(String id);
 
     /**
     * 组织机构表 批量删除
     * @param ids ID 数组
-    * @return ResultVo
+    * @return ResultWrapper
     */
     @PostMapping("/delAll")
-    ResultVo<?> delAll(String ids);
-
-    /**
-    * 组织机构表 Excel 导出
-    * @param request request
-    * @param response response
-    */
-    @GetMapping("/exportExcel")
-    void exportExcel(HttpServletRequest request, HttpServletResponse response);
-
-    /**
-    * 组织机构表 Excel 导入
-    * @param request 文件流 request
-    * @return ResultVo
-    */
-    @PostMapping("/importExcel")
-    ResultVo<?> importExcel(MultipartHttpServletRequest request);
-
-    /**
-    * 组织机构表 Excel 下载导入模版
-    * @param response response
-    */
-    @GetMapping("/importExcel/template")
-    void importTemplate(HttpServletResponse response);
+    ResultWrapper<?> delAll(String ids);
 
 }

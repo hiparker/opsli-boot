@@ -9,7 +9,6 @@
 		a.username as username,
         a.password as password,
         a.password_level as passwordLevel,
-        a.secret_key as secretKey,
         a.no as no,
         a.real_name as realName,
         a.enable as enable,
@@ -53,8 +52,7 @@
         update sys_user
         set
             password = #{newPassword},
-            password_level = #{passwordLevel},
-            secret_key = #{salt}
+            password_level = #{passwordLevel}
         where id = #{userId}
     </update>
 

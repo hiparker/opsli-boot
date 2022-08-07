@@ -51,12 +51,6 @@ public class ToUserPassword implements Serializable {
     @ValidatorLenMax(50)
     private String newPassword;
 
-    /** 盐值，密码秘钥 前端不可改*/
-    @ApiModelProperty(value = "盐值，密码秘钥 前端不可改")
-    @ExcelIgnore
-    @ValidatorLenMax(50)
-    private String salt;
-
     /** 登录密码强度 前端不可改 */
     @ApiModelProperty(value = "登录密码强度 前端不可改")
     @ExcelIgnore

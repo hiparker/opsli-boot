@@ -7,7 +7,7 @@ server:
 spring:
   #redis 配置
   redis:
-    database: 0
+    database: 8
     host: 10.0.0.28
     password: '123456'
     port: 6379
@@ -83,6 +83,15 @@ opsli:
   # web 上传文件路径
   web:
     upload-path: var/files
+
+# 短信
+sms:
+  # 阿里云
+  aliyun:
+    # key
+    access-key-id:
+    # 密钥
+    access-key-secret:
 
 # 日志
 logging:

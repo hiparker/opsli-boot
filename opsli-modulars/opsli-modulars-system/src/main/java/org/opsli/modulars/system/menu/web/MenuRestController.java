@@ -21,7 +21,6 @@ import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.lang.tree.Tree;
 import cn.hutool.core.lang.tree.TreeNodeConfig;
-import cn.hutool.core.util.ReflectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -29,15 +28,12 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.opsli.api.base.result.ResultVo;
+import org.opsli.api.base.result.ResultWrapper;
 import org.opsli.api.web.system.menu.MenuApi;
 import org.opsli.api.wrapper.system.menu.MenuFullModel;
 import org.opsli.api.wrapper.system.menu.MenuModel;
 import org.opsli.api.wrapper.system.user.UserModel;
 import org.opsli.common.annotation.ApiRestController;
-import org.opsli.common.annotation.EnableLog;
-import org.opsli.common.annotation.RequiresPermissionsCus;
 import org.opsli.common.constants.MenuConstants;
 import org.opsli.common.constants.MyBatisConstants;
 import org.opsli.common.enums.DictType;
@@ -45,6 +41,9 @@ import org.opsli.common.utils.FieldUtil;
 import org.opsli.common.utils.WrapperUtil;
 import org.opsli.core.base.controller.BaseRestController;
 import org.opsli.core.general.StartPrint;
+import org.opsli.core.log.annotation.OperateLogger;
+import org.opsli.core.log.enums.ModuleEnum;
+import org.opsli.core.log.enums.OperationTypeEnum;
 import org.opsli.core.persistence.Page;
 import org.opsli.core.persistence.querybuilder.GenQueryBuilder;
 import org.opsli.core.persistence.querybuilder.QueryBuilder;
@@ -54,13 +53,10 @@ import org.opsli.core.utils.UserUtil;
 import org.opsli.modulars.system.menu.entity.SysMenu;
 import org.opsli.modulars.system.menu.service.IMenuService;
 import org.opsli.modulars.system.user.service.IUserRoleRefService;
-import org.opsli.modulars.system.user.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.multipart.MultipartHttpServletRequest;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
 
@@ -97,11 +93,11 @@ public class MenuRestController extends BaseRestController<SysMenu, MenuModel, I
      * 根据 获得用户 菜单 - 按钮权限 不是高频率
      * 判断是否是超级管理员，如果是 则显示全部菜单 否则显示有权限菜单
      *
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @ApiOperation(value = "根据 获得用户 菜单 - 权限", notes = "根据 获得用户 菜单 - 权限")
     @Override
-    public ResultVo<?> getMenuAndPermsTree(String label) {
+    public ResultWrapper<?> getMenuAndPermsTree(String label) {
         UserModel user = UserUtil.getUser();
 
         // 获得当前用户菜单
@@ -118,7 +114,7 @@ public class MenuRestController extends BaseRestController<SysMenu, MenuModel, I
         // 获得菜单树
         List<Tree<Object>> treeNodes = getMenuTrees(menuModelList);
 
-        return ResultVo.success(treeNodes);
+        return ResultWrapper.getSuccessResultWrapper(treeNodes);
     }
 
     /**
@@ -126,11 +122,11 @@ public class MenuRestController extends BaseRestController<SysMenu, MenuModel, I
      *
      * 判断是否是超级管理员，如果是 则显示全部菜单 否则显示有权限菜单
      *
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @ApiOperation(value = "当前登陆用户菜单", notes = "当前登陆用户菜单")
     @Override
-    public ResultVo<?> findMenuTree() {
+    public ResultWrapper<?> findMenuTree() {
         UserModel user = UserUtil.getUser();
 
         // 获得用户 对应菜单
@@ -147,7 +143,7 @@ public class MenuRestController extends BaseRestController<SysMenu, MenuModel, I
         // 获得菜单树
         List<Tree<Object>> treeNodes = getMenuTrees(menuModelList, EXCLUSION_FIELDS);
 
-        return ResultVo.success(treeNodes);
+        return ResultWrapper.getSuccessResultWrapper(treeNodes);
     }
 
 
@@ -155,12 +151,12 @@ public class MenuRestController extends BaseRestController<SysMenu, MenuModel, I
      * 懒加载菜单
      * @param parentId 父节点ID
      * @param id 自身ID （不为空 则排除自身）
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @ApiOperation(value = "获得菜单树 懒加载", notes = "获得菜单树 懒加载")
-    @RequiresPermissions("system_menu_select")
+    @PreAuthorize("hasAuthority('system_menu_select')")
     @Override
-    public ResultVo<?> findMenuTreeByLazy(String parentId, String id) {
+    public ResultWrapper<?> findMenuTreeByLazy(String parentId, String id) {
         List<MenuModel> menuModelList;
         if(StringUtils.isEmpty(parentId)){
             menuModelList = Lists.newArrayList();
@@ -195,19 +191,19 @@ public class MenuRestController extends BaseRestController<SysMenu, MenuModel, I
         super.handleTreeHasChildren(treeNodes,
                 (parentIds)-> IService.hasChildrenByChoose(parentIds));
 
-        return ResultVo.success(treeNodes);
+        return ResultWrapper.getSuccessResultWrapper(treeNodes);
     }
 
     /**
      * 获得列表菜单树 懒加载
      *
      * @param parentId 父节点ID
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @ApiOperation(value = "获得列表菜单树 懒加载", notes = "获得列表菜单树 懒加载")
-    @RequiresPermissions("system_menu_select")
+    @PreAuthorize("hasAuthority('system_menu_select')")
     @Override
-    public ResultVo<?> findMenuTreePageByLazy(String parentId) {
+    public ResultWrapper<?> findMenuTreePageByLazy(String parentId) {
         List<MenuModel> menuModelList;
         if(StringUtils.isEmpty(parentId)){
             menuModelList = Lists.newArrayList();
@@ -231,18 +227,18 @@ public class MenuRestController extends BaseRestController<SysMenu, MenuModel, I
         super.handleTreeHasChildren(treeNodes,
                 (parentIds)-> IService.hasChildren(parentIds));
 
-        return ResultVo.success(treeNodes);
+        return ResultWrapper.getSuccessResultWrapper(treeNodes);
     }
 
     /**
      * 获得列表菜单树
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @ApiOperation(value = "获得列表菜单树", notes = "获得列表菜单树")
-    @RequiresPermissions("system_menu_select")
+    @PreAuthorize("hasAuthority('system_menu_select')")
     @Override
-    public ResultVo<?> findMenuTreePage(HttpServletRequest request) {
-        QueryBuilder<SysMenu> queryBuilder = new WebQueryBuilder<>(entityClazz,
+    public ResultWrapper<?> findMenuTreePage(HttpServletRequest request) {
+        QueryBuilder<SysMenu> queryBuilder = new WebQueryBuilder<>(IService.getEntityClass(),
                 request.getParameterMap());
 
         // 获得菜单
@@ -252,33 +248,33 @@ public class MenuRestController extends BaseRestController<SysMenu, MenuModel, I
         // 获得菜单树
         List<Tree<Object>> treeNodes = getMenuTrees(menuModelList);
 
-        return ResultVo.success(treeNodes);
+        return ResultWrapper.getSuccessResultWrapper(treeNodes);
     }
 
     /**
      * 获得菜单List
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @ApiOperation(value = "获得菜单List", notes = "获得菜单List")
-    @RequiresPermissions("system_menu_select")
+    @PreAuthorize("hasAuthority('system_menu_select')")
     @Override
-    public ResultVo<List<MenuModel>> findList() {
+    public ResultWrapper<List<MenuModel>> findList() {
         QueryBuilder<SysMenu> queryBuilder = new GenQueryBuilder<>();
         // 菜单集合
         List<SysMenu> menuList = IService.findList(queryBuilder.build());
-        List<MenuModel> menuModelList = WrapperUtil.transformInstance(menuList, modelClazz);
-        return ResultVo.success(menuModelList);
+        List<MenuModel> menuModelList = WrapperUtil.transformInstance(menuList, IService.getModelClass());
+        return ResultWrapper.getSuccessResultWrapper(menuModelList);
     }
 
     /**
      * 菜单 查一条
      * @param model 模型
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @ApiOperation(value = "获得单条菜单", notes = "获得单条菜单 - ID")
-    @RequiresPermissions("system_menu_select")
+    @PreAuthorize("hasAuthority('system_menu_select')")
     @Override
-    public ResultVo<MenuModel> get(MenuModel model) {
+    public ResultWrapper<MenuModel> get(MenuModel model) {
         if(model != null){
             if(StringUtils.equals(MenuConstants.GEN_ID, model.getId())){
                 // 生成根节点菜单
@@ -288,7 +284,7 @@ public class MenuRestController extends BaseRestController<SysMenu, MenuModel, I
             }
         }
 
-        return ResultVo.success(model);
+        return ResultWrapper.getSuccessResultWrapper(model);
     }
 
     /**
@@ -296,138 +292,99 @@ public class MenuRestController extends BaseRestController<SysMenu, MenuModel, I
      * @param pageNo 当前页
      * @param pageSize 每页条数
      * @param request request
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @ApiOperation(value = "获得分页数据", notes = "获得分页数据 - 查询构造器")
-    @RequiresPermissions("system_menu_select")
+    @PreAuthorize("hasAuthority('system_menu_select')")
     @Override
-    public ResultVo<?> findPage(Integer pageNo, Integer pageSize, HttpServletRequest request) {
+    public ResultWrapper<?> findPage(Integer pageNo, Integer pageSize, HttpServletRequest request) {
 
-        QueryBuilder<SysMenu> queryBuilder = new WebQueryBuilder<>(entityClazz, request.getParameterMap());
+        QueryBuilder<SysMenu> queryBuilder = new WebQueryBuilder<>(IService.getEntityClass(), request.getParameterMap());
         Page<SysMenu, MenuModel> page = new Page<>(pageNo, pageSize);
         page.setQueryWrapper(queryBuilder.build());
         page = IService.findPage(page);
 
-        return ResultVo.success(page.getPageData());
+        return ResultWrapper.getSuccessResultWrapper(page.getPageData());
     }
 
     /**
      * 菜单 新增
      * @param model 模型
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @ApiOperation(value = "新增菜单", notes = "新增菜单")
-    @RequiresPermissions("system_menu_insert")
-    @EnableLog
+    @PreAuthorize("hasAuthority('system_menu_insert')")
+    @OperateLogger(description = "新增菜单",
+            module = ModuleEnum.MODULE_MENU, operationType = OperationTypeEnum.INSERT, db = true)
     @Override
-    public ResultVo<?> insert(MenuModel model) {
+    public ResultWrapper<?> insert(MenuModel model) {
         // 演示模式 不允许操作
         super.demoError();
 
         // 调用新增方法
         IService.insert(model);
-        return ResultVo.success("新增菜单成功");
+        return ResultWrapper.getSuccessResultWrapperByMsg("新增菜单成功");
     }
 
     /**
      * 菜单 修改
      * @param model 模型
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @ApiOperation(value = "修改菜单", notes = "修改菜单")
-    @RequiresPermissions("system_menu_update")
-    @EnableLog
+    @PreAuthorize("hasAuthority('system_menu_update')")
+    @OperateLogger(description = "修改菜单",
+            module = ModuleEnum.MODULE_MENU, operationType = OperationTypeEnum.UPDATE, db = true)
     @Override
-    public ResultVo<?> update(MenuModel model) {
+    public ResultWrapper<?> update(MenuModel model) {
         // 演示模式 不允许操作
         super.demoError();
 
         // 调用修改方法
         IService.update(model);
-        return ResultVo.success("修改菜单成功");
+        return ResultWrapper.getSuccessResultWrapperByMsg("修改菜单成功");
     }
 
 
     /**
      * 菜单 删除
      * @param id ID
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @ApiOperation(value = "删除菜单数据", notes = "删除菜单数据")
-    @RequiresPermissions("system_menu_delete")
-    @EnableLog
+    @PreAuthorize("hasAuthority('system_menu_delete')")
+    @OperateLogger(description = "删除菜单数据",
+            module = ModuleEnum.MODULE_MENU, operationType = OperationTypeEnum.DELETE, db = true)
     @Override
-    public ResultVo<?> del(String id){
+    public ResultWrapper<?> del(String id){
         // 演示模式 不允许操作
         super.demoError();
 
         IService.delete(id);
-        return ResultVo.success("删除菜单成功");
+        return ResultWrapper.getSuccessResultWrapperByMsg("删除菜单成功");
     }
 
 
     /**
      * 菜单 批量删除
      * @param ids ID 数组
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @ApiOperation(value = "批量删除菜单数据", notes = "批量删除菜单数据")
-    @RequiresPermissions("system_menu_delete")
-    @EnableLog
+    @PreAuthorize("hasAuthority('system_menu_delete')")
+    @OperateLogger(description = "批量删除菜单数据",
+            module = ModuleEnum.MODULE_MENU, operationType = OperationTypeEnum.DELETE, db = true)
     @Override
-    public ResultVo<?> delAll(String ids){
+    public ResultWrapper<?> delAll(String ids){
         // 演示模式 不允许操作
         super.demoError();
 
         String[] idArray = Convert.toStrArray(ids);
         IService.deleteAll(idArray);
 
-        return ResultVo.success("批量删除菜单成功");
+        return ResultWrapper.getSuccessResultWrapperByMsg("批量删除菜单成功");
     }
 
-
-    /**
-     * 菜单 Excel 导出
-     * @param request request
-     * @param response response
-     */
-    @ApiOperation(value = "导出Excel", notes = "导出Excel")
-    @RequiresPermissionsCus("system_menu_export")
-    @EnableLog
-    @Override
-    public void exportExcel(HttpServletRequest request, HttpServletResponse response) {
-        // 当前方法
-        Method method = ReflectUtil.getMethodByName(this.getClass(), "exportExcel");
-        QueryBuilder<SysMenu> queryBuilder = new WebQueryBuilder<>(entityClazz, request.getParameterMap());
-        super.excelExport(MenuApi.SUB_TITLE, queryBuilder.build(), response, method);
-    }
-
-    /**
-     * 菜单 Excel 导入
-     * @param request 文件流 request
-     * @return ResultVo
-     */
-    @ApiOperation(value = "导入Excel", notes = "导入Excel")
-    @RequiresPermissions("system_menu_import")
-    @EnableLog
-    @Override
-    public ResultVo<?> importExcel(MultipartHttpServletRequest request) {
-        return super.importExcel(request);
-    }
-
-    /**
-     * 菜单 Excel 下载导入模版
-     * @param response response
-     */
-    @ApiOperation(value = "导出Excel模版", notes = "导出Excel模版")
-    @RequiresPermissionsCus("system_menu_import")
-    @EnableLog
-    @Override
-    public void importTemplate(HttpServletResponse response) {
-        // 当前方法
-        Method method = ReflectUtil.getMethodByName(this.getClass(), "importTemplate");
-        super.importTemplate(MenuApi.SUB_TITLE, response, method);
-    }
 
 
     // ==================
@@ -435,15 +392,15 @@ public class MenuRestController extends BaseRestController<SysMenu, MenuModel, I
     /**
      * 根据菜单权限 获得菜单
      * @param permissions 菜单权限
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @Override
-    public ResultVo<MenuModel> getByPermissions(String permissions) {
+    public ResultWrapper<MenuModel> getByPermissions(String permissions) {
         MenuModel menu = IService.getByPermissions(permissions);
         if(menu == null){
-            ResultVo.error("暂无数据");
+            ResultWrapper.getErrorResultWrapper().setMsg("暂无数据");
         }
-        return ResultVo.success(menu);
+        return ResultWrapper.getSuccessResultWrapper(menu);
     }
 
 
@@ -590,11 +547,11 @@ public class MenuRestController extends BaseRestController<SysMenu, MenuModel, I
     /**
      * 菜单完整 新增
      * @param menuFullModel 模型
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @Override
-    public ResultVo<?> saveMenuByFull(MenuFullModel menuFullModel) {
+    public ResultWrapper<?> saveMenuByFull(MenuFullModel menuFullModel) {
         IService.saveMenuByFull(menuFullModel);
-        return ResultVo.success();
+        return ResultWrapper.getSuccessResultWrapper();
     }
 }

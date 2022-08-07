@@ -15,7 +15,7 @@
  */
 package org.opsli.api.web.system.role;
 
-import org.opsli.api.base.result.ResultVo;
+import org.opsli.api.base.result.ResultWrapper;
 import org.opsli.api.wrapper.system.role.RoleMenuRefModel;
 import org.opsli.api.wrapper.system.role.RoleModel;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -49,18 +49,18 @@ public interface RoleMenuRefApi {
     /**
      * 获得当前已有权限
      * @param model 角色Id
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @GetMapping("/getPerms")
-    ResultVo<?> getPerms(RoleMenuRefModel model);
+    ResultWrapper<?> getPerms(RoleMenuRefModel model);
 
     /**
      * 设置权限
      * @param model roleId 角色Id
      * @param model permsIds 权限Id 数组
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @PostMapping("/setPerms")
-    ResultVo<?> setPerms(@RequestBody RoleMenuRefModel model);
+    ResultWrapper<?> setPerms(@RequestBody RoleMenuRefModel model);
 
 }

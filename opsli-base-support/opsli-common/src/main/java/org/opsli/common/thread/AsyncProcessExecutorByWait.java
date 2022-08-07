@@ -32,7 +32,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * 用于当前方法中复杂业务多线程处理，等待线程执行完毕后 获得统一结果
  * 2021年11月2日14:07:54 重构 多线程异步等待执行器
  *
- * @author 周鹏程
+ * @author Parker
  * @date 2020-12-10 10:36
  */
 @Slf4j

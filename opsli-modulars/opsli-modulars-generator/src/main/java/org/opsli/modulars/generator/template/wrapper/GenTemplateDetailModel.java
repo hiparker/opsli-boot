@@ -31,7 +31,7 @@ import org.opsli.plugins.excel.annotation.ExcelInfo;
 /**
 * 代码模板详情 Model
 *
-* @author 周鹏程
+* @author Parker
 * @date 2021-05-28 17:12:38
 */
 @Data

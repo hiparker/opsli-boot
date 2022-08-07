@@ -15,7 +15,7 @@
  */
 package org.opsli.modulars.generator.logs.api;
 
-import org.opsli.api.base.result.ResultVo;
+import org.opsli.api.base.result.ResultWrapper;
 import org.opsli.modulars.generator.logs.wrapper.GenLogsModel;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -45,10 +45,10 @@ public interface GenLogsApi {
     /**
      * 生成记录 查一条
      * @param tableId 模型
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @GetMapping("/getByTableId")
-    ResultVo<GenLogsModel> getByTableId(String tableId);
+    ResultWrapper<GenLogsModel> getByTableId(String tableId);
 
     /**
      * 代码生成 修改
@@ -61,10 +61,10 @@ public interface GenLogsApi {
      *
      * @param menuParentId 上级菜单ID
      * @param tableId 表ID
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @PostMapping("/createMenu")
-    ResultVo<?> createMenu(String menuParentId, String tableId);
+    ResultWrapper<?> createMenu(String menuParentId, String tableId);
 
 
 }

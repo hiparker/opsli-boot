@@ -18,10 +18,11 @@ package org.opsli.core.utils;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.convert.Convert;
+import cn.hutool.core.util.StrUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.shiro.crypto.hash.Md5Hash;
-import org.opsli.api.base.result.ResultVo;
+//import org.apache.shiro.crypto.hash.Md5Hash;
+import org.opsli.api.base.result.ResultWrapper;
 import org.opsli.api.web.system.user.UserApi;
 import org.opsli.api.web.system.user.UserOrgRefApi;
 import org.opsli.api.web.system.user.UserRoleRefApi;
@@ -164,6 +165,10 @@ public class UserUtil {
         ThrowExceptionUtil.isThrowException(!IS_INIT,
                 CoreMsg.OTHER_EXCEPTION_UTILS_INIT);
 
+        if(StrUtil.isEmpty(userId)){
+            return null;
+        }
+
         // 缓存Key
         String cacheKey = CacheUtil.formatKey(RedisConstants.PREFIX_USER_ID + userId);
 
@@ -175,8 +180,8 @@ public class UserUtil {
             userModelTemp.setIzApi(true);
 
             // 查询数据库
-            ResultVo<UserModel> resultVo = userApi.get(userModelTemp);
-            if(!resultVo.isSuccess()){
+            ResultWrapper<UserModel> resultVo = userApi.get(userModelTemp);
+            if(!ResultWrapper.isSuccess(resultVo)){
                 return null;
             }
             return resultVo.getData();
@@ -207,20 +212,103 @@ public class UserUtil {
         ThrowExceptionUtil.isThrowException(!IS_INIT,
                 CoreMsg.OTHER_EXCEPTION_UTILS_INIT);
 
-        // 缓存Key
-        String cacheKey = CacheUtil.formatKey(RedisConstants.PREFIX_USERNAME + userName);
+        if(StrUtil.isEmpty(userName)){
+            return null;
+        }
 
-        Object cache = SecurityCache.get(redisTemplate, cacheKey, (k) -> {
+        // 缓存Key
+        String cacheKey = CacheUtil.formatKey(RedisConstants.PREFIX_USER_USERNAME + userName);
+
+        String userId = (String) SecurityCache.get(redisTemplate, cacheKey, (k) -> {
             // 查询数据库
-            ResultVo<UserModel> resultVo = userApi.getUserByUsername(userName);
-            if(!resultVo.isSuccess()){
+            ResultWrapper<UserModel> resultVo = userApi.getUserByUsername(userName);
+            if(!ResultWrapper.isSuccess(resultVo)){
                 return null;
             }
-            return resultVo.getData();
+
+            if(null == resultVo.getData()){
+                return null;
+            }
+
+            return resultVo.getData().getId();
         }, true);
 
-        return Convert.convert(UserModel.class, cache);
+        // 只查一次
+        return getUser(userId, true);
     }
+
+
+    /**
+     * 根据 mobile 获得用户
+     * @param mobile 手机号
+     * @return UserModel
+     */
+    public static UserModel getUserByMobile(String mobile){
+        // 判断 工具类是否初始化完成
+        ThrowExceptionUtil.isThrowException(!IS_INIT,
+                CoreMsg.OTHER_EXCEPTION_UTILS_INIT);
+
+        if(StrUtil.isEmpty(mobile)){
+            return null;
+        }
+
+        // 缓存Key
+        String cacheKey = CacheUtil.formatKey(RedisConstants.PREFIX_USER_MOBILE + mobile);
+
+        String userId = (String) SecurityCache.get(redisTemplate, cacheKey, (k) -> {
+            // 查询数据库
+            ResultWrapper<UserModel> resultVo = userApi.getUserByMobile(mobile);
+            if(!ResultWrapper.isSuccess(resultVo)){
+                return null;
+            }
+
+            if(null == resultVo.getData()){
+                return null;
+            }
+
+            return resultVo.getData().getId();
+        }, true);
+
+        // 只查一次
+        return getUser(userId, true);
+    }
+
+
+    /**
+     * 根据 email 获得用户
+     * @param email 邮箱
+     * @return UserModel
+     */
+    public static UserModel getUserByEmail(String email){
+        // 判断 工具类是否初始化完成
+        ThrowExceptionUtil.isThrowException(!IS_INIT,
+                CoreMsg.OTHER_EXCEPTION_UTILS_INIT);
+
+        if(StrUtil.isEmpty(email)){
+            return null;
+        }
+
+        // 缓存Key
+        String cacheKey = CacheUtil.formatKey(RedisConstants.PREFIX_USER_EMAIL + email);
+
+        String userId = (String) SecurityCache.get(redisTemplate, cacheKey, (k) -> {
+            // 查询数据库
+            ResultWrapper<UserModel> resultVo = userApi.getUserByEmail(email);
+            if(!ResultWrapper.isSuccess(resultVo)){
+                return null;
+            }
+
+            if(null == resultVo.getData()){
+                return null;
+            }
+
+            return resultVo.getData().getId();
+        }, true);
+
+        // 只查一次
+        return getUser(userId, true);
+    }
+
 
     /**
      * 根据 userId 获得用户角色列表
@@ -245,8 +333,8 @@ public class UserUtil {
         final String finalUserId = userId;
         Object cache = SecurityCache.get(redisTemplate, cacheKey, (k) -> {
             // 查询数据库
-            ResultVo<List<String>> resultVo = userRoleRefApi.getRolesByUserId(finalUserId);
-            if(!resultVo.isSuccess()){
+            ResultWrapper<List<String>> resultVo = userRoleRefApi.getRolesByUserId(finalUserId);
+            if(!ResultWrapper.isSuccess(resultVo)){
                 return null;
             }
             return resultVo.getData();
@@ -284,8 +372,8 @@ public class UserUtil {
         final String finalUserId = userId;
         Object cache = SecurityCache.get(redisTemplate, cacheKey, (k) -> {
             // 查询数据库
-            ResultVo<List<String>> resultVo = userRoleRefApi.getAllPerms(finalUserId);
-            if(!resultVo.isSuccess()){
+            ResultWrapper<List<String>> resultVo = userRoleRefApi.getAllPerms(finalUserId);
+            if(!ResultWrapper.isSuccess(resultVo)){
                 return null;
             }
             return resultVo.getData();
@@ -322,8 +410,8 @@ public class UserUtil {
         final String finalUserId = userId;
         Object cache = SecurityCache.get(redisTemplate, cacheKey, (k) -> {
             // 查询数据库
-            ResultVo<List<UserOrgRefModel>> resultVo = userOrgRefApi.findListByUserId(finalUserId);
-            if(!resultVo.isSuccess()){
+            ResultWrapper<List<UserOrgRefModel>> resultVo = userOrgRefApi.findListByUserId(finalUserId);
+            if(!ResultWrapper.isSuccess(resultVo)){
                 return null;
             }
             return resultVo.getData();
@@ -373,8 +461,8 @@ public class UserUtil {
         final String finalUserId = userId;
         Object cache = SecurityCache.get(redisTemplate, cacheKey, (k) -> {
             // 查询数据库
-            ResultVo<List<MenuModel>> resultVo = userRoleRefApi.getMenuListByUserId(finalUserId);
-            if(!resultVo.isSuccess()){
+            ResultWrapper<List<MenuModel>> resultVo = userRoleRefApi.getMenuListByUserId(finalUserId);
+            if(!ResultWrapper.isSuccess(resultVo)){
                 return null;
             }
             return resultVo.getData();
@@ -412,8 +500,8 @@ public class UserUtil {
         final String finalUserId = userId;
         Object cache = SecurityCache.get(redisTemplate, cacheKey, (k) -> {
             // 查询数据库
-            ResultVo<RoleModel> resultVo = userRoleRefApi.getDefRoleByUserId(finalUserId);
-            if(!resultVo.isSuccess()){
+            ResultWrapper<RoleModel> resultVo = userRoleRefApi.getDefRoleByUserId(finalUserId);
+            if(!ResultWrapper.isSuccess(resultVo)){
                 return null;
             }
             return resultVo.getData();
@@ -447,8 +535,8 @@ public class UserUtil {
         final String finalUserId = userId;
         Object cache = SecurityCache.get(redisTemplate, cacheKey, (k) -> {
             // 查询数据库
-            ResultVo<UserOrgRefModel> resultVo = userOrgRefApi.getDefOrgByUserId(finalUserId);
-            if(!resultVo.isSuccess()){
+            ResultWrapper<UserOrgRefModel> resultVo = userOrgRefApi.getDefOrgByUserId(finalUserId);
+            if(!ResultWrapper.isSuccess(resultVo)){
                 return null;
             }
             return resultVo.getData();
@@ -498,10 +586,12 @@ public class UserUtil {
         }
 
         String cacheKeyByUserId = CacheUtil.formatKey(RedisConstants.PREFIX_USER_ID + user.getId());
-        String cacheKeyByUsername = CacheUtil.formatKey(RedisConstants.PREFIX_USERNAME + user.getUsername());
+        String cacheKeyByUsername = CacheUtil.formatKey(RedisConstants.PREFIX_USER_USERNAME + user.getUsername());
+        String cacheKeyByMobile = CacheUtil.formatKey(RedisConstants.PREFIX_USER_MOBILE + user.getMobile());
+        String cacheKeyByEmail = CacheUtil.formatKey(RedisConstants.PREFIX_USER_EMAIL + user.getEmail());
 
-        return SecurityCache.removeMore(redisTemplate,
-                cacheKeyByUserId, cacheKeyByUsername);
+        return SecurityCache.remove(redisTemplate,
+                cacheKeyByUserId, cacheKeyByUsername, cacheKeyByMobile, cacheKeyByEmail);
     }
 
 
@@ -664,21 +754,6 @@ public class UserUtil {
         List<String> userAllPermsByUserId = UserUtil.getUserAllPermsByUserId(currUser.getId());
         return !CollUtil.isEmpty(userAllPermsByUserId) &&
                 userAllPermsByUserId.contains(PERMS_TENANT);
-    }
-
-    /**
-     * 处理密码
-     * @param password 密码
-     * @param secretKey 盐值
-     * @return String
-     */
-    public static String handlePassword(String password, String secretKey){
-        // 判断 工具类是否初始化完成
-        ThrowExceptionUtil.isThrowException(!IS_INIT,
-                CoreMsg.OTHER_EXCEPTION_UTILS_INIT);
-
-
-        return new Md5Hash(password, secretKey).toHex();
     }
 
     // =====================================

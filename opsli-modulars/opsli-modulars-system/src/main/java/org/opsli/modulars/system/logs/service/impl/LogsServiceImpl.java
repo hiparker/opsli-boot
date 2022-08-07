@@ -46,7 +46,7 @@ public class LogsServiceImpl extends CrudServiceImpl<LogsMapper, SysLogs, LogsMo
     @Transactional(rollbackFor = Exception.class)
     @Override
     public LogsModel insert(LogsModel model) {
-        int count = super.count();
+        long count = super.count();
         // 如果日志存储量为10万 则自动清空上月前数据
         if(count > LOG_BIG_COUNT){
             this.emptyByOneMonth();

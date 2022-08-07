@@ -51,7 +51,7 @@ import java.util.List;
 /**
  * 代码模板 Service Impl
  *
- * @author 周鹏程
+ * @author Parker
  * @date 2021-05-27 14:33:49
  */
 @Service
@@ -191,7 +191,7 @@ public class GenTemplateServiceImpl extends CrudServiceImpl<GenTemplateMapper, G
         QueryWrapper<GenTemplate> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("table_type", base.getTableType());
         queryWrapper.notIn(FieldUtil.humpToUnderline(MyBatisConstants.FIELD_ID), id);
-        int count = this.count(queryWrapper);
+        long count = this.count(queryWrapper);
         if(count == 0){
             // 代码模板同一表类型下，至少保障有一个模板
             throw new GeneratorException(GeneratorMsg.EXCEPTION_TEMPLATE_AT_LEAST_ONE);

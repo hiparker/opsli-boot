@@ -15,11 +15,8 @@
  */
 package org.opsli.api.web.system.org;
 
-import org.opsli.api.base.result.ResultVo;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.opsli.api.base.result.ResultWrapper;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -50,90 +47,67 @@ public interface SysOrgRestApi {
      * 获得懒加载树
      * @param parentId 父级ID
      * @param id 忽略自身ID
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @GetMapping("/findTreeLazy")
-    ResultVo<?> findTreeLazy(String parentId, String id);
+    ResultWrapper<?> findTreeLazy(String parentId, String id);
 
     /**
      * 获得全量树 包含默认节点
      * @param isGen 是否包含根节点
      * @param id 忽略自身ID
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @GetMapping("/findTreeByDef")
-    ResultVo<?> findTreeByDef(boolean isGen, String id);
+    ResultWrapper<?> findTreeByDef(boolean isGen, String id);
 
     /**
      * 获得当前用户下 组织
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @GetMapping("/findTreeByDefWithUserToLike")
-    ResultVo<?> findTreeByDefWithUserToLike();
+    ResultWrapper<?> findTreeByDefWithUserToLike();
 
     // ================
 
     /**
     * 组织机构表 查一条
     * @param model 模型
-    * @return ResultVo
+    * @return ResultWrapper
     */
     @GetMapping("/get")
-    ResultVo<SysOrgModel> get(SysOrgModel model);
+    ResultWrapper<SysOrgModel> get(SysOrgModel model);
 
     /**
     * 组织机构表 新增
     * @param model 模型
-    * @return ResultVo
+    * @return ResultWrapper
     */
     @PostMapping("/insert")
-    ResultVo<?> insert(@RequestBody SysOrgModel model);
+    ResultWrapper<?> insert(@RequestBody SysOrgModel model);
 
     /**
     * 组织机构表 修改
     * @param model 模型
-    * @return ResultVo
+    * @return ResultWrapper
     */
     @PostMapping("/update")
-    ResultVo<?> update(@RequestBody SysOrgModel model);
+    ResultWrapper<?> update(@RequestBody SysOrgModel model);
 
     /**
     * 组织机构表 删除
     * @param id ID
-    * @return ResultVo
+    * @return ResultWrapper
     */
     @PostMapping("/del")
-    ResultVo<?> del(String id);
+    ResultWrapper<?> del(String id);
 
     /**
     * 组织机构表 批量删除
     * @param ids ID 数组
-    * @return ResultVo
+    * @return ResultWrapper
     */
     @PostMapping("/delAll")
-    ResultVo<?> delAll(String ids);
-
-    /**
-    * 组织机构表 Excel 导出
-    * @param request request
-    * @param response response
-    */
-    @GetMapping("/exportExcel")
-    void exportExcel(HttpServletRequest request, HttpServletResponse response);
-
-    /**
-    * 组织机构表 Excel 导入
-    * @param request 文件流 request
-    * @return ResultVo
-    */
-    @PostMapping("/importExcel")
-    ResultVo<?> importExcel(MultipartHttpServletRequest request);
-
-    /**
-    * 组织机构表 Excel 下载导入模版
-    * @param response response
-    */
-    @GetMapping("/importExcel/template")
-    void importTemplate(HttpServletResponse response);
+    ResultWrapper<?> delAll(String ids);
 
 }

@@ -15,7 +15,7 @@
  */
 package org.opsli.api.web.system.dict;
 
-import org.opsli.api.base.result.ResultVo;
+import org.opsli.api.base.result.ResultWrapper;
 import org.opsli.api.wrapper.system.dict.DictDetailModel;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -49,20 +49,20 @@ public interface DictDetailApi {
     /**
      * 数据字典 查一条
      * @param model 模型
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @GetMapping("/get")
-    ResultVo<DictDetailModel> get(DictDetailModel model);
+    ResultWrapper<DictDetailModel> get(DictDetailModel model);
 
     /**
      * 数据字典 查询分页
      * @param pageNo 当前页
      * @param pageSize 每页条数
      * @param request request
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @GetMapping("/findPage")
-    ResultVo<?> findPage(
+    ResultWrapper<?> findPage(
             @RequestParam(name = "pageNo", defaultValue = "1") Integer pageNo,
             @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize,
             HttpServletRequest request
@@ -71,57 +71,34 @@ public interface DictDetailApi {
     /**
      * 数据字典 新增
      * @param model 模型
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @PostMapping("/insert")
-    ResultVo<?> insert(@RequestBody DictDetailModel model);
+    ResultWrapper<?> insert(@RequestBody DictDetailModel model);
 
     /**
      * 数据字典 修改
      * @param model 模型
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @PostMapping("/update")
-    ResultVo<?> update(@RequestBody DictDetailModel model);
+    ResultWrapper<?> update(@RequestBody DictDetailModel model);
 
     /**
      * 数据字典 删除
      * @param id ID
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @PostMapping("/del")
-    ResultVo<?> del(String id);
+    ResultWrapper<?> del(String id);
 
     /**
      * 数据字典 批量删除
      * @param ids ID 数组
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @PostMapping("/delAll")
-    ResultVo<?> delAll(String ids);
-
-    /**
-     * 数据字典 Excel 导出
-     * @param request request
-     * @param response response
-     */
-    @GetMapping("/exportExcel")
-    void exportExcel(HttpServletRequest request, HttpServletResponse response);
-
-    /**
-     * 数据字典 Excel 导入
-     * @param request 文件流 request
-     * @return ResultVo
-     */
-    @PostMapping("/importExcel")
-    ResultVo<?> importExcel(MultipartHttpServletRequest request);
-
-    /**
-     * 数据字典 Excel 下载导入模版
-     * @param response response
-     */
-    @GetMapping("/importExcel/template")
-    void importTemplate(HttpServletResponse response);
+    ResultWrapper<?> delAll(String ids);
 
 
     // ================================
@@ -130,9 +107,9 @@ public interface DictDetailApi {
      * 根据字典类型编号 查询出所有字典
      *
      * @param typeCode 字典类型编号
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @GetMapping("/findListByTypeCode")
-    ResultVo<List<DictDetailModel>> findListByTypeCode(String typeCode);
+    ResultWrapper<List<DictDetailModel>> findListByTypeCode(String typeCode);
 
 }

@@ -23,6 +23,8 @@
         <module>opsli-plugins-waf</module>
         <module>opsli-plugins-crypto</module>
         <module>opsli-plugins-email</module>
+        <module>opsli-plugins-sms</module>
+        <module>opsli-plugins-security</module>
     </modules>
 
     <dependencyManagement>

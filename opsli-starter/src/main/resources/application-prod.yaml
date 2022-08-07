@@ -79,6 +79,15 @@ opsli:
   web:
     upload-path: var/files
 
+# 短信
+sms:
+  # 阿里云
+  aliyun:
+    # key
+    access-key-id:
+    # 密钥
+    access-key-secret:
+
 # 日志
 logging:
   level:

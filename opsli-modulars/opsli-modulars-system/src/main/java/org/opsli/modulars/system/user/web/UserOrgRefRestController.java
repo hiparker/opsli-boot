@@ -15,34 +15,23 @@
  */
 package org.opsli.modulars.system.user.web;
 
-import cn.hutool.core.collection.CollUtil;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.opsli.api.base.result.ResultVo;
+import org.opsli.api.base.result.ResultWrapper;
 import org.opsli.api.web.system.user.UserOrgRefApi;
-import org.opsli.api.wrapper.system.org.SysOrgModel;
 import org.opsli.api.wrapper.system.user.UserModel;
 import org.opsli.api.wrapper.system.user.UserOrgRefModel;
 import org.opsli.api.wrapper.system.user.UserOrgRefWebModel;
-import org.opsli.api.wrapper.system.user.UserWebModel;
 import org.opsli.common.annotation.ApiRestController;
 import org.opsli.common.exception.ServiceException;
 import org.opsli.core.autoconfigure.properties.GlobalProperties;
 import org.opsli.core.msg.CoreMsg;
-import org.opsli.core.persistence.Page;
-import org.opsli.core.persistence.querybuilder.GenQueryBuilder;
-import org.opsli.core.persistence.querybuilder.QueryBuilder;
 import org.opsli.core.utils.UserUtil;
 import org.opsli.modulars.system.SystemMsg;
-import org.opsli.modulars.system.user.entity.SysUserOrgRef;
-import org.opsli.modulars.system.user.entity.SysUserWeb;
 import org.opsli.modulars.system.user.service.IUserOrgRefService;
-import org.opsli.modulars.system.user.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.util.List;
 
@@ -65,19 +54,19 @@ public class UserOrgRefRestController implements UserOrgRefApi {
     private IUserOrgRefService iUserOrgRefService;
 
     @Override
-    public ResultVo<List<UserOrgRefModel>> findListByUserId(String userId) {
+    public ResultWrapper<List<UserOrgRefModel>> findListByUserId(String userId) {
         List<UserOrgRefModel> listByUserId = iUserOrgRefService.findListByUserId(userId);
-        return ResultVo.success(listByUserId);
+        return ResultWrapper.getSuccessResultWrapper(listByUserId);
     }
 
     /**
      * 设置组织
      * @param model 模型
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @Override
-    @RequiresPermissions("system_user_setOrg")
-    public ResultVo<?> setOrg(UserOrgRefWebModel model) {
+    @PreAuthorize("hasAuthority('system_user_setOrg')")
+    public ResultWrapper<?> setOrg(UserOrgRefWebModel model) {
         // 演示模式 不允许操作
         this.demoError();
 
@@ -86,18 +75,18 @@ public class UserOrgRefRestController implements UserOrgRefApi {
             // 权限设置失败
             throw new ServiceException(SystemMsg.EXCEPTION_USER_ORG_ERROR);
         }
-        return ResultVo.success();
+        return ResultWrapper.getSuccessResultWrapper();
     }
 
     /**
      * 根据 userId 获得用户默认组织
      * @param userId 用户Id
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @Override
-    public ResultVo<UserOrgRefModel> getDefOrgByUserId(String userId) {
+    public ResultWrapper<UserOrgRefModel> getDefOrgByUserId(String userId) {
         UserOrgRefModel userOrgRefModel = iUserOrgRefService.getDefOrgByUserId(userId);
-        return ResultVo.success(userOrgRefModel);
+        return ResultWrapper.getSuccessResultWrapper(userOrgRefModel);
     }
 
 

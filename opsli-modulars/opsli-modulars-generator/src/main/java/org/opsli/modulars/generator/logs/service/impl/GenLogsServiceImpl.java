@@ -18,7 +18,7 @@ package org.opsli.modulars.generator.logs.service.impl;
 import cn.hutool.core.collection.CollUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.apache.commons.lang3.StringUtils;
-import org.opsli.api.base.result.ResultVo;
+import org.opsli.api.base.result.ResultWrapper;
 import org.opsli.api.web.system.menu.MenuApi;
 import org.opsli.api.wrapper.system.menu.MenuFullModel;
 import org.opsli.common.utils.WrapperUtil;
@@ -177,9 +177,9 @@ public class GenLogsServiceImpl extends CrudServiceImpl<GenLogsMapper, GenLogs, 
         menuFullModel.setTitle(byTableId.getCodeTitle());
         menuFullModel.setModuleName(byTableId.getModuleName());
         menuFullModel.setSubModuleName(byTableId.getSubModuleName());
-        ResultVo<?> insertRet = menuApi.saveMenuByFull(menuFullModel);
+        ResultWrapper<?> insertRet = menuApi.saveMenuByFull(menuFullModel);
 
-        return insertRet.isSuccess();
+        return ResultWrapper.isSuccess(insertRet);
     }
 
 

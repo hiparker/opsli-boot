@@ -25,7 +25,9 @@ import com.google.common.util.concurrent.Striped;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
@@ -37,6 +39,8 @@ import java.util.function.Function;
  * 本地锁要优于分布式锁的速度，当然在秒杀系统还是要使用分布式锁的
  *
  * 目前只支持 Redis 的 String 和 Hash
+ * 实际业务的话 这两种一般也是足够了
+ * 依赖于 RedisTemplate 和 LRU cache，多套业务部署 最大穿透次数为 业务服务N次
  *
  * @author Parker
  * @date 2021/12/10 12:39
@@ -373,6 +377,10 @@ public final class SecurityCache {
 			throw new RuntimeException("入参[redisTemplate,key,callbackSource]必填");
 		}
 
+		// 先判断本地缓存是否存在 默认为存在（类似于伪布隆过滤）
+		if(isNonExist(key)){
+			return null;
+		}
 		// 缓存 Object 对象
 		Map<String, Object> cache = getAllHashCacheObject(redisTemplate, key, null);
 		// 如果缓存不为空 则直接返回
@@ -387,6 +395,11 @@ public final class SecurityCache {
 		try {
 			// 尝试获得锁
 			if(lock.tryLock(DEFAULT_LOCK_TIME, TimeUnit.SECONDS)){
+				// 先判断本地缓存是否存在 默认为存在（类似于伪布隆过滤）
+				if(isNonExist(key)){
+					return null;
+				}
+
 				// 梅开二度 如果查到后 直接返回
 				cache = getAllHashCacheObject(redisTemplate, key, null);
 				// 如果缓存不为空 则直接返回
@@ -588,48 +601,28 @@ public final class SecurityCache {
 
 
 	/**
-	 * 批量删除缓存
+	 * 删除缓存
 	 * @param redisTemplate redisTemplate
 	 * @param keys 主键
 	 */
-	public static boolean removeMore(
+	public static boolean remove(
 			final RedisTemplate<String, Object> redisTemplate,
 			final String... keys) {
 		if (null == redisTemplate || null == keys) {
-			throw new RuntimeException("入参[redisTemplate,keys]必填");
-		}
-
-		int count = keys.length;
-		for (String key : keys) {
-			boolean isRemove = remove(redisTemplate, key);
-			if(isRemove){
-				count--;
-			}
-		}
-		return 0 == count;
-	}
-
-	/**
-	 * 删除缓存
-	 * @param redisTemplate redisTemplate
-	 * @param key 主键
-	 */
-	public static boolean remove(
-			final RedisTemplate<String, Object> redisTemplate,
-			final String key) {
-		if (null == redisTemplate || null == key) {
 			throw new RuntimeException("入参[redisTemplate,key]必填");
 		}
 
-		// 清除本地记录
-		LFU_NULL_CACHE.invalidate(key);
+		List<String> removeKeyList = new ArrayList<>();
+		for (String key : keys) {
+			// 清除本地记录
+			LFU_NULL_CACHE.invalidate(key);
 
-		String cacheKeyByKv = StrUtil.addPrefixIfNot(key, CACHE_PREFIX_KV);
-		String cacheKeyByHash = StrUtil.addPrefixIfNot(key, CACHE_PREFIX_HASH);
+			removeKeyList.add(StrUtil.addPrefixIfNot(key, CACHE_PREFIX_KV));
+			removeKeyList.add(StrUtil.addPrefixIfNot(key, CACHE_PREFIX_HASH));
+		}
 
 		// 清除缓存
-		redisTemplate.delete(cacheKeyByKv);
-		redisTemplate.delete(cacheKeyByHash);
+		redisTemplate.delete(removeKeyList);
 		return true;
 	}
 
