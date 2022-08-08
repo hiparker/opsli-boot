@@ -69,7 +69,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             // 关闭csrf token认证不需要csrf防护
             .csrf().disable();
 
-        // 关闭Session回话管理器
+        // 关闭Session会话管理器
         http.sessionManagement().disable();
 
         // 初始化 initAuthorizeRequests
