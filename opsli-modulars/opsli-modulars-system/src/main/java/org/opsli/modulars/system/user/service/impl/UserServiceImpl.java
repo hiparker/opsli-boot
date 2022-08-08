@@ -17,12 +17,10 @@ package org.opsli.modulars.system.user.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
-import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.github.pagehelper.PageInfo;
 import com.google.common.collect.Lists;
 import lombok.AllArgsConstructor;
@@ -46,7 +44,6 @@ import org.opsli.core.utils.OptionsUtil;
 import org.opsli.core.utils.UserUtil;
 import org.opsli.core.utils.VerificationCodeUtil;
 import org.opsli.modulars.system.SystemMsg;
-import org.opsli.modulars.system.menu.service.IMenuService;
 import org.opsli.modulars.system.role.entity.SysRole;
 import org.opsli.modulars.system.role.service.IRoleService;
 import org.opsli.modulars.system.user.entity.SysUser;
@@ -55,7 +52,7 @@ import org.opsli.modulars.system.user.mapper.UserMapper;
 import org.opsli.modulars.system.user.service.IUserRoleRefService;
 import org.opsli.modulars.system.user.service.IUserService;
 import org.opsli.plugins.security.utils.PasswordUtil;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -72,6 +69,7 @@ import java.util.List;
  * @date 2020-09-16 17:33
  */
 @AllArgsConstructor
+@Lazy
 @Service
 public class UserServiceImpl extends CrudServiceImpl<UserMapper, SysUser, UserModel> implements IUserService {
 

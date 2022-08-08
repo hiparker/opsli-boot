@@ -60,18 +60,20 @@ import java.util.List;
  * @date 2020-09-16 17:33
  */
 @Service
-@Lazy
 public class UserRoleRefServiceImpl extends ServiceImpl<UserRoleRefMapper, SysUserRoleRef> implements IUserRoleRefService {
 
     @Autowired(required = false)
     private UserRoleRefMapper mapper;
 
+    @Lazy
     @Autowired
     private IRoleService iRoleService;
 
+    @Lazy
     @Autowired
     private IUserService iUserService;
 
+    @Lazy
     @Autowired
     private IMenuService iMenuService;
 

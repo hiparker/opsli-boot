@@ -37,6 +37,7 @@ import org.opsli.modulars.system.dict.mapper.DictDetailMapper;
 import org.opsli.modulars.system.dict.service.IDictDetailService;
 import org.opsli.modulars.system.dict.service.IDictService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -54,6 +55,8 @@ public class DictDetailServiceImpl extends CrudServiceImpl<DictDetailMapper, Sys
 
     @Autowired(required = false)
     private DictDetailMapper mapper;
+
+    @Lazy
     @Autowired
     private IDictService iDictService;
 

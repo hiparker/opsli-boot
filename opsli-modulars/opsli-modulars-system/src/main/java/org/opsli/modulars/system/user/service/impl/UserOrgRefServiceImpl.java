@@ -45,6 +45,7 @@ import org.opsli.modulars.system.user.mapper.UserOrgRefMapper;
 import org.opsli.modulars.system.user.service.IUserOrgRefService;
 import org.opsli.modulars.system.user.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -72,8 +73,11 @@ public class UserOrgRefServiceImpl extends ServiceImpl<UserOrgRefMapper, SysUser
     @Autowired(required = false)
     private UserOrgRefMapper mapper;
 
+    @Lazy
     @Autowired
     private IUserService iUserService;
+
+    @Lazy
     @Autowired
     private ISysOrgService iSysOrgService;
 
