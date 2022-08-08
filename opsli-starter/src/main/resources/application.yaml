@@ -8,7 +8,7 @@ server:
     # 对于 Tomcat 头文件不限制大小
     max-swallow-size: -1
   servlet:
-    #context-path: /opsli-boot
+    context-path: /opsli-boot
     ## 专门针对 Controller层接口路径前缀全局配置
     api:
       path:
