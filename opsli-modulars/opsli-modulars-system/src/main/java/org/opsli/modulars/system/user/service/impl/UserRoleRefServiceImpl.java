@@ -46,6 +46,7 @@ import org.opsli.modulars.system.user.mapper.UserRoleRefMapper;
 import org.opsli.modulars.system.user.service.IUserRoleRefService;
 import org.opsli.modulars.system.user.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -59,6 +60,7 @@ import java.util.List;
  * @date 2020-09-16 17:33
  */
 @Service
+@Lazy
 public class UserRoleRefServiceImpl extends ServiceImpl<UserRoleRefMapper, SysUserRoleRef> implements IUserRoleRefService {
 
     @Autowired(required = false)
