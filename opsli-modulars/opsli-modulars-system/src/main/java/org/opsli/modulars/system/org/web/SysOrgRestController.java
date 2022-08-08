@@ -19,8 +19,6 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.lang.tree.Tree;
 import cn.hutool.core.lang.tree.TreeNodeConfig;
-import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.google.common.collect.Lists;
@@ -29,16 +27,13 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.opsli.api.base.result.ResultVo;
+import org.opsli.api.base.result.ResultWrapper;
 import org.opsli.api.web.system.org.SysOrgRestApi;
 import org.opsli.api.wrapper.system.org.SysOrgModel;
 import org.opsli.api.wrapper.system.role.RoleModel;
 import org.opsli.api.wrapper.system.user.UserModel;
 import org.opsli.api.wrapper.system.user.UserOrgRefModel;
 import org.opsli.common.annotation.ApiRestController;
-import org.opsli.common.annotation.EnableLog;
-import org.opsli.common.annotation.RequiresPermissionsCus;
 import org.opsli.common.constants.MyBatisConstants;
 import org.opsli.common.enums.DictType;
 import org.opsli.common.exception.ServiceException;
@@ -46,9 +41,11 @@ import org.opsli.common.utils.FieldUtil;
 import org.opsli.common.utils.ListDistinctUtil;
 import org.opsli.common.utils.WrapperUtil;
 import org.opsli.core.base.controller.BaseRestController;
+import org.opsli.core.log.annotation.OperateLogger;
+import org.opsli.core.log.enums.ModuleEnum;
+import org.opsli.core.log.enums.OperationTypeEnum;
 import org.opsli.core.persistence.querybuilder.GenQueryBuilder;
 import org.opsli.core.persistence.querybuilder.QueryBuilder;
-import org.opsli.core.persistence.querybuilder.WebQueryBuilder;
 import org.opsli.core.utils.OrgUtil;
 import org.opsli.core.utils.TenantUtil;
 import org.opsli.core.utils.TreeBuildUtil;
@@ -56,11 +53,8 @@ import org.opsli.core.utils.UserUtil;
 import org.opsli.modulars.system.SystemMsg;
 import org.opsli.modulars.system.org.entity.SysOrg;
 import org.opsli.modulars.system.org.service.ISysOrgService;
-import org.springframework.web.multipart.MultipartHttpServletRequest;
+import org.springframework.security.access.prepost.PreAuthorize;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.lang.reflect.Method;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -88,11 +82,11 @@ public class SysOrgRestController extends BaseRestController<SysOrg, SysOrgModel
 
     /**
      * 获得当前用户下 组织
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @ApiOperation(value = "获得当前用户下 组织", notes = "获得当前用户下 组织")
     @Override
-    public ResultVo<?> findTreeByDefWithUserToLike() {
+    public ResultWrapper<?> findTreeByDefWithUserToLike() {
         // 生成 全部/未分组
         String parentId = PARENT_ID;
         List<SysOrgModel> orgModelList = OrgUtil.createDefShowNodes(parentId, Lists.newArrayList());
@@ -143,7 +137,7 @@ public class SysOrgRestController extends BaseRestController<SysOrg, SysOrgModel
                     sysOrg.setParentId(parentId);
                 }
                 orgModelList.addAll(
-                        WrapperUtil.transformInstance(dataList, modelClazz)
+                        WrapperUtil.transformInstance(dataList, IService.getModelClass())
                 );
             }
         }
@@ -154,11 +148,11 @@ public class SysOrgRestController extends BaseRestController<SysOrg, SysOrgModel
 
     /**
      * 获得组织树 懒加载
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @ApiOperation(value = "获得组织树 懒加载", notes = "获得组织树 懒加载")
     @Override
-    public ResultVo<?> findTreeLazy(String parentId, String id) {
+    public ResultWrapper<?> findTreeLazy(String parentId, String id) {
         List<SysOrgModel> orgModelList;
         if(StringUtils.isEmpty(parentId)){
             orgModelList = Lists.newArrayList();
@@ -204,7 +198,7 @@ public class SysOrgRestController extends BaseRestController<SysOrg, SysOrgModel
                 dataList = IService.findList(wrapperByEmpty);
             }
 
-            orgModelList = WrapperUtil.transformInstance(dataList, modelClazz);
+            orgModelList = WrapperUtil.transformInstance(dataList, IService.getModelClass());
         }
 
         // 处理组织树
@@ -213,11 +207,11 @@ public class SysOrgRestController extends BaseRestController<SysOrg, SysOrgModel
 
     /**
      * 获得组织树
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @ApiOperation(value = "获得组织树", notes = "获得组织树")
     @Override
-    public ResultVo<?> findTreeByDef(boolean isGen, String id) {
+    public ResultWrapper<?> findTreeByDef(boolean isGen, String id) {
         List<SysOrgModel> orgModelList = Lists.newArrayList();
         String parentId = PARENT_ID;
         if(isGen){
@@ -284,7 +278,7 @@ public class SysOrgRestController extends BaseRestController<SysOrg, SysOrgModel
 
         if(CollUtil.isNotEmpty(dataList)){
             orgModelList.addAll(
-                    WrapperUtil.transformInstance(dataList, modelClazz)
+                    WrapperUtil.transformInstance(dataList, IService.getModelClass())
             );
         }
 
@@ -300,12 +294,12 @@ public class SysOrgRestController extends BaseRestController<SysOrg, SysOrgModel
     /**
     * 组织机构 查一条
     * @param model 模型
-    * @return ResultVo
+    * @return ResultWrapper
     */
     @ApiOperation(value = "获得单条组织机构", notes = "获得单条组织机构 - ID")
-    @RequiresPermissions("system_org_select")
+    @PreAuthorize("hasAuthority('system_org_select')")
     @Override
-    public ResultVo<SysOrgModel> get(SysOrgModel model) {
+    public ResultWrapper<SysOrgModel> get(SysOrgModel model) {
         if(model != null){
             if(StringUtils.equals(PARENT_ID, model.getId())){
                 // 生成根节点组织
@@ -315,19 +309,20 @@ public class SysOrgRestController extends BaseRestController<SysOrg, SysOrgModel
             }
         }
 
-        return ResultVo.success(model);
+        return ResultWrapper.getSuccessResultWrapper(model);
     }
 
     /**
     * 组织机构 新增
     * @param model 模型
-    * @return ResultVo
+    * @return ResultWrapper
     */
     @ApiOperation(value = "新增组织机构数据", notes = "新增组织机构数据")
-    @RequiresPermissions("system_org_insert")
-    @EnableLog
+    @PreAuthorize("hasAuthority('system_org_insert')")
+    @OperateLogger(description = "新增组织机构数据",
+            module = ModuleEnum.MODULE_ORG, operationType = OperationTypeEnum.INSERT, db = true)
     @Override
-    public ResultVo<?> insert(SysOrgModel model) {
+    public ResultWrapper<?> insert(SysOrgModel model) {
 
         // 如果新增的是 根节点数据 则需要验证权限
         if(null != model && TreeBuildUtil.DEF_PARENT_ID.equals(model.getParentId())){
@@ -349,106 +344,67 @@ public class SysOrgRestController extends BaseRestController<SysOrg, SysOrgModel
 
         // 调用新增方法
         IService.insert(model);
-        return ResultVo.success("新增组织机构成功");
+        return ResultWrapper.getSuccessResultWrapperByMsg("新增组织机构成功");
     }
 
     /**
     * 组织机构 修改
     * @param model 模型
-    * @return ResultVo
+    * @return ResultWrapper
     */
     @ApiOperation(value = "修改组织机构数据", notes = "修改组织机构数据")
-    @RequiresPermissions("system_org_update")
-    @EnableLog
+    @PreAuthorize("hasAuthority('system_org_update')")
+    @OperateLogger(description = "修改组织机构数据",
+            module = ModuleEnum.MODULE_ORG, operationType = OperationTypeEnum.UPDATE, db = true)
     @Override
-    public ResultVo<?> update(SysOrgModel model) {
+    public ResultWrapper<?> update(SysOrgModel model) {
         // 演示模式 不允许操作
         super.demoError();
 
         // 调用修改方法
         IService.update(model);
-        return ResultVo.success("修改组织机构成功");
+        return ResultWrapper.getSuccessResultWrapperByMsg("修改组织机构成功");
     }
 
 
     /**
     * 组织机构 删除
     * @param id ID
-    * @return ResultVo
+    * @return ResultWrapper
     */
     @ApiOperation(value = "删除组织机构数据", notes = "删除组织机构数据")
-    @RequiresPermissions("system_org_update")
-    @EnableLog
+    @PreAuthorize("hasAuthority('system_org_delete')")
+    @OperateLogger(description = "删除组织机构数据",
+            module = ModuleEnum.MODULE_ORG, operationType = OperationTypeEnum.DELETE, db = true)
     @Override
-    public ResultVo<?> del(String id){
+    public ResultWrapper<?> del(String id){
         // 演示模式 不允许操作
         super.demoError();
 
         IService.delete(id);
-        return ResultVo.success("删除组织机构成功");
+        return ResultWrapper.getSuccessResultWrapperByMsg("删除组织机构成功");
     }
 
     /**
     * 组织机构 批量删除
     * @param ids ID 数组
-    * @return ResultVo
+    * @return ResultWrapper
     */
     @ApiOperation(value = "批量删除组织机构数据", notes = "批量删除组织机构数据")
-    @RequiresPermissions("system_org_update")
-    @EnableLog
+    @PreAuthorize("hasAuthority('system_org_delete')")
+    @OperateLogger(description = "批量删除组织机构数据",
+            module = ModuleEnum.MODULE_ORG, operationType = OperationTypeEnum.DELETE, db = true)
     @Override
-    public ResultVo<?> delAll(String ids){
+    public ResultWrapper<?> delAll(String ids){
         // 演示模式 不允许操作
         super.demoError();
 
         String[] idArray = Convert.toStrArray(ids);
         IService.deleteAll(idArray);
 
-        return ResultVo.success("批量删除组织机构成功");
+        return ResultWrapper.getSuccessResultWrapperByMsg("批量删除组织机构成功");
     }
 
-
-    /**
-    * 组织机构 Excel 导出
-    * @param request request
-    * @param response response
-    */
-    @ApiOperation(value = "导出Excel", notes = "导出Excel")
-    @RequiresPermissionsCus("system_org_export")
-    @EnableLog
-    @Override
-    public void exportExcel(HttpServletRequest request, HttpServletResponse response) {
-        // 当前方法
-        Method method = ReflectUtil.getMethodByName(this.getClass(), "exportExcel");
-        QueryBuilder<SysOrg> queryBuilder = new WebQueryBuilder<>(entityClazz, request.getParameterMap());
-        super.excelExport(SysOrgRestApi.SUB_TITLE, queryBuilder.build(), response, method);
-    }
-
-    /**
-    * 组织机构 Excel 导入
-    * @param request 文件流 request
-    * @return ResultVo
-    */
-    @ApiOperation(value = "导入Excel", notes = "导入Excel")
-    @RequiresPermissions("system_org_import")
-    @EnableLog
-    @Override
-    public ResultVo<?> importExcel(MultipartHttpServletRequest request) {
-        return super.importExcel(request);
-    }
-
-    /**
-    * 组织机构 Excel 下载导入模版
-    * @param response response
-    */
-    @ApiOperation(value = "导出Excel模版", notes = "导出Excel模版")
-    @RequiresPermissionsCus("system_org_import")
-    @Override
-    public void importTemplate(HttpServletResponse response) {
-        // 当前方法
-        Method method = ReflectUtil.getMethodByName(this.getClass(), "importTemplate");
-        super.importTemplate(SysOrgRestApi.SUB_TITLE, response, method);
-    }
 
     // ==============================
 
@@ -472,9 +428,9 @@ public class SysOrgRestController extends BaseRestController<SysOrg, SysOrgModel
      * @param parentId 父级ID
      * @param orgModelList 组织集合
      * @param izLazy 是否懒加载
-     * @return ResultVo
+     * @return ResultWrapper
      */
-    private ResultVo<?> handleOrgTree(String parentId, List<SysOrgModel> orgModelList, boolean izLazy) {
+    private ResultWrapper<?> handleOrgTree(String parentId, List<SysOrgModel> orgModelList, boolean izLazy) {
         //配置
         TreeNodeConfig treeNodeConfig = new TreeNodeConfig();
         // 自定义属性名 都要默认值的
@@ -507,7 +463,7 @@ public class SysOrgRestController extends BaseRestController<SysOrg, SysOrgModel
                     (parentIds)-> IService.hasChildren(parentIdSet));
         }
 
-        return ResultVo.success(treeNodes);
+        return ResultWrapper.getSuccessResultWrapper(treeNodes);
     }
 
 }

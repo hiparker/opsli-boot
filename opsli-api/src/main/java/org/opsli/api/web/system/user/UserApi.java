@@ -15,14 +15,12 @@
  */
 package org.opsli.api.web.system.user;
 
-import org.opsli.api.base.result.ResultVo;
+import org.opsli.api.base.encrypt.EncryptModel;
+import org.opsli.api.base.result.ResultWrapper;
 import org.opsli.api.wrapper.system.menu.MenuModel;
 import org.opsli.api.wrapper.system.role.RoleModel;
 import org.opsli.api.wrapper.system.user.*;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import javax.servlet.http.HttpServletRequest;
@@ -51,97 +49,123 @@ public interface UserApi {
     /**
      * 当前登陆用户信息
      * @param request request
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @GetMapping("/getInfo")
-    ResultVo<UserInfo> getInfo(HttpServletRequest request);
+    ResultWrapper<UserInfo> getInfo(HttpServletRequest request);
 
     /**
      * 当前登陆用户信息
      *
      * @param userId 用户ID
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @GetMapping("/getInfoById")
-    ResultVo<UserInfo> getInfoById(String userId);
+    ResultWrapper<UserInfo> getInfoById(String userId);
 
     /**
      * 当前登陆用户信息
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @GetMapping("/getOrg")
-    ResultVo<?> getOrg();
+    ResultWrapper<?> getOrg();
 
     /**
      * 当前登陆用户信息
      *
      * @param userId 用户ID
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @GetMapping("/getOrgByUserId")
-    ResultVo<?> getOrgByUserId(String userId);
+    ResultWrapper<?> getOrgByUserId(String userId);
 
     /**
      * 根据 userId 获得用户角色Id集合
      * @param userId 用户Id
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @GetMapping("/getRoleIdsByUserId")
-    ResultVo<List<String>> getRoleIdsByUserId(String userId);
-
-
-    /**
-     * 修改密码
-     * @param userPassword 账号密码
-     * @return ResultVo
-     */
-    @PostMapping("/updatePassword")
-    ResultVo<?> updatePassword(@RequestBody UserPassword userPassword);
+    ResultWrapper<List<String>> getRoleIdsByUserId(String userId);
 
     /**
      * 修改密码 ID
      *
-     * @param userPassword 密码类
+     * @param encryptModel 账号密码
      * @return ResultVo
      */
     @PostMapping("/updatePasswordById")
-    ResultVo<?> updatePasswordById(@RequestBody ToUserPassword userPassword);
+    ResultWrapper<?> updatePasswordById(@RequestBody EncryptModel encryptModel);
+
+
+    /**
+     * 修改密码
+     * @param encryptModel 账号密码
+     * @return ResultWrapper
+     */
+    @PostMapping("/updatePassword")
+    ResultWrapper<?> updatePassword(@RequestBody EncryptModel encryptModel);
+
+    /**
+     * 修改邮箱
+     * @param encryptModel 加密数据
+     * @return ResultWrapper
+     */
+    @PostMapping("/updateEmail")
+    ResultWrapper<?> updateEmail(@RequestBody EncryptModel encryptModel);
+
+    /**
+     * 修改手机
+     * @param encryptModel 加密数据
+     * @return ResultWrapper
+     */
+    @PostMapping("/updateMobile")
+    ResultWrapper<?> updateMobile(@RequestBody EncryptModel encryptModel);
+
 
     /**
      * 重置密码 ID
      *
-     * @param userId 用户ID
-     * @return ResultVo
+     * @param encryptModel 加密数据（用户ID）
+     * @return ResultWrapper
      */
     @PostMapping("/resetPasswordById")
-    ResultVo<?> resetPasswordById(String userId);
+    ResultWrapper<?> resetPasswordById(@RequestBody EncryptModel encryptModel);
 
     /**
      * 变更账户状态
      *
-     * @param userId 用户ID
-     * @param enable 启用状态
-     * @return ResultVo
+     * @param encryptModel 加密数据（EnableUserModel）
+     * @return ResultWrapper
      */
     @PostMapping("/enableAccount")
-    ResultVo<?> enableAccount(String userId, String enable);
+    ResultWrapper<?> enableAccount(@RequestBody EncryptModel encryptModel);
+
+    /**
+     * 修改密码（忘记密码）
+     *
+     * @param encryptModel 加密数据
+     * @return ResultWrapper
+     */
+    @PostMapping("/updatePasswordByForget")
+    ResultWrapper<?> updatePasswordByForget(@RequestBody EncryptModel encryptModel);
+
 
     /**
      * 上传头像
      * @param userAvatarModel 图片地址
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @PostMapping("/updateAvatar")
-    ResultVo<?> updateAvatar(@RequestBody UserAvatarModel userAvatarModel);
+    ResultWrapper<?> updateAvatar(@RequestBody UserAvatarModel userAvatarModel);
 
 
     /**
      * 用户信息 查一条
      * @param model 模型
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @GetMapping("/get")
-    ResultVo<UserModel> get(UserModel model);
+    ResultWrapper<UserModel> get(UserModel model);
 
     /**
      * 用户信息 查询分页
@@ -149,10 +173,10 @@ public interface UserApi {
      * @param pageSize 每页条数
      * @param orgIdGroup 组织ID组
      * @param request request
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @GetMapping("/findPage")
-    ResultVo<?> findPage(
+    ResultWrapper<?> findPage(
             @RequestParam(name = "pageNo", defaultValue = "1") Integer pageNo,
             @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize,
             @RequestParam(name = "orgIdGroup") String orgIdGroup,
@@ -164,10 +188,10 @@ public interface UserApi {
      * @param pageNo 当前页
      * @param pageSize 每页条数
      * @param request request
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @GetMapping("/findPageByTenant")
-    ResultVo<?> findPageByTenant(
+    ResultWrapper<?> findPageByTenant(
             @RequestParam(name = "pageNo", defaultValue = "1") Integer pageNo,
             @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize,
             HttpServletRequest request
@@ -178,91 +202,114 @@ public interface UserApi {
     /**
      * 用户信息 新增
      * @param model 模型
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @PostMapping("/insert")
-    ResultVo<?> insert(@RequestBody UserModel model);
+    ResultWrapper<?> insert(@RequestBody UserModel model);
 
     /**
      * 用户信息 修改
      * @param model 模型
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @PostMapping("/update")
-    ResultVo<?> update(@RequestBody UserModel model);
+    ResultWrapper<?> update(@RequestBody UserModel model);
 
     /**
      * 用户自身信息 修改
      * @param model 模型
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @PostMapping("/updateSelf")
-    ResultVo<?> updateSelf(@RequestBody UserModel model);
+    ResultWrapper<?> updateSelf(@RequestBody UserModel model);
 
 
     /**
      * 用户信息 删除
-     * @param id ID
-     * @return ResultVo
+     * @param encryptModel 加密（id ID）
+     * @return ResultWrapper
      */
     @PostMapping("/del")
-    ResultVo<?> del(String id);
+    ResultWrapper<?> del(@RequestBody EncryptModel encryptModel);
 
     /**
      * 用户信息 批量删除
-     * @param ids ID 数组
-     * @return ResultVo
+     * @param encryptModel 加密（ids ID 数组）
+     * @return ResultWrapper
      */
     @PostMapping("/delAll")
-    ResultVo<?> delAll(String ids);
+    ResultWrapper<?> delAll(@RequestBody EncryptModel encryptModel);
+
+
+    /**
+     * 用户信息 Excel 导出认证
+     *
+     * @param type 类型
+     * @param request request
+     */
+    @GetMapping("/excel/auth/{type}")
+    ResultWrapper<String> exportExcelAuth(
+            @PathVariable("type") String type,
+            HttpServletRequest request);
 
     /**
      * 用户信息 Excel 导出
-     * @param request request
+     *
+     * @param certificate 凭证
      * @param response response
      */
-    @GetMapping("/exportExcel")
-    void exportExcel(HttpServletRequest request, HttpServletResponse response);
+    @GetMapping("/excel/export/{certificate}")
+    void exportExcel(
+            @PathVariable("certificate") String certificate,
+            HttpServletResponse response);
 
     /**
      * 用户信息 Excel 导入
      * @param request 文件流 request
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @PostMapping("/importExcel")
-    ResultVo<?> importExcel(MultipartHttpServletRequest request);
+    ResultWrapper<?> importExcel(MultipartHttpServletRequest request);
 
 
-    /**
-     * 用户信息 Excel 下载导入模版
-     * @param response response
-     */
-    @GetMapping("/importExcel/template")
-    void importTemplate(HttpServletResponse response);
 
 
     /**
      * 切换租户
      * @param tenantId 租户ID
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @PostMapping("/switchTenant")
-    ResultVo<?> switchTenant(String tenantId);
+    ResultWrapper<?> switchTenant(String tenantId);
 
     /**
      * 切换回自己账户
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @PostMapping("/switchOneself")
-    ResultVo<?> switchOneself();
+    ResultWrapper<?> switchOneself();
 
     /**
      * 根据 username 获得用户
      * @param username 用户名
-     * @return ResultVo
+     * @return ResultWrapper
      */
     //@GetMapping("/getUserByUsername")
-    ResultVo<UserModel> getUserByUsername(String username);
+    ResultWrapper<UserModel> getUserByUsername(String username);
+
+    /**
+     * 根据 手机号 获得用户
+     * @param mobile 手机号
+     * @return ResultWrapper
+     */
+    ResultWrapper<UserModel> getUserByMobile(String mobile);
+
+    /**
+     * 根据 邮箱 获得用户
+     * @param email 邮箱
+     * @return ResultWrapper
+     */
+    ResultWrapper<UserModel> getUserByEmail(String email);
 
 
 

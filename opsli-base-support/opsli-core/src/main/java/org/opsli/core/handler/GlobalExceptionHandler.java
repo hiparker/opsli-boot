@@ -18,14 +18,9 @@ package org.opsli.core.handler;
 import cn.hutool.core.text.StrFormatter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.shiro.authc.IncorrectCredentialsException;
-import org.apache.shiro.authc.LockedAccountException;
-import org.apache.shiro.authc.pam.UnsupportedTokenException;
-import org.apache.shiro.authz.AuthorizationException;
-import org.opsli.api.base.result.ResultVo;
+import org.opsli.api.base.result.ResultWrapper;
 import org.opsli.common.exception.*;
 import org.opsli.core.msg.CoreMsg;
-import org.opsli.core.msg.TokenMsg;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -86,9 +81,9 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ServiceException.class)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public ResultVo<?> businessException(ServiceException e) {
+    public ResultWrapper<?> businessException(ServiceException e) {
         log.warn("业务异常 - 异常编号：{} - 异常信息：{}",e.getCode(),e.getMessage());
-        return ResultVo.error(e.getCode(), e.getMessage());
+        return ResultWrapper.getCustomResultWrapper(e.getCode(), e.getMessage());
     }
 
     /**
@@ -97,8 +92,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(EmptyException.class)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public ResultVo<?> emptyException(EmptyException e) {
-        return ResultVo.error(e.getCode(), e.getMessage());
+    public ResultWrapper<?> emptyException(EmptyException e) {
+        return ResultWrapper.getCustomResultWrapper(e.getCode(), e.getMessage());
     }
 
     /**
@@ -107,58 +102,9 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(JwtException.class)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public ResultVo<?> jwtException(JwtException e) {
-        return ResultVo.error(e.getCode(), e.getMessage());
+    public ResultWrapper<?> jwtException(JwtException e) {
+        return ResultWrapper.getCustomResultWrapper(e.getCode(), e.getMessage());
     }
-
-    /**
-     * 拦截 自定义 Shiro 认证异常
-     */
-    @ExceptionHandler(IncorrectCredentialsException.class)
-    @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    @ResponseBody
-    public ResultVo<?> incorrectCredentialsException(IncorrectCredentialsException e) {
-        // token失效，请重新登录
-        return ResultVo.error(e.getMessage());
-    }
-
-    /**
-     * 拦截 自定义 Shiro 认证异常
-     */
-    @ExceptionHandler(LockedAccountException.class)
-    @ResponseStatus(HttpStatus.OK)
-    @ResponseBody
-    public ResultVo<?> lockedAccountException(LockedAccountException e) {
-        // 账号已被锁定,请联系管理员
-        return ResultVo.error(e.getMessage());
-    }
-
-    /**
-     * 拦截 自定义 Shiro 认证异常
-     */
-    @ExceptionHandler(AuthorizationException.class)
-    @ResponseStatus(HttpStatus.OK)
-    @ResponseBody
-    public ResultVo<?> authorizationException(AuthorizationException e) {
-        // 无权访问该方法
-        return ResultVo.error(TokenMsg.EXCEPTION_NOT_AUTH.getCode(),
-                TokenMsg.EXCEPTION_NOT_AUTH.getMessage()
-                );
-    }
-
-    /**
-     * 拦截 自定义 Shiro 认证异常
-     */
-    @ExceptionHandler(UnsupportedTokenException.class)
-    @ResponseStatus(HttpStatus.OK)
-    @ResponseBody
-    public ResultVo<?> unsupportedTokenException(UnsupportedTokenException e) {
-        // 找不到认证授权器
-        return ResultVo.error(TokenMsg.EXCEPTION_NOT_REALM.getCode(),
-                TokenMsg.EXCEPTION_NOT_REALM.getMessage()
-        );
-    }
-
 
     /**
      * 拦截 自定义 Token 认证异常
@@ -166,9 +112,9 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(TokenException.class)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public ResultVo<?> tokenException(TokenException e) {
+    public ResultWrapper<?> tokenException(TokenException e) {
         // Token 异常
-        return ResultVo.error(e.getCode(), e.getMessage());
+        return ResultWrapper.getCustomResultWrapper(e.getCode(), e.getMessage());
     }
 
     /**
@@ -177,8 +123,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(WafException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
-    public ResultVo<?> wafException(WafException e) {
-        return ResultVo.error(e.getCode(), e.getMessage());
+    public ResultWrapper<?> wafException(WafException e) {
+        return ResultWrapper.getCustomResultWrapper(e.getCode(), e.getMessage());
     }
 
     // ============================
@@ -189,9 +135,9 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(NullPointerException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ResponseBody
-    public ResultVo<?> nullPointerException(NullPointerException e) {
+    public ResultWrapper<?> nullPointerException(NullPointerException e) {
         log.error("空指针异常：{}",e.getMessage(),e);
-        return ResultVo.error(e.getMessage());
+        return ResultWrapper.getErrorResultWrapper();
     }
 
 
@@ -201,9 +147,9 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(SQLIntegrityConstraintViolationException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ResponseBody
-    public ResultVo<?> sqlIntegrityConstraintViolationException(EmptyException e) {
+    public ResultWrapper<?> sqlIntegrityConstraintViolationException(EmptyException e) {
         log.error("数据异常：{}",e.getMessage(),e);
-        return ResultVo.error(e.getCode(), CoreMsg.SQL_EXCEPTION_INTEGRITY_CONSTRAINT_VIOLATION.getMessage());
+        return ResultWrapper.getCustomResultWrapper(e.getCode(), CoreMsg.SQL_EXCEPTION_INTEGRITY_CONSTRAINT_VIOLATION.getMessage());
     }
 
     /**
@@ -212,17 +158,17 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(SQLException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ResponseBody
-    public ResultVo<?> sqlException(SQLException e) {
+    public ResultWrapper<?> sqlException(SQLException e) {
         //log.error("数据异常：{}",e.getMessage(),e);
         // 默认值异常
         if(StringUtils.contains(e.getMessage(),SQL_EXCEPTION)){
             String field = e.getMessage().replaceAll("Field '","")
                     .replaceAll("' doesn't have a default value","");
             String msg = StrFormatter.format(CoreMsg.SQL_EXCEPTION_NOT_HAVE_DEFAULT_VALUE.getMessage(), field);
-            return ResultVo.error(CoreMsg.SQL_EXCEPTION_NOT_HAVE_DEFAULT_VALUE.getCode(), msg);
+            return ResultWrapper.getCustomResultWrapper(CoreMsg.SQL_EXCEPTION_NOT_HAVE_DEFAULT_VALUE.getCode(), msg);
         }
         String msg = StrFormatter.format(CoreMsg.SQL_EXCEPTION_UNKNOWN.getMessage(), e.getMessage());
-        return ResultVo.error(CoreMsg.SQL_EXCEPTION_UNKNOWN.getCode(), msg);
+        return ResultWrapper.getCustomResultWrapper(CoreMsg.SQL_EXCEPTION_UNKNOWN.getCode(), msg);
     }
 
 }

@@ -357,7 +357,7 @@ public class SysOrgServiceImpl extends CrudServiceImpl<SysOrgMapper, SysOrg, Sys
         }
 
         // 租户检测
-        wrapper = new QueryTenantHandler().handler(super.entityClazz, wrapper);
+        wrapper = new QueryTenantHandler().handler(this.getEntityClass(), wrapper);
 
         return super.count(wrapper) == 0;
     }

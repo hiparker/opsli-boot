@@ -30,14 +30,20 @@ public enum TokenMsg implements BaseMsg {
      */
     EXCEPTION_TOKEN_CREATE_ERROR(12000,"生成Token失败"),
     EXCEPTION_TOKEN_CREATE_LIMIT_ERROR(12001,"您的账号已在其他设备登录"),
-    EXCEPTION_TOKEN_LOSE_EFFICACY(401,"Token失效，请重新登录"),
+    EXCEPTION_TOKEN_LOSE_EFFICACY(401,"凭证已过期，请重新登陆"),
+
+    AUTH_CREDENTIALS_INVALID(100208, "凭证已过期，请重新登陆"),
+    AUTH_AUTH_INVALID(100209, "认证失败，请重新登陆"),
 
 
     /**
      * 登陆
      */
+    EXCEPTION_CAPTCHA_CERTIFICATE_ERROR(12097, "凭证验证失败，请刷新重试"),
+    EXCEPTION_CAPTCHA_ARGS_NULL(12098, "参数异常"),
+    EXCEPTION_CAPTCHA_OFTEN(12099, "已获取验证码，请勿频繁获取"),
     EXCEPTION_CAPTCHA_ERROR(12100,"验证码不正确！"),
-    EXCEPTION_CAPTCHA_NULL(12201, "验证码已失效"),
+    EXCEPTION_CAPTCHA_NULL(12201, "验证码已失效, 请重新生成"),
     EXCEPTION_CAPTCHA_UUID_NULL(12202, "验证码UUID为空"),
     EXCEPTION_CAPTCHA_CODE_NULL(12203, "验证码为空"),
     EXCEPTION_LOGIN_ACCOUNT_NO(12101,"账号或密码不正确！"),

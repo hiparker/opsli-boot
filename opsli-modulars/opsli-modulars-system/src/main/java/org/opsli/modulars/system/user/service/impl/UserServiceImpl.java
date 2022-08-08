@@ -18,15 +18,20 @@ package org.opsli.modulars.system.user.service.impl;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.RandomUtil;
+import cn.hutool.core.util.StrUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.github.pagehelper.PageInfo;
 import com.google.common.collect.Lists;
+import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.opsli.api.wrapper.system.options.OptionsModel;
 import org.opsli.api.wrapper.system.user.*;
 import org.opsli.common.constants.MyBatisConstants;
 import org.opsli.common.enums.DictType;
+import org.opsli.common.enums.VerificationTypeEnum;
 import org.opsli.common.exception.ServiceException;
 import org.opsli.common.utils.CheckStrength;
 import org.opsli.common.utils.FieldUtil;
@@ -39,6 +44,7 @@ import org.opsli.core.persistence.querybuilder.QueryBuilder;
 import org.opsli.core.persistence.querybuilder.conf.WebQueryConf;
 import org.opsli.core.utils.OptionsUtil;
 import org.opsli.core.utils.UserUtil;
+import org.opsli.core.utils.VerificationCodeUtil;
 import org.opsli.modulars.system.SystemMsg;
 import org.opsli.modulars.system.menu.service.IMenuService;
 import org.opsli.modulars.system.role.entity.SysRole;
@@ -48,7 +54,9 @@ import org.opsli.modulars.system.user.entity.SysUserWeb;
 import org.opsli.modulars.system.user.mapper.UserMapper;
 import org.opsli.modulars.system.user.service.IUserRoleRefService;
 import org.opsli.modulars.system.user.service.IUserService;
+import org.opsli.plugins.security.utils.PasswordUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -63,17 +71,15 @@ import java.util.List;
  * @author Parker
  * @date 2020-09-16 17:33
  */
+@AllArgsConstructor
 @Service
 public class UserServiceImpl extends CrudServiceImpl<UserMapper, SysUser, UserModel> implements IUserService {
 
-    @Autowired(required = false)
-    private UserMapper mapper;
-    @Autowired
-    private IMenuService iMenuService;
-    @Autowired
-    private IRoleService iRoleService;
-    @Autowired
-    private IUserRoleRefService iUserRoleRefService;
+    private final UserMapper mapper;
+    private final IRoleService iRoleService;
+    private final IUserRoleRefService iUserRoleRefService;
+
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -115,26 +121,29 @@ public class UserServiceImpl extends CrudServiceImpl<UserMapper, SysUser, UserMo
 
         // 新增可以直接设置密码
         if(StringUtils.isNotEmpty(model.getPassword())){
-            // 设置随机新盐值
-            model.setSecretKey(
-                    RandomUtil.randomString(20)
-            );
             // 获得密码强度
             model.setPasswordLevel(
                     CheckStrength.getPasswordLevel(model.getPassword()).getCode()
             );
             // 处理密码
             model.setPassword(
-                    UserUtil.handlePassword(model.getPassword(),
-                            model.getSecretKey())
+                    PasswordUtil.encode(passwordEncoder, model.getPassword())
             );
         }
 
         // 如果手机号有变化 则强制覆盖手机号
         if(StringUtils.isNotEmpty(model.getMobile())){
-            UpdateWrapper<SysUser> updateWrapper = new UpdateWrapper<>();
-            updateWrapper.set("mobile", null);
-            updateWrapper.eq("mobile", model.getMobile());
+            LambdaUpdateWrapper<SysUser> updateWrapper = new LambdaUpdateWrapper<>();
+            updateWrapper.set(SysUser::getMobile, null);
+            updateWrapper.eq(SysUser::getMobile, model.getMobile());
+            this.update(updateWrapper);
+        }
+
+        // 如果邮箱有变化 则强制覆盖邮箱
+        if(StringUtils.isNotEmpty(model.getEmail())){
+            LambdaUpdateWrapper<SysUser> updateWrapper = new LambdaUpdateWrapper<>();
+            updateWrapper.set(SysUser::getEmail, null);
+            updateWrapper.eq(SysUser::getEmail, model.getEmail());
             this.update(updateWrapper);
         }
 
@@ -150,11 +159,9 @@ public class UserServiceImpl extends CrudServiceImpl<UserMapper, SysUser, UserMo
             }
 
             if(StringUtils.isNotBlank(defRole)){
-                QueryWrapper<SysRole> roleQueryWrapper = new QueryWrapper<>();
-                roleQueryWrapper.eq("role_code", defRole);
-                roleQueryWrapper.eq(
-                        FieldUtil.humpToUnderline(MyBatisConstants.FIELD_DELETE_LOGIC),
-                        DictType.NO_YES_NO.getValue());
+                LambdaUpdateWrapper<SysRole> roleQueryWrapper = new LambdaUpdateWrapper<>();
+                roleQueryWrapper.eq(SysRole::getRoleCode, defRole);
+                roleQueryWrapper.eq(SysRole::getDeleted,DictType.NO_YES_NO.getValue());
                 SysRole sysRole = iRoleService.getOne(roleQueryWrapper);
                 if(sysRole != null){
                     UserRoleRefModel userRoleRefModel = UserRoleRefModel.builder()
@@ -207,7 +214,6 @@ public class UserServiceImpl extends CrudServiceImpl<UserMapper, SysUser, UserMo
         // 需要注意的是 不要轻易改修改策略
         model.setUsername(null);
         model.setPassword(null);
-        model.setSecretKey(null);
         model.setLoginIp(null);
         model.setEnable(null);
         model.setIzExistOrg(null);
@@ -216,10 +222,19 @@ public class UserServiceImpl extends CrudServiceImpl<UserMapper, SysUser, UserMo
         if(update != null){
             // 如果手机号有变化 则强制覆盖手机号
             if(!StringUtils.equals(userModel.getMobile(), update.getMobile())){
-                UpdateWrapper<SysUser> updateWrapper = new UpdateWrapper<>();
-                updateWrapper.set("mobile", null);
-                updateWrapper.eq("mobile", model.getMobile());
-                updateWrapper.notIn(MyBatisConstants.FIELD_ID, update.getId());
+                LambdaUpdateWrapper<SysUser> updateWrapper = new LambdaUpdateWrapper<>();
+                updateWrapper.set(SysUser::getMobile, null);
+                updateWrapper.eq(SysUser::getMobile, model.getMobile());
+                updateWrapper.notIn(SysUser::getId, update.getId());
+                this.update(updateWrapper);
+            }
+
+            // 如果邮箱有变化 则强制覆盖邮箱
+            if(StringUtils.isNotEmpty(model.getEmail())){
+                LambdaUpdateWrapper<SysUser> updateWrapper = new LambdaUpdateWrapper<>();
+                updateWrapper.set(SysUser::getEmail, null);
+                updateWrapper.eq(SysUser::getEmail, model.getEmail());
+                updateWrapper.notIn(SysUser::getId, update.getId());
                 this.update(updateWrapper);
             }
 
@@ -255,11 +270,9 @@ public class UserServiceImpl extends CrudServiceImpl<UserMapper, SysUser, UserMo
         }
 
 
-        UpdateWrapper<SysUser> updateWrapper = new UpdateWrapper<>();
-        updateWrapper.set("enable", enable)
-                .eq(
-                FieldUtil.humpToUnderline(MyBatisConstants.FIELD_ID), userId
-        );
+        LambdaUpdateWrapper<SysUser> updateWrapper = new LambdaUpdateWrapper<>();
+        updateWrapper.set(SysUser::getEnable, enable);
+        updateWrapper.eq(SysUser::getId, userId);
         if(this.update(updateWrapper)){
             // 刷新用户缓存
             this.clearCache(Collections.singletonList(model));
@@ -418,13 +431,36 @@ public class UserServiceImpl extends CrudServiceImpl<UserMapper, SysUser, UserMo
 
     @Override
     public UserModel queryByUserName(String username) {
-        String key = FieldUtil.humpToUnderline("username");
-        QueryBuilder<SysUser> queryBuilder = new GenQueryBuilder<>();
-        QueryWrapper<SysUser> queryWrapper = queryBuilder.build();
-        queryWrapper.eq(key, username);
-        queryWrapper.eq(
-                FieldUtil.humpToUnderline(MyBatisConstants.FIELD_DELETE_LOGIC)
-                , "0");
+        if(StrUtil.isBlank(username)){
+            return null;
+        }
+        LambdaQueryWrapper<SysUser> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(SysUser::getUsername, username);
+        queryWrapper.eq(SysUser::getDeleted, DictType.NO_YES_NO.getValue());
+        SysUser user = this.getOne(queryWrapper);
+        return super.transformT2M(user);
+    }
+
+    @Override
+    public UserModel queryByMobile(String mobile) {
+        if(StrUtil.isBlank(mobile)){
+            return null;
+        }
+        LambdaQueryWrapper<SysUser> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(SysUser::getMobile, mobile);
+        queryWrapper.eq(SysUser::getDeleted, DictType.NO_YES_NO.getValue());
+        SysUser user = this.getOne(queryWrapper);
+        return super.transformT2M(user);
+    }
+
+    @Override
+    public UserModel queryByEmail(String email) {
+        if(StrUtil.isBlank(email)){
+            return null;
+        }
+        LambdaQueryWrapper<SysUser> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(SysUser::getEmail, email);
+        queryWrapper.eq(SysUser::getDeleted, DictType.NO_YES_NO.getValue());
         SysUser user = this.getOne(queryWrapper);
         return super.transformT2M(user);
     }
@@ -446,7 +482,7 @@ public class UserServiceImpl extends CrudServiceImpl<UserMapper, SysUser, UserMo
         // 如果没有租户修改能力 则默认增加租户限制
         if(!UserUtil.isHasUpdateTenantPerms(UserUtil.getUser())){
             // 数据处理责任链
-            queryWrapper = super.addHandler(entityClazz, queryWrapper);
+            queryWrapper = super.addHandler(this.getEntityClass(), queryWrapper);
         }
 
         return super.list(queryWrapper);
@@ -459,7 +495,7 @@ public class UserServiceImpl extends CrudServiceImpl<UserMapper, SysUser, UserMo
         // 如果没有租户修改能力 则默认增加租户限制
         if(!UserUtil.isHasUpdateTenantPerms(UserUtil.getUser())){
             // 数据处理责任链
-            queryWrapper = super.addHandler(entityClazz, queryWrapper);
+            queryWrapper = super.addHandler(this.getEntityClass(), queryWrapper);
         }
         return super.list(queryWrapper);
     }
@@ -479,27 +515,20 @@ public class UserServiceImpl extends CrudServiceImpl<UserMapper, SysUser, UserMo
             throw new ServiceException(SystemMsg.EXCEPTION_USER_PASSWORD_EQ_ERROR);
         }
 
-        // 获得 处理后 老密码
-        String orlPassword = UserUtil.handlePassword(userPassword.getOldPassword(),
-                userModel.getSecretKey());
-
         // 判断老密码是否正确
-        if(!userModel.getPassword().equals(orlPassword)){
+        boolean matchesPassword =
+                PasswordUtil.matches(passwordEncoder, userPassword.getOldPassword(), userModel.getPassword());
+        if(!matchesPassword){
             throw new ServiceException(SystemMsg.EXCEPTION_USER_PASSWORD_ERROR);
         }
 
-        // 设置随机新盐值
-        userPassword.setSalt(
-                RandomUtil.randomString(20)
-        );
         // 获得密码强度
         userPassword.setPasswordLevel(
                 CheckStrength.getPasswordLevel(userPassword.getNewPassword()).getCode()
         );
         // 处理密码
         userPassword.setNewPassword(
-                UserUtil.handlePassword(userPassword.getNewPassword(),
-                        userPassword.getSalt())
+                PasswordUtil.encode(passwordEncoder, userPassword.getNewPassword())
         );
 
         // 修改密码
@@ -522,18 +551,14 @@ public class UserServiceImpl extends CrudServiceImpl<UserMapper, SysUser, UserMo
             return false;
         }
 
-        // 设置随机新盐值
-        toUserPassword.setSalt(
-                RandomUtil.randomString(20)
-        );
         // 获得密码强度
         toUserPassword.setPasswordLevel(
                 CheckStrength.getPasswordLevel(toUserPassword.getNewPassword()).getCode()
         );
+
         // 处理密码
         toUserPassword.setNewPassword(
-                UserUtil.handlePassword(toUserPassword.getNewPassword(),
-                        toUserPassword.getSalt())
+                PasswordUtil.encode(passwordEncoder, toUserPassword.getNewPassword())
         );
 
         // 修改密码
@@ -551,6 +576,92 @@ public class UserServiceImpl extends CrudServiceImpl<UserMapper, SysUser, UserMo
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    public boolean updateUserEmail(UpdateUserEmailModel updateUserEmailModel) {
+        UserModel userModel = UserUtil.getUserBySource();
+
+        String sourceEmail = userModel.getEmail();
+        if(StrUtil.isNotEmpty(sourceEmail)){
+            if(sourceEmail.equals(updateUserEmailModel.getEmail())){
+                // 相同邮箱
+                throw new ServiceException(SystemMsg.EXCEPTION_USER_EMAIL_EQ);
+            }
+        }
+
+        // 验证授权是否正确
+        VerificationCodeUtil.checkCertificate(
+                VerificationTypeEnum.AUTH.getType(), updateUserEmailModel.getCertificate());
+
+        // 验证验证码是否正确
+        VerificationCodeUtil.checkEmailCode(
+                updateUserEmailModel.getEmail(), updateUserEmailModel.getVerificationCode(),
+                VerificationTypeEnum.AUTH.getType());
+
+        // 验证邮箱是否已经存在
+        boolean verification =
+                uniqueVerificationByEmail(userModel.getId(), updateUserEmailModel.getEmail());
+        if(!verification){
+            // 重复
+            throw new ServiceException(SystemMsg.EXCEPTION_USER_EMAIL_UNIQUE);
+        }
+
+        LambdaUpdateWrapper<SysUser> updateWrapper = new LambdaUpdateWrapper<>();
+        updateWrapper.set(SysUser::getEmail, updateUserEmailModel.getEmail());
+        updateWrapper.eq(SysUser::getId, userModel.getId());
+        boolean ret = this.update(updateWrapper);
+        if(ret){
+            // 刷新用户缓存
+            this.clearCache(Collections.singletonList(userModel));
+        }
+
+        return false;
+    }
+
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public boolean updateUserMobile(UpdateUserMobileModel updateUserMobileModel) {
+        UserModel userModel = UserUtil.getUserBySource();
+
+        String sourceMobile = userModel.getMobile();
+        if(StrUtil.isNotEmpty(sourceMobile)){
+            if(sourceMobile.equals(updateUserMobileModel.getMobile())){
+                // 相同手机
+                throw new ServiceException(SystemMsg.EXCEPTION_USER_MOBILE_EQ);
+            }
+        }
+
+
+        // 验证授权是否正确
+        VerificationCodeUtil.checkCertificate(
+                VerificationTypeEnum.AUTH.getType(), updateUserMobileModel.getCertificate());
+
+        // 验证验证码是否正确
+        VerificationCodeUtil.checkMobileCode(
+                updateUserMobileModel.getMobile(), updateUserMobileModel.getVerificationCode(),
+                VerificationTypeEnum.AUTH.getType());
+
+        // 验证手机号是否已经存在
+        boolean verification =
+                uniqueVerificationByMobile(userModel.getId(), updateUserMobileModel.getMobile());
+        if(!verification){
+            // 重复
+            throw new ServiceException(SystemMsg.EXCEPTION_USER_MOBILE_UNIQUE);
+        }
+
+        LambdaUpdateWrapper<SysUser> updateWrapper = new LambdaUpdateWrapper<>();
+        updateWrapper.set(SysUser::getMobile, updateUserMobileModel.getMobile());
+        updateWrapper.eq(SysUser::getId, userModel.getId());
+        boolean ret = this.update(updateWrapper);
+        if(ret){
+            // 刷新用户缓存
+            this.clearCache(Collections.singletonList(userModel));
+        }
+
+        return false;
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
     public boolean resetPassword(UserPassword userPassword) {
         UserModel userModel = super.get(userPassword.getUserId());
         // 如果为空则 不修改密码
@@ -558,20 +669,14 @@ public class UserServiceImpl extends CrudServiceImpl<UserMapper, SysUser, UserMo
             return false;
         }
 
-        // 设置随机新盐值
-        userPassword.setSalt(
-                RandomUtil.randomString(20)
-        );
         // 获得密码强度
         userPassword.setPasswordLevel(
                 CheckStrength.getPasswordLevel(userPassword.getNewPassword()).getCode()
         );
         // 处理密码
         userPassword.setNewPassword(
-                UserUtil.handlePassword(userPassword.getNewPassword(),
-                        userPassword.getSalt())
+                PasswordUtil.encode(passwordEncoder, userPassword.getNewPassword())
         );
-
 
         // 修改密码
         boolean ret = mapper.updatePassword(userPassword);
@@ -718,7 +823,7 @@ public class UserServiceImpl extends CrudServiceImpl<UserMapper, SysUser, UserMo
 
         // 租户检测
         // 数据处理责任链
-        wrapper = super.addHandler(entityClazz, wrapper);
+        wrapper = super.addHandler(this.getEntityClass(), wrapper);
 
         return super.count(wrapper) == 0;
     }
@@ -733,16 +838,61 @@ public class UserServiceImpl extends CrudServiceImpl<UserMapper, SysUser, UserMo
         if(model == null){
             return false;
         }
-        QueryWrapper<SysUser> wrapper = new QueryWrapper<>();
 
+        LambdaQueryWrapper<SysUser> wrapper = new LambdaQueryWrapper<>();
         // name 唯一
-        wrapper.eq("username", model.getUsername());
+        wrapper.eq(SysUser::getUsername, model.getUsername());
 
         // 重复校验排除自身
         if(StringUtils.isNotEmpty(model.getId())){
-            wrapper.notIn(MyBatisConstants.FIELD_ID, model.getId());
+            wrapper.notIn(SysUser::getId, model.getId());
+        }
+        return super.count(wrapper) == 0;
+    }
+
+    /**
+     * 唯一验证 邮箱
+     * @param userId 用户ID
+     * @param email 邮箱
+     * @return Integer
+     */
+    @Transactional(readOnly = true)
+    public boolean uniqueVerificationByEmail(String userId, String email){
+        if(StrUtil.isEmpty(email)){
+            return false;
         }
 
+        LambdaQueryWrapper<SysUser> wrapper = new LambdaQueryWrapper<>();
+        // name 唯一
+        wrapper.eq(SysUser::getEmail, email);
+
+        // 重复校验排除自身
+        if(StringUtils.isNotEmpty(userId)){
+            wrapper.notIn(SysUser::getId, userId);
+        }
+        return super.count(wrapper) == 0;
+    }
+
+    /**
+     * 唯一验证 手机
+     * @param userId 用户ID
+     * @param mobile 手机
+     * @return Integer
+     */
+    @Transactional(readOnly = true)
+    public boolean uniqueVerificationByMobile(String userId, String mobile){
+        if(StrUtil.isEmpty(mobile)){
+            return false;
+        }
+
+        LambdaQueryWrapper<SysUser> wrapper = new LambdaQueryWrapper<>();
+        // name 唯一
+        wrapper.eq(SysUser::getMobile, mobile);
+
+        // 重复校验排除自身
+        if(StringUtils.isNotEmpty(userId)){
+            wrapper.notIn(SysUser::getId, userId);
+        }
         return super.count(wrapper) == 0;
     }
 

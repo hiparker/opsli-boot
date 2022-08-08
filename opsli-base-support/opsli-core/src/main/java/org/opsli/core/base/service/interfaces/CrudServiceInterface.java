@@ -45,6 +45,13 @@ public interface CrudServiceInterface<T extends BaseEntity, E extends ApiWrapper
 
 
     /**
+     * 获得Model Class
+     * @return Class<E>
+     */
+    Class<E> getModelClass();
+
+
+    /**
      * 获取单条数据
      *
      * @param id ID
@@ -201,19 +208,7 @@ public interface CrudServiceInterface<T extends BaseEntity, E extends ApiWrapper
      * @return  Page<T>
      */
     Page<T,E> findPageNotCount(Page<T,E> page);
-
-
-    /**
-     * 获得Model Clazz
-     * @return Class
-     */
-    Class<E> getModelClazz();
-
-    /**
-     * 获得Entity Clazz
-     * @return Class
-     */
-    Class<T> getEntityClazz();
+    
 
 }
 

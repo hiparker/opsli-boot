@@ -15,7 +15,7 @@
  */
 package org.opsli.api.web.system.user;
 
-import org.opsli.api.base.result.ResultVo;
+import org.opsli.api.base.result.ResultWrapper;
 import org.opsli.api.wrapper.system.menu.MenuModel;
 import org.opsli.api.wrapper.system.role.RoleMenuRefModel;
 import org.opsli.api.wrapper.system.role.RoleModel;
@@ -48,50 +48,50 @@ public interface UserRoleRefApi {
     /**
      * 设置角色
      * @param userId 用户ID
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @GetMapping("/getRoles")
-    ResultVo<?> getRoles(String userId);
+    ResultWrapper<?> getRoles(String userId);
 
     /**
      * 设置角色
      * @param model 用户角色关联对象
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @PostMapping("/setRoles")
-    ResultVo<?> setRoles(@RequestBody UserRoleRefModel model);
+    ResultWrapper<?> setRoles(@RequestBody UserRoleRefModel model);
 
 
     /**
      * 根据 userId 获得用户角色
      * @param userId 用户Id
-     * @return ResultVo
+     * @return ResultWrapper
      */
     //@GetMapping("/getRolesByUserId")
-    ResultVo<List<String>> getRolesByUserId(String userId);
+    ResultWrapper<List<String>> getRolesByUserId(String userId);
 
     /**
      * 根据 userId 获得用户默认角色
      * @param userId 用户Id
-     * @return ResultVo
+     * @return ResultWrapper
      */
     //@GetMapping("/getRolesByUserId")
-    ResultVo<RoleModel> getDefRoleByUserId(String userId);
+    ResultWrapper<RoleModel> getDefRoleByUserId(String userId);
 
     /**
      * 根据 userId 获得用户权限
      * @param userId 用户Id
-     * @return ResultVo
+     * @return ResultWrapper
      */
     //@GetMapping("/queryAllPerms")
-    ResultVo<List<String>> getAllPerms(String userId);
+    ResultWrapper<List<String>> getAllPerms(String userId);
 
     /**
      * 根据 userId 获得用户菜单
      * @param userId 用户Id
-     * @return ResultVo
+     * @return ResultWrapper
      */
     //@GetMapping("/queryAllPerms")
-    ResultVo<List<MenuModel>> getMenuListByUserId(String userId);
+    ResultWrapper<List<MenuModel>> getMenuListByUserId(String userId);
 
 }

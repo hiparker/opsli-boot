@@ -11,7 +11,7 @@ import org.springframework.util.ObjectUtils;
 import javax.servlet.http.HttpServletRequest;
 
 /**
- * @author 周鹏程
+ * @author Parker
  * @date 2022/3/18 14:34
  */
 public final class UserLoginLogFactory {

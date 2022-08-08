@@ -15,7 +15,7 @@
  */
 package org.opsli.api.web.system.menu;
 
-import org.opsli.api.base.result.ResultVo;
+import org.opsli.api.base.result.ResultWrapper;
 import org.opsli.api.wrapper.system.menu.MenuFullModel;
 import org.opsli.api.wrapper.system.menu.MenuModel;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -52,71 +52,71 @@ public interface MenuApi {
      * 获得列表菜单
      *
      * @param request request
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @GetMapping("/findMenuTreePage")
-    ResultVo<?> findMenuTreePage(HttpServletRequest request);
+    ResultWrapper<?> findMenuTreePage(HttpServletRequest request);
 
     /**
      * 懒加载列表菜单
      *
      * @param parentId 父节点ID
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @GetMapping("/findMenuTreePageByLazy")
-    ResultVo<?> findMenuTreePageByLazy(String parentId);
+    ResultWrapper<?> findMenuTreePageByLazy(String parentId);
 
     /**
      * 懒加载菜单
      * @param parentId 父节点ID
      * @param id 自身ID （不为空 则排除自身）
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @GetMapping("/findMenuTreeByLazy")
-    ResultVo<?> findMenuTreeByLazy(String parentId, String id);
+    ResultWrapper<?> findMenuTreeByLazy(String parentId, String id);
 
     /**
      * 获得当前用户登录菜单
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @PostMapping("/findMenuTree")
-    ResultVo<?> findMenuTree();
+    ResultWrapper<?> findMenuTree();
 
 
     /**
      * 根据 获得用户 菜单 - 权限
      *
      * @param label 标签
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @GetMapping("/getMenuAndPermsTree")
-    ResultVo<?> getMenuAndPermsTree(String label);
+    ResultWrapper<?> getMenuAndPermsTree(String label);
 
     /**
      * 获得集合
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @GetMapping("/findList")
-    ResultVo<List<MenuModel>> findList();
+    ResultWrapper<List<MenuModel>> findList();
 
 
     /**
      * 菜单 查一条
      * @param model 模型
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @GetMapping("/get")
-    ResultVo<MenuModel> get(MenuModel model);
+    ResultWrapper<MenuModel> get(MenuModel model);
 
     /**
      * 菜单 查询分页
      * @param pageNo 当前页
      * @param pageSize 每页条数
      * @param request request
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @GetMapping("/findPage")
-    ResultVo<?> findPage(
+    ResultWrapper<?> findPage(
             @RequestParam(name = "pageNo", defaultValue = "1") Integer pageNo,
             @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize,
             HttpServletRequest request
@@ -125,58 +125,34 @@ public interface MenuApi {
     /**
      * 菜单 新增
      * @param model 模型
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @PostMapping("/insert")
-    ResultVo<?> insert(@RequestBody MenuModel model);
+    ResultWrapper<?> insert(@RequestBody MenuModel model);
 
     /**
      * 菜单 修改
      * @param model 模型
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @PostMapping("/update")
-    ResultVo<?> update(@RequestBody MenuModel model);
+    ResultWrapper<?> update(@RequestBody MenuModel model);
 
     /**
      * 菜单 删除
      * @param id ID
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @PostMapping("/del")
-    ResultVo<?> del(String id);
+    ResultWrapper<?> del(String id);
 
     /**
      * 菜单 批量删除
      * @param ids ID 数组
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @PostMapping("/delAll")
-    ResultVo<?> delAll(String ids);
-
-    /**
-     * 菜单 Excel 导出
-     * @param request request
-     * @param response response
-     */
-    @GetMapping("/exportExcel")
-    void exportExcel(HttpServletRequest request, HttpServletResponse response);
-
-    /**
-     * 菜单 Excel 导入
-     * @param request 文件流 request
-     * @return ResultVo
-     */
-    @PostMapping("/importExcel")
-    ResultVo<?> importExcel(MultipartHttpServletRequest request);
-
-    /**
-     * 菜单 Excel 下载导入模版
-     * @param response response
-     */
-    @GetMapping("/importExcel/template")
-    void importTemplate(HttpServletResponse response);
-
+    ResultWrapper<?> delAll(String ids);
 
 
     // ================= 普通
@@ -184,14 +160,14 @@ public interface MenuApi {
     /**
      * 根据菜单权限 获得菜单
      * @param permissions 菜单权限
-     * @return ResultVo
+     * @return ResultWrapper
      */
-    ResultVo<MenuModel> getByPermissions(String permissions);
+    ResultWrapper<MenuModel> getByPermissions(String permissions);
 
     /**
      * 菜单完整 新增
      * @param menuFullModel 模型
-     * @return ResultVo
+     * @return ResultWrapper
      */
-    ResultVo<?> saveMenuByFull(@RequestBody MenuFullModel menuFullModel);
+    ResultWrapper<?> saveMenuByFull(@RequestBody MenuFullModel menuFullModel);
 }

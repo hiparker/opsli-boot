@@ -27,7 +27,7 @@ import org.opsli.modulars.generator.template.entity.GenTemplateDetail;
 /**
  * 代码模板详情 Mapper
  *
- * @author 周鹏程
+ * @author Parker
  * @date 2021-05-28 17:12:38
  */
 @Mapper

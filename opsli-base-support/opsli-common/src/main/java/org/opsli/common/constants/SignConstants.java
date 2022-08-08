@@ -17,6 +17,9 @@ public final class SignConstants {
     /** 租户ID */
     public static final String TENANT_ID = "tenantId";
 
+    /** 登陆来源 */
+    public static final String LOGIN_FROM = "loginFrom";
+
     /** 时间戳 */
     public static final String TIMESTAMP  = "timestamp";
 

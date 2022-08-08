@@ -18,7 +18,7 @@ package org.opsli.modulars.generator.logs.service.impl;
 import cn.hutool.core.collection.CollUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.apache.commons.lang3.StringUtils;
-import org.opsli.api.base.result.ResultVo;
+import org.opsli.api.base.result.ResultWrapper;
 import org.opsli.api.web.system.menu.MenuApi;
 import org.opsli.api.wrapper.system.menu.MenuFullModel;
 import org.opsli.common.utils.WrapperUtil;
@@ -116,6 +116,13 @@ public class GenLogsServiceImpl extends CrudServiceImpl<GenLogsMapper, GenLogs, 
             throw new GeneratorException(GeneratorMsg.EXCEPTION_CREATE_NULL);
         }
         model.setVersion(null);
+        // 强制设置为小写 保持权限统一
+        model.setModuleName(null==model.getModuleName()
+                ?null:model.getModuleName().toLowerCase());
+        model.setSubModuleName(null==model.getSubModuleName()
+                ?null:model.getSubModuleName().toLowerCase());
+
+
         GenLogsModel saveModel = this.save(model);
         if(saveModel != null){
             GenTableModel genTableModel = iGenTableService.get(saveModel.getTableId());
@@ -170,9 +177,9 @@ public class GenLogsServiceImpl extends CrudServiceImpl<GenLogsMapper, GenLogs, 
         menuFullModel.setTitle(byTableId.getCodeTitle());
         menuFullModel.setModuleName(byTableId.getModuleName());
         menuFullModel.setSubModuleName(byTableId.getSubModuleName());
-        ResultVo<?> insertRet = menuApi.saveMenuByFull(menuFullModel);
+        ResultWrapper<?> insertRet = menuApi.saveMenuByFull(menuFullModel);
 
-        return insertRet.isSuccess();
+        return ResultWrapper.isSuccess(insertRet);
     }
 
 

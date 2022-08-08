@@ -18,7 +18,7 @@ package org.opsli.core.utils;
 import cn.hutool.core.convert.Convert;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.opsli.api.base.result.ResultVo;
+import org.opsli.api.base.result.ResultWrapper;
 import org.opsli.api.web.system.tenant.TenantApi;
 import org.opsli.api.wrapper.system.tenant.TenantModel;
 import org.opsli.core.cache.CacheUtil;
@@ -74,8 +74,8 @@ public class TenantUtil {
 
         Object cache = SecurityCache.get(redisTemplate, cacheKey, (k) -> {
             // 查询数据库
-            ResultVo<TenantModel> resultVo = tenantApi.getTenantByUsable(tenantId);
-            if(!resultVo.isSuccess()){
+            ResultWrapper<TenantModel> resultVo = tenantApi.getTenantByUsable(tenantId);
+            if(!ResultWrapper.isSuccess(resultVo)){
                 return null;
             }
 

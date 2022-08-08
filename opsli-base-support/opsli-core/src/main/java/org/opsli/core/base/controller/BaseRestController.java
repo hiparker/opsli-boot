@@ -16,7 +16,6 @@
 package org.opsli.core.base.controller;
 
 
-import cn.hutool.core.annotation.AnnotationUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.convert.Convert;
@@ -24,36 +23,42 @@ import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.date.TimeInterval;
 import cn.hutool.core.lang.tree.Tree;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.json.JSONArray;
+import cn.hutool.json.JSONObject;
+import cn.hutool.json.JSONUtil;
 import com.alibaba.excel.support.ExcelTypeEnum;
 import com.alibaba.excel.util.CollectionUtils;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.opsli.api.base.result.ResultVo;
+import org.opsli.api.base.result.ResultWrapper;
 import org.opsli.api.base.warpper.ApiWrapper;
 import org.opsli.api.wrapper.system.user.UserModel;
-import org.opsli.common.annotation.RequiresPermissionsCus;
-import org.opsli.common.annotation.hotdata.EnableHotData;
+import org.opsli.common.constants.RedisConstants;
 import org.opsli.common.constants.TreeConstants;
 import org.opsli.common.enums.ExcelOperate;
 import org.opsli.common.exception.ServiceException;
-import org.opsli.common.exception.TokenException;
-import org.opsli.common.utils.OutputStreamUtil;
+import org.opsli.common.utils.UniqueStrGeneratorUtils;
 import org.opsli.common.utils.WrapperUtil;
 import org.opsli.core.autoconfigure.properties.GlobalProperties;
 import org.opsli.core.base.entity.BaseEntity;
 import org.opsli.core.base.entity.HasChildren;
 import org.opsli.core.base.service.interfaces.CrudServiceInterface;
+import org.opsli.core.cache.CacheUtil;
 import org.opsli.core.msg.CoreMsg;
-import org.opsli.core.msg.TokenMsg;
-import org.opsli.core.security.shiro.realm.JwtRealm;
+import org.opsli.core.persistence.querybuilder.QueryBuilder;
+import org.opsli.core.persistence.querybuilder.WebQueryBuilder;
 import org.opsli.core.utils.ExcelUtil;
 import org.opsli.core.utils.UserUtil;
 import org.opsli.plugins.excel.exception.ExcelPluginException;
 import org.opsli.plugins.excel.listener.BatchExcelListener;
+import org.opsli.plugins.redis.RedisPlugin;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -61,10 +66,11 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
-import javax.annotation.PostConstruct;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.lang.reflect.Method;
+import java.io.Serializable;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
 /**
@@ -77,14 +83,8 @@ import java.util.function.Function;
 @RestController
 public abstract class BaseRestController <T extends BaseEntity, E extends ApiWrapper, S extends CrudServiceInterface<T,E>>{
 
-    /** 开启热点数据状态 */
-    protected boolean hotDataFlag = false;
-
-    /** Entity Clazz 类 */
-    protected Class<T> entityClazz;
-    /** Model Clazz 类 */
-    protected Class<E> modelClazz;
-
+    /** 凭证 10分钟失效 */
+    private static final int CERTIFICATE_EXPIRED_MINUTE = 10;
 
     /** 配置类 */
     @Autowired
@@ -93,6 +93,10 @@ public abstract class BaseRestController <T extends BaseEntity, E extends ApiWra
     /** 子类Service */
     @Autowired(required = false)
     protected S IService;
+
+    /** Redis 类 */
+    @Autowired
+    private RedisPlugin redisPlugin;
 
     /**
      * 默认 直接设置 传入数据的
@@ -103,15 +107,18 @@ public abstract class BaseRestController <T extends BaseEntity, E extends ApiWra
      */
     @ModelAttribute
     public E get(@RequestParam(required=false) String id) {
+        if(StrUtil.isEmpty(id)){
+            return null;
+        }
         return IService.get(id);
     }
 
     /**
      * Excel 导入
      * @param request request
-     * @return ResultVo
+     * @return ResultWrapper
      */
-    protected ResultVo<?> importExcel(MultipartHttpServletRequest request){
+    protected ResultWrapper<?> importExcel(MultipartHttpServletRequest request){
         // 计时器
         TimeInterval timer = DateUtil.timer();
         Iterator<String> itr = request.getFileNames();
@@ -119,21 +126,20 @@ public abstract class BaseRestController <T extends BaseEntity, E extends ApiWra
         List<MultipartFile> files = request.getFiles(uploadedFile);
         if (CollectionUtils.isEmpty(files)) {
             // 请选择文件
-            return ResultVo.error(CoreMsg.EXCEL_FILE_NULL.getCode(),
-                    CoreMsg.EXCEL_FILE_NULL.getMessage());
+            return ResultWrapper.getCustomResultWrapper(CoreMsg.EXCEL_FILE_NULL);
         }
-        ResultVo<?> resultVo ;
+        ResultWrapper<?> resultVo ;
         String msgInfo;
         try {
             UserModel user = UserUtil.getUser();
             Date currDate = DateUtil.date();
 
             // 导入优化为 监听器 模式 超过一定阈值直接释放资源 防止导入数据导致系统 OOM
-            ExcelUtil.getInstance().readExcelByListener(files.get(0), modelClazz, new BatchExcelListener<E>() {
+            ExcelUtil.getInstance().readExcelByListener(files.get(0), IService.getModelClass(), new BatchExcelListener<E>() {
                 @Override
                 public void saveData(List<E> dataList) {
                     // 处理字典数据
-                    List<E> disposeData = ExcelUtil.getInstance().handleDatas(dataList, modelClazz, ExcelOperate.READ);
+                    List<E> disposeData = ExcelUtil.getInstance().handleDatas(dataList, IService.getModelClass(), ExcelOperate.READ);
                     // 手动赋值 必要数据 防止频繁开启Redis网络IO
                     for (E model : disposeData) {
                         model.setIzManual(true);
@@ -152,7 +158,7 @@ public abstract class BaseRestController <T extends BaseEntity, E extends ApiWra
             // 提示信息
             msgInfo = StrUtil.format(CoreMsg.EXCEL_IMPORT_SUCCESS.getMessage(), DateUtil.formatBetween(timerCount));
             // 导出成功
-            resultVo = ResultVo.success(msgInfo);
+            resultVo = ResultWrapper.getSuccessResultWrapper(msgInfo);
             resultVo.setCode(CoreMsg.EXCEL_IMPORT_SUCCESS.getCode());
 
         } catch (ExcelPluginException e) {
@@ -162,7 +168,8 @@ public abstract class BaseRestController <T extends BaseEntity, E extends ApiWra
             msgInfo = StrUtil.format(CoreMsg.EXCEL_IMPORT_ERROR.getMessage(), DateUtil.formatBetween(timerCount),
                     e.getMessage());
             // 导入失败
-            resultVo = ResultVo.error(CoreMsg.EXCEL_IMPORT_ERROR.getCode(), msgInfo);
+            resultVo = ResultWrapper.getCustomResultWrapper(
+                    CoreMsg.EXCEL_IMPORT_ERROR.getCode(), msgInfo);
         }
         // 记录导出日志
         log.info(msgInfo);
@@ -170,107 +177,112 @@ public abstract class BaseRestController <T extends BaseEntity, E extends ApiWra
     }
 
     /**
-     * 下载导入模板
-     * @param fileName 文件名称
-     * @param response response
+     * Excel 导出认证
+     *
+     * @param type 类型（Excel导出、Excel模版导出）
+     * @param subName 主题
+     * @param request request
+     * @return Optional<String>
      */
-    protected void importTemplate(String fileName, HttpServletResponse response, Method method){
-        this.excelExport(fileName + " 模版 ",null, response, method);
+    protected Optional<String> excelExportAuth(String type, String subName, HttpServletRequest request){
+        // 封装缓存数据
+        ExcelExportCache exportCache;
+        if(ExcelExportCache.EXCEL_EXPORT.equals(type)){
+            // 异常检测
+            QueryBuilder<T> queryBuilder = new WebQueryBuilder<>(IService.getEntityClass(), request.getParameterMap());
+            QueryWrapper<T> queryWrapper = queryBuilder.build();
+            // 导出数量限制 -1 为无限制
+            Integer exportMaxCount = globalProperties.getExcel().getExportMaxCount();
+            if(exportMaxCount != null && exportMaxCount > -1){
+                // 获得数量 大于 阈值 禁止导出， 防止OOM
+                long count = IService.count(queryWrapper);
+                if(count > exportMaxCount){
+                    String maxError = StrUtil.format(CoreMsg.EXCEL_HANDLE_MAX.getMessage(), count,
+                            exportMaxCount);
+                    // 超出最大导出数量
+                    throw new ExcelPluginException(CoreMsg.EXCEL_HANDLE_MAX.getCode(), maxError);
+                }
+            }
+
+            // 封装缓存数据
+            exportCache = ExcelExportCache.builder()
+                    .subName(subName)
+                    .parameterMapStr(JSONUtil.toJsonStr(request.getParameterMap()))
+                    .type(type)
+                    .build();
+        }else if(ExcelExportCache.EXCEL_IMPORT_TEMPLATE_EXPORT.equals(type)){
+            // 封装缓存数据
+            exportCache = ExcelExportCache.builder()
+                    .subName(subName+ " 模版 ")
+                    .parameterMapStr(JSONUtil.toJsonStr(request.getParameterMap()))
+                    .type(type)
+                    .build();
+        }else {
+            return Optional.empty();
+        }
+
+
+        // 缓存Key
+        Long increment = redisPlugin
+                .increment(CacheUtil.formatKey(RedisConstants.PREFIX_TMP_EXCEL_EXPORT_NUM_NAME));
+        String certificate = UniqueStrGeneratorUtils.generator(increment);
+
+        // 缓存Key
+        String certificateCacheKeyTmp = CacheUtil.formatKey(
+                RedisConstants.PREFIX_TMP_EXCEL_EXPORT_NAME + certificate);
+        redisPlugin.put(certificateCacheKeyTmp, exportCache, CERTIFICATE_EXPIRED_MINUTE, TimeUnit.MINUTES);
+
+        return Optional.of(certificate);
     }
 
     /**
-     * 导出
+     * 导出 Excel
      *
-     * 导出时，Token认证和方法权限认证 全部都由自定义完成
-     * 因为在 导出不成功时，需要推送错误信息，
-     * 前端直接走下载流，当失败时无法获得失败信息，即使前后端换一种方式后端推送二进制文件前端再次解析也是最少2倍的耗时
-     * ，且如果数据量过大，前端进行渲染时直接会把浏览器卡死
-     * 而直接开启socket接口推送显然是太过浪费资源了，所以目前采用Java最原始的手段
-     * response 推送 javascript代码 alert 提示报错信息
-     *
-     * @param fileName 文件名称
-     * @param queryWrapper 查询构建器
      * @param response response
      */
-    protected void excelExport(String fileName, QueryWrapper<T> queryWrapper, HttpServletResponse response,
-                                      Method method){
-        // 权限认证
-        try {
-            if(method == null){
-                // 无权访问该方法
-                throw new TokenException(TokenMsg.EXCEPTION_NOT_AUTH);
-
-            }
-
-            // Token 认证
-            JwtRealm.authToken();
-
-            RequiresPermissionsCus permissionsCus = method.getAnnotation(RequiresPermissionsCus.class);
-            if(permissionsCus != null){
-                // 方法权限认证
-                JwtRealm.authPerms(permissionsCus.value());
-            }
-        }catch (TokenException e){
-            // 推送错误信息
-            OutputStreamUtil.exceptionResponse(e.getMessage(), response);
+    protected void excelExport(String certificate, HttpServletResponse response){
+        // 缓存Key
+        String certificateCacheKeyTmp = CacheUtil.formatKey(
+                RedisConstants.PREFIX_TMP_EXCEL_EXPORT_NAME + certificate);
+        Object cacheObj = redisPlugin.get(certificateCacheKeyTmp);
+        ExcelExportCache cache = Convert.convert(ExcelExportCache.class, cacheObj);
+        if(cache == null){
             return;
         }
 
-        // 计时器
-        TimeInterval timer = DateUtil.timer();
-        String msgInfo;
-        ResultVo<?> resultVo;
-        List<E> modelList = Lists.newArrayList();
-        try {
-            if(queryWrapper != null){
-                // 导出数量限制 -1 为无限制
-                Integer exportMaxCount = globalProperties.getExcel().getExportMaxCount();
-                if(exportMaxCount != null && exportMaxCount > -1){
-                    // 获得数量 大于 阈值 禁止导出， 防止OOM
-                    int count = IService.count(queryWrapper);
-                    if(count > exportMaxCount){
-                        String maxError = StrUtil.format(CoreMsg.EXCEL_HANDLE_MAX.getMessage(), count,
-                                exportMaxCount);
-                        // 超出最大导出数量
-                        throw new ExcelPluginException(CoreMsg.EXCEL_HANDLE_MAX.getCode(), maxError);
-                    }
-                }
+        // 主题名称
+        String subName = cache.getSubName();
 
+        List<E> modelList = null;
 
-                List<T> entityList = IService.findList(queryWrapper);
-                // 转化类型
-                modelList = WrapperUtil.transformInstance(entityList, modelClazz);
-            }
-            // 导出Excel
-            ExcelUtil.getInstance().writeExcel(response, modelList ,fileName,"sheet", modelClazz ,ExcelTypeEnum.XLSX);
-            // 花费毫秒数
-            long timerCount = timer.interval();
-            // 提示信息
-            msgInfo = StrUtil.format(CoreMsg.EXCEL_EXPORT_SUCCESS.getMessage(), modelList.size(),
-                    DateUtil.formatBetween(timerCount));
-            // 导出成功
-            resultVo = ResultVo.success(msgInfo);
-            resultVo.setCode(CoreMsg.EXCEL_EXPORT_SUCCESS.getCode());
-        } catch (ExcelPluginException e) {
-            // 花费毫秒数
-            long timerCount = timer.interval();
-            // 提示信息
-            msgInfo = StrUtil.format(CoreMsg.EXCEL_EXPORT_ERROR.getMessage(), DateUtil.formatBetween(timerCount), e.getMessage());
-            // 导出失败
-            resultVo = ResultVo.error(CoreMsg.EXCEL_EXPORT_ERROR.getCode(), msgInfo);
-        }finally {
-            // 清空list
-            modelList.clear();
+        // 如果导出Excel 需要查询数据
+        if(ExcelExportCache.EXCEL_EXPORT.equals(cache.getType())){
+            // 参数Map
+            Map<String, String[]> parameterMap = new HashMap<>();
+            JSONObject jsonObject = JSONUtil.parseObj(cache.getParameterMapStr());
+            jsonObject.forEach((k, v) -> {
+                JSONArray values = (JSONArray) v;
+                String[] parameters = (String[]) values.toArray(String.class);
+                parameterMap.put(k, parameters);
+            });
+
+            QueryBuilder<T> queryBuilder = new WebQueryBuilder<>(IService.getEntityClass(), parameterMap);
+            QueryWrapper<T> queryWrapper = queryBuilder.build();
+
+            List<T> entityList = IService.findList(queryWrapper);
+            // 转化类型
+            modelList = WrapperUtil.transformInstance(entityList, IService.getModelClass());
+
         }
-        // 记录导出日志
-        log.info(msgInfo);
 
-        // 导出异常
-        if(!resultVo.isSuccess()){
-            // 无权访问该方法
-            OutputStreamUtil.exceptionResponse(resultVo.getMsg(), response);
-        }
+        // 导出Excel
+        ExcelUtil.getInstance().writeExcel(
+                response, modelList, subName,"sheet", IService.getModelClass() ,ExcelTypeEnum.XLSX);
+
+        // 删除凭证
+        redisPlugin.del(certificateCacheKeyTmp);
     }
+
 
     /**
      * 演示模式
@@ -347,34 +359,28 @@ public abstract class BaseRestController <T extends BaseEntity, E extends ApiWra
 
     // =================================================
 
-    @PostConstruct
-    public void init(){
-        try {
-            this.modelClazz = IService.getModelClazz();
-            this.entityClazz = IService.getEntityClazz();
-            if(IService != null){
-                // 判断Service 是否包含 热数据注解
-                this.hotDataFlag = AnnotationUtil.hasAnnotation(IService.getServiceClazz(),
-                        EnableHotData.class);
-            }
-        }catch (Exception e){
-            log.error(e.getMessage(),e);
-        }
+
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Data
+    public static class ExcelExportCache implements Serializable {
+
+        private static final long serialVersionUID = 1L;
+
+        public final static String EXCEL_IMPORT_TEMPLATE_EXPORT = "import-template-export";
+
+        public final static String EXCEL_EXPORT = "export";
+
+
+        /** 主题名 */
+        private String subName;
+
+        /** 类型 */
+        private String type;
+
+        /** 请求参数Map */
+        private String parameterMapStr;
+
     }
-
-
-    /**
-     * 创建包装类泛型对象
-     * @return E
-     */
-    private E createModel() {
-        try {
-            Class<E> modelClazz = this.modelClazz;
-            return modelClazz.newInstance();
-        } catch (Exception e) {
-            log.error(e.getMessage(),e);
-        }
-        return null;
-    }
-
 }

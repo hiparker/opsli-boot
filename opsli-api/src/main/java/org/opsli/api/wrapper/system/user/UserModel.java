@@ -60,12 +60,6 @@ public class UserModel extends ApiWrapper {
     @ValidatorLenMax(1)
     private String passwordLevel;
 
-    /** 盐值，密码秘钥 */
-    @ApiModelProperty(value = "盐值，密码秘钥")
-    @ExcelIgnore
-    @ValidatorLenMax(50)
-    private String secretKey;
-
     /** 是否启用 */
     @ApiModelProperty(value = "是否启用")
     @ExcelIgnore
@@ -84,14 +78,14 @@ public class UserModel extends ApiWrapper {
     @ApiModelProperty(value = "手机")
     @ExcelProperty(value = "手机", order = 2)
     @ExcelInfo
-    @Validator({ValidatorType.IS_MOBILE})
+    @Validator({ValidatorType.IS_NOT_NULL, ValidatorType.IS_MOBILE})
     private String mobile;
 
     /** 邮箱 */
     @ApiModelProperty(value = "邮箱")
     @ExcelProperty(value = "邮箱", order = 3)
     @ExcelInfo
-    @Validator({ValidatorType.IS_EMAIL})
+    @Validator({ValidatorType.IS_NOT_NULL, ValidatorType.IS_EMAIL})
     @ValidatorLenMax(100)
     private String email;
 

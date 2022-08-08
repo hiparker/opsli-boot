@@ -70,13 +70,20 @@ public class ResultVoMap extends HashMap<String,Object> implements Serializable 
 
 	// -------------------------------------------
 
-	@JsonIgnore//返回对象时忽略此属性
+	/**
+	 * 返回对象时忽略此属性
+	 */
+	@JsonIgnore
 	public static ResultVoMap success(String msg) {
 		ResultVoMap j = new ResultVoMap();
 		j.setMsg(msg);
 		return j;
 	}
-	@JsonIgnore//返回对象时忽略此属性
+
+	/**
+	 * 返回对象时忽略此属性
+	 */
+	@JsonIgnore//
 	public static ResultVoMap error(String msg) {
 		ResultVoMap j = new ResultVoMap();
 		j.setSuccess(false);
@@ -84,14 +91,20 @@ public class ResultVoMap extends HashMap<String,Object> implements Serializable 
 		return j;
 	}
 
-	@JsonIgnore//返回对象时忽略此属性
+	/**
+	 * 返回对象时忽略此属性
+	 */
+	@JsonIgnore
 	public static ResultVoMap success(Map<String, Object> map) {
 		ResultVoMap restResponse = new ResultVoMap();
 		restResponse.putAll(map);
 		return restResponse;
 	}
 
-	@JsonIgnore//返回对象时忽略此属性
+	/**
+	 * 返回对象时忽略此属性
+	 */
+	@JsonIgnore
 	public static ResultVoMap success() {
 		return new ResultVoMap();
 	}

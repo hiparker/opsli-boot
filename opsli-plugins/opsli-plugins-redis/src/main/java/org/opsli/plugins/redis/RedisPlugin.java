@@ -30,10 +30,7 @@ import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.stereotype.Component;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -143,6 +140,25 @@ public class RedisPlugin {
 		try {
 			if(timeout > 0){
 				ret = redisTemplate.expire(key, timeout, unit);
+			}
+		}catch (Exception e){
+			log.error(e.getMessage(),e);
+		}
+		return ret != null && ret;
+	}
+
+	/**
+	 * 设置缓存有效时间
+	 *
+	 * @param key 主键
+	 * @param date 失效时间
+	 * @return boolean
+	 */
+	public boolean expireAt(String key, Date date) {
+		Boolean ret = null;
+		try {
+			if(null != date){
+				ret = redisTemplate.expireAt(key, date);
 			}
 		}catch (Exception e){
 			log.error(e.getMessage(),e);

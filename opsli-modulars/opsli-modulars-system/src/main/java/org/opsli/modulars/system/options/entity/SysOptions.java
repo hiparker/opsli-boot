@@ -23,6 +23,7 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableLogic;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import opsli.plugins.crypto.spring.annotation.CryptoMapperField;
 import org.opsli.core.base.entity.BaseEntity;
 
 /**
@@ -42,11 +43,15 @@ public class SysOptions extends BaseEntity {
     private String optionName;
 
     /** 参数值 */
+    @CryptoMapperField
     @TableField(updateStrategy = FieldStrategy.IGNORED)
     private String optionValue;
 
     /** 是否内置数据 0否  1是*/
     private String izLock;
+
+    /** 是否忽略 0否  1是*/
+    private String izExclude;
 
     /** 备注 */
     @TableField(updateStrategy = FieldStrategy.IGNORED)

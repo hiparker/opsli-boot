@@ -15,12 +15,9 @@
  */
 package org.opsli.api.web.system.role;
 
-import org.opsli.api.base.result.ResultVo;
+import org.opsli.api.base.result.ResultWrapper;
 import org.opsli.api.wrapper.system.role.RoleModel;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import javax.servlet.http.HttpServletRequest;
@@ -48,20 +45,20 @@ public interface RoleApi {
     /**
      * 角色 查一条
      * @param model 模型
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @GetMapping("/get")
-    ResultVo<RoleModel> get(RoleModel model);
+    ResultWrapper<RoleModel> get(RoleModel model);
 
     /**
      * 角色 查询分页
      * @param pageNo 当前页
      * @param pageSize 每页条数
      * @param request request
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @GetMapping("/findPage")
-    ResultVo<?> findPage(
+    ResultWrapper<?> findPage(
             @RequestParam(name = "pageNo", defaultValue = "1") Integer pageNo,
             @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize,
             HttpServletRequest request
@@ -70,56 +67,63 @@ public interface RoleApi {
     /**
      * 角色 新增
      * @param model 模型
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @PostMapping("/insert")
-    ResultVo<?> insert(@RequestBody RoleModel model);
+    ResultWrapper<?> insert(@RequestBody RoleModel model);
 
     /**
      * 角色 修改
      * @param model 模型
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @PostMapping("/update")
-    ResultVo<?> update(@RequestBody RoleModel model);
+    ResultWrapper<?> update(@RequestBody RoleModel model);
 
     /**
      * 角色 删除
      * @param id ID
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @PostMapping("/del")
-    ResultVo<?> del(String id);
+    ResultWrapper<?> del(String id);
 
     /**
      * 角色 批量删除
      * @param ids ID 数组
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @PostMapping("/delAll")
-    ResultVo<?> delAll(String ids);
+    ResultWrapper<?> delAll(String ids);
+
+    /**
+     * 角色 Excel 导出认证
+     *
+     * @param type 类型
+     * @param request request
+     */
+    @GetMapping("/excel/auth/{type}")
+    ResultWrapper<String> exportExcelAuth(
+            @PathVariable("type") String type,
+            HttpServletRequest request);
 
     /**
      * 角色 Excel 导出
-     * @param request request
+     *
+     * @param certificate 凭证
      * @param response response
      */
-    @GetMapping("/exportExcel")
-    void exportExcel(HttpServletRequest request, HttpServletResponse response);
+    @GetMapping("/excel/export/{certificate}")
+    void exportExcel(
+            @PathVariable("certificate") String certificate,
+            HttpServletResponse response);
 
     /**
      * 角色 Excel 导入
      * @param request 文件流 request
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @PostMapping("/importExcel")
-    ResultVo<?> importExcel(MultipartHttpServletRequest request);
-
-    /**
-     * 角色 Excel 下载导入模版
-     * @param response response
-     */
-    @GetMapping("/importExcel/template")
-    void importTemplate(HttpServletResponse response);
+    ResultWrapper<?> importExcel(MultipartHttpServletRequest request);
 
 }

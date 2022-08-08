@@ -2,7 +2,7 @@ version: '3.3'
 services:
   # 构建 MySQL数据库 这里不指定数据库文件 防止误操作 等隐患问题
   opsli-boot-mysql:
-    build: ./db-file
+    build: ./db-file/2.0版本
     image: opsli-boot-mysql
     restart: always
     environment:

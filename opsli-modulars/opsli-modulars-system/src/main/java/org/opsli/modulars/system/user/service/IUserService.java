@@ -15,10 +15,7 @@
  */
 package org.opsli.modulars.system.user.service;
 
-import org.opsli.api.wrapper.system.user.ToUserPassword;
-import org.opsli.api.wrapper.system.user.UserModel;
-import org.opsli.api.wrapper.system.user.UserPassword;
-import org.opsli.api.wrapper.system.user.UserWebModel;
+import org.opsli.api.wrapper.system.user.*;
 import org.opsli.core.base.service.interfaces.CrudServiceInterface;
 import org.opsli.core.persistence.Page;
 import org.opsli.modulars.system.user.entity.SysUser;
@@ -40,6 +37,20 @@ public interface IUserService extends CrudServiceInterface<SysUser, UserModel> {
      */
     UserModel queryByUserName(String username);
 
+    /**
+     * 根据 手机号 获得当前用户
+     * @param mobile 手机
+     * @return UserModel
+     */
+    UserModel queryByMobile(String mobile);
+
+    /**
+     * 根据 邮箱 获得当前用户
+     * @param email 邮箱
+     * @return UserModel
+     */
+    UserModel queryByEmail(String email);
+
 
     /**
      * 修改密码 验证旧密码
@@ -54,6 +65,20 @@ public interface IUserService extends CrudServiceInterface<SysUser, UserModel> {
      * @return boolean
      */
     boolean updatePasswordByNotCheckOld(ToUserPassword userPassword);
+
+    /**
+     * 修改邮箱
+     * @param updateUserEmailModel model
+     * @return boolean
+     */
+    boolean updateUserEmail(UpdateUserEmailModel updateUserEmailModel);
+
+    /**
+     * 修改手机
+     * @param updateUserMobileModel model
+     * @return boolean
+     */
+    boolean updateUserMobile(UpdateUserMobileModel updateUserMobileModel);
 
     /**
      * 重置密码

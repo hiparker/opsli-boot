@@ -18,7 +18,7 @@ package org.opsli.modulars.tools.searchhis.web;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
-import org.opsli.api.base.result.ResultVo;
+import org.opsli.api.base.result.ResultWrapper;
 import org.opsli.common.annotation.ApiRestController;
 import org.opsli.common.annotation.Limiter;
 import org.opsli.common.annotation.SearchHis;
@@ -45,11 +45,11 @@ public class SearchHisRestController {
     @Limiter
     @ApiOperation(value = "获得搜索历史记录", notes = "获得搜索历史记录")
     @PostMapping("/getSearchHis")
-    public ResultVo<?> getSearchHis(String key, Integer count, HttpServletRequest request){
+    public ResultWrapper<?> getSearchHis(String key, Integer count, HttpServletRequest request){
 
         Set<Object> searchHis = SearchHisUtil.getSearchHis(request, key, count);
 
-        return ResultVo.success(searchHis);
+        return ResultWrapper.getSuccessResultWrapper(searchHis);
     }
 
     /**

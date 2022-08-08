@@ -18,7 +18,7 @@ package org.opsli.core.utils;
 import cn.hutool.core.convert.Convert;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.opsli.api.base.result.ResultVo;
+import org.opsli.api.base.result.ResultWrapper;
 import org.opsli.api.web.system.menu.MenuApi;
 import org.opsli.api.wrapper.system.menu.MenuModel;
 import org.opsli.common.constants.RedisConstants;
@@ -69,8 +69,8 @@ public class MenuUtil {
 
         Object cache = SecurityCache.get(redisTemplate, cacheKey, (k) -> {
             // 查询数据库
-            ResultVo<MenuModel> resultVo = menuApi.getByPermissions(permissions);
-            if(!resultVo.isSuccess()){
+            ResultWrapper<MenuModel> resultVo = menuApi.getByPermissions(permissions);
+            if(!ResultWrapper.isSuccess(resultVo)){
                 return null;
             }
             return resultVo.getData();

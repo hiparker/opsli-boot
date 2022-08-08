@@ -15,6 +15,7 @@
  */
 package org.opsli.modulars.gentest.carinfo.entity;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import com.baomidou.mybatisplus.annotation.FieldStrategy;
 import com.baomidou.mybatisplus.annotation.TableField;
@@ -24,10 +25,10 @@ import lombok.EqualsAndHashCode;
 import org.opsli.core.base.entity.BaseEntity;
 
 /**
- * 汽车信息
+ * 测试汽车 Entity
  *
  * @author Parker
- * @date 2020-12-20 20:12:57
+ * @date 2022-08-06 23:53:30
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -52,14 +53,17 @@ public class TestCar extends BaseEntity {
 
     // ========================================
 
+
+
+
+
+
     /** 多租户字段 */
     private String tenantId;
 
-    /** 组织机构 */
-    private String orgIds;
-
     /** 逻辑删除字段 */
     @TableLogic
-    private String deleted;
+    private Integer deleted;
+
 
 }

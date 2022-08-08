@@ -19,8 +19,8 @@ import com.google.common.collect.Maps;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.opsli.api.base.result.ResultVo;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.opsli.api.base.result.ResultWrapper;
 import org.opsli.common.annotation.ApiRestController;
 import org.opsli.core.utils.SystemInfoUtil;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -40,12 +40,12 @@ public class MonitorController {
 
     /**
      * 查询服务器信息
-     * @return ResultVo
+     * @return ResultWrapper
      */
-    @RequiresPermissions("devops_sysmonitor_select")
+    @PreAuthorize("hasAuthority('devops_sysmonitor_select')")
     @GetMapping("/getSystemInfo")
     @ApiOperation(value = "当前服务器信息", notes = "当前服务器信息")
-    public ResultVo<?> getSystemInfo() {
+    public ResultWrapper<?> getSystemInfo() {
         Map<String,Object> map = Maps.newHashMapWithExpectedSize(5);
         //服务器信息
         map.put("systemInfo", SystemInfoUtil.INSTANCE.getSysInfo());
@@ -57,42 +57,42 @@ public class MonitorController {
         map.put("JVMInfo", SystemInfoUtil.INSTANCE.getJvmInfo());
         //磁盘信息
         map.put("sysFileInfo", SystemInfoUtil.INSTANCE.getDiskInfo());
-        return ResultVo.success(map);
+        return ResultWrapper.getSuccessResultWrapper(map);
     }
 
     /**
      * 查询CPU信息
-     * @return ResultVo
+     * @return ResultWrapper
      */
-    @RequiresPermissions("devops_sysmonitor_select")
+    @PreAuthorize("hasAuthority('devops_sysmonitor_select')")
     @GetMapping("/getCpuInfo")
     @ApiOperation(value = "当前CPU信息", notes = "当前CPU信息")
-    public ResultVo<?> getCpuInfo() {
-        return ResultVo.success(
-                SystemInfoUtil.INSTANCE.getCpuInfo());
+    public ResultWrapper<?> getCpuInfo() {
+        return ResultWrapper
+                .getSuccessResultWrapper(SystemInfoUtil.INSTANCE.getCpuInfo());
     }
 
     /**
      * 查询内存信息
-     * @return ResultVo
+     * @return ResultWrapper
      */
-    @RequiresPermissions("devops_sysmonitor_select")
+    @PreAuthorize("hasAuthority('devops_sysmonitor_select')")
     @GetMapping("/getMemInfo")
     @ApiOperation(value = "当前内存信息", notes = "当前内存信息")
-    public ResultVo<?> getMemInfo() {
-        return ResultVo.success(
+    public ResultWrapper<?> getMemInfo() {
+        return ResultWrapper.getSuccessResultWrapper(
                 SystemInfoUtil.INSTANCE.getMemoryInfo());
     }
 
     /**
      * 查询JVM信息
-     * @return ResultVo
+     * @return ResultWrapper
      */
-    @RequiresPermissions("devops_sysmonitor_select")
+    @PreAuthorize("hasAuthority('devops_sysmonitor_select')")
     @GetMapping("/getJVMInfo")
     @ApiOperation(value = "当前JVM信息", notes = "当前JVM信息")
-    public ResultVo<?> getJvmInfo() {
-        return ResultVo.success(
+    public ResultWrapper<?> getJvmInfo() {
+        return ResultWrapper.getSuccessResultWrapper(
                 SystemInfoUtil.INSTANCE.getJvmInfo());
     }
 

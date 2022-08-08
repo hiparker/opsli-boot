@@ -28,7 +28,7 @@ import java.util.Optional;
 /**
  * 用户认证信息上下文
  *
- * @author 周鹏程
+ * @author Parker
  * @date 2021年12月22日16:22:59
  */
 public final class UserContextHolder {

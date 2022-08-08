@@ -353,7 +353,7 @@ public class TenantServiceImpl extends CrudServiceImpl<TenantMapper, SysTenant, 
         queryWrapper.in(FieldUtil.humpToUnderline(MyBatisConstants.FIELD_TENANT),
                 tenantIdList
         );
-        int count = iUserService.count(queryWrapper);
+        long count = iUserService.count(queryWrapper);
         if(count > 0){
             // 该租户正在被其他用户绑定，无法删除
             throw new ServiceException(SystemMsg.EXCEPTION_TENANT_USED_DEL);

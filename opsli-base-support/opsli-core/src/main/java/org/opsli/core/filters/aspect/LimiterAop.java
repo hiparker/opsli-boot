@@ -43,7 +43,7 @@ import static org.opsli.common.constants.OrderConstants.LIMITER_AOP_SORT;
 /**
  * 限流器
  *
- * @author 周鹏程
+ * @author Parker
  * @date 2020-09-16
  */
 @Slf4j

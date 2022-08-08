@@ -16,10 +16,14 @@
 package org.opsli.core.base.service.impl;
 
 import cn.hutool.core.convert.Convert;
+import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.TypeUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.core.toolkit.ReflectionKit;
+import com.baomidou.mybatisplus.core.toolkit.reflect.SpringReflectionHelper;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.PageInfo;
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
@@ -35,6 +39,7 @@ import org.opsli.core.persistence.querybuilder.QueryBuilder;
 import org.opsli.core.persistence.querybuilder.chain.QueryDataPermsHandler;
 import org.opsli.core.persistence.querybuilder.chain.QueryTenantHandler;
 import org.opsli.core.persistence.querybuilder.conf.WebQueryConf;
+import org.springframework.core.GenericTypeResolver;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
@@ -64,12 +69,8 @@ import java.util.Map;
 public abstract class CrudServiceImpl<M extends BaseMapper<T>, T extends BaseEntity, E extends ApiWrapper>
         extends BaseService<M, T> implements CrudServiceInterface<T,E> {
 
-    /** JSON tmp */
-    private static final String JSON_TMP = "{\"id\":\"1\"}";
-    /** Entity Clazz 类 */
-    protected Class<T> entityClazz;
     /** Model Clazz 类 */
-    protected Class<E> modelClazz;
+    protected Class<E> modelClazz = getInnerModelClazz();
 
     @Override
     public E get(String id) {
@@ -213,7 +214,7 @@ public abstract class CrudServiceImpl<M extends BaseMapper<T>, T extends BaseEnt
     @Override
     public List<T> findList(QueryWrapper<T> queryWrapper) {
         // 数据处理责任链
-        QueryWrapper<T> qWrapper = this.addHandler(entityClazz, queryWrapper);
+        QueryWrapper<T> qWrapper = this.addHandler(this.getEntityClass(), queryWrapper);
 
         return super.list(qWrapper);
     }
@@ -221,7 +222,7 @@ public abstract class CrudServiceImpl<M extends BaseMapper<T>, T extends BaseEnt
     @Override
     public List<T> findAllList() {
         // 数据处理责任链
-        QueryWrapper<T> qWrapper = this.addHandler(entityClazz);
+        QueryWrapper<T> qWrapper = this.addHandler(this.getEntityClass());
 
         return super.list(qWrapper);
     }
@@ -229,7 +230,7 @@ public abstract class CrudServiceImpl<M extends BaseMapper<T>, T extends BaseEnt
     @Override
     public Page<T,E> findPage(Page<T,E> page) {
         // 数据处理责任链
-        QueryWrapper<T> qWrapper = this.addHandler(entityClazz, page.getQueryWrapper());
+        QueryWrapper<T> qWrapper = this.addHandler(this.getEntityClass(), page.getQueryWrapper());
         page.pageHelperBegin();
         try{
             List<T> list = super.list(qWrapper);
@@ -245,7 +246,7 @@ public abstract class CrudServiceImpl<M extends BaseMapper<T>, T extends BaseEnt
     @Override
     public Page<T,E> findPageNotCount(Page<T,E> page) {
         // 数据处理责任链
-        QueryWrapper<T> qWrapper = this.addHandler(entityClazz, page.getQueryWrapper());
+        QueryWrapper<T> qWrapper = this.addHandler(this.getEntityClass(), page.getQueryWrapper());
         page.pageHelperBegin(false);
         try{
             List<T> list = super.list(qWrapper);
@@ -286,7 +287,7 @@ public abstract class CrudServiceImpl<M extends BaseMapper<T>, T extends BaseEnt
      * @return T
      */
     protected T transformM2T(E model){
-        return WrapperUtil.transformInstance(model, entityClazz);
+        return WrapperUtil.transformInstance(model, this.getEntityClass());
     }
 
     /**
@@ -296,7 +297,7 @@ public abstract class CrudServiceImpl<M extends BaseMapper<T>, T extends BaseEnt
      * @return List<T>
      */
     protected List<T> transformMs2Ts(List<E> models){
-        return WrapperUtil.transformInstance(models, entityClazz);
+        return WrapperUtil.transformInstance(models, this.getEntityClass());
     }
 
     /**
@@ -342,26 +343,8 @@ public abstract class CrudServiceImpl<M extends BaseMapper<T>, T extends BaseEnt
 
     // ======================== 初始化 ========================
 
-    /**
-     * 初始化
-     */
-    @PostConstruct
-    public void init(){
-        try {
-            this.modelClazz = this.getInnerModelClazz();
-            this.entityClazz = this.getInnerEntityClazz();
-        }catch (Exception e){
-            log.error(e.getMessage(),e);
-        }
-    }
-
     @Override
-    public Class<T> getEntityClazz() {
-        return entityClazz;
-    }
-
-    @Override
-    public Class<E> getModelClazz() {
+    public Class<E> getModelClass() {
         return modelClazz;
     }
 
@@ -371,56 +354,8 @@ public abstract class CrudServiceImpl<M extends BaseMapper<T>, T extends BaseEnt
      */
     @SuppressWarnings("unchecked")
     public Class<E> getInnerModelClazz(){
-        String typeName = "E";
-        Class<E> tClass = null;
-        Map<Type, Type> typeMap = TypeUtil.getTypeMap(this.getClass());
-        for (Map.Entry<Type, Type> typeTypeEntry : typeMap.entrySet()) {
-            Type entryKey = typeTypeEntry.getKey();
-            Type entryValue = typeTypeEntry.getValue();
-
-            // 如果等于当前类型名称则进入
-            if(entryKey != null && entryValue != null){
-                if(StringUtils.equals(typeName, entryKey.getTypeName())){
-                    // 小技巧 json 转换 obj 然后 转换成 type对象
-                    Object convert = Convert.convert(entryValue, JSONObject.parse(JSON_TMP));
-                    if(convert instanceof ApiWrapper) {
-                        tClass = (Class<E>) entryValue;
-                        break;
-                    }
-                }
-            }
-
-        }
-        return tClass;
-    }
-
-    /**
-     * 内部获得 Entity 泛型 Clazz
-     * @return Class<T>
-     */
-    @SuppressWarnings("unchecked")
-    private Class<T> getInnerEntityClazz(){
-        String typeName = "T";
-        Class<T> tClass = null;
-        Map<Type, Type> typeMap = TypeUtil.getTypeMap(this.getClass());
-        for (Map.Entry<Type, Type> typeTypeEntry : typeMap.entrySet()) {
-            Type entryKey = typeTypeEntry.getKey();
-            Type entryValue = typeTypeEntry.getValue();
-
-            // 如果等于当前类型名称则进入
-            if(entryKey != null && entryValue != null){
-                if(StringUtils.equals(typeName, entryKey.getTypeName())){
-                    // 小技巧 json 转换 obj 然后 转换成 type对象
-                    Object convert = Convert.convert(entryValue, JSONObject.parse(JSON_TMP));
-                    if(convert instanceof ApiWrapper) {
-                        tClass = (Class<T>) entryValue;
-                        break;
-                    }
-                }
-            }
-
-        }
-        return tClass;
+        Class<?>[] typeArguments = GenericTypeResolver.resolveTypeArguments(this.getClass(), CrudServiceImpl.class);
+        return null == typeArguments ? null : (Class<E>) typeArguments[2];
     }
 
 }

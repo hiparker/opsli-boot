@@ -15,6 +15,8 @@
  */
 package org.opsli.common.utils;
 
+import cn.hutool.core.thread.ThreadUtil;
+import cn.hutool.core.util.StrUtil;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.Maps;
@@ -25,7 +27,6 @@ import org.opsli.common.thread.AsyncProcessExecutor;
 import org.opsli.common.thread.AsyncProcessExecutorFactory;
 
 import javax.servlet.http.HttpServletRequest;
-import java.time.Duration;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -39,6 +40,8 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public final class RateLimiterUtil {
 
+    /** 默认IP */
+    public static final String DEFAULT_IP = "unknown";
     /** 默认QPS */
     public static final double DEFAULT_QPS = 10d;
     /** 默认缓存个数 超出后流量自动清理 */
@@ -46,7 +49,7 @@ public final class RateLimiterUtil {
     /** 默认缓存时效 超出后自动清理 */
     private static final int DEFAULT_CACHE_TIME = 5;
     /** 默认等待时长 */
-    private static final int DEFAULT_WAIT = 5000;
+    private static final int DEFAULT_WAIT = 500;
     /** 限流器单机缓存 */
     private static final Cache<String, Map<String, RateLimiterUtil.RateLimiterInner> > LFU_CACHE;
 
@@ -108,6 +111,11 @@ public final class RateLimiterUtil {
      */
     @SuppressWarnings("UnstableApiUsage")
     public static boolean enter(String clientIpAddress, String resource, Double dfQps) {
+        // IP 为空补偿器
+        if(StrUtil.isBlank(clientIpAddress)){
+            clientIpAddress = DEFAULT_IP;
+        }
+
         // 计时器
         long t1 = System.currentTimeMillis();
 
@@ -152,7 +160,7 @@ public final class RateLimiterUtil {
         RateLimiter rateLimiter = rateLimiterObj.getRateLimiter();
 
         //非阻塞
-        if (!rateLimiter.tryAcquire(Duration.ofMillis(DEFAULT_WAIT))) {
+        if (!rateLimiter.tryAcquire(DEFAULT_WAIT, TimeUnit.MILLISECONDS)) {
             //限速中，提示用户
             log.error("限流器 - 访问频繁 耗时: "+ (System.currentTimeMillis() - t1) + "ms, IP地址: " + clientIpAddress + ", URI: " + resource);
             return false;
@@ -183,17 +191,39 @@ public final class RateLimiterUtil {
 
 
     public static void main(String[] args) {
-        int count = 500;
-        RateLimiterUtil.removeIp("127.0.0.1");
-        AsyncProcessExecutor normalExecutor = AsyncProcessExecutorFactory.createNormalExecutor();
-        for (int i = 0; i < count; i++) {
-            normalExecutor.put(()->{
-                boolean enter = RateLimiterUtil.enter("127.0.0.1","/api/v1", 2d);
-                System.out.println(enter);
-            });
+//        int count = 500;
+//        RateLimiterUtil.removeIp("127.0.0.1");
+//        AsyncProcessExecutor normalExecutor = AsyncProcessExecutorFactory.createNormalExecutor();
+//        for (int i = 0; i < count; i++) {
+//            normalExecutor.put(()->{
+//                RateLimiter rateLimiter = RateLimiter.create(1);
+//
+//
+//                boolean enter = RateLimiterUtil.enter("127.0.0.1","/api/v1", 2d);
+//                System.out.println(enter);
+//            });
+//        }
+//        normalExecutor.execute();
+
+
+        int count = 3;
+        RateLimiter rateLimiter = RateLimiter.create(count);
+        AsyncProcessExecutor normalExecutor = AsyncProcessExecutorFactory.createWaitExecutor();
+
+        int num = 0;
+        while (true){
+            System.out.println("------------"+ (++num) +"------------");
+            for (int i = 0; i < count+1; i++) {
+                normalExecutor.put(()->{
+                    boolean tryAcquire = rateLimiter.tryAcquire(500, TimeUnit.MILLISECONDS);
+                    System.out.println(tryAcquire);
+                });
+            }
+            normalExecutor.execute();
+            ThreadUtil.sleep(1100);
         }
-        normalExecutor.execute();
     }
+
 
 }
 

@@ -56,12 +56,12 @@ public class UserInfo extends ApiWrapper {
 
     /** 手机 */
     @ApiModelProperty(value = "手机")
-    @Validator({ValidatorType.IS_MOBILE})
+    @Validator({ValidatorType.IS_NOT_NULL, ValidatorType.IS_MOBILE})
     private String mobile;
 
     /** 邮箱 */
     @ApiModelProperty(value = "邮箱")
-    @Validator({ValidatorType.IS_EMAIL})
+    @Validator({ValidatorType.IS_NOT_NULL, ValidatorType.IS_EMAIL})
     private String email;
 
     /** 工号 */

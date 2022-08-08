@@ -16,32 +16,32 @@
 package org.opsli.modulars.system.tenant.web;
 
 import cn.hutool.core.convert.Convert;
-import cn.hutool.core.util.ReflectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.opsli.api.base.result.ResultVo;
+import org.opsli.api.base.result.ResultWrapper;
 import org.opsli.api.web.system.tenant.TenantApi;
 import org.opsli.api.wrapper.system.tenant.TenantModel;
 import org.opsli.common.annotation.ApiRestController;
-import org.opsli.common.annotation.EnableLog;
-import org.opsli.common.annotation.RequiresPermissionsCus;
 import org.opsli.common.enums.DictType;
 import org.opsli.common.utils.WrapperUtil;
 import org.opsli.core.base.controller.BaseRestController;
+import org.opsli.core.log.annotation.OperateLogger;
+import org.opsli.core.log.enums.ModuleEnum;
+import org.opsli.core.log.enums.OperationTypeEnum;
 import org.opsli.core.persistence.Page;
 import org.opsli.core.persistence.querybuilder.GenQueryBuilder;
 import org.opsli.core.persistence.querybuilder.QueryBuilder;
 import org.opsli.core.persistence.querybuilder.WebQueryBuilder;
 import org.opsli.modulars.system.tenant.entity.SysTenant;
 import org.opsli.modulars.system.tenant.service.ITenantService;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.lang.reflect.Method;
+import java.util.Optional;
 
 
 /**
@@ -59,35 +59,36 @@ public class TenantRestController extends BaseRestController<SysTenant, TenantMo
 
     /**
      * 变更租户状态账户
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @ApiOperation(value = "变更租户状态账户", notes = "变更租户状态账户")
-    @RequiresPermissions("system_tenant_enable")
-    @EnableLog
+    @PreAuthorize("hasAuthority('system_tenant_enable')")
+    @OperateLogger(description = "变更租户状态账户",
+            module = ModuleEnum.MODULE_TENANT, operationType = OperationTypeEnum.UPDATE, db = true)
     @Override
-    public ResultVo<?> enableTenant(String tenantId, String enable) {
+    public ResultWrapper<?> enableTenant(String tenantId, String enable) {
         // 演示模式 不允许操作
         super.demoError();
 
         // 变更租户状态账户
         boolean enableStatus = IService.enableTenant(tenantId, enable);
         if(!enableStatus){
-            return ResultVo.error("变更用户状态账户失败");
+            return ResultWrapper.getErrorResultWrapper().setMsg("变更租户状态账户失败");
         }
-        return ResultVo.success();
+        return ResultWrapper.getSuccessResultWrapper();
     }
 
     /**
      * 租户 查一条
      * @param model 模型
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @ApiOperation(value = "获得单条租户", notes = "获得单条租户 - ID")
-    @RequiresPermissions("system_tenant_select")
+    @PreAuthorize("hasAuthority('system_tenant_select')")
     @Override
-    public ResultVo<TenantModel> get(TenantModel model) {
+    public ResultWrapper<TenantModel> get(TenantModel model) {
         model = IService.get(model);
-        return ResultVo.success(model);
+        return ResultWrapper.getSuccessResultWrapper(model);
     }
 
     /**
@@ -95,152 +96,162 @@ public class TenantRestController extends BaseRestController<SysTenant, TenantMo
      * @param pageNo 当前页
      * @param pageSize 每页条数
      * @param request request
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @ApiOperation(value = "获得分页数据", notes = "获得分页数据 - 查询构造器")
-    //@RequiresPermissions("system_tenant_select")
+    //@PreAuthorize("hasAuthority('system_tenant_select')")
     @Override
-    public ResultVo<?> findPage(Integer pageNo, Integer pageSize, HttpServletRequest request) {
+    public ResultWrapper<?> findPage(Integer pageNo, Integer pageSize, HttpServletRequest request) {
 
-        QueryBuilder<SysTenant> queryBuilder = new WebQueryBuilder<>(entityClazz, request.getParameterMap());
+        QueryBuilder<SysTenant> queryBuilder = new WebQueryBuilder<>(IService.getEntityClass(), request.getParameterMap());
         Page<SysTenant, TenantModel> page = new Page<>(pageNo, pageSize);
         page.setQueryWrapper(queryBuilder.build());
         page = IService.findPage(page);
 
-        return ResultVo.success(page.getPageData());
+        return ResultWrapper.getSuccessResultWrapper(page.getPageData());
     }
 
     /**
      * 租户 新增
      * @param model 模型
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @ApiOperation(value = "新增租户", notes = "新增租户")
-    @RequiresPermissions("system_tenant_insert")
-    @EnableLog
+    @PreAuthorize("hasAuthority('system_tenant_insert')")
+    @OperateLogger(description = "新增租户",
+            module = ModuleEnum.MODULE_TENANT, operationType = OperationTypeEnum.INSERT, db = true)
     @Override
-    public ResultVo<?> insert(TenantModel model) {
+    public ResultWrapper<?> insert(TenantModel model) {
         // 调用新增方法
         IService.insert(model);
-        return ResultVo.success("新增租户成功");
+        return ResultWrapper.getSuccessResultWrapperByMsg("新增租户成功");
     }
 
     /**
      * 租户 修改
      * @param model 模型
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @ApiOperation(value = "修改租户", notes = "修改租户")
-    @RequiresPermissions("system_tenant_update")
-    @EnableLog
+    @PreAuthorize("hasAuthority('system_tenant_update')")
+    @OperateLogger(description = "修改租户",
+            module = ModuleEnum.MODULE_TENANT, operationType = OperationTypeEnum.UPDATE, db = true)
     @Override
-    public ResultVo<?> update(TenantModel model) {
+    public ResultWrapper<?> update(TenantModel model) {
         // 演示模式 不允许操作
         super.demoError();
 
         // 调用修改方法
         IService.update(model);
-        return ResultVo.success("修改租户成功");
+        return ResultWrapper.getSuccessResultWrapperByMsg("修改租户成功");
     }
 
 
     /**
      * 租户 删除
      * @param id ID
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @ApiOperation(value = "删除租户数据", notes = "删除租户数据")
-    @RequiresPermissions("system_tenant_delete")
-    @EnableLog
+    @PreAuthorize("hasAuthority('system_tenant_delete')")
+    @OperateLogger(description = "删除租户数据",
+            module = ModuleEnum.MODULE_TENANT, operationType = OperationTypeEnum.DELETE, db = true)
     @Override
-    public ResultVo<?> del(String id){
+    public ResultWrapper<?> del(String id){
         // 演示模式 不允许操作
         super.demoError();
 
         IService.delete(id);
-        return ResultVo.success("删除租户成功");
+        return ResultWrapper.getSuccessResultWrapperByMsg("删除租户成功");
     }
 
 
     /**
      * 租户 批量删除
      * @param ids ID 数组
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @ApiOperation(value = "批量删除租户数据", notes = "批量删除租户数据")
-    @RequiresPermissions("system_tenant_delete")
-    @EnableLog
+    @PreAuthorize("hasAuthority('system_tenant_delete')")
+    @OperateLogger(description = "批量删除租户数据",
+            module = ModuleEnum.MODULE_TENANT, operationType = OperationTypeEnum.DELETE, db = true)
     @Override
-    public ResultVo<?> delAll(String ids){
+    public ResultWrapper<?> delAll(String ids){
         // 演示模式 不允许操作
         super.demoError();
 
         String[] idArray = Convert.toStrArray(ids);
         IService.deleteAll(idArray);
-        return ResultVo.success("批量删除租户成功");
+        return ResultWrapper.getSuccessResultWrapperByMsg("批量删除租户成功");
+    }
+
+
+    /**
+     * 租户 Excel 导出认证
+     *
+     * @param type 类型
+     * @param request request
+     */
+    @ApiOperation(value = "Excel 导出认证", notes = "Excel 导出认证")
+    @PreAuthorize("hasAnyAuthority('system_tenant_export', 'system_tenant_import')")
+    @Override
+    public ResultWrapper<String> exportExcelAuth(String type, HttpServletRequest request) {
+        Optional<String> certificateOptional =
+                super.excelExportAuth(type, TenantApi.SUB_TITLE, request);
+        if(!certificateOptional.isPresent()){
+            return ResultWrapper.getErrorResultWrapper();
+        }
+        return ResultWrapper.getSuccessResultWrapper(certificateOptional.get());
     }
 
 
     /**
      * 租户 Excel 导出
-     * @param request request
      * @param response response
      */
     @ApiOperation(value = "导出Excel", notes = "导出Excel")
-    @RequiresPermissionsCus("system_tenant_export")
-    @EnableLog
+    @PreAuthorize("hasAuthority('system_tenant_export')")
+    @OperateLogger(description = "导出Excel",
+            module = ModuleEnum.MODULE_TENANT, operationType = OperationTypeEnum.SELECT, db = true)
     @Override
-    public void exportExcel(HttpServletRequest request, HttpServletResponse response) {
-        // 当前方法
-        Method method = ReflectUtil.getMethodByName(this.getClass(), "exportExcel");
-        QueryBuilder<SysTenant> queryBuilder = new WebQueryBuilder<>(entityClazz, request.getParameterMap());
-        super.excelExport(TenantApi.SUB_TITLE, queryBuilder.build(), response, method);
+    public void exportExcel(String certificate, HttpServletResponse response) {
+        // 导出Excel
+        super.excelExport(certificate, response);
     }
 
     /**
      * 租户 Excel 导入
      * @param request 文件流 request
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @ApiOperation(value = "导入Excel", notes = "导入Excel")
-    @RequiresPermissions("system_tenant_import")
-    @EnableLog
+    @PreAuthorize("hasAuthority('system_tenant_import')")
+    @OperateLogger(description = "租户 Excel 导入",
+            module = ModuleEnum.MODULE_TENANT, operationType = OperationTypeEnum.INSERT, db = true)
     @Override
-    public ResultVo<?> importExcel(MultipartHttpServletRequest request) {
+    public ResultWrapper<?> importExcel(MultipartHttpServletRequest request) {
         return super.importExcel(request);
     }
 
-    /**
-     * 租户 Excel 下载导入模版
-     * @param response response
-     */
-    @ApiOperation(value = "导出Excel模版", notes = "导出Excel模版")
-    @RequiresPermissionsCus("system_tenant_import")
-    @Override
-    public void importTemplate(HttpServletResponse response) {
-        // 当前方法
-        Method method = ReflectUtil.getMethodByName(this.getClass(), "importTemplate");
-        super.importTemplate(TenantApi.SUB_TITLE, response, method);
-    }
 
     // =========================
 
     /**
      * 获得已启用租户 查一条
      * @param tenantId 模型
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @ApiOperation(value = "获得已启用租户", notes = "获得已启用租户 - ID")
     @Override
-    public ResultVo<TenantModel> getTenantByUsable(String tenantId) {
+    public ResultWrapper<TenantModel> getTenantByUsable(String tenantId) {
         QueryBuilder<SysTenant> queryBuilder = new GenQueryBuilder<>();
         QueryWrapper<SysTenant> queryWrapper = queryBuilder.build();
         queryWrapper.eq("id", tenantId)
                 .eq("enable", DictType.NO_YES_YES.getValue());
         SysTenant entity = IService.getOne(queryWrapper);
 
-        return ResultVo.success(
-                WrapperUtil.transformInstance(entity, modelClazz)
+        return ResultWrapper.getSuccessResultWrapper(
+                WrapperUtil.transformInstance(entity, IService.getModelClass())
         );
     }
 

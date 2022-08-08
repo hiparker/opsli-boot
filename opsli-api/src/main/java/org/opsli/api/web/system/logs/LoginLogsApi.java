@@ -15,7 +15,7 @@
  */
 package org.opsli.api.web.system.logs;
 
-import org.opsli.api.base.result.ResultVo;
+import org.opsli.api.base.result.ResultWrapper;
 import org.opsli.api.wrapper.system.logs.LogsModel;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -48,10 +48,10 @@ public interface LoginLogsApi {
      * @param pageNo 当前页
      * @param pageSize 每页条数
      * @param request request
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @GetMapping("/findPage")
-    ResultVo<?> findPage(
+    ResultWrapper<?> findPage(
             @RequestParam(name = "pageNo", defaultValue = "1") Integer pageNo,
             @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize,
             HttpServletRequest request

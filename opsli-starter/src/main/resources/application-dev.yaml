@@ -7,7 +7,7 @@ server:
 spring:
   #redis 配置
   redis:
-    database: 0
+    database: 8
     host: 10.0.0.28
     password: '123456'
     port: 6379

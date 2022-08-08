@@ -71,4 +71,10 @@ public class LoginLogsModel extends ApiWrapper {
     @ApiModelProperty(value = "用户代理")
     private String userAgent;
 
+    /**
+     * 登陆来源
+     */
+    @ApiModelProperty(value = "登陆来源")
+    private String loginFrom;
+
 }

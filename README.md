@@ -1,4 +1,4 @@
-# OPSLI 快速开发平台 (已开源)
+# OPSLI 快速开发平台 (v2.0)
 <div align="center">
  <img width="500" src="https://gitee.com/hiparker/opsli-ui/raw/master/repository-images/logo.png"/>
  <br/> <br/>
@@ -31,15 +31,15 @@
 
 > 单机版
 
-| 名称             | 版本号  |      | 名称           | 版本号         |
-| ---------------- | ------- | ---- | -------------- | -------------- |
-| jdk版本          | ^1.8    |      | springboot版本 | ^2.3.3.RELEASE |
-| mybatis-plus版本 | ^3.4.0  |      | pagehelper版本 | ^1.1.0         |
-| druid版本        | ^1.1.17 |      | dynamic版本    | ^2.5.4         |
-| shiro-redis版本  | ^3.3.1  |      | jwt版本        | ^3.10.3        |
-| ehcache版本      | ^3.9.0  |      | easyexcel版本  | ^2.2.6         |
-| kaptcha版本      | ^0.0.9  |      | guava版本      | ^29.0-jre      |
-| enjoy版本        | ^4.9.03 |      | hutool版本     | ^5.7.14         |
+| 名称             | 版本号 |      | 名称           | 版本号          |
+| ---------------- |---| ---- | -------------- |--------------|
+| jdk版本          | 1.8 |      | springboot版本 | 2.5.6        |
+| mybatis-plus版本 | 3.5.2 |      | pagehelper版本 | 1.3.0        |
+| druid版本        | 1.1.17 |      | dynamic版本    | 2.5.4        |
+| fastjson版本  | 1.2.83  |      | transmittable版本        | 2.12.5       |
+| ehcache版本      | 3.9.0 |      | easyexcel版本  | 2.2.6        |
+| captcha版本      | 1.6.2 |      | guava版本      | 30.0-android |
+| enjoy版本        | 4.9.06 |      | hutool版本     | 5.7.14       |
 
 ## 在线演示
 
@@ -100,8 +100,6 @@
 │   │   │   │   │               ├── exception                   公共模块 - 异常类
 │   │   │   │   │               ├── msg                         公共模块 - 信息
 │   │   │   │   │               ├── thread                      公共模块 - 线程相关
-│   │   │   │   │               │   ├── refuse                      拒绝策略线程池
-│   │   │   │   │               │   └── wait                        等待线程池
 │   │   │   │   │               └── utils                       公共模块 - 工具类
 │   │   │   │   │
 │   └── opsli-core                                          基础 - 核心模块
@@ -110,27 +108,33 @@
 │       │   │   ├── java
 │       │   │   │   └── org
 │       │   │   │       └── opsli
-│       │   │   │           └── core
-│       │   │   │               ├── api                         核心模块 - API接口相关（登录Token缓存）
-│       │   │   │               ├── autoconfigure               核心模块 - 自动配置
-│       │   │   │               │   ├── conf                      自动装配
-│       │   │   │               │   └── properties                配置文件注入
-│       │   │   │               ├── base                        核心模块 - 基础类 Entity Service
-│       │   │   │               ├── cache                       核心模块 - 缓存处理
-│       │   │   │               ├── filters                     核心模块 - 过滤器
-│       │   │   │               │   ├── aspect                     AOP切面
-│       │   │   │               │   └── interceptor                Spring拦截器
-│       │   │   │               ├── conf                        核心模块 - 全局统一自动装配
-│       │   │   │               ├── general                     核心模块 - 打印信息
-│       │   │   │               ├── handler                     核心模块 - 异常拦截处理
-│       │   │   │               ├── listener                    核心模块 - 系统监听器
-│       │   │   │               ├── msg                         核心模块 - 信息
-│       │   │   │               ├── persistence                 核心模块 - 查询条件构造器
-│       │   │   │               │   └── querybuilder
-│       │   │   │               │       └── chain               核心模块 - 查询条件构造器 - 责任链(例: 租户处理)
-│       │   │   │               ├── security                    核心模块 - 权限验证
-│       │   │   │               │   └── shiro                       Shiro权限校验
-│       │   │   │               └── utils                       核心模块 - 工具类
+│       │   │   │           ├── core                        核心
+│       │   │   │           │   ├── api                         核心模块 - API接口相关（登录Token缓存）
+│       │   │   │           │   ├── autoconfigure               核心模块 - 自动配置
+│       │   │   │           │   │   ├── conf                      自动装配
+│       │   │   │           │   │   └── properties                配置文件注入
+│       │   │   │           │   ├── base                        核心模块 - 基础类 Entity Service
+│       │   │   │           │   ├── cache                       核心模块 - 缓存处理
+│       │   │   │           │   ├── eventbus                    核心模块 - 消息事件
+│       │   │   │           │   ├── filters                     核心模块 - 过滤器
+│       │   │   │           │   │   ├── aspect                     AOP切面
+│       │   │   │           │   │   └── interceptor                Spring拦截器
+│       │   │   │           │   ├── general                     核心模块 - 其他处理器
+│       │   │   │           │   ├── handler                     核心模块 - 异常拦截处理
+│       │   │   │           │   ├── holder                      核心模块 - 上下文数据
+│       │   │   │           │   ├── listener                    核心模块 - 系统监听器
+│       │   │   │           │   ├── log                         核心模块 - 日志处理
+│       │   │   │           │   ├── msg                         核心模块 - 信息
+│       │   │   │           │   ├── options                     核心模块 - 系统参数
+│       │   │   │           │   ├── persistence                 核心模块 - 查询条件构造器
+│       │   │   │           │   │   └── querybuilder
+│       │   │   │           │   │       └── chain               核心模块 - 查询条件构造器 - 责任链(例: 租户处理)
+│       │   │   │           │   ├── security                    核心模块 - 权限验证
+│       │   │   │           │   │   ├── filter                       拦截器
+│       │   │   │           │   │   └── service                      获取用户的Service
+│       │   │   │           │   └── utils                       核心模块 - 工具类
+│       │   │   │           └── pligins                   插件
+│       │   │   │               └── oss                         插件模块 - OSS文件存储
 │       │   │   │
 ├── opsli-modulars                                        业务
 │   ├── opsli-modulars-generator                              代码生成器
@@ -166,6 +170,11 @@
 │       │   │   │               │   ├── area                    系统模块 - 地域
 │       │   │   │               │   ├── dict                    系统模块 - 字典
 │       │   │   │               │   ├── login                   系统模块 - 登录
+│       │   │   │               │   │   ├── dto                   系统模块 - 登录 - DTO
+│       │   │   │               │   │   ├── event                 系统模块 - 登录 - 消息事件
+│       │   │   │               │   │   ├── handler               系统模块 - 登录 - 前置、成功、失败处理器
+│       │   │   │               │   │   ├── vo                    系统模块 - 登录 - 返回数据
+│       │   │   │               │   │   └──web                    系统模块 - 登录 - 接口控制器
 │       │   │   │               │   ├── logs                    系统模块 - 日志
 │       │   │   │               │   ├── menu                    系统模块 - 菜单
 │       │   │   │               │   ├── monitor                 系统模块 - 系统监控
@@ -176,11 +185,29 @@
 │       │   │   │               │   └── user                    系统模块 - 用户
 │       │   │   │               │
 │       │   │   │               └── tools                     工具包
-│       │   │   │                   ├── searchhis               工具包 - 搜索历史
-│       │   │   │                   └── email                   工具包 - 邮件包
+│       │   │   │                   ├── api                     工具包 - 版本控制API测试类
+│       │   │   │                   ├── common                  工具包 - 公共服务
+│       │   │   │                   ├── email                   工具包 - 邮件包
+│       │   │   │                   ├── oss                     工具包 - 文件存储
+│       │   │   │                   └── searchhis               工具包 - 搜索历史
 │       │   │   │
-├── opsli-plugins                                         插件
-│   ├── opsli-plugins-ehcache                               Ehcache缓存插件 (二级缓存)
+├── opsli-plugins                                  插件
+│   ├── opsli-plugins-crypto                              加解密插件包
+│   │   ├── src
+│   │   │   ├── main
+│   │   │   │   ├── java
+│   │   │   │   │   └── org
+│   │   │   │   │       └── opsli
+│   │   │   │   │           └── plugins
+│   │   │   │   │               └── crypto
+│   │   │   │   │                   ├── enums                 加解密插件包 - 枚举
+│   │   │   │   │                   ├── exception             加解密插件包 - 异常处理类
+│   │   │   │   │                   ├── model                 加解密插件包 - 模型
+│   │   │   │   │                   ├── msg                   加解密插件包 - 异常消息
+│   │   │   │   │                   ├── spring                加解密插件包 - Spring集成相关内容
+│   │   │   │   │                   └── strategy              加解密插件包 - 加解密策略 包含 对称、非对称等等
+│   │   │   │   │
+│   ├── opsli-plugins-ehcache                             Ehcache缓存插件 (二级缓存)
 │   │   ├── src
 │   │   │   ├── main
 │   │   │   │   ├── java
@@ -192,7 +219,21 @@
 │   │   │   │   │                   ├── msg                   Ehcache缓存插件 - 信息
 │   │   │   │   │                   └── service               Ehcache缓存插件 - 服务
 │   │   │   │   │
-│   ├── opsli-plugins-excel                                 Excel插件
+│   ├── opsli-plugins-email                               邮件插件包
+│   │   ├── src
+│   │   │   ├── main
+│   │   │   │   ├── java
+│   │   │   │   │   └── org
+│   │   │   │   │       └── opsli
+│   │   │   │   │           └── plugins
+│   │   │   │   │               └── email
+│   │   │   │   │                   ├── conf                  邮件插件包 - 配置文件
+│   │   │   │   │                   ├── exception             邮件插件包 - 异常处理类
+│   │   │   │   │                   ├── msg                   邮件插件包 - 异常消息
+│   │   │   │   │                   ├── service               邮件插件包 - 处理类
+│   │   │   │   │                   └── wrapper               邮件插件包 - 包装器
+│   │   │   │   │
+│   ├── opsli-plugins-excel                               Excel插件
 │   │   ├── src
 │   │   │   ├── main
 │   │   │   │   ├── java
@@ -206,7 +247,7 @@
 │   │   │   │   │                   ├── listener              Excel插件 - 监听器
 │   │   │   │   │                   └── msg                   Excel插件 - 信息
 │   │   │   │   │
-│   └── opsli-plugins-redis                                 Redis缓存插件(一级缓存)
+│   └── opsli-plugins-redis                               Redis缓存插件(一级缓存)
 │   │   ├── src
 │   │   │   ├── main
 │   │   │   │   ├── java
@@ -216,6 +257,7 @@
 │   │   │   │   │               └── redis
 │   │   │   │   │                   ├── conf                  Redis缓存插件 - 自动装配
 │   │   │   │   │                   ├── exception             Redis缓存插件 - 异常类
+│   │   │   │   │                   ├── jsonserializer        Redis缓存插件 - json特殊处理器
 │   │   │   │   │                   ├── lock                  Redis缓存插件 - 分布式锁
 │   │   │   │   │                   ├── msg                   Redis缓存插件 - 信息
 │   │   │   │   │                   ├── pushsub               Redis缓存插件 - 消息订阅
@@ -223,7 +265,7 @@
 │   │   │   │   └── resources
 │   │   │   │   │    └── lua                                  Redis缓存插件 - Lua脚本
 │   │   │   │   │
-│   └── opsli-plugins-redisson                                Redisson分布式锁
+│   └── opsli-plugins-redisson                            Redisson分布式锁
 │   │   ├── src
 │   │   │   ├── main
 │   │   │   │   ├── java
@@ -238,7 +280,41 @@
 │   │   │   │   │                   ├── properties            Redisson分布式锁 - 配置类
 │   │   │   │   │                   └── strategy              Redisson分布式锁 - 策略
 │   │   │   │   │
-│   └── opsli-plugins-waf                                     Waf软防火墙
+│   ├── opsli-plugins-security                            安全认证插件包
+│   │   ├── src
+│   │   │   ├── main
+│   │   │   │   ├── java
+│   │   │   │   │   └── org
+│   │   │   │   │       └── opsli
+│   │   │   │   │           └── plugins
+│   │   │   │   │               └── security
+│   │   │   │   │                   ├── authentication        安全认证插件包 - 识别器
+│   │   │   │   │                   ├── checker               安全认证插件包 - 检查器
+│   │   │   │   │                   ├── eventbus              安全认证插件包 - 消息事件
+│   │   │   │   │                   ├── eventdto              安全认证插件包 - 消息事件DTO
+│   │   │   │   │                   ├── exception             安全认证插件包 - 异常
+│   │   │   │   │                   ├── handler               安全认证插件包 - 登陆处理器
+│   │   │   │   │                   ├── properties            安全认证插件包 - 配置文件
+│   │   │   │   │                   ├── provider              安全认证插件包 - Security认证器
+│   │   │   │   │                   ├── service               安全认证插件包 - 加载用户信息抽象Service
+│   │   │   │   │                   ├── utils                 安全认证插件包 - 工具包
+│   │   │   │   │                   └── vo                    安全认证插件包 - VO
+│   │   │   │   │
+│   ├── opsli-plugins-sms                               短信插件包
+│   │   ├── src
+│   │   │   ├── main
+│   │   │   │   ├── java
+│   │   │   │   │   └── org
+│   │   │   │   │       └── opsli
+│   │   │   │   │           └── plugins
+│   │   │   │   │               └── sms
+│   │   │   │   │                   ├── enums                 短信插件包 - 配置文件
+│   │   │   │   │                   ├── exception             短信插件包 - 异常处理类
+│   │   │   │   │                   ├── model                 短信插件包 - 模型
+│   │   │   │   │                   ├── msg                   短信插件包 - 异常消息
+│   │   │   │   │                   └── service               短信插件包 - 服务处理
+│   │   │   │   │
+│   └── opsli-plugins-waf                                 Waf软防火墙
 │       ├── src
 │       │   ├── main
 │       │   │   ├── java

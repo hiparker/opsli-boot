@@ -16,13 +16,11 @@
 package org.opsli.modulars.system.user.web;
 
 import cn.hutool.core.convert.Convert;
-import com.baomidou.mybatisplus.extension.service.IService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.opsli.api.base.result.ResultVo;
+import org.opsli.api.base.result.ResultWrapper;
 import org.opsli.api.web.system.user.UserRoleRefApi;
 import org.opsli.api.wrapper.system.menu.MenuModel;
 import org.opsli.api.wrapper.system.role.RoleModel;
@@ -32,12 +30,11 @@ import org.opsli.common.annotation.ApiRestController;
 import org.opsli.common.exception.ServiceException;
 import org.opsli.core.autoconfigure.properties.GlobalProperties;
 import org.opsli.core.msg.CoreMsg;
-import org.opsli.core.utils.OrgUtil;
 import org.opsli.core.utils.UserUtil;
 import org.opsli.modulars.system.SystemMsg;
 import org.opsli.modulars.system.user.service.IUserRoleRefService;
-import org.opsli.modulars.system.user.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.util.List;
 
@@ -64,11 +61,11 @@ public class UserRoleRefRestController implements UserRoleRefApi {
     /**
      * 根据 userId 获得用户角色Id集合
      * @param userId 用户Id
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @ApiOperation(value = "根据 userId 获得用户角色Id集合", notes = "根据 userId 获得用户角色Id集合")
     @Override
-    public ResultVo<UserRoleRefModel> getRoles(String userId) {
+    public ResultWrapper<UserRoleRefModel> getRoles(String userId) {
 
         List<String> roleIdList = iUserRoleRefService.getRoleIdList(userId);
         String defRoleId = iUserRoleRefService.getDefRoleId(userId);
@@ -79,73 +76,71 @@ public class UserRoleRefRestController implements UserRoleRefApi {
                 .defRoleId(defRoleId)
                 .build();
 
-        return ResultVo.success(userRoleRefModel);
+        return ResultWrapper.getSuccessResultWrapper(userRoleRefModel);
     }
 
     /**
      * 设置角色
      * @param model 模型
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @Override
-    @RequiresPermissions("system_user_setRole")
-    public ResultVo<?> setRoles(UserRoleRefModel model) {
+    @PreAuthorize("hasAuthority('system_user_setRole')")
+    public ResultWrapper<?> setRoles(UserRoleRefModel model) {
         // 演示模式 不允许操作
         this.demoError();
 
         boolean ret = iUserRoleRefService.setRoles(model);
         if(ret){
-            return ResultVo.success();
+            return ResultWrapper.getSuccessResultWrapper();
         }
         // 权限设置失败
-        return ResultVo.error(SystemMsg.EXCEPTION_USER_ROLES_ERROR.getCode(),
-                SystemMsg.EXCEPTION_USER_ROLES_ERROR.getMessage()
-                );
+        return ResultWrapper.getCustomResultWrapper(SystemMsg.EXCEPTION_USER_ROLES_ERROR);
     }
 
     /**
      * 根据 userId 获得用户角色
      * @param userId 用户Id
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @Override
-    public ResultVo<List<String>> getRolesByUserId(String userId) {
+    public ResultWrapper<List<String>> getRolesByUserId(String userId) {
         List<String> roleCodeList = iUserRoleRefService.getRoleCodeList(userId);
-        return ResultVo.success(roleCodeList);
+        return ResultWrapper.getSuccessResultWrapper(roleCodeList);
     }
 
     /**
      * 根据 userId 获得用户默认角色
      * @param userId 用户Id
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @Override
-    public ResultVo<RoleModel> getDefRoleByUserId(String userId) {
+    public ResultWrapper<RoleModel> getDefRoleByUserId(String userId) {
         RoleModel defRoleByUserId = iUserRoleRefService.getDefRoleByUserId(userId);
-        return ResultVo.success(defRoleByUserId);
+        return ResultWrapper.getSuccessResultWrapper(defRoleByUserId);
     }
 
     /**
      * 根据 userId 获得用户权限
      * @param userId 用户Id
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @Override
-    public ResultVo<List<String>> getAllPerms(String userId) {
+    public ResultWrapper<List<String>> getAllPerms(String userId) {
         List<String> allPerms = iUserRoleRefService.getAllPerms(userId);
-        return ResultVo.success(allPerms);
+        return ResultWrapper.getSuccessResultWrapper(allPerms);
     }
 
 
     /**
      * 根据 userId 获得用户菜单
      * @param userId 用户Id
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @Override
-    public ResultVo<List<MenuModel>> getMenuListByUserId(String userId) {
+    public ResultWrapper<List<MenuModel>> getMenuListByUserId(String userId) {
         List<MenuModel> menuModelList = iUserRoleRefService.getMenuListByUserId(userId);
-        return ResultVo.success(menuModelList);
+        return ResultWrapper.getSuccessResultWrapper(menuModelList);
     }
 
 

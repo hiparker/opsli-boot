@@ -90,9 +90,6 @@ public class GlobalProperties {
             /** 有效时间 （分钟）*/
             private Integer effectiveTime;
 
-            /** 排除URL*/
-            private Set<String> urlExclusion;
-
         }
 
         /**

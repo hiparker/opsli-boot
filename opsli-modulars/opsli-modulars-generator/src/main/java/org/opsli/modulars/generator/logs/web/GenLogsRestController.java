@@ -19,18 +19,18 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.beanutils.BeanUtils;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.opsli.api.base.result.ResultVo;
+import org.opsli.core.log.annotation.OperateLogger;
+import org.opsli.core.log.enums.ModuleEnum;
+import org.opsli.core.log.enums.OperationTypeEnum;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.opsli.api.base.result.ResultWrapper;
 import org.opsli.common.annotation.ApiRestController;
-import org.opsli.common.annotation.EnableLog;
 import org.opsli.core.base.controller.BaseRestController;
 import org.opsli.modulars.generator.logs.api.GenLogsApi;
 import org.opsli.modulars.generator.logs.entity.GenLogs;
 import org.opsli.modulars.generator.logs.service.IGenLogsService;
 import org.opsli.modulars.generator.logs.wrapper.GenLogsModel;
 import org.opsli.plugins.generator.utils.GeneratorHandleUtil;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -49,22 +49,23 @@ public class GenLogsRestController extends BaseRestController<GenLogs, GenLogsMo
         implements GenLogsApi {
 
     @ApiOperation(value = "获得当前表生成记录", notes = "获得当前表生成记录")
-    @RequiresPermissions("dev_generator_select")
+    @PreAuthorize("hasAuthority('dev_generator_select')")
     @Override
-    public ResultVo<GenLogsModel> getByTableId(String tableId) {
+    public ResultWrapper<GenLogsModel> getByTableId(String tableId) {
         // 判断代码生成器 是否启用
         GeneratorHandleUtil.judgeGeneratorEnable(super.globalProperties);
 
         GenLogsModel byTableId = IService.getByTableId(tableId);
-        return ResultVo.success(byTableId);
+        return ResultWrapper.getSuccessResultWrapper(byTableId);
     }
 
     /**
      * 代码生成 修改
      */
     @ApiOperation(value = "代码生成", notes = "代码生成")
-    @RequiresPermissions("dev_generator_create")
-    @EnableLog
+    @PreAuthorize("hasAuthority('dev_generator_create')")
+    @OperateLogger(description = "代码生成",
+            module = ModuleEnum.MODULE_GENERATOR, operationType = OperationTypeEnum.INSERT, db = true)
     @Override
     public void create(HttpServletRequest request, HttpServletResponse response) {
         // request 对象属性
@@ -88,13 +89,14 @@ public class GenLogsRestController extends BaseRestController<GenLogs, GenLogsMo
      *
      * @param menuParentId 上级菜单ID
      * @param tableId 表ID
-     * @return ResultVo
+     * @return ResultWrapper
      */
     @ApiOperation(value = "生成菜单", notes = "生成菜单")
-    @RequiresPermissions("dev_generator_createMenu")
-    @EnableLog
+    @PreAuthorize("hasAuthority('dev_generator_createMenu')")
+    @OperateLogger(description = "代码生成 - 生成菜单",
+            module = ModuleEnum.MODULE_GENERATOR, operationType = OperationTypeEnum.INSERT, db = true)
     @Override
-    public ResultVo<?> createMenu(String menuParentId, String tableId) {
+    public ResultWrapper<?> createMenu(String menuParentId, String tableId) {
         // 判断代码生成器 是否启用
         GeneratorHandleUtil.judgeGeneratorEnable(super.globalProperties);
 
@@ -104,9 +106,9 @@ public class GenLogsRestController extends BaseRestController<GenLogs, GenLogsMo
         // 调用生成菜单方法
         boolean menuFlag = IService.createMenu(menuParentId, tableId);
         if(!menuFlag){
-            return ResultVo.error();
+            return ResultWrapper.getErrorResultWrapper();
         }
-        return ResultVo.success();
+        return ResultWrapper.getSuccessResultWrapper();
     }
 
 }
