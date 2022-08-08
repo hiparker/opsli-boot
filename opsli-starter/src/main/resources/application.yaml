@@ -164,14 +164,11 @@ opsli:
     credentials-expired: -1
     # 排除过滤URL
     url-exclusion:
-      # 未登陆状态下可以访问
-      anonymous:
+      permit-all:
         - "/captcha"
         - "/system/slipCount"
         - "/system/login"
         - "/system/login-by-code"
-      # 无限制
-      permit-all:
         - "/api/*/common/public-key"
         - "/api/*/common/email/create-code"
         - "/api/*/common/mobile/create-code"
