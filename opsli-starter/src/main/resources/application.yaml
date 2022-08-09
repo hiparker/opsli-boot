@@ -164,17 +164,7 @@ opsli:
     credentials-expired: -1
     # 排除过滤URL
     url-exclusion:
-      # 未登陆状态下可以访问
-      anonymous:
-        - "/captcha"
-        - "/system/slipCount"
-        - "/system/login"
-        - "/system/login-by-code"
-      # 无限制
       permit-all:
-        - "/api/*/common/public-key"
-        - "/api/*/common/email/create-code"
-        - "/api/*/common/mobile/create-code"
         - "/swagger-ui.html"
         - "/doc.html"
         - "/swagger-resources/**"
@@ -183,6 +173,13 @@ opsli:
         - "/swagger/**"
         - "/v2/api-docs"
         - "/druid/**"
+        - "/captcha"
+        - "/system/slipCount"
+        - "/system/login"
+        - "/system/login-by-code"
+        - "/api/*/common/public-key"
+        - "/api/*/common/email/create-code"
+        - "/api/*/common/mobile/create-code"
 
     # 超级管理员账号
     super-admin: system

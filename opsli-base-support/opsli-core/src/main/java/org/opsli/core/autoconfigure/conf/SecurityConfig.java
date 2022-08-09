@@ -67,7 +67,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .frameOptions().disable()
             .and()
             // 关闭csrf token认证不需要csrf防护
-            .csrf().disable();
+            .csrf().disable()
+            // 关闭Session会话管理器 JWT 不需要
+            .sessionManagement().disable()
+            // 关闭记住我功能 JWT 不需要
+            .rememberMe().disable();
 
         // 初始化 initAuthorizeRequests
         this.initAuthorizeRequests(http);
@@ -78,15 +82,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
      * @param http http
      */
     private void initAuthorizeRequests(HttpSecurity http) throws Exception {
-        // 设置URL 未登陆前可访问URL
-        List<String> anonymousList = authProperties.getUrlExclusion().getAnonymous();
-        if(null != anonymousList){
-            String[] urlExclusionArray = anonymousList.toArray(new String[0]);
-            http.authorizeRequests()
-                    // URL 未登陆前可访问
-                    .antMatchers(urlExclusionArray).anonymous();
-        }
-
         // 设置URL白名单
         List<String> permitAll = authProperties.getUrlExclusion().getPermitAll();
         if(null != permitAll){
@@ -104,6 +99,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         // 注意 自定义 Filter 不要交给 Spring管理
         http.addFilterBefore(new JwtAuthenticationTokenFilter(uidUserDetailDetailService),
                 UsernamePasswordAuthenticationFilter.class);
+
+
 
         // 异常处理
         http.exceptionHandling()

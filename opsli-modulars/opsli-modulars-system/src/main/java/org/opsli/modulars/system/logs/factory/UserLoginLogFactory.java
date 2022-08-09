@@ -5,6 +5,7 @@ import org.opsli.api.wrapper.system.logs.LoginLogsModel;
 import org.opsli.api.wrapper.system.user.UserModel;
 import org.opsli.api.wrapper.system.user.UserOrgRefModel;
 import org.opsli.common.enums.DictType;
+import org.opsli.common.utils.IPUtil;
 import org.opsli.core.utils.UserUtil;
 import org.springframework.util.ObjectUtils;
 
@@ -27,7 +28,7 @@ public final class UserLoginLogFactory {
 		loginInfo.setUsername(user.getUsername());
 		loginInfo.setRealName(user.getRealName());
 		// *** 需要确保 user对象的ip信息是有值的
-		loginInfo.setRemoteAddr(user.getLoginIp());
+		loginInfo.setRemoteAddr(IPUtil.getClientAddressBySingle(request));
 		String header = request.getHeader("User-Agent");
 		loginInfo.setUserAgent(header);
 
