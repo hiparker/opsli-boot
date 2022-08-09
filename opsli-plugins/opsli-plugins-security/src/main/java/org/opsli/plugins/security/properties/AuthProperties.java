@@ -45,9 +45,6 @@ public class AuthProperties {
     @Data
     public static class UrlExclusion {
 
-        /** 未登陆状态下可以访问 */
-        private List<String> anonymous;
-
         /** 无限制 */
         private List<String> permitAll;
 

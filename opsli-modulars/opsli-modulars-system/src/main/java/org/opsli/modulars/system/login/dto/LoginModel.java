@@ -35,7 +35,7 @@ public class LoginModel {
     private String principal;
 
     /** 密码 */
-    @Validator({ValidatorType.IS_NOT_NULL, ValidatorType.IS_SECURITY_PASSWORD})
+    @Validator({ValidatorType.IS_NOT_NULL})
     @ValidatorLenMin(6)
     private String password;
 

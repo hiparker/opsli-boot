@@ -82,15 +82,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
      * @param http http
      */
     private void initAuthorizeRequests(HttpSecurity http) throws Exception {
-        // 设置URL 未登陆前可访问URL
-        List<String> anonymousList = authProperties.getUrlExclusion().getAnonymous();
-        if(null != anonymousList){
-            String[] urlExclusionArray = anonymousList.toArray(new String[0]);
-            http.authorizeRequests()
-                    // URL 未登陆前可访问
-                    .antMatchers(urlExclusionArray).anonymous();
-        }
-
         // 设置URL白名单
         List<String> permitAll = authProperties.getUrlExclusion().getPermitAll();
         if(null != permitAll){
