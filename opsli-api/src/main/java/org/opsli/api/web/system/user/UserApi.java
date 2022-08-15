@@ -294,7 +294,6 @@ public interface UserApi {
      * @param username 用户名
      * @return ResultWrapper
      */
-    //@GetMapping("/getUserByUsername")
     ResultWrapper<UserModel> getUserByUsername(String username);
 
     /**
@@ -311,6 +310,11 @@ public interface UserApi {
      */
     ResultWrapper<UserModel> getUserByEmail(String email);
 
-
+    /**
+     * 用户信息 查一条
+     * @param id ID
+     * @return ResultWrapper
+     */
+    ResultWrapper<UserModel> getById(String id);
 
 }
