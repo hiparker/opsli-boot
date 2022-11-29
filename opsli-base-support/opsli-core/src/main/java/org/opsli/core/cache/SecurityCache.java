@@ -144,7 +144,9 @@ public final class SecurityCache {
 		}catch (Exception e){
 			log.error(e.getMessage(), e);
 		}finally {
-			lock.unlock();
+			try {
+				lock.unlock();
+			}catch (Exception ignored){}
 		}
 		return cache;
 	}
@@ -206,7 +208,9 @@ public final class SecurityCache {
 		}catch (Exception e){
 			log.error(e.getMessage(), e);
 		}finally {
-			lock.unlock();
+			try {
+				lock.unlock();
+			}catch (Exception ignored){}
 		}
 		return cache;
 	}
@@ -354,7 +358,9 @@ public final class SecurityCache {
 		}catch (Exception e){
 			log.error(e.getMessage(), e);
 		}finally {
-			lock.unlock();
+			try {
+				lock.unlock();
+			}catch (Exception ignored){}
 		}
 		return cache;
 	}
@@ -421,7 +427,9 @@ public final class SecurityCache {
 		}catch (Exception e){
 			log.error(e.getMessage(), e);
 		}finally {
-			lock.unlock();
+			try {
+				lock.unlock();
+			}catch (Exception ignored){}
 		}
 		return cache;
 	}
@@ -488,7 +496,9 @@ public final class SecurityCache {
 		}catch (Exception e){
 			log.error(e.getMessage(), e);
 		}finally {
-			lock.unlock();
+			try {
+				lock.unlock();
+			}catch (Exception ignored){}
 		}
 		return cache;
 	}
