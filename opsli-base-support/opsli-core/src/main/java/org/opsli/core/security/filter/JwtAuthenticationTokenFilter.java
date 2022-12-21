@@ -35,7 +35,7 @@ import java.io.IOException;
 
 /**
  * JWT 认证 拦截器
- * 注： 不要降 自定义filter 交给 Spring管理
+ * 注： 不要将 自定义filter 交给 Spring管理
  * @author Parker
  * @date 2022年07月22日16:16:42
  */
