@@ -15,9 +15,9 @@
  */
 package org.opsli.common.utils;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.extra.cglib.CglibUtil;
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 
@@ -35,54 +35,60 @@ import java.util.stream.Collectors;
 @Slf4j
 public final class WrapperUtil {
 
-    /** 私有化构造函数 */
-    private WrapperUtil(){}
+    /**
+     * 私有化构造函数
+     */
+    private WrapperUtil() {
+    }
 
     /**
      * 转化对象
+     *
      * @param source 源数据
      * @param target 目标
-     * @param <M> 泛型
+     * @param <M>    泛型
      * @return M
      */
-    public static <M> M transformInstance(Object source, Class<M> target){
+    public static <M> M transformInstance(Object source, Class<M> target) {
         return transformInstance(source, target, false);
     }
 
 
     /**
      * 转化集合对象
+     *
      * @param source 源数据
      * @param target 目标
-     * @param <M> 泛型
+     * @param <M>    泛型
      * @return List<M>
      */
-    public static <T,M> List<M> transformInstance(Collection<T> source, Class<M> target){
+    public static <T, M> List<M> transformInstance(Collection<T> source, Class<M> target) {
         return transformInstance(source, target, false);
     }
 
 
     /**
      * 克隆并且转化对象
-     * @param source 源数据
-     * @param target 目标
+     *
+     * @param source  源数据
+     * @param target  目标
      * @param isClone 是否克隆
      * @return M
      */
-    public static <T,M> M transformInstance(Object source, Class<M> target, boolean isClone){
-        if(source == null){
+    public static <T, M> M transformInstance(Object source, Class<M> target, boolean isClone) {
+        if (source == null) {
             return null;
         }
 
-        if(isClone){
+        if (isClone) {
             source = ObjectUtil.cloneIfPossible(source);
         }
 
         M m = null;
         try {
-            m = CglibUtil.copy(source, target);
-        }catch (Exception e){
-            log.error(e.getMessage(),e);
+            m = BeanUtil.copyProperties(source, target);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
         }
         return m;
     }
@@ -90,14 +96,15 @@ public final class WrapperUtil {
 
     /**
      * 克隆并且转化集合对象
-     * @param source 源数据
-     * @param target 目标
+     *
+     * @param source  源数据
+     * @param target  目标
      * @param isClone 是否克隆
-     * @param <M> M
+     * @param <M>     M
      * @return List<M>
      */
-    public static <T,M> List<M> transformInstance(Collection<T> source, Class<M> target, boolean isClone){
-        if(CollUtil.isEmpty(source)){
+    public static <T, M> List<M> transformInstance(Collection<T> source, Class<M> target, boolean isClone) {
+        if (CollUtil.isEmpty(source)) {
             return Lists.newArrayList();
         }
 
@@ -106,8 +113,8 @@ public final class WrapperUtil {
             toInstanceList = source.stream()
                     .map((s) -> transformInstance(s, target, isClone))
                     .collect(Collectors.toList());
-        }catch (Exception e){
-            log.error(e.getMessage(),e);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
         }
         return toInstanceList;
     }
