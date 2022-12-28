@@ -15,9 +15,9 @@
  */
 package org.opsli.common.utils;
 
-import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.extra.cglib.CglibUtil;
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 
@@ -75,12 +75,12 @@ public final class WrapperUtil {
         }
 
         if(isClone){
-            source = ObjectUtil.cloneByStream(source);
+            source = ObjectUtil.cloneIfPossible(source);
         }
 
         M m = null;
         try {
-            m = BeanUtil.copyProperties(source, target);
+            m = CglibUtil.copy(source, target);
         }catch (Exception e){
             log.error(e.getMessage(),e);
         }
@@ -101,13 +101,11 @@ public final class WrapperUtil {
             return Lists.newArrayList();
         }
 
-        if(isClone){
-            source = ObjectUtil.cloneByStream(source);
-        }
-
         List<M> toInstanceList = Lists.newArrayList();
         try {
-            toInstanceList = source.stream().map((s) -> transformInstance(s, target, true)).collect(Collectors.toList());
+            toInstanceList = source.stream()
+                    .map((s) -> transformInstance(s, target, isClone))
+                    .collect(Collectors.toList());
         }catch (Exception e){
             log.error(e.getMessage(),e);
         }
