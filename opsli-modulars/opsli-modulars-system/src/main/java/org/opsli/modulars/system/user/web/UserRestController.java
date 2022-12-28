@@ -404,11 +404,15 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
      * @return ResultWrapper
      */
     @ApiOperation(value = "获得单条用户信息", notes = "获得单条用户信息 - ID")
-    // 因为工具类 使用到该方法 不做权限验证
-    //@PreAuthorize("hasAuthority('system_user_select')")
+    @PreAuthorize("hasAuthority('system_user_select')")
     @Override
     public ResultWrapper<UserModel> get(UserModel model) {
         model = IService.get(model);
+
+        // 防止密码泄露
+        model.setPassword(null);
+        model.setPasswordLevel(null);
+
         return ResultWrapper.getSuccessResultWrapper(model);
     }
 
@@ -635,51 +639,6 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
         return super.importExcel(request);
     }
 
-
-    /**
-     * 根据 username 获得用户
-     * @param username 用户名
-     * @return ResultWrapper
-     */
-    @ApiOperation(value = "根据 username 获得用户", notes = "根据 username 获得用户")
-    @Override
-    public ResultWrapper<UserModel> getUserByUsername(String username) {
-        UserModel userModel = IService.queryByUserName(username);
-        if(userModel == null){
-            // 暂无该用户
-            throw new ServiceException(SystemMsg.EXCEPTION_USER_NULL.getCode(),
-                    StrUtil.format(SystemMsg.EXCEPTION_USER_NULL.getMessage(), username)
-            );
-        }
-        return ResultWrapper.getSuccessResultWrapper(userModel);
-    }
-
-    @ApiOperation(value = "根据 手机号 获得用户", notes = "根据 手机号 获得用户")
-    @Override
-    public ResultWrapper<UserModel> getUserByMobile(String mobile) {
-        UserModel userModel = IService.queryByMobile(mobile);
-        if(userModel == null){
-            // 暂无该用户
-            throw new ServiceException(SystemMsg.EXCEPTION_USER_NULL.getCode(),
-                    StrUtil.format(SystemMsg.EXCEPTION_USER_NULL.getMessage(), mobile)
-            );
-        }
-        return ResultWrapper.getSuccessResultWrapper(userModel);
-    }
-
-    @ApiOperation(value = "根据 邮箱 获得用户", notes = "根据 邮箱 获得用户")
-    @Override
-    public ResultWrapper<UserModel> getUserByEmail(String email) {
-        UserModel userModel = IService.queryByEmail(email);
-        if(userModel == null){
-            // 暂无该用户
-            throw new ServiceException(SystemMsg.EXCEPTION_USER_NULL.getCode(),
-                    StrUtil.format(SystemMsg.EXCEPTION_USER_NULL.getMessage(), email)
-            );
-        }
-        return ResultWrapper.getSuccessResultWrapper(userModel);
-    }
-
     /**
      * 切换租户
      * @param tenantId 租户ID
@@ -763,6 +722,63 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
         return UserUtil.updateUser(currUser)
                 ? ResultWrapper.getSuccessResultWrapperByMsg("切换成功")
                 : ResultWrapper.getErrorResultWrapper().setMsg("切换失败");
+    }
+
+
+    /**
+     * 根据 username 获得用户
+     * @param username 用户名
+     * @return ResultWrapper
+     */
+    @ApiOperation(value = "根据 username 获得用户", notes = "根据 username 获得用户")
+    @Override
+    public ResultWrapper<UserModel> getUserByUsername(String username) {
+        UserModel userModel = IService.queryByUserName(username);
+        if(userModel == null){
+            // 暂无该用户
+            throw new ServiceException(SystemMsg.EXCEPTION_USER_NULL.getCode(),
+                    StrUtil.format(SystemMsg.EXCEPTION_USER_NULL.getMessage(), username)
+            );
+        }
+        return ResultWrapper.getSuccessResultWrapper(userModel);
+    }
+
+    @ApiOperation(value = "根据 手机号 获得用户", notes = "根据 手机号 获得用户")
+    @Override
+    public ResultWrapper<UserModel> getUserByMobile(String mobile) {
+        UserModel userModel = IService.queryByMobile(mobile);
+        if(userModel == null){
+            // 暂无该用户
+            throw new ServiceException(SystemMsg.EXCEPTION_USER_NULL.getCode(),
+                    StrUtil.format(SystemMsg.EXCEPTION_USER_NULL.getMessage(), mobile)
+            );
+        }
+        return ResultWrapper.getSuccessResultWrapper(userModel);
+    }
+
+    @ApiOperation(value = "根据 邮箱 获得用户", notes = "根据 邮箱 获得用户")
+    @Override
+    public ResultWrapper<UserModel> getUserByEmail(String email) {
+        UserModel userModel = IService.queryByEmail(email);
+        if(userModel == null){
+            // 暂无该用户
+            throw new ServiceException(SystemMsg.EXCEPTION_USER_NULL.getCode(),
+                    StrUtil.format(SystemMsg.EXCEPTION_USER_NULL.getMessage(), email)
+            );
+        }
+        return ResultWrapper.getSuccessResultWrapper(userModel);
+    }
+
+    /**
+     * 用户信息 查一条
+     * @param id 模型
+     * @return ResultWrapper
+     */
+    @ApiOperation(value = "根据 ID 获得用户", notes = "根据 ID 获得用户")
+    @Override
+    public ResultWrapper<UserModel> getById(String id) {
+        UserModel userModel = IService.get(id);
+        return ResultWrapper.getSuccessResultWrapper(userModel);
     }
 
 }

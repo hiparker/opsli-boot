@@ -174,16 +174,7 @@ public class UserUtil {
 
         Object cache = SecurityCache.get(redisTemplate, cacheKey, (k) -> {
             // 查询数据库
-            UserModel userModelTemp = new UserModel();
-            userModelTemp.setId(userId);
-            // 设置为系统内部调用 否则 会拿到 空值
-            userModelTemp.setIzApi(true);
-
-            // 查询数据库
-            ResultWrapper<UserModel> resultVo = userApi.get(userModelTemp);
-            if(!ResultWrapper.isSuccess(resultVo)){
-                return null;
-            }
+            ResultWrapper<UserModel> resultVo = userApi.getById(userId);
             return resultVo.getData();
         }, true);
 

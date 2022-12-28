@@ -93,6 +93,7 @@
         <protobuf-java.version>3.18.2</protobuf-java.version>
         <beanutils.version>1.9.4</beanutils.version>
         <transmittable.version>2.12.5</transmittable.version>
+        <cglib.version>3.3.0</cglib.version>
 
         <!-- 需要使用着两个版本 来引入对应的模块和插件 -->
         <!-- API版本 -->
@@ -144,6 +145,13 @@
                 <groupId>com.github.whvcse</groupId>
                 <artifactId>easy-captcha</artifactId>
                 <version>${captcha.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>cglib</groupId>
+                <artifactId>cglib</artifactId>
+                <version>${cglib.version}</version>
+                <scope>compile</scope>
             </dependency>
 
             <!-- JWT -->
@@ -348,6 +356,13 @@
             <groupId>cn.hutool</groupId>
             <artifactId>hutool-all</artifactId>
             <version>${hutool.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>cglib</groupId>
+            <artifactId>cglib</artifactId>
+            <version>${cglib.version}</version>
+            <scope>compile</scope>
         </dependency>
 
         <!-- 修复 Cxa9261daf-3755 -->

@@ -321,7 +321,7 @@ public class UserTokenUtil {
         if(BooleanUtil.isTrue(LOGIN_PROPERTIES.getReviveMode())){
             // 设置该用户全部token失效时间， 如果这时又有新设备登录 则续命
             redisPlugin.expire(ticketSetKey,
-                    TOKEN_PROPERTIES.getEffectiveTime(), TimeUnit.MILLISECONDS);
+                    TOKEN_PROPERTIES.getEffectiveTime(), TimeUnit.MINUTES);
         }
     }
 
