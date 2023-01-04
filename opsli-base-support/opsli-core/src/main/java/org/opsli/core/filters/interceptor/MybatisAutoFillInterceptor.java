@@ -140,37 +140,27 @@ public class MybatisAutoFillInterceptor implements Interceptor {
             }
 
             switch (f.getName()) {
-                // 创建人
+                // 创建人、更新人
                 case MyBatisConstants.FIELD_CREATE_BY:
-                    // 如果创建人 为空则进行默认赋值
-                    Object createValue = ReflectUtil.getFieldValue(arg, f.getName());
-                    if(StringUtils.isBlank(Convert.toStr(createValue))){
-                        BeanUtil.setProperty(arg, MyBatisConstants.FIELD_CREATE_BY, UserUtil.getUser().getId());
-                    }
-                    break;
-                // 更新人
                 case MyBatisConstants.FIELD_UPDATE_BY:
-                    // 如果更新人 为空则进行默认赋值
-                    Object updateValue = ReflectUtil.getFieldValue(arg, f.getName());
-                    if(StringUtils.isBlank(Convert.toStr(updateValue))){
-                        BeanUtil.setProperty(arg, MyBatisConstants.FIELD_UPDATE_BY, UserUtil.getUser().getId());
+                    // 如果创建人 为空则进行默认赋值
+                    Object createOrUpdateValue = ReflectUtil.getFieldValue(arg, f.getName());
+                    if(StringUtils.isBlank(Convert.toStr(createOrUpdateValue))){
+                        BeanUtil.setProperty(arg, f.getName(), UserUtil.getUser().getId());
                     }
                     break;
-                // 创建日期
+                // 创建日期、更新日期
                 case MyBatisConstants.FIELD_CREATE_TIME:
-                    BeanUtil.setProperty(arg, MyBatisConstants.FIELD_CREATE_TIME, currDate);
-                    break;
-                // 更新日期
                 case MyBatisConstants.FIELD_UPDATE_TIME:
-                    BeanUtil.setProperty(arg, MyBatisConstants.FIELD_UPDATE_TIME, currDate);
+                    BeanUtil.setProperty(arg, f.getName(), currDate);
                     break;
                 // 乐观锁
                 case MyBatisConstants.FIELD_OPTIMISTIC_LOCK:
-                    BeanUtil.setProperty(arg, MyBatisConstants.FIELD_OPTIMISTIC_LOCK, 0);
+                    BeanUtil.setProperty(arg, f.getName(), 0);
                     break;
                 // 逻辑删除
                 case MyBatisConstants.FIELD_DELETE_LOGIC:
-                    BeanUtil.setProperty(arg, MyBatisConstants.FIELD_DELETE_LOGIC,  MyBatisConstants.LOGIC_NOT_DELETE_VALUE);
+                    BeanUtil.setProperty(arg, f.getName(),  MyBatisConstants.LOGIC_NOT_DELETE_VALUE);
                     break;
                 // 多租户设置
                 case MyBatisConstants.FIELD_TENANT:
@@ -178,7 +168,7 @@ public class MybatisAutoFillInterceptor implements Interceptor {
                     // 如果租户ID 为空则进行默认赋值
                     Object tenantValue = ReflectUtil.getFieldValue(arg, f.getName());
                     if(StringUtils.isBlank(Convert.toStr(tenantValue))){
-                        BeanUtil.setProperty(arg, MyBatisConstants.FIELD_TENANT,  UserUtil.getTenantId());
+                        BeanUtil.setProperty(arg, f.getName(),  UserUtil.getTenantId());
                     }
                     break;
                 // 组织机构设置
@@ -190,7 +180,7 @@ public class MybatisAutoFillInterceptor implements Interceptor {
                                 UserUtil.getUserDefOrgByUserId(UserUtil.getUser().getId());
                         if(null != userOrgRefModel){
                             String orgIds = userOrgRefModel.getOrgIds();
-                            BeanUtil.setProperty(arg, MyBatisConstants.FIELD_ORG_GROUP, orgIds);
+                            BeanUtil.setProperty(arg, f.getName(), orgIds);
                         }
                     }
                     break;
@@ -255,12 +245,12 @@ public class MybatisAutoFillInterceptor implements Interceptor {
                     // 如果更新人 为空则进行默认赋值
                     Object updateValue = ReflectUtil.getFieldValue(arg, f.getName());
                     if(StringUtils.isBlank(Convert.toStr(updateValue))){
-                        BeanUtil.setProperty(arg, MyBatisConstants.FIELD_UPDATE_BY, UserUtil.getUser().getId());
+                        BeanUtil.setProperty(arg, f.getName(), UserUtil.getUser().getId());
                     }
                     break;
                 // 更新日期
                 case MyBatisConstants.FIELD_UPDATE_TIME:
-                    BeanUtil.setProperty(arg, MyBatisConstants.FIELD_UPDATE_TIME, DateUtil.date());
+                    BeanUtil.setProperty(arg, f.getName(), DateUtil.date());
                     break;
                 default:
                     break;
