@@ -30,12 +30,14 @@ import org.apache.ibatis.mapping.SqlCommandType;
 import org.apache.ibatis.plugin.*;
 import org.opsli.api.wrapper.system.user.UserOrgRefModel;
 import org.opsli.common.constants.MyBatisConstants;
+import org.opsli.common.enums.DictType;
 import org.opsli.core.utils.UserUtil;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
+import java.util.function.Consumer;
 
 /**
  * MyBatis 拦截器 注入属性用
@@ -110,84 +112,61 @@ public class MybatisAutoFillInterceptor implements Interceptor {
             return;
         }
 
-        // 排除字段
-        List<String> existField = Lists.newArrayList();
-
         // 当前时间
         Date currDate = DateUtil.date();
+        final Object argObj = arg;
 
-        // 字段缓存 减少每次更新 反射
-        Field[] fields = ENTITY_FIELD_MAP.get(arg.getClass());
-        if(fields == null){
-            fields = ReflectUtil.getFields(arg.getClass());
-            ENTITY_FIELD_MAP.put(arg.getClass(), fields);
-        }
-
-        for (Field f : fields) {
-            // 判断是否是排除字段
-            if(existField.contains(f.getName())){
-                continue;
-            }
-
-            // 如果设置为忽略字段 则直接跳过不处理
-            TableField tableField = f.getAnnotation(TableField.class);
-            if(tableField != null){
-                boolean exist = tableField.exist();
-                if(!exist){
-                    existField.add(f.getName());
-                    continue;
-                }
-            }
-
-            switch (f.getName()) {
+        // 处理字段
+        loopHandlerField(argObj, (fieldName)->{
+            switch (fieldName) {
                 // 创建人、更新人
                 case MyBatisConstants.FIELD_CREATE_BY:
                 case MyBatisConstants.FIELD_UPDATE_BY:
                     // 如果创建人 为空则进行默认赋值
-                    Object createOrUpdateValue = ReflectUtil.getFieldValue(arg, f.getName());
+                    Object createOrUpdateValue = ReflectUtil.getFieldValue(argObj, fieldName);
                     if(StringUtils.isBlank(Convert.toStr(createOrUpdateValue))){
-                        BeanUtil.setProperty(arg, f.getName(), UserUtil.getUser().getId());
+                        BeanUtil.setProperty(argObj, fieldName, UserUtil.getUser().getId());
                     }
                     break;
                 // 创建日期、更新日期
                 case MyBatisConstants.FIELD_CREATE_TIME:
                 case MyBatisConstants.FIELD_UPDATE_TIME:
-                    BeanUtil.setProperty(arg, f.getName(), currDate);
+                    BeanUtil.setProperty(argObj, fieldName, currDate);
                     break;
                 // 乐观锁
                 case MyBatisConstants.FIELD_OPTIMISTIC_LOCK:
-                    BeanUtil.setProperty(arg, f.getName(), 0);
+                    BeanUtil.setProperty(argObj, fieldName, DictType.NO_YES_NO.getValue());
                     break;
                 // 逻辑删除
                 case MyBatisConstants.FIELD_DELETE_LOGIC:
-                    BeanUtil.setProperty(arg, f.getName(),  MyBatisConstants.LOGIC_NOT_DELETE_VALUE);
+                    BeanUtil.setProperty(argObj, fieldName,  MyBatisConstants.LOGIC_NOT_DELETE_VALUE);
                     break;
                 // 多租户设置
                 case MyBatisConstants.FIELD_TENANT:
                     // 2020-12-05 修复当前租户可能为空字符串报错问题
                     // 如果租户ID 为空则进行默认赋值
-                    Object tenantValue = ReflectUtil.getFieldValue(arg, f.getName());
+                    Object tenantValue = ReflectUtil.getFieldValue(argObj, fieldName);
                     if(StringUtils.isBlank(Convert.toStr(tenantValue))){
-                        BeanUtil.setProperty(arg, f.getName(),  UserUtil.getTenantId());
+                        BeanUtil.setProperty(argObj, fieldName,  UserUtil.getTenantId());
                     }
                     break;
                 // 组织机构设置
                 case MyBatisConstants.FIELD_ORG_GROUP:
                     // 如果组织IDs 为空则进行默认赋值
-                    Object orgValue = ReflectUtil.getFieldValue(arg, f.getName());
+                    Object orgValue = ReflectUtil.getFieldValue(argObj, fieldName);
                     if(StringUtils.isBlank(Convert.toStr(orgValue))){
                         UserOrgRefModel userOrgRefModel =
                                 UserUtil.getUserDefOrgByUserId(UserUtil.getUser().getId());
                         if(null != userOrgRefModel){
                             String orgIds = userOrgRefModel.getOrgIds();
-                            BeanUtil.setProperty(arg, f.getName(), orgIds);
+                            BeanUtil.setProperty(argObj, fieldName, orgIds);
                         }
                     }
                     break;
                 default:
                     break;
             }
-        }
+        });
     }
 
     /**
@@ -199,22 +178,52 @@ public class MybatisAutoFillInterceptor implements Interceptor {
             return;
         }
 
-        // 排除字段
-        List<String> existField = Lists.newArrayList();
-
         // 2020-09-19
         // 修改这儿 有可能会拿到一个 MapperMethod，需要特殊处理
         if (arg instanceof MapperMethod.ParamMap) {
             MapperMethod.ParamMap<?> paramMap = (MapperMethod.ParamMap<?>) arg;
-            if (paramMap.containsKey(ET)) {
-                arg = paramMap.get(ET);
-            } else {
-                arg = paramMap.get("param1");
-            }
+            arg = paramMap.containsKey(ET)
+                    ? paramMap.get(ET)
+                    : paramMap.get("param1");
             if (arg == null) {
                 return;
             }
         }
+
+        // 当前时间
+        Date currDate = DateUtil.date();
+        final Object argObj = arg;
+
+        // 处理字段
+        loopHandlerField(argObj, (fieldName)->{
+            switch (fieldName) {
+                // 更新人
+                case MyBatisConstants.FIELD_UPDATE_BY:
+                    // 如果更新人 为空则进行默认赋值
+                    Object updateValue = ReflectUtil.getFieldValue(argObj, fieldName);
+                    if(StringUtils.isBlank(Convert.toStr(updateValue))){
+                        BeanUtil.setProperty(argObj, fieldName, UserUtil.getUser().getId());
+                    }
+                    break;
+                // 更新日期
+                case MyBatisConstants.FIELD_UPDATE_TIME:
+                    BeanUtil.setProperty(argObj, fieldName, currDate);
+                    break;
+                default:
+                    break;
+            }
+        });
+    }
+
+    /**
+     * 循环处理字段
+     *
+     * @param arg 参数
+     * @param callback 回调函数
+     */
+    private void loopHandlerField(Object arg, Consumer<String> callback){
+        // 排除字段
+        List<String> existField = Lists.newArrayList();
 
         // 字段缓存 减少每次更新 反射
         Field[] fields = ENTITY_FIELD_MAP.get(arg.getClass());
@@ -225,36 +234,21 @@ public class MybatisAutoFillInterceptor implements Interceptor {
 
         for (Field f : fields) {
             // 判断是否是排除字段
-            if(existField.contains(f.getName())){
+            if (existField.contains(f.getName())) {
                 continue;
             }
 
             // 如果设置为忽略字段 则直接跳过不处理
             TableField tableField = f.getAnnotation(TableField.class);
-            if(tableField != null){
-                boolean exist = tableField.exist();
-                if(!exist){
+            if (tableField != null) {
+                if (!tableField.exist()) {
                     existField.add(f.getName());
                     continue;
                 }
             }
 
-            switch (f.getName()) {
-                // 更新人
-                case MyBatisConstants.FIELD_UPDATE_BY:
-                    // 如果更新人 为空则进行默认赋值
-                    Object updateValue = ReflectUtil.getFieldValue(arg, f.getName());
-                    if(StringUtils.isBlank(Convert.toStr(updateValue))){
-                        BeanUtil.setProperty(arg, f.getName(), UserUtil.getUser().getId());
-                    }
-                    break;
-                // 更新日期
-                case MyBatisConstants.FIELD_UPDATE_TIME:
-                    BeanUtil.setProperty(arg, f.getName(), DateUtil.date());
-                    break;
-                default:
-                    break;
-            }
+            // 回调函数
+            callback.accept(f.getName());
         }
     }
 
