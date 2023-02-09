@@ -15,6 +15,8 @@
  */
 package org.opsli.core.autoconfigure.conf;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.extern.slf4j.Slf4j;
 import org.opsli.common.annotation.ApiRestController;
 import org.opsli.core.api.ApiRequestMappingHandlerMapping;
@@ -23,6 +25,8 @@ import org.opsli.core.filters.interceptor.UserAuthInterceptor;
 import org.springframework.boot.autoconfigure.web.servlet.WebMvcRegistrations;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
@@ -86,5 +90,14 @@ public class SpringWebMvcConfig implements WebMvcConfigurer, WebMvcRegistrations
 		// 加载特定拦截器
 		registry.addInterceptor(new UserAuthInterceptor());
 		WebMvcConfigurer.super.addInterceptors(registry);
+	}
+
+	@Bean
+	public MappingJackson2HttpMessageConverter getMappingJackson2HttpMessageConverter() {
+		ObjectMapper objectMapper = Jackson2ObjectMapperBuilder.json()
+				.serializerByType(Long.class, ToStringSerializer.instance)
+				.serializerByType(Long.TYPE, ToStringSerializer.instance)
+				.build();
+		return new MappingJackson2HttpMessageConverter(objectMapper);
 	}
 }

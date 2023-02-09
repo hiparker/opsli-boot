@@ -80,5 +80,7 @@ public final class RedisConstants {
 	/** Excel 导出 凭证 */
 	public static final String PREFIX_TMP_EXCEL_EXPORT_NAME = "kv#{}:excel-export:";
 
+	public static final String PREFIX_ID_INCR = "kv#{}:id_incr:";
+
 	private RedisConstants(){}
 }
