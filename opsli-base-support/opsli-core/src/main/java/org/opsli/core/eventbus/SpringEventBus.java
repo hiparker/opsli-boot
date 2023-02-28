@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.opsli.core.log.bus;
+package org.opsli.core.eventbus;
 
 import com.google.common.eventbus.AsyncEventBus;
 import com.google.common.eventbus.EventBus;
@@ -21,7 +21,6 @@ import com.google.common.eventbus.SubscriberExceptionContext;
 import com.google.common.eventbus.SubscriberExceptionHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.opsli.common.thread.ThreadPoolFactory;
-import org.opsli.core.eventbus.AbstractSpringEventBus;
 import org.springframework.stereotype.Component;
 
 import java.util.concurrent.ThreadPoolExecutor;
@@ -34,11 +33,11 @@ import java.util.concurrent.TimeUnit;
  */
 @Component
 @Slf4j
-public class OperationLogEventBus extends AbstractSpringEventBus implements  SubscriberExceptionHandler {
+public class SpringEventBus extends AbstractSpringEventBus implements  SubscriberExceptionHandler {
 
     private final EventBus eventBus;
 
-    public OperationLogEventBus() {
+    public SpringEventBus() {
     	// 异步事件配置线程池
         eventBus = new AsyncEventBus(
                 ThreadPoolFactory.createInitThreadPool(5, 10, 60, TimeUnit.SECONDS,
