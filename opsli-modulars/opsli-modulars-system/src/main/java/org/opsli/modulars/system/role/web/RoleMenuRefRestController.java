@@ -19,6 +19,7 @@ import com.google.common.collect.Lists;
 import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.opsli.common.annotation.ApiVersion;
 import org.opsli.core.log.annotation.OperateLogger;
 import org.opsli.core.log.enums.ModuleEnum;
 import org.opsli.core.log.enums.OperationTypeEnum;
@@ -37,6 +38,7 @@ import org.opsli.modulars.system.SystemMsg;
 import org.opsli.modulars.system.menu.entity.SysMenu;
 import org.opsli.modulars.system.role.service.IRoleMenuRefService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 
 import java.util.List;
 import java.util.Map;
@@ -94,6 +96,31 @@ public class RoleMenuRefRestController implements RoleMenuRefApi {
     }
 
     /**
+     * 获得当前已有权限 (针对Vue3 兼容)
+     * @param model roleId 角色Id
+     * @return ResultWrapper
+     */
+    @PreAuthorize("hasAuthority('system_role_setMenuPerms')")
+    @Override
+    @ApiVersion(2)
+    public ResultWrapper<?> getPermsV2(RoleMenuRefModel model) {
+        if(model == null){
+            return ResultWrapper.getCustomResultWrapper(SystemMsg.EXCEPTION_ROLE_ID_NOT_NULL);
+        }
+
+        List<SysMenu> perms = iRoleMenuRefService.getPerms(model.getRoleId());
+        List<String> permsIds = Lists.newArrayListWithCapacity(perms.size());
+        if(!perms.isEmpty()){
+            for (SysMenu perm : perms) {
+                permsIds.add(perm.getId());
+            }
+        }
+
+        return ResultWrapper.getSuccessResultWrapper(permsIds);
+    }
+
+
+    /**
      * 设置菜單权限
      * @param model 模型
      * @return ResultWrapper
@@ -111,6 +138,33 @@ public class RoleMenuRefRestController implements RoleMenuRefApi {
         }
 
         boolean ret = iRoleMenuRefService.setPerms(model.getRoleId(),
+                model.getPermsIds());
+        if(ret){
+            return ResultWrapper.getSuccessResultWrapper();
+        }
+        // 权限设置失败
+        return ResultWrapper.getCustomResultWrapper(SystemMsg.EXCEPTION_ROLE_PERMS_ERROR);
+    }
+
+
+    /**
+     * 设置菜單权限
+     * @param model 模型
+     * @return ResultWrapper
+     */
+    @PreAuthorize("hasAuthority('system_role_setMenuPerms')")
+    @OperateLogger(description = "设置菜單权限",
+            module = ModuleEnum.MODULE_ROLE, operationType = OperationTypeEnum.UPDATE, db = true)
+    @Override
+    public ResultWrapper<?> setPermsV2(RoleMenuRefModel model) {
+        // 演示模式 不允许操作
+        this.demoError();
+
+        if(model == null){
+            return ResultWrapper.getErrorResultWrapper().setMsg("设置权限失败");
+        }
+
+        boolean ret = iRoleMenuRefService.setPermsV2(model.getRoleId(),
                 model.getPermsIds());
         if(ret){
             return ResultWrapper.getSuccessResultWrapper();

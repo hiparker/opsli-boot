@@ -43,6 +43,14 @@ public interface IRoleMenuRefService {
     boolean setPerms(String roleId,String[] permsIds);
 
     /**
+     * 保存权限（兼容Vue3）
+     * @param roleId 角色ID
+     * @param permsIds 权限集合
+     * @return boolean
+     */
+    boolean setPermsV2(String roleId,String[] permsIds);
+
+    /**
      * 根据角色ID 移除对应 权限数据
      * @param roleIds 角色ID
      * @return boolean
