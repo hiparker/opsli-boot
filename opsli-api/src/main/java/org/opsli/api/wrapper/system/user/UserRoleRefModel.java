@@ -17,9 +17,7 @@ package org.opsli.api.wrapper.system.user;
 
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Builder;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.*;
 import org.opsli.common.annotation.validator.Validator;
 import org.opsli.common.annotation.validator.ValidatorLenMax;
 import org.opsli.common.enums.ValidatorType;
@@ -35,6 +33,8 @@ import java.io.Serializable;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @ExcelIgnoreUnannotated
+@AllArgsConstructor
+@NoArgsConstructor
 @Builder
 public class UserRoleRefModel implements Serializable {
 

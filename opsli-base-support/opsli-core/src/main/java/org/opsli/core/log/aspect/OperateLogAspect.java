@@ -29,7 +29,7 @@ import org.opsli.core.base.dto.LoginUserDto;
 import org.opsli.core.holder.UserContextHolder;
 import org.opsli.core.log.annotation.OperateLogger;
 import org.opsli.core.log.bean.OperationLog;
-import org.opsli.core.log.bus.OperationLogEventBus;
+import org.opsli.core.eventbus.SpringEventBus;
 import org.opsli.core.log.enums.LogLevelEnum;
 import org.opsli.core.log.enums.LogScopeEnum;
 import org.opsli.core.utils.UserTokenUtil;
@@ -57,7 +57,7 @@ public class OperateLogAspect {
     private static final String RE = "\\$\\{([\\w\\.\\-\\/\\+\\$\\#\\@\\!\\^\\&\\(\\)]+)\\}";
 
     @Resource
-    private OperationLogEventBus operationLogEventBus;
+    private SpringEventBus springEventBus;
 
     @Pointcut("@annotation(org.opsli.core.log.annotation.OperateLogger)")
     public void operationLog(){}
@@ -156,7 +156,7 @@ public class OperateLogAspect {
         }
         // 存入数据库
         if(annotation.db()){
-            operationLogEventBus.post(operationLog);
+            springEventBus.post(operationLog);
         }
     }
 

@@ -88,6 +88,38 @@ public class RoleMenuRefServiceImpl extends ServiceImpl<RoleMenuRefMapper,SysRol
         return true;
     }
 
+    /**
+     * 兼容Vue3 设置权限
+     * @param roleId 角色ID
+     * @param permsIds 权限集合
+     * @return boolean
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public boolean setPermsV2(String roleId, String[] permsIds) {
+        if(StringUtils.isEmpty(roleId)){
+            throw new ServiceException(SystemMsg.EXCEPTION_ROLE_ID_NOT_NULL);
+        }
+
+        // 删除已有权限
+        this.delPermsByRoleIds(Convert.toList(String.class, roleId));
+
+        List<SysRoleMenuRef> list = Lists.newArrayListWithCapacity(permsIds.length);
+        for (String permsId : permsIds) {
+            SysRoleMenuRef entity = new SysRoleMenuRef();
+            entity.setRoleId(roleId);
+            entity.setMenuId(permsId);
+            list.add(entity);
+        }
+        boolean ret = super.saveBatch(list);
+        if(ret){
+            // 清除缓存
+            this.clearCache(roleId);
+        }
+        return ret;
+    }
+
+
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean delPermsByMenuIds(List<String> menuIds){

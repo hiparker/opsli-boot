@@ -288,6 +288,29 @@ public class MenuRestController extends BaseRestController<SysMenu, MenuModel, I
     }
 
     /**
+     * 菜单 查一条
+     * @param parentId 父节点ID
+     * @return ResultWrapper
+     */
+    @ApiOperation(value = "获得单条菜单", notes = "获得单条菜单 - ID")
+    @PreAuthorize("hasAuthority('system_menu_select')")
+    @Override
+    public ResultWrapper<MenuModel> getParent(String parentId) {
+        if(StringUtils.isBlank(parentId)){
+            return ResultWrapper.getSuccessResultWrapper(null);
+        }
+        MenuModel model;
+        if(StringUtils.equals(MenuConstants.GEN_ID, parentId)){
+            // 生成根节点菜单
+            model = getGenMenuModel();
+        }else{
+            model = IService.get(parentId);
+        }
+
+        return ResultWrapper.getSuccessResultWrapper(model);
+    }
+
+    /**
      * 菜单 查询分页
      * @param pageNo 当前页
      * @param pageSize 每页条数

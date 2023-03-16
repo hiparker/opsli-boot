@@ -102,6 +102,14 @@ public interface MenuApi {
 
     /**
      * 菜单 查一条
+     * @param parentId 父级ID
+     * @return ResultWrapper
+     */
+    @GetMapping("/getParent")
+    ResultWrapper<MenuModel> getParent(String parentId);
+
+    /**
+     * 菜单 查一条
      * @param model 模型
      * @return ResultWrapper
      */
