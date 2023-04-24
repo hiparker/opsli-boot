@@ -25,6 +25,7 @@
         <module>opsli-plugins-email</module>
         <module>opsli-plugins-sms</module>
         <module>opsli-plugins-security</module>
+        <module>opsli-plugins-pagehelper</module>
     </modules>
 
     <dependencyManagement>

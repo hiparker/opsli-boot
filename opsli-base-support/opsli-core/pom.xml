@@ -120,8 +120,9 @@
 
         <!-- page-helper 分页 -->
         <dependency>
-            <groupId>com.github.pagehelper</groupId>
-            <artifactId>pagehelper-spring-boot-starter</artifactId>
+            <groupId>org.opsliframework.boot</groupId>
+            <artifactId>opsli-plugins-pagehelper</artifactId>
+            <version>${pagehelper.version}</version>
         </dependency>
 
         <!-- druid -->

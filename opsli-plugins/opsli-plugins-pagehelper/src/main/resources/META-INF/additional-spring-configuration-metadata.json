@@ -1,0 +1,88 @@
+{
+  "groups": [
+    {
+      "name": "pagehelper",
+      "type": "org.opsli.plugins.pagehelper.PageHelperProperties",
+      "sourceType": "org.opsli.plugins.pagehelper.PageHelperProperties"
+    }
+  ],
+  "properties": [
+    {
+      "name": "pagehelper.banner",
+      "type": "java.lang.Boolean",
+      "defaultValue": false,
+      "sourceType": "org.opsli.plugins.pagehelper.PageHelperProperties"
+    },
+    {
+      "name": "pagehelper.auto-dialect",
+      "type": "java.lang.Boolean",
+      "sourceType": "org.opsli.plugins.pagehelper.PageHelperProperties"
+    },
+    {
+      "name": "pagehelper.auto-dialect-class",
+      "type": "java.lang.String",
+      "sourceType": "org.opsli.plugins.pagehelper.PageHelperProperties"
+    },
+    {
+      "name": "pagehelper.auto-runtime-dialect",
+      "type": "java.lang.Boolean",
+      "sourceType": "org.opsli.plugins.pagehelper.PageHelperProperties"
+    },
+    {
+      "name": "pagehelper.close-conn",
+      "type": "java.lang.Boolean",
+      "sourceType": "org.opsli.plugins.pagehelper.PageHelperProperties"
+    },
+    {
+      "name": "pagehelper.default-count",
+      "type": "java.lang.Boolean",
+      "sourceType": "org.opsli.plugins.pagehelper.PageHelperProperties"
+    },
+    {
+      "name": "pagehelper.dialect",
+      "type": "java.lang.String",
+      "sourceType": "org.opsli.plugins.pagehelper.PageHelperProperties"
+    },
+    {
+      "name": "pagehelper.dialect-alias",
+      "type": "java.lang.String",
+      "sourceType": "org.opsli.plugins.pagehelper.PageHelperProperties"
+    },
+    {
+      "name": "pagehelper.helper-dialect",
+      "type": "java.lang.String",
+      "sourceType": "org.opsli.plugins.pagehelper.PageHelperProperties"
+    },
+    {
+      "name": "pagehelper.offset-as-page-num",
+      "type": "java.lang.Boolean",
+      "sourceType": "org.opsli.plugins.pagehelper.PageHelperProperties"
+    },
+    {
+      "name": "pagehelper.page-size-zero",
+      "type": "java.lang.Boolean",
+      "sourceType": "org.opsli.plugins.pagehelper.PageHelperProperties"
+    },
+    {
+      "name": "pagehelper.params",
+      "type": "java.lang.String",
+      "sourceType": "org.opsli.plugins.pagehelper.PageHelperProperties"
+    },
+    {
+      "name": "pagehelper.reasonable",
+      "type": "java.lang.Boolean",
+      "sourceType": "org.opsli.plugins.pagehelper.PageHelperProperties"
+    },
+    {
+      "name": "pagehelper.row-bounds-with-count",
+      "type": "java.lang.Boolean",
+      "sourceType": "org.opsli.plugins.pagehelper.PageHelperProperties"
+    },
+    {
+      "name": "pagehelper.support-methods-arguments",
+      "type": "java.lang.Boolean",
+      "sourceType": "org.opsli.plugins.pagehelper.PageHelperProperties"
+    }
+  ],
+  "hints": []
+}

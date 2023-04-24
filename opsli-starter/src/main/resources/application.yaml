@@ -36,8 +36,6 @@ spring:
       max-file-size: 10MB
       max-request-size: 10MB
   #静态资源
-  resources:
-    static-locations: classpath:/META-INF/resources/,classpath:/resources/, classpath:/static/, classpath:/public/,file:${opsli.web.upload-path}
   #json 时间戳统一转换
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss
@@ -52,7 +50,13 @@ spring:
   #
   #main:
   #  allow-bean-definition-overriding: true
-
+  web:
+    resources:
+      static-locations: classpath:/META-INF/resources/,classpath:/resources/, classpath:/static/, classpath:/public/,file:${opsli.web.upload-path}
+  mvc:
+    #Spring Boot 2.6+后映射匹配的默认策略已从AntPathMatcher更改为PathPatternParser,需要手动指定为ant-path-matcher
+    pathmatch:
+      matching-strategy: ant_path_matcher
   # 缓存配置项
   cache:
     # 前缀
