@@ -33,8 +33,8 @@
 
 | 名称             | 版本号 |      | 名称           | 版本号          |
 | ---------------- |---| ---- | -------------- |--------------|
-| jdk版本          | 1.8 |      | springboot版本 | 2.5.6        |
-| mybatis-plus版本 | 3.5.2 |      | pagehelper版本 | 1.3.0        |
+| jdk版本          | 1.8 |      | springboot版本 | 2.7.10       |
+| mybatis-plus版本 | 3.5.2 |      | pagehelper版本 | 1.4.6        |
 | druid版本        | 1.1.17 |      | dynamic版本    | 2.5.4        |
 | fastjson版本  | 1.2.83  |      | transmittable版本        | 2.12.5       |
 | ehcache版本      | 3.9.0 |      | easyexcel版本  | 2.2.6        |
