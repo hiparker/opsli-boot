@@ -90,7 +90,7 @@
         <guava.version>30.0-android</guava.version>
         <commons.io.version>2.11.0</commons.io.version>
         <commons.lang3.version>3.11</commons.lang3.version>
-        <snakeyaml.version>1.27</snakeyaml.version>
+        <snakeyaml.version>2.0</snakeyaml.version>
         <email.version>1.6.2</email.version>
         <logback.version>1.2.9</logback.version>
         <protobuf-java.version>3.18.2</protobuf-java.version>
