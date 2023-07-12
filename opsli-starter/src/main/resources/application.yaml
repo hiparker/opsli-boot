@@ -169,6 +169,7 @@ opsli:
     # 排除过滤URL
     url-exclusion:
       permit-all:
+        - "/static/files/**"
         - "/swagger-ui.html"
         - "/doc.html"
         - "/swagger-resources/**"

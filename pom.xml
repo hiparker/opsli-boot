@@ -87,7 +87,7 @@
 
         <!-- 工具 -->
         <hutool.version>5.7.14</hutool.version>
-        <guava.version>30.0-android</guava.version>
+        <guava.version>31.1-jre</guava.version>
         <commons.io.version>2.11.0</commons.io.version>
         <commons.lang3.version>3.11</commons.lang3.version>
         <snakeyaml.version>2.0</snakeyaml.version>
