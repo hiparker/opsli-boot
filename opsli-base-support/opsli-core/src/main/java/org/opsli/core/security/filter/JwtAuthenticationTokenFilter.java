@@ -15,6 +15,7 @@
  */
 package org.opsli.core.security.filter;
 
+import cn.hutool.json.JSONUtil;
 import lombok.AllArgsConstructor;
 import org.opsli.core.base.dto.LoginUserDto;
 import org.opsli.core.security.service.UidUserDetailDetailServiceImpl;
@@ -22,6 +23,8 @@ import org.opsli.core.utils.UserTokenUtil;
 import org.opsli.plugins.security.authentication.AfterAuthenticationToken;
 import org.opsli.plugins.security.exception.AuthException;
 import org.opsli.plugins.security.exception.errorcode.AuthErrorCodeEnum;
+import org.opsli.plugins.security.utils.WebUtils;
+import org.opsli.plugins.security.vo.AuthResultWrapper;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.util.StringUtils;
@@ -56,26 +59,41 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
             return;
         }
 
-        // 验证Token
-        UserTokenUtil.verify(token);
+        try {
+            // 验证Token
+            UserTokenUtil.verify(token);
 
-        // 获得登陆用户信息
-        LoginUserDto loginUserDto = UserTokenUtil.getLoginUserDto(token)
-                // 认证无效
-                .orElseThrow(() -> new AuthException(AuthErrorCodeEnum.AUTH_AUTH_INVALID));
+            // 获得登陆用户信息
+            LoginUserDto loginUserDto = UserTokenUtil.getLoginUserDto(token)
+                    // 认证无效
+                    .orElseThrow(() -> new AuthException(AuthErrorCodeEnum.AUTH_AUTH_INVALID));
 
-        // 这里用Uid 获取用户信息，因为涉及到超管切换租户身份
-        // 非 租户系统 可以直接使用 用户名获取信息
-        UserDetails userDetails = uidUserDetailDetailService.loadUserByPrincipal(loginUserDto.getUid())
-                // 认证无效
-                .orElseThrow(() -> new AuthException(AuthErrorCodeEnum.AUTH_AUTH_INVALID));
+            // 这里用Uid 获取用户信息，因为涉及到超管切换租户身份
+            // 非 租户系统 可以直接使用 用户名获取信息
+            UserDetails userDetails = uidUserDetailDetailService.loadUserByPrincipal(loginUserDto.getUid())
+                    // 认证无效
+                    .orElseThrow(() -> new AuthException(AuthErrorCodeEnum.AUTH_AUTH_INVALID));
 
-        AfterAuthenticationToken authenticationToken =
-                new AfterAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+            AfterAuthenticationToken authenticationToken =
+                    new AfterAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+            SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+        }catch (AuthException ae){
+            // 权校验Token异常
+            Integer code = ae.getCode();
+            String errorMessage = ae.getErrorMessage();
+            AuthResultWrapper<?> customResultWrapper =
+                    AuthResultWrapper.getCustomResultWrapper(code, errorMessage);
 
-        SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-
+            WebUtils.renderString(request, response, JSONUtil.toJsonStr(customResultWrapper));
+            return;
+        }catch (Exception e){
+            // 其他异常
+            AuthResultWrapper<?> customResultWrapper = AuthResultWrapper.getErrorResultWrapper();
+            WebUtils.renderString(request, response, JSONUtil.toJsonStr(customResultWrapper));
+            return;
+        }
         //放行
         filterChain.doFilter(request, response);
     }
+
 }
