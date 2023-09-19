@@ -88,7 +88,8 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
             return;
         }catch (Exception e){
             // 其他异常
-            AuthResultWrapper<?> customResultWrapper = AuthResultWrapper.getErrorResultWrapper();
+            AuthResultWrapper<?> customResultWrapper =
+                    AuthResultWrapper.getCustomResultWrapper(AuthErrorCodeEnum.AUTH_AUTH_INVALID);
             WebUtils.renderString(request, response, JSONUtil.toJsonStr(customResultWrapper));
             return;
         }
