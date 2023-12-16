@@ -437,7 +437,7 @@
         <repository>
             <id>aliyun</id>
             <name>aliyun Repository</name>
-            <url>http://maven.aliyun.com/nexus/content/groups/public</url>
+            <url>https://maven.aliyun.com/nexus/content/groups/public</url>
             <snapshots>
                 <enabled>false</enabled>
             </snapshots>
@@ -445,7 +445,7 @@
         <repository>
             <id>uk</id>
             <name>uk Repository</name>
-            <url>http://uk.maven.org/maven2/</url>
+            <url>https://uk.maven.org/maven2/</url>
             <snapshots>
                 <enabled>false</enabled>
             </snapshots>
@@ -453,7 +453,7 @@
         <repository>
             <id>ibiblio</id>
             <name>ibiblio Repository</name>
-            <url>http://mirrors.ibiblio.org/pub/mirrors/maven2</url>
+            <url>https://mirrors.ibiblio.org/pub/mirrors/maven2</url>
             <snapshots>
                 <enabled>false</enabled>
             </snapshots>
