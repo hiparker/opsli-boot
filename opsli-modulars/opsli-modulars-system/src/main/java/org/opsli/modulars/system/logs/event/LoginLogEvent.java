@@ -29,7 +29,7 @@ import org.springframework.stereotype.Component;
 /**
  * 记录登陆日志信息
  *
- * @author Parker
+ * @author Pace
  * @date 2022-07-20 10:37:58
  */
 @Slf4j

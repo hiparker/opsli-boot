@@ -15,22 +15,24 @@
  */
 package org.opsli.modulars.system.login.web;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.ServletOutputStream;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.opsli.api.base.encrypt.EncryptModel;
 import org.opsli.common.annotation.Limiter;
 import org.opsli.common.enums.AlertType;
 import org.opsli.common.enums.LoginModelType;
 import org.opsli.common.utils.WrapperUtil;
 import org.opsli.core.utils.CaptchaUtil;
+import org.opsli.core.utils.CryptoUtil;
 import org.opsli.core.utils.ValidatorUtil;
-import org.opsli.api.base.encrypt.EncryptModel;
 import org.opsli.modulars.system.login.dto.LoginModel;
 import org.opsli.modulars.system.login.handler.before.LoginModelVerifyCaptchaBeforeHandler;
 import org.opsli.modulars.system.login.handler.before.LoginModelVerifyTempLockedBeforeHandler;
 import org.opsli.modulars.system.login.handler.error.BizServiceErrorHandler;
 import org.opsli.modulars.system.login.handler.success.*;
-import org.opsli.core.utils.CryptoUtil;
 import org.opsli.plugins.security.authentication.EmailPasswordAuthenticationToken;
 import org.opsli.plugins.security.authentication.MobilePasswordAuthenticationToken;
 import org.opsli.plugins.security.handler.*;
@@ -43,18 +45,16 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
  * 账号 + 密码 登录
  * 不需要继承 api 接口
  *
- * @author parker
+ * @author Pace
  * @date 2020-05-23 13:30
  */
-@Api(tags = "登录相关")
+@Tag(name = "登录相关")
 @Slf4j
 @RestController
 public class LoginByAccountRestController {
@@ -67,7 +67,7 @@ public class LoginByAccountRestController {
      * @param uuid 随机UUID
      */
     @Limiter(alertType = AlertType.ALERT)
-    @ApiOperation(value = "验证码", notes = "验证码")
+    @Operation(summary = "验证码")
     @GetMapping("captcha")
     public void captcha(String uuid, HttpServletResponse response) throws IOException {
         ServletOutputStream out = response.getOutputStream();
@@ -79,7 +79,7 @@ public class LoginByAccountRestController {
     }
 
     @Limiter
-    @ApiOperation(value = "账号+密码 登录", notes = "账号+密码 登录")
+    @Operation(summary = "账号+密码 登录")
     @PostMapping("/system/login")
     public void login(@RequestBody EncryptModel encryptModel){
         // 验证加密登录对象

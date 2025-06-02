@@ -35,13 +35,13 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 
 /**
  * 生成认证 Token (LoginModel)
- * @author Parker
+ * @author Pace
  * @date 2022-07-17 12:57 PM
  **/
 @AllArgsConstructor

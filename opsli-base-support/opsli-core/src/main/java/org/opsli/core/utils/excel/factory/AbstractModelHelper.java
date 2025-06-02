@@ -23,7 +23,7 @@ import org.opsli.api.base.warpper.ApiWrapper;
  *
  * 抽象 实体助手
  *
- * @author Parker
+ * @author Pace
  * @date 2020-09-16
  */
 public abstract class AbstractModelHelper {

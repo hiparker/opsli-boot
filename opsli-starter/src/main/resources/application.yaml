@@ -26,6 +26,8 @@ server:
 #        include: metrics,httptrace
 
 spring:
+  main:
+    allow-bean-definition-overriding: true
   application:
     name: opsli-boot
   profiles:
@@ -44,9 +46,9 @@ spring:
   aop:
     proxy-target-class: true
   # 自动注入
-  autoconfigure:
-    exclude:
-      - com.alibaba.druid.spring.boot.autoconfigure.DruidDataSourceAutoConfigure
+#  autoconfigure:
+#    exclude:
+#      - com.alibaba.druid.spring.boot.autoconfigure.DruidDataSourceAutoConfigure
   #
   #main:
   #  allow-bean-definition-overriding: true
@@ -61,20 +63,54 @@ spring:
   cache:
     # 前缀
     prefix: opsli
-  # 二级缓存  ---- Redis 配置
-  redis:
-    lettuce:
-      pool:
-        max-active: 8   #最大连接数据库连接数,设 0 为没有限制
-        max-idle: 8     #最大等待连接中的数量,设 0 为没有限制
-        max-wait: -1ms  #最大建立连接等待时间。如果超过此时间将接到异常。设为-1表示无限制。
-        min-idle: 0     #最小等待连接中的数量,设 0 为没有限制
-      shutdown-timeout: 100ms
+  data:
+    redis:
+      # Lettuce 连接池优化配置
+      lettuce:
+        pool:
+          # 连接池配置优化建议
+          max-active: 50      # 根据并发量调整，避免连接不够用
+          max-idle: 20        # 保持足够的空闲连接，减少创建连接开销
+          min-idle: 10        # 保证最小连接数，避免冷启动问题
+          max-wait: 3000ms    # 设置合理的等待时间，避免无限等待
+        # 连接超时配置
+        shutdown-timeout: 200ms
 
   # 数据库配置
   datasource:
     # 数据库连接池监控
     druid:
+      # 连接池配置
+      initial-size: 5
+      min-idle: 5
+      max-active: 20
+      max-wait: 60000
+      # 监控配置
+      filters: stat,wall,slf4j    # 启用过滤器
+      # 慢SQL监控
+      filter:
+        stat:
+          enabled: true
+          log-slow-sql: true      # 记录慢SQL
+          slow-sql-millis: 2000   # 定义慢SQL时间阈值
+          merge-sql: true         # 合并相同SQL
+        wall:
+          enabled: true           # SQL防火墙
+        slf4j:
+          enabled: true           # 日志
+          connection-log-enabled: false
+          statement-log-enabled: false
+          statement-sql-pretty-format: true
+          statement-parameter-set-log-enabled: false
+      # 监控Web页面
+      stat-view-servlet:
+        url-pattern: /druid/*
+      # 连接配置
+      keep-alive: true
+      validation-query: SELECT 1
+      test-while-idle: true
+      test-on-borrow: false
+      test-on-return: false
       web-stat-filter:
         enabled: true
         url-pattern: /*
@@ -83,28 +119,25 @@ spring:
     # 多数据源
     dynamic:
       druid:
-        # 连接池的配置信息
         # 初始化大小，最小，最大
-        initial-size: 5
-        min-idle: 5
-        maxActive: 20
+        initial-size: ${spring.datasource.druid.initial-size}
+        min-idle: ${spring.datasource.druid.min-idle}
+        maxActive: ${spring.datasource.druid.max-active}
         # 配置获取连接等待超时的时间
-        maxWait: 60000
+        maxWait: ${spring.datasource.druid.max-wait}
         # 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒
         timeBetweenEvictionRunsMillis: 60000
         # 配置一个连接在池中最小生存的时间，单位是毫秒
         minEvictableIdleTimeMillis: 300000
         validationQuery: SELECT 1 FROM DUAL
-        testWhileIdle: true
-        testOnBorrow: false
-        testOnReturn: false
+        testWhileIdle: ${spring.datasource.druid.test-while-idle}
+        testOnBorrow: ${spring.datasource.druid.test-on-borrow}
+        testOnReturn: ${spring.datasource.druid.test-on-return}
         # 打开PSCache，并且指定每个连接上PSCache的大小
         poolPreparedStatements: true
         maxPoolPreparedStatementPerConnectionSize: 20
         # 配置监控统计拦截的 Filter，去掉后监控界面 SQL 无法统计，wall 用于防火墙
-        filters: stat,wall,slf4j
-        # 通过connectProperties属性来打开mergeSql功能；慢SQL记录
-        connectionProperties: druid.stat.mergeSql\=true;druid.stat.slowSqlMillis\=5000
+        filters: ${spring.datasource.druid.filters}
 
 
 #mybatis-plus 插件
@@ -170,13 +203,15 @@ opsli:
     url-exclusion:
       permit-all:
         - "/static/files/**"
+        - "/v3/api-docs/**"
         - "/swagger-ui.html"
+        - "/swagger-ui/**"
         - "/doc.html"
         - "/swagger-resources/**"
         - "/webjars/**"
         - "/app/**"
-        - "/swagger/**"
-        - "/v2/api-docs"
+        - "/swagger/*"
+
         - "/druid/**"
         - "/captcha"
         - "/system/slipCount"
@@ -217,3 +252,26 @@ opsli:
   excel:
     # Excel 最大导出操作数量 防止OOM  -1为无限制
     export-max-count: 100000
+
+# springdoc-openapi项目配置
+springdoc:
+  swagger-ui:
+    path: /doc.html
+    persist-authorization: true # 持久化授权信息
+    display-request-duration: true # 显示请求耗时
+    operations-sorter: alpha
+  api-docs:
+    path: /v3/api-docs
+    enabled: ${springdoc.swagger-ui.enabled}
+
+  # 公共配置
+  cache:
+    disabled: false  # 禁用缓存
+  show-actuator: false  # 是否为Actuator端点生成API文档
+  writer-with-default-pretty-printer: true  # 格式化JSON输出
+  model-and-view-allowed: true  # 允许ModelAndView作为返回类型
+  override-with-generic-response: true  # 使用泛型响应覆盖
+
+
+pagehelper:
+  bound-sql-interceptors:

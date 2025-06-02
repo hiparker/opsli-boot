@@ -32,7 +32,7 @@ import org.springframework.stereotype.Component;
 /**
  * 邮件+验证码 验证器
  *
- * @author Parker
+ * @author Pace
  * @date 2022年07月18日10:41:50
  */
 @AllArgsConstructor

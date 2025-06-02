@@ -15,8 +15,8 @@
  */
 package org.opsli.modulars.tools.common;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.opsli.api.base.encrypt.EncryptModel;
@@ -44,10 +44,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 /**
  * 公共 Controller
  *
- * @author Parker
+ * @author Pace
  * @date 2020-09-16 17:33
  */
-@Api(tags = RoleMenuRefApi.TITLE)
+@Tag(name = "登录相关")
 @Slf4j
 @AllArgsConstructor
 @ApiRestController("/{ver}/common")
@@ -59,7 +59,7 @@ public class CommonRestController {
      * 获得公钥
      */
     @Limiter
-    @ApiOperation(value = "获得公钥", notes = "获得公钥")
+    @Operation(summary = "获得公钥")
     @GetMapping("/public-key")
     public ResultWrapper<?> getPublicKey(){
         // 获得公钥
@@ -80,7 +80,7 @@ public class CommonRestController {
      * @param encryptModel 加密参数
      */
     @Limiter(qps = 1)
-    @ApiOperation(value = "生成Email 验证码", notes = "生成Email 验证码")
+    @Operation(summary = "生成Email 验证码")
     @PostMapping("/email/create-code")
     public ResultWrapper<?> createEmailCode(@RequestBody EncryptModel encryptModel) {
         // 解密对象
@@ -118,7 +118,7 @@ public class CommonRestController {
      * @param encryptModel 加密参数
      */
     @Limiter(qps = 1)
-    @ApiOperation(value = "生成Mobile 验证码", notes = "生成Mobile 验证码")
+    @Operation(summary = "生成Mobile 验证码")
     @PostMapping("/mobile/create-code")
     public ResultWrapper<?> createMobileCode(@RequestBody EncryptModel encryptModel) {
         // 解密对象

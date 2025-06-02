@@ -27,8 +27,8 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.google.common.collect.Lists;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.opsli.api.base.result.ResultWrapper;
@@ -55,10 +55,10 @@ import java.util.Map;
 /**
  * 地域表 Controller
  *
- * @author Parker
+ * @author Pace
  * @date 2020-11-28 18:59:59
  */
-@Api(tags = SysAreaRestApi.TITLE)
+@Tag(name = SysAreaRestApi.TITLE)
 @Slf4j
 @ApiRestController("/{ver}/system/area")
 public class SysAreaRestController extends BaseRestController<SysArea, SysAreaModel, ISysAreaService>
@@ -72,7 +72,7 @@ public class SysAreaRestController extends BaseRestController<SysArea, SysAreaMo
     * @param model 模型
     * @return ResultWrapper
     */
-    @ApiOperation(value = "获得单条地域", notes = "获得单条地域 - ID")
+    @Operation(summary = "获得单条地域 - ID")
     @PreAuthorize("hasAuthority('system_area_select')")
     @Override
     public ResultWrapper<SysAreaModel> get(SysAreaModel model) {
@@ -84,7 +84,7 @@ public class SysAreaRestController extends BaseRestController<SysArea, SysAreaMo
      * 获得组织树树
      * @return ResultWrapper
      */
-    @ApiOperation(value = "获得菜单树", notes = "获得菜单树")
+    @Operation(summary = "获得菜单树")
     @PreAuthorize("hasAuthority('system_area_select')")
     @Override
     public ResultWrapper<?> findTree(String parentId) {
@@ -121,7 +121,7 @@ public class SysAreaRestController extends BaseRestController<SysArea, SysAreaMo
      *
      * @return ResultWrapper
      */
-    @ApiOperation(value = "获取全量地域列表", notes = "获取全量地域列表")
+    @Operation(summary = "获取全量地域列表")
     @PreAuthorize("hasAuthority('system_area_select')")
     @Override
     public ResultWrapper<?> findTreeAll(Integer deep) {
@@ -153,7 +153,7 @@ public class SysAreaRestController extends BaseRestController<SysArea, SysAreaMo
     * @param model 模型
     * @return ResultWrapper
     */
-    @ApiOperation(value = "新增地域数据", notes = "新增地域数据")
+    @Operation(summary = "新增地域数据")
     @PreAuthorize("hasAuthority('system_area_insert')")
     @OperateLogger(description = "新增地域数据",
             module = ModuleEnum.MODULE_AREA, operationType = OperationTypeEnum.INSERT, db = true)
@@ -172,7 +172,7 @@ public class SysAreaRestController extends BaseRestController<SysArea, SysAreaMo
     * @param model 模型
     * @return ResultWrapper
     */
-    @ApiOperation(value = "修改地域数据", notes = "修改地域数据")
+    @Operation(summary = "修改地域数据")
     @PreAuthorize("hasAuthority('system_area_update')")
     @OperateLogger(description = "修改地域数据",
             module = ModuleEnum.MODULE_AREA, operationType = OperationTypeEnum.UPDATE, db = true)
@@ -192,7 +192,7 @@ public class SysAreaRestController extends BaseRestController<SysArea, SysAreaMo
     * @param id ID
     * @return ResultWrapper
     */
-    @ApiOperation(value = "删除地域数据", notes = "删除地域数据")
+    @Operation(summary = "删除地域数据")
     @PreAuthorize("hasAuthority('system_area_delete')")
     @OperateLogger(description = "删除地域数据",
             module = ModuleEnum.MODULE_AREA, operationType = OperationTypeEnum.DELETE, db = true)
@@ -210,7 +210,7 @@ public class SysAreaRestController extends BaseRestController<SysArea, SysAreaMo
     * @param ids ID 数组
     * @return ResultWrapper
     */
-    @ApiOperation(value = "批量删除地域数据", notes = "批量删除地域数据")
+    @Operation(summary = "批量删除地域数据")
     @PreAuthorize("hasAuthority('system_area_delete')")
     @OperateLogger(description = "批量删除地域数据",
             module = ModuleEnum.MODULE_AREA, operationType = OperationTypeEnum.DELETE, db = true)
@@ -262,7 +262,7 @@ public class SysAreaRestController extends BaseRestController<SysArea, SysAreaMo
     /**
      * 导入数据
      */
-    //@ApiOperation(value = "获得json数据 查询数据", notes = "获得json数据 查询数据")
+    //@Operation(summary = "获得json数据 查询数据")
     //@GetMapping("/importJson")
     public void importJson() {
         // https://github.com/small-dream/China_Province_City

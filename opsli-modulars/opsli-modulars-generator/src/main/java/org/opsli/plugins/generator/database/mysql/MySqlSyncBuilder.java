@@ -38,7 +38,7 @@ import java.util.List;
 /**
  * MySQL 同步构建器
  *
- * @author parker
+ * @author Pace
  * @date 2020-09-13 19:36
  */
 @Service

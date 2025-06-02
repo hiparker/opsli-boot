@@ -26,7 +26,7 @@ import org.opsli.core.base.entity.BaseEntity;
 /**
  * 某系统用户
  *
- * @author Parker
+ * @author Pace
  * @date 2020-11-22 12:12:05
  */
 @Data

@@ -24,7 +24,7 @@ import java.util.List;
 /**
  * 数据字典 明细 接口
  *
- * @author Parker
+ * @author Pace
  * @date 2020-09-16 17:33
  */
 public interface IDictDetailService extends CrudServiceInterface<SysDictDetail, DictDetailModel> {

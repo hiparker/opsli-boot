@@ -15,7 +15,8 @@
  */
 package org.opsli.plugins.security.handler;
 
-import org.opsli.plugins.security.exception.AuthException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.opsli.plugins.security.exception.AuthServiceException;
 import org.opsli.plugins.security.exception.errorcode.AuthErrorCodeEnum;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -23,8 +24,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Function;
@@ -32,7 +31,7 @@ import java.util.function.Function;
 /**
  * 登录策略执行器
  *
- * @author Parker
+ * @author Pace
  * @date 2022-07-16 10:50 PM
  **/
 public class LoginHandler<T> {

@@ -17,7 +17,7 @@ package org.opsli.api.wrapper.testt;
 
 import java.util.Date;
 import com.alibaba.excel.annotation.ExcelProperty;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.opsli.api.base.warpper.ApiWrapper;
@@ -31,7 +31,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 /**
  * 测试3
  *
- * @author Parker
+ * @author Pace
  * @date 2020-12-20 18:27:04
  */
 @Data
@@ -39,7 +39,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 public class Test3Model extends ApiWrapper {
 
     /** 金钱 */
-    @ApiModelProperty(value = "金钱")
+    @Schema(description = "金钱")
     @ExcelProperty(value = "金钱", order = 1)
     @ExcelInfo
     @Validator({ValidatorType.IS_NOT_NULL, ValidatorType.IS_MONEY})
@@ -47,7 +47,7 @@ public class Test3Model extends ApiWrapper {
     private Double money;
 
     /** 年龄 */
-    @ApiModelProperty(value = "年龄")
+    @Schema(description = "年龄")
     @ExcelProperty(value = "年龄", order = 2)
     @ExcelInfo
     @Validator({ValidatorType.IS_NOT_NULL, ValidatorType.IS_INTEGER})
@@ -55,7 +55,7 @@ public class Test3Model extends ApiWrapper {
     private Integer age;
 
     /** 名称 */
-    @ApiModelProperty(value = "名称")
+    @Schema(description = "名称")
     @ExcelProperty(value = "名称", order = 3)
     @ExcelInfo
     @Validator({ValidatorType.IS_CHINESE})
@@ -63,7 +63,7 @@ public class Test3Model extends ApiWrapper {
     private String name;
 
     /** 生日 */
-    @ApiModelProperty(value = "生日")
+    @Schema(description = "生日")
     @ExcelProperty(value = "生日", order = 4)
     @ExcelInfo
     @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
@@ -71,7 +71,7 @@ public class Test3Model extends ApiWrapper {
     private Date birth;
 
     /** 是否启用 */
-    @ApiModelProperty(value = "是否启用")
+    @Schema(description = "是否启用")
     @ExcelProperty(value = "是否启用", order = 5)
     @ExcelInfo( dictType = "no_yes" )
     @ValidatorLenMax(1)

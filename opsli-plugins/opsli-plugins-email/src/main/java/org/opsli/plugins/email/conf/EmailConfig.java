@@ -2,16 +2,18 @@ package org.opsli.plugins.email.conf;
 
 import lombok.Data;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
  * 本地存储配置
  *
- * @author Parker
+ * @author Pace
  */
 @Data
 public class EmailConfig implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /** SMTP地址 */

@@ -23,7 +23,7 @@ import org.opsli.modulars.gentest.user.entity.TestUser;
 /**
  * 某系统用户 Mapper
  *
- * @author Parker
+ * @author Pace
  * @date 2020-11-22 12:12:05
  */
 @Mapper

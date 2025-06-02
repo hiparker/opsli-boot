@@ -20,12 +20,13 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
  * 当前登录用户信息
  *
- * @author Parker
+ * @author Pace
  * @date 2021年12月22日16:22:37
  */
 @Data
@@ -34,6 +35,7 @@ import java.io.Serializable;
 @Builder
 public class LoginUserInfo implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /** 用户ID */

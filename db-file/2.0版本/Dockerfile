@@ -1,7 +1,7 @@
 FROM mysql:8.0.19
 
 MAINTAINER opsli.com
-LABEL version=V1.3.3
+LABEL version=V2.1.4
 LABEL description=OPSLI-快速开发平台
 LABEL qqGroup=724850675
 

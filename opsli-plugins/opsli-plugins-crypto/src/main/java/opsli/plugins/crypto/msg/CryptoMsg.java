@@ -20,7 +20,7 @@ import org.opsli.common.base.msg.BaseMsg;
 /**
  * 加解密 - 消息
  *
- * @author Parker
+ * @author Pace
  * @date 2021年5月17日16:46:42
  */
 public enum CryptoMsg implements BaseMsg {

@@ -20,7 +20,7 @@ import org.opsli.common.base.msg.BaseMsg;
 /**
  * 框架服务异常
  *
- * @author Parker
+ * @author Pace
  * @date 2020-09-13 19:41
  */
 public class ServiceException extends RuntimeException{

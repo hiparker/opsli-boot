@@ -22,7 +22,7 @@ import org.opsli.core.base.entity.BaseEntity;
 /**
  * 查询构造器
  *
- * @author Parker
+ * @author Pace
  * @date 2020-09-21 23:57
  */
 public interface QueryBuilder<T extends BaseEntity> {

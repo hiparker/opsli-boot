@@ -15,7 +15,7 @@
  */
 package org.opsli.plugins.oss.conf;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import org.opsli.common.annotation.OptionDict;
 import org.opsli.common.annotation.validator.Validator;
@@ -23,12 +23,13 @@ import org.opsli.common.annotation.validator.ValidatorLenMax;
 import org.opsli.common.enums.ValidatorType;
 import org.opsli.core.utils.OptionsUtil;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
  * 又拍云存储配置工厂
  *
- * @author Parker
+ * @author Pace
  * @date 2020-09-19 20:03
  */
 public enum UpYunConfigFactory implements ConfigFactory<UpYunConfigFactory.UpYunConfig> {
@@ -55,43 +56,44 @@ public enum UpYunConfigFactory implements ConfigFactory<UpYunConfigFactory.UpYun
     /**
      * 本地存储配置
      *
-     * @author Parker
+     * @author Pace
      */
     @Data
     public static class UpYunConfig implements Serializable {
 
+        @Serial
         private static final long serialVersionUID = 1L;
 
         /** 域名 */
-        @ApiModelProperty(value = "域名")
+        @Schema(description = "域名")
         @Validator({ValidatorType.IS_NOT_NULL})
         @ValidatorLenMax(100)
         @OptionDict("storage_upyun_domain")
         private String domain;
 
         /** 前缀 */
-        @ApiModelProperty(value = "前缀")
+        @Schema(description = "前缀")
         @ValidatorLenMax(100)
         @OptionDict("storage_upyun_path_prefix")
         private String pathPrefix;
 
 
         /** 操作员用户名 */
-        @ApiModelProperty(value = "操作员用户名")
+        @Schema(description = "操作员用户名")
         @Validator({ValidatorType.IS_NOT_NULL})
         @ValidatorLenMax(100)
         @OptionDict("storage_upyun_username")
         private String username;
 
         /** 操作员密码 */
-        @ApiModelProperty(value = "操作员密码")
+        @Schema(description = "操作员密码")
         @Validator({ValidatorType.IS_NOT_NULL})
         @ValidatorLenMax(100)
         @OptionDict("storage_upyun_password")
         private String password;
 
         /** 存储仓库名 */
-        @ApiModelProperty(value = "存储仓库名")
+        @Schema(description = "存储仓库名")
         @Validator({ValidatorType.IS_NOT_NULL})
         @ValidatorLenMax(100)
         @OptionDict("storage_upyun_bucket_name")

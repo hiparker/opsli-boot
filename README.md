@@ -3,7 +3,7 @@
  <img width="500" src="https://gitee.com/hiparker/opsli-ui/raw/master/repository-images/logo.png"/>
  <br/> <br/>
 
-[![AUR](https://img.shields.io/badge/license-Apache%20License%202.0-blue.svg)](https://github.com/hiparker/opsli-boot/blob/master/LICENSE) [![spring-boot](https://img.shields.io/badge/spring--boot-2.5.6.RELEASE-green.svg)](http://spring.io/projects/spring-boot) [![mybatis-plus](https://img.shields.io/badge/mybatis--plus-3.5.2-blue.svg)](http://mp.baomidou.com) [![hutool](https://img.shields.io/badge/hutool-5.7.14-blue.svg)](https://www.hutool.cn) [![Stars](https://img.shields.io/github/stars/hiparker/opsli-boot?style=flat-square&label=Stars&logo=github)](https://github.com/hiparker/opsli-boot) [![Forks](https://img.shields.io/github/forks/hiparker/opsli-boot?style=flat-square&label=Forks&logo=github)](https://github.com/hiparker/opsli-boot)
+[![AUR](https://img.shields.io/badge/license-Apache%20License%202.0-blue.svg)](https://github.com/hiparker/opsli-boot/blob/master/LICENSE) [![spring-boot](https://img.shields.io/badge/spring--boot-3.4.6.RELEASE-green.svg)](http://spring.io/projects/spring-boot) [![mybatis-plus](https://img.shields.io/badge/mybatis--plus-3.5.12-blue.svg)](http://mp.baomidou.com) [![hutool](https://img.shields.io/badge/hutool-5.8.38-blue.svg)](https://www.hutool.cn) [![Stars](https://img.shields.io/github/stars/hiparker/opsli-boot?style=flat-square&label=Stars&logo=github)](https://github.com/hiparker/opsli-boot) [![Forks](https://img.shields.io/github/forks/hiparker/opsli-boot?style=flat-square&label=Forks&logo=github)](https://github.com/hiparker/opsli-boot)
 </div>
 
 ## 关于
@@ -31,15 +31,15 @@
 
 > 单机版
 
-| 名称             | 版本号 |      | 名称           | 版本号          |
-| ---------------- |---| ---- | -------------- |--------------|
-| jdk版本          | 1.8 |      | springboot版本 | 2.7.10       |
-| mybatis-plus版本 | 3.5.2 |      | pagehelper版本 | 1.4.6        |
-| druid版本        | 1.1.17 |      | dynamic版本    | 2.5.4        |
-| fastjson版本  | 1.2.83  |      | transmittable版本        | 2.12.5       |
-| ehcache版本      | 3.9.0 |      | easyexcel版本  | 2.2.6        |
-| captcha版本      | 1.6.2 |      | guava版本      | 30.0-android |
-| enjoy版本        | 4.9.06 |      | hutool版本     | 5.7.14       |
+| 名称             | 版本号    |      | 名称              | 版本号        |
+| ---------------- |--------| ---- |-----------------|------------|
+| jdk版本          | 22     |      | springboot版本    | 3.4.6      |
+| mybatis-plus版本 | 3.5.12 |      | pagehelper版本    | 2.1.0      |
+| druid版本        | 1.2.25 |      | dynamic版本       | 4.3.1      |
+| fastjson版本  | 1.2.83 |      | transmittable版本 | 2.14.5     |
+| hutool版本      | 5.8.38 |      | easyexcel版本     | 4.0.3      |
+| captcha版本      | 1.6.2  |      | guava版本         | 33.4.8-jre |
+| enjoy版本        | 5.2.2  |      | caffeine版本      | 3.1.8      |
 
 ## 在线演示
 
@@ -240,18 +240,6 @@
 │   │   │   │   │                   ├── msg                   加解密插件包 - 异常消息
 │   │   │   │   │                   ├── spring                加解密插件包 - Spring集成相关内容
 │   │   │   │   │                   └── strategy              加解密插件包 - 加解密策略 包含 对称、非对称等等
-│   │   │   │   │
-│   ├── opsli-plugins-ehcache                             Ehcache缓存插件 (二级缓存)
-│   │   ├── src
-│   │   │   ├── main
-│   │   │   │   ├── java
-│   │   │   │   │   └── org
-│   │   │   │   │       └── opsli
-│   │   │   │   │           └── plugins
-│   │   │   │   │               └── cache
-│   │   │   │   │                   ├── conf                  Ehcache缓存插件 - 自动装配
-│   │   │   │   │                   ├── msg                   Ehcache缓存插件 - 信息
-│   │   │   │   │                   └── service               Ehcache缓存插件 - 服务
 │   │   │   │   │
 │   ├── opsli-plugins-email                               邮件插件包
 │   │   ├── src

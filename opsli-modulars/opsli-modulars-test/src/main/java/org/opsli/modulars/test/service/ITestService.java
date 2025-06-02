@@ -22,7 +22,7 @@ import org.opsli.modulars.test.entity.TestEntity;
 /**
  * 测试 Service
  *
- * @author Parker
+ * @author Pace
  * @date 2020-09-17 13:01
  */
 public interface ITestService extends CrudServiceInterface<TestEntity,TestModel> {

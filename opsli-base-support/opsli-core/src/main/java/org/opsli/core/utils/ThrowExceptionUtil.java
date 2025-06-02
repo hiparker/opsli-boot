@@ -6,7 +6,7 @@ import org.opsli.common.exception.ServiceException;
 /**
  * 抛出异常工具类
  *
- * @author Parker
+ * @author Pace
  * @date 2021年5月7日18:32:32
  */
 public final class ThrowExceptionUtil {

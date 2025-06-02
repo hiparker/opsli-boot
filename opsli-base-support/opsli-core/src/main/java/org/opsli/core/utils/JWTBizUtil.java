@@ -36,7 +36,7 @@ import java.util.Map;
 /**
  * JWT 的工具类：包含了创建和解码的工具
  *
- * @author Parker
+ * @author Pace
  * @date 2021年12月22日20:01:23
  */
 public final class JWTBizUtil {

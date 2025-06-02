@@ -19,23 +19,21 @@ import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.StrUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.FileUtils;
 import org.opsli.core.autoconfigure.properties.GlobalProperties;
 import org.opsli.core.utils.GlobalPropertiesUtil;
 import org.opsli.core.utils.ValidatorUtil;
-import org.opsli.plugins.oss.enums.OssStorageType;
 import org.opsli.plugins.oss.conf.LocalConfigFactory;
+import org.opsli.plugins.oss.enums.OssStorageType;
 import org.opsli.plugins.oss.service.BaseOssStorageService;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.Date;
 
 /**
  * 本地文件上传
  *
- * @author Parker
+ * @author Pace
  * @date 2021年4月30日14:09:08
  */
 @Slf4j
@@ -110,13 +108,8 @@ public class LocalStorageServiceImpl extends BaseOssStorageService {
         // 创建文件
         File tmpFile = new File(
                 packageName + super.handlePath(fileAttr.getRandomFileNameAndSuffix()));
-        try {
-            FileUtils.copyFile(file, tmpFile);
-        }catch (IOException e){
-            log.error(e.getMessage(), e);
-        }
+        FileUtil.copy(file, tmpFile, true);
         FileUtil.touch(tmpFile);
-
         return fileAttr;
     }
 
@@ -170,13 +163,8 @@ public class LocalStorageServiceImpl extends BaseOssStorageService {
         // 创建文件
         File tmpFile = new File(
                 packageName + super.handlePath(fileAttr.getRandomFileNameAndSuffix()));
-        try {
-            FileUtils.copyInputStreamToFile(inputStream, tmpFile);
-        }catch (IOException e){
-            log.error(e.getMessage(), e);
-        }
+        FileUtil.copyFile(inputStream, tmpFile);
         FileUtil.touch(tmpFile);
-
         return fileAttr;
     }
 

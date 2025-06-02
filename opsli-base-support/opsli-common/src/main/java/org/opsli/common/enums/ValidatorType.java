@@ -19,7 +19,7 @@ package org.opsli.common.enums;
 /**
  * 通过单例 模式 生成系统唯一标示
  *
- * @author Parker
+ * @author Pace
  * @date 2020-09-17 23:40
  */
 public enum ValidatorType {

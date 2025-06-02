@@ -16,14 +16,14 @@
 package org.opsli.plugins.security.utils;
 
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
  * response 返回
  *
- * @author Parker
+ * @author Pace
  * @date 2022年07月15日14:04:13
  */
 public class WebUtils {

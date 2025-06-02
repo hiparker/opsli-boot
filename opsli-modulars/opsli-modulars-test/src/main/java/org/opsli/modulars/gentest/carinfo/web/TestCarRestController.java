@@ -16,36 +16,36 @@
 package org.opsli.modulars.gentest.carinfo.web;
 
 import cn.hutool.core.convert.Convert;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.opsli.api.base.result.ResultWrapper;
+import org.opsli.api.web.gentest.carinfo.TestCarRestApi;
+import org.opsli.api.wrapper.gentest.carinfo.TestCarModel;
 import org.opsli.common.annotation.ApiRestController;
 import org.opsli.core.base.controller.BaseRestController;
+import org.opsli.core.log.annotation.OperateLogger;
+import org.opsli.core.log.enums.ModuleEnum;
+import org.opsli.core.log.enums.OperationTypeEnum;
 import org.opsli.core.persistence.Page;
 import org.opsli.core.persistence.querybuilder.QueryBuilder;
 import org.opsli.core.persistence.querybuilder.WebQueryBuilder;
-import org.springframework.web.multipart.MultipartHttpServletRequest;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.opsli.core.log.enums.*;
-import org.opsli.core.log.annotation.OperateLogger;
-
 import org.opsli.modulars.gentest.carinfo.entity.TestCar;
-import org.opsli.api.wrapper.gentest.carinfo.TestCarModel;
 import org.opsli.modulars.gentest.carinfo.service.ITestCarService;
-import org.opsli.api.web.gentest.carinfo.TestCarRestApi;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import java.util.Optional;
 
 /**
  * 测试汽车 Controller
  *
- * @author Parker
+ * @author Pace
  * @date 2022-08-06 23:58:27
  */
-@Api(tags = TestCarRestApi.TITLE)
+@Tag(name = TestCarRestApi.TITLE)
 @Slf4j
 @ApiRestController("/{ver}/gentest/carinfo")
 public class TestCarRestController extends BaseRestController<TestCar, TestCarModel, ITestCarService>
@@ -57,7 +57,7 @@ public class TestCarRestController extends BaseRestController<TestCar, TestCarMo
      * @param model 模型
      * @return ResultWrapper
      */
-    @ApiOperation(value = "获得单条测试汽车", notes = "获得单条测试汽车 - ID")
+    @Operation(summary = "获得单条测试汽车 - ID")
     @PreAuthorize("hasAuthority('gentest_carinfo_select')")
     @Override
     public ResultWrapper<TestCarModel> get(TestCarModel model) {
@@ -75,7 +75,7 @@ public class TestCarRestController extends BaseRestController<TestCar, TestCarMo
      * @param request request
      * @return ResultWrapper
      */
-    @ApiOperation(value = "获得分页数据", notes = "获得分页数据 - 查询构造器")
+    @Operation(summary = "获得分页数据 - 查询构造器")
     @PreAuthorize("hasAuthority('gentest_carinfo_select')")
     @Override
     public ResultWrapper<?> findPage(Integer pageNo, Integer pageSize, HttpServletRequest request) {
@@ -93,7 +93,7 @@ public class TestCarRestController extends BaseRestController<TestCar, TestCarMo
      * @param model 模型
      * @return ResultWrapper
      */
-    @ApiOperation(value = "新增测试汽车数据", notes = "新增测试汽车数据")
+    @Operation(summary = "新增测试汽车数据")
     @PreAuthorize("hasAuthority('gentest_carinfo_insert')")
     @OperateLogger(description = "新增测试汽车数据",
             module = ModuleEnum.MODULE_UNKNOWN, operationType = OperationTypeEnum.INSERT, db = true)
@@ -109,7 +109,7 @@ public class TestCarRestController extends BaseRestController<TestCar, TestCarMo
      * @param model 模型
      * @return ResultWrapper
      */
-    @ApiOperation(value = "修改测试汽车数据", notes = "修改测试汽车数据")
+    @Operation(summary = "修改测试汽车数据")
     @PreAuthorize("hasAuthority('gentest_carinfo_update')")
     @OperateLogger(description = "修改测试汽车数据",
             module = ModuleEnum.MODULE_UNKNOWN, operationType = OperationTypeEnum.UPDATE, db = true)
@@ -126,7 +126,7 @@ public class TestCarRestController extends BaseRestController<TestCar, TestCarMo
      * @param id ID
      * @return ResultVo
      */
-    @ApiOperation(value = "删除测试汽车数据", notes = "删除测试汽车数据")
+    @Operation(summary = "删除测试汽车数据")
     @PreAuthorize("hasAuthority('gentest_carinfo_delete')")
     @OperateLogger(description = "删除测试汽车数据",
             module = ModuleEnum.MODULE_UNKNOWN, operationType = OperationTypeEnum.DELETE, db = true)
@@ -141,7 +141,7 @@ public class TestCarRestController extends BaseRestController<TestCar, TestCarMo
      * @param ids ID 数组
      * @return ResultVo
      */
-    @ApiOperation(value = "批量删除测试汽车数据", notes = "批量删除测试汽车数据")
+    @Operation(summary = "批量删除测试汽车数据")
     @PreAuthorize("hasAuthority('gentest_carinfo_delete')")
     @OperateLogger(description = "批量删除测试汽车数据",
             module = ModuleEnum.MODULE_UNKNOWN, operationType = OperationTypeEnum.DELETE, db = true)
@@ -158,13 +158,13 @@ public class TestCarRestController extends BaseRestController<TestCar, TestCarMo
      * @param type 类型
      * @param request request
      */
-    @ApiOperation(value = "Excel 导出认证", notes = "Excel 导出认证")
+    @Operation(summary = "Excel 导出认证")
     @PreAuthorize("hasAnyAuthority('gentest_carinfo_export', 'gentest_carinfo_import')")
     @Override
     public ResultWrapper<String> exportExcelAuth(String type, HttpServletRequest request) {
         Optional<String> certificateOptional =
                 super.excelExportAuth(type, TestCarRestApi.SUB_TITLE, request);
-        if(!certificateOptional.isPresent()){
+        if(certificateOptional.isEmpty()){
             return ResultWrapper.getErrorResultWrapper();
         }
         return ResultWrapper.getSuccessResultWrapper(certificateOptional.get());
@@ -175,7 +175,7 @@ public class TestCarRestController extends BaseRestController<TestCar, TestCarMo
      * 测试汽车 Excel 导出
      * @param response response
      */
-    @ApiOperation(value = "导出Excel", notes = "导出Excel")
+    @Operation(summary = "导出Excel")
     @PreAuthorize("hasAuthority('gentest_carinfo_export')")
     @OperateLogger(description = "测试汽车 导出Excel",
             module = ModuleEnum.MODULE_UNKNOWN, operationType = OperationTypeEnum.SELECT, db = true)
@@ -191,7 +191,7 @@ public class TestCarRestController extends BaseRestController<TestCar, TestCarMo
      * @param request 文件流 request
      * @return ResultVo
      */
-    @ApiOperation(value = "导入Excel", notes = "导入Excel")
+    @Operation(summary = "导入Excel")
     @PreAuthorize("hasAuthority('gentest_carinfo_import')")
     @OperateLogger(description = "测试汽车 Excel 导入",
             module = ModuleEnum.MODULE_UNKNOWN, operationType = OperationTypeEnum.INSERT, db = true)

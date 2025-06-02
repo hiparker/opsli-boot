@@ -32,7 +32,7 @@ import org.opsli.core.base.entity.BaseEntity;
 /**
  * 代码模板详情 Entity
  *
- * @author Parker
+ * @author Pace
  * @date 2021-05-28 17:12:38
  */
 @Data

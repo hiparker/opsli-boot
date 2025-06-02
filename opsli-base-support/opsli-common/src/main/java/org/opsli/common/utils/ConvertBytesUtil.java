@@ -18,7 +18,7 @@ package org.opsli.common.utils;
 /**
  * 字节转换
  *
- * @author Parker
+ * @author Pace
  * @date 2020-09-19 23:21
  */
 public final class ConvertBytesUtil {

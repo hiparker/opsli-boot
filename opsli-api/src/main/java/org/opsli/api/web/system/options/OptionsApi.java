@@ -20,8 +20,8 @@ package org.opsli.api.web.system.options;
 import org.opsli.api.base.result.ResultWrapper;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 
 import org.opsli.api.wrapper.system.options.OptionsModel;
@@ -38,7 +38,7 @@ import java.util.Map;
  *
  * 这样写法虽然比较绕，但是当单体项目想要改造微服务架构时 时非常容易的
  *
- * @author Parker
+ * @author Pace
  * @date 2021-02-07 18:24:38
  */
 public interface OptionsApi {

@@ -16,29 +16,28 @@
 package org.opsli.modulars.system.role.web;
 
 import com.google.common.collect.Lists;
-import io.swagger.annotations.Api;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.opsli.common.annotation.ApiVersion;
-import org.opsli.core.log.annotation.OperateLogger;
-import org.opsli.core.log.enums.ModuleEnum;
-import org.opsli.core.log.enums.OperationTypeEnum;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.opsli.api.base.result.ResultWrapper;
 import org.opsli.api.web.system.role.RoleMenuRefApi;
 import org.opsli.api.wrapper.system.role.RoleMenuRefModel;
 import org.opsli.api.wrapper.system.user.UserModel;
 import org.opsli.common.annotation.ApiRestController;
-
+import org.opsli.common.annotation.ApiVersion;
 import org.opsli.common.exception.ServiceException;
 import org.opsli.core.autoconfigure.properties.GlobalProperties;
+import org.opsli.core.log.annotation.OperateLogger;
+import org.opsli.core.log.enums.ModuleEnum;
+import org.opsli.core.log.enums.OperationTypeEnum;
 import org.opsli.core.msg.CoreMsg;
 import org.opsli.core.utils.UserUtil;
 import org.opsli.modulars.system.SystemMsg;
 import org.opsli.modulars.system.menu.entity.SysMenu;
 import org.opsli.modulars.system.role.service.IRoleMenuRefService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.util.List;
 import java.util.Map;
@@ -48,10 +47,10 @@ import java.util.stream.Collectors;
 /**
  * 角色权限 Controller
  *
- * @author Parker
+ * @author Pace
  * @date 2020-09-16 17:33
  */
-@Api(tags = RoleMenuRefApi.TITLE)
+@Tag(name = RoleMenuRefApi.TITLE)
 @Slf4j
 @ApiRestController("/{ver}/system/role/perms")
 public class RoleMenuRefRestController implements RoleMenuRefApi {
@@ -68,6 +67,7 @@ public class RoleMenuRefRestController implements RoleMenuRefApi {
      * @param model roleId 角色Id
      * @return ResultWrapper
      */
+    @Operation(summary = "获得当前已有权限")
     @PreAuthorize("hasAuthority('system_role_setMenuPerms')")
     @Override
     public ResultWrapper<?> getPerms(RoleMenuRefModel model) {
@@ -100,6 +100,7 @@ public class RoleMenuRefRestController implements RoleMenuRefApi {
      * @param model roleId 角色Id
      * @return ResultWrapper
      */
+    @Operation(summary = "获得当前已有权限 (针对Vue3 兼容)")
     @PreAuthorize("hasAuthority('system_role_setMenuPerms')")
     @Override
     @ApiVersion(2)
@@ -121,12 +122,13 @@ public class RoleMenuRefRestController implements RoleMenuRefApi {
 
 
     /**
-     * 设置菜單权限
+     * 设置菜单权限
      * @param model 模型
      * @return ResultWrapper
      */
+    @Operation(summary = "设置菜单权限")
     @PreAuthorize("hasAuthority('system_role_setMenuPerms')")
-    @OperateLogger(description = "设置菜單权限",
+    @OperateLogger(description = "设置菜单权限",
             module = ModuleEnum.MODULE_ROLE, operationType = OperationTypeEnum.UPDATE, db = true)
     @Override
     public ResultWrapper<?> setPerms(RoleMenuRefModel model) {
@@ -148,12 +150,13 @@ public class RoleMenuRefRestController implements RoleMenuRefApi {
 
 
     /**
-     * 设置菜單权限
+     * 设置菜单权限
      * @param model 模型
      * @return ResultWrapper
      */
+    @Operation(summary = "设置菜单权限")
     @PreAuthorize("hasAuthority('system_role_setMenuPerms')")
-    @OperateLogger(description = "设置菜單权限",
+    @OperateLogger(description = "设置菜单权限",
             module = ModuleEnum.MODULE_ROLE, operationType = OperationTypeEnum.UPDATE, db = true)
     @Override
     public ResultWrapper<?> setPermsV2(RoleMenuRefModel model) {

@@ -1,8 +1,8 @@
 package org.opsli.core.listener;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.opsli.core.general.StartPrint;
-import org.opsli.core.utils.OptionsUtil;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 /**
  * 系统启动成功
  *
- * @author parker
+ * @author Pace
  * @date 2020-03-31 13:56
  */
 @Component
@@ -18,8 +18,7 @@ import org.springframework.stereotype.Component;
 public class ApplicationReadyEventListener implements ApplicationListener<ApplicationReadyEvent> {
 
     @Override
-    public void onApplicationEvent(ApplicationReadyEvent event) {
-        event.getApplicationContext();
+    public void onApplicationEvent(@NotNull ApplicationReadyEvent event) {
         // 输出启动日志
         StartPrint.getInstance().successPrint();
     }

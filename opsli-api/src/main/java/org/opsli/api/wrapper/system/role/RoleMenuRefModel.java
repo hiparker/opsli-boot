@@ -16,7 +16,7 @@
 package org.opsli.api.wrapper.system.role;
 
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.opsli.common.annotation.validator.Validator;
@@ -28,7 +28,7 @@ import java.io.Serializable;
 /**
  * 角色表
  *
- * @author Parker
+ * @author Pace
  * @date 2020-09-16 17:33
  */
 @Data
@@ -37,13 +37,13 @@ import java.io.Serializable;
 public class RoleMenuRefModel implements Serializable {
 
     /** 角色ID */
-    @ApiModelProperty(value = "角色ID")
+    @Schema(description = "角色ID")
     @Validator({ValidatorType.IS_NOT_NULL})
     @ValidatorLenMax(50)
     private String roleId;
 
     /** 权限数组 */
-    @ApiModelProperty(value = "权限数组")
+    @Schema(description = "权限数组")
     private String[] permsIds;
 
 }

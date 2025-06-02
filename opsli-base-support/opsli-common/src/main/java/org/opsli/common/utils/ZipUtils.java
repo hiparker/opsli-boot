@@ -29,7 +29,7 @@ import java.util.zip.ZipOutputStream;
 /**
  * 文件流转压缩包工具类
  *
- * @author Parker
+ * @author Pace
  * @date 2020-01-07
  */
 @Slf4j

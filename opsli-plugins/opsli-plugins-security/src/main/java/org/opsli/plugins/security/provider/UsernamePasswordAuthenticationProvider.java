@@ -38,7 +38,7 @@ import org.springframework.stereotype.Component;
 /**
  * 用户名+密码 验证器
  *
- * @author Parker
+ * @author Pace
  * @date 2022年07月18日10:41:50
  */
 @AllArgsConstructor

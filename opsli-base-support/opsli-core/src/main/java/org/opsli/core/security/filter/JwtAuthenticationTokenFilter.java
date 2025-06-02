@@ -16,6 +16,7 @@
 package org.opsli.core.security.filter;
 
 import cn.hutool.json.JSONUtil;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import org.opsli.core.base.dto.LoginUserDto;
 import org.opsli.core.security.service.UidUserDetailDetailServiceImpl;
@@ -30,16 +31,16 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
  * JWT 认证 拦截器
  * 注： 不要将 自定义filter 交给 Spring管理
- * @author Parker
+ * @author Pace
  * @date 2022年07月22日16:16:42
  */
 @AllArgsConstructor
@@ -49,7 +50,7 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(
-            HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+            @NotNull HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull FilterChain filterChain)
             throws ServletException, IOException {
         // 获取token
         String token = UserTokenUtil.getRequestToken(request);

@@ -26,7 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.opsli.common.thread.AsyncProcessExecutor;
 import org.opsli.common.thread.AsyncProcessExecutorFactory;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -34,7 +34,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * 单机限流
  *
- * @author Parker
+ * @author Pace
  * @date 2021-01-05 16:06
  */
 @Slf4j

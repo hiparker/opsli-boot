@@ -21,7 +21,7 @@ import org.opsli.modulars.generator.table.wrapper.GenTableAndColumnModel;
 /**
  * 同步策略
  *
- * @author parker
+ * @author Pace
  * @date 2020-11-18 11:47
  */
 public interface SyncStrategy {

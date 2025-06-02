@@ -20,7 +20,7 @@ import org.opsli.common.base.msg.BaseMsg;
 /**
  * 系统 - 消息
  *
- * @author Parker
+ * @author Pace
  * @date 2020-09-13 17:40
  */
 public enum SystemMsg implements BaseMsg {

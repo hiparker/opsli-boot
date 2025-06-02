@@ -9,7 +9,7 @@ import java.util.concurrent.*;
 /**
  * 线程池工厂
  *
- * @author Parker
+ * @author Pace
  * @date 2021/11/2 10:48
  */
 public final class ThreadPoolFactory {

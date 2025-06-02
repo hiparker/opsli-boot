@@ -1,6 +1,6 @@
 package org.opsli.core.filters.interceptor;
 
-
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.StrUtil;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,9 +15,11 @@ import org.apache.ibatis.plugin.*;
 import org.apache.ibatis.session.ResultHandler;
 import org.apache.ibatis.session.RowBounds;
 import org.opsli.core.autoconfigure.properties.EncryptProperties;
+import org.opsli.core.filters.interceptor.crypto.ObjectProcessor;
 import org.springframework.stereotype.Component;
-import java.lang.reflect.*;
-import java.time.chrono.ChronoLocalDate;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.*;
 
 /**
@@ -28,7 +30,7 @@ import java.util.*;
  * Signature.method:在定义拦截类的基础之上，在定义拦截的方法
  * Signature.args:在定义拦截方法的基础之上在定义拦截的方法对应的参数，JAVA里面方法可能重载，故注意参数的类型和顺序
  *
- * @author Parker
+ * @author Pace
  * @date 2022-08-07
  */
 @Slf4j
@@ -52,17 +54,18 @@ public class MybatisCryptoInterceptor implements Interceptor {
      */
     @Override
     public Object intercept(Invocation invocation) throws Throwable {
-        Method method = invocation.getMethod();
-
-        switch (method.getName()) {
-            case "update":
-                return updateHandle(invocation);
-            case "query":
-                return selectHandle(invocation);
-            default:
-                return invocation.proceed();
+        try {
+            Method method = invocation.getMethod();
+            return switch (method.getName()) {
+                case "update" -> updateHandle(invocation);
+                case "query" -> selectHandle(invocation);
+                default -> invocation.proceed();
+            };
+        } catch (Exception e) {
+            log.error("MybatisCryptoInterceptor intercept error", e);
+            // 出现异常时继续执行原方法，避免中断业务流程
+            return invocation.proceed();
         }
-
     }
 
     /**
@@ -124,147 +127,37 @@ public class MybatisCryptoInterceptor implements Interceptor {
      *
      * @param object
      * @param cryptoType
-     * @throws IllegalAccessException
      */
-    private void handleParameterOrResult(Object object, CryptoType cryptoType) throws IllegalAccessException {
+    private void handleParameterOrResult(Object object, CryptoType cryptoType) {
         HashMap<Field, Object> fieldObjectHashMap = new HashMap<>();
-        //多个参数
-        if (object instanceof Map) {
-            Map paramMap = (Map) object;
-            Set keySet = paramMap.keySet();
-            for (Object key : keySet) {
-                Object o = paramMap.get(key);
-                if (o != null) {
-                    handleObject(o, o.getClass(), fieldObjectHashMap);
-                }
 
-            }
-        } else {
-            if (object != null) {
-                handleObject(object, object.getClass(), fieldObjectHashMap);
-            }
-        }
-
-        //统一修改加密解密值
-        fieldObjectHashMap.keySet().forEach(key -> {
-            try {
-                handleString(key, fieldObjectHashMap.get(key), cryptoType);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
-    }
-
-    /**
-     * 是否是基本类型
-     *
-     * @param type
-     * @return
-     */
-    private boolean isBase(Type type) {
-        return boolean.class.equals(type) ||
-                char.class.equals(type) ||
-                long.class.equals(type) ||
-                int.class.equals(type) ||
-                byte.class.equals(type) ||
-                short.class.equals(type) ||
-                double.class.equals(type) ||
-                float.class.equals(type);
-    }
-
-    /**
-     * 是否是
-     *
-     * @param object
-     * @return
-     */
-    private boolean isFilter(Object object) {
-
-        return object == null || object instanceof CharSequence || object instanceof Number || object instanceof Collection || object instanceof Date || object instanceof ChronoLocalDate;
-    }
-
-    /**
-     * 聚合父类属性
-     *
-     * @param oClass
-     * @param fields
-     * @return
-     */
-    private List<Field> mergeField(Class<?> oClass, List<Field> fields) {
-        if (fields == null) {
-            fields = new ArrayList<>();
-        }
-        Class<?> superclass = oClass.getSuperclass();
-        if (superclass != null && !superclass.equals(Object.class) && superclass.getDeclaredFields().length > 0) {
-            mergeField(superclass, fields);
-        }
-        for (Field declaredField : oClass.getDeclaredFields()) {
-
-            int modifiers = declaredField.getModifiers();
-
-            if (Modifier.isStatic(modifiers) || Modifier.isFinal(modifiers) || Modifier.isVolatile(modifiers) || Modifier.isSynchronized(modifiers)) {
-                continue;
-            }
-            fields.add(declaredField);
-        }
-
-        return fields;
-
-    }
-
-    /**
-     * 处理Object
-     *
-     * @param obj
-     * @param oClass
-     * @throws IllegalAccessException
-     */
-    private void handleObject(Object obj, Class<?> oClass, HashMap<Field, Object> fieldObjectHashMap) throws IllegalAccessException {
-        //过滤
-        if (isFilter(obj)) {
-            return;
-        }
-
-        List<Field> fields = mergeField(oClass, null);
-
-        for (Field declaredField : fields) {
-
-            //静态属性直接跳过
-            if (Modifier.isStatic(declaredField.getModifiers())) {
-                continue;
-            }
-
-            boolean accessible = declaredField.isAccessible();
-            declaredField.setAccessible(true);
-            Object value = declaredField.get(obj);
-            declaredField.setAccessible(accessible);
-
-            if (value == null) {
-                // TODO
-                continue;
-            } else if (value instanceof Number) {
-                // TODO
-                continue;
-            } else if (value instanceof String) {
-                CryptoMapperField annotation = declaredField.getAnnotation(CryptoMapperField.class);
-                if (annotation != null) {
-                    fieldObjectHashMap.put(declaredField, obj);
-                }
-
-            } else if (value instanceof Collection) {
-                Collection coll = (Collection) value;
-                for (Object o : coll) {
-                    if (isFilter(o)) {
-                        //默认集合内类型一致
-                        break;
+        try {
+            //多个参数
+            if (object instanceof Map paramMap) {
+                Set keySet = paramMap.keySet();
+                for (Object key : keySet) {
+                    Object o = paramMap.get(key);
+                    if (o != null) {
+                        new ObjectProcessor().handleObject(o, o.getClass(), fieldObjectHashMap);
                     }
-                    handleObject(o, o.getClass(), fieldObjectHashMap);
                 }
             } else {
-                handleObject(value, value.getClass(), fieldObjectHashMap);
+                if (object != null) {
+                    new ObjectProcessor().handleObject(object, object.getClass(), fieldObjectHashMap);
+                }
             }
-        }
 
+            //统一修改加密解密值
+            fieldObjectHashMap.keySet().forEach(key -> {
+                try {
+                    handleString(key, fieldObjectHashMap.get(key), cryptoType);
+                } catch (Exception e) {
+                    log.error("Mybatis 拦截器-加解密插件-处理参数结果异常 ERROR=> {}", e.getMessage(), e);
+                }
+            });
+        } catch (Exception e) {
+            log.warn("处理参数或结果时发生异常，跳过处理: {}", e.getMessage());
+        }
     }
 
     /**
@@ -273,49 +166,51 @@ public class MybatisCryptoInterceptor implements Interceptor {
      * @param field
      * @param object
      * @param cryptoType
-     * @throws IllegalAccessException
-     * @throws InstantiationException
-     * @throws NoSuchMethodException
-     * @throws InvocationTargetException
+     * @throws Exception
      */
     private void handleString(Field field, Object object, CryptoType cryptoType) throws Exception {
+        // 判断是否为bean
+        boolean isBean = BeanUtil.isBean(object.getClass());
+        if(!isBean){
+            return;
+        }
 
-        boolean accessible = field.isAccessible();
-        field.setAccessible(true);
-        Object value = field.get(object);
+        try {
+            Object value = BeanUtil.getProperty(object, field.getName());
+            CryptoMapperField annotation = field.getAnnotation(CryptoMapperField.class);
+            if (annotation != null) {
+                String key;
+                //全局配置的key
+                String propertiesKey = encryptProperties.getKey();
+                log.debug("全局key是：{}", propertiesKey);
+                //属性上的key
+                String annotationKey = annotation.key();
+                log.debug("注解key是：{}", annotationKey);
 
-        CryptoMapperField annotation = field.getAnnotation(CryptoMapperField.class);
-        if (annotation != null) {
+                if (StrUtil.isNotBlank(annotationKey)) {
+                    key = annotationKey;
+                } else {
+                    key = propertiesKey;
+                }
 
-            String key;
-            //全局配置的key
-            String propertiesKey = encryptProperties.getKey();
-            log.debug("全局key是：" + propertiesKey);
-            //属性上的key
-            String annotationKey = annotation.key();
-            log.debug("注解key是：" + annotationKey);
+                Class<? extends ICrypto> iCryptoImpl = annotation.iCrypto();
+                ICrypto iCrypto = iCryptoImpl.getDeclaredConstructor().newInstance();
 
-            if (StrUtil.isNotBlank(annotationKey)) {
-                key = annotationKey;
-            } else {
-                key = propertiesKey;
+                //解密后的值
+                String valueResult;
+                if (cryptoType.equals(CryptoType.DECRYPT)) {
+                    valueResult = iCrypto.decrypt(String.valueOf(value), key);
+                } else {
+                    valueResult = iCrypto.encrypt(String.valueOf(value), key);
+                }
+
+                log.debug("原值：{}", value);
+                log.debug("现在：{}", valueResult);
+                BeanUtil.setProperty(object, field.getName(), String.valueOf(valueResult));
             }
-
-            Class<? extends ICrypto> iCryptoImpl = annotation.iCrypto();
-            ICrypto iCrypto = iCryptoImpl.newInstance();
-
-            //解密后的值
-            String valueResult;
-            if (cryptoType.equals(CryptoType.DECRYPT)) {
-                valueResult = iCrypto.decrypt(String.valueOf(value), key);
-            } else {
-                valueResult = iCrypto.encrypt(String.valueOf(value), key);
-            }
-
-            log.debug("原值：" + value);
-            log.debug("现在：" + valueResult);
-            field.set(object, String.valueOf(valueResult));
-            field.setAccessible(accessible);
+        } catch (Exception e) {
+            log.error("处理字段 {}.{} 的加密解密时发生异常: {}",
+                    field.getDeclaringClass().getName(), field.getName(), e.getMessage());
         }
     }
 

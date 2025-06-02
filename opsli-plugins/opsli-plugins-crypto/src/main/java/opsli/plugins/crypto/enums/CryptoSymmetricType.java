@@ -18,7 +18,7 @@ package opsli.plugins.crypto.enums;
 /**
  * 对称算法类型
  *
- * @author Parker
+ * @author Pace
  * @date 2021年5月17日16:48:14
  */
 public enum CryptoSymmetricType {

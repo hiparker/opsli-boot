@@ -26,7 +26,7 @@ import java.util.Map;
 /**
  * 代码生成器 - 数据库表
  *
- * @author parker
+ * @author Pace
  * @date 2020-09-16 17:34
  */
 public interface DatabaseTableService {

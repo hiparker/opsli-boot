@@ -20,10 +20,12 @@ import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 import org.opsli.api.base.warpper.ApiWrapper;
 
+import java.io.Serial;
+
 /**
  * Entity 基础类
  *
- * @author Parker
+ * @author Pace
  * @date 2020-09-15
  */
 @Data
@@ -31,6 +33,7 @@ import org.opsli.api.base.warpper.ApiWrapper;
 @EqualsAndHashCode(callSuper = false)
 public abstract class BaseEntity extends ApiWrapper {
 
+	@Serial
 	private static final long serialVersionUID = 1L;
 
 

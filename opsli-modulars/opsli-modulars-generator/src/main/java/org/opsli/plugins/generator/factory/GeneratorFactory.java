@@ -4,7 +4,7 @@ package org.opsli.plugins.generator.factory;
 /**
  * 代码生成器工厂
  *
- * @author Parker
+ * @author Pace
  * @date 2021年6月1日19:10:36
  */
 public final class GeneratorFactory {

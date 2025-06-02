@@ -15,7 +15,7 @@
  */
 package org.opsli.core.options;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import org.opsli.common.annotation.OptionDict;
 import org.opsli.common.annotation.validator.Validator;
@@ -23,12 +23,13 @@ import org.opsli.common.enums.ValidatorType;
 import org.opsli.core.utils.OptionsUtil;
 import org.opsli.core.utils.ValidatorUtil;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
  * 阿里云短信配置
  *
- * @author Parker
+ * @author Pace
  * @date 2020-09-19 20:03
  */
 public enum SmsAliYunConfigFactory {
@@ -57,21 +58,22 @@ public enum SmsAliYunConfigFactory {
     /**
      * 阿里云短信配置
      *
-     * @author Parker
+     * @author Pace
      */
     @Data
     public static class SmsAliYunConfigOption implements Serializable {
 
+        @Serial
         private static final long serialVersionUID = 1L;
 
         /** access_key */
-        @ApiModelProperty(value = "阿里云AccessKey")
+        @Schema(description = "阿里云AccessKey")
         @Validator({ValidatorType.IS_NOT_NULL})
         @OptionDict("sms_aliyun_access_key")
         private String accessKey;
 
         /** access_key_secret */
-        @ApiModelProperty(value = "阿里云AccessKeySecret")
+        @Schema(description = "阿里云AccessKeySecret")
         @Validator({ValidatorType.IS_NOT_NULL})
         @OptionDict("sms_aliyun_access_key_secret")
         private String accessKeySecret;

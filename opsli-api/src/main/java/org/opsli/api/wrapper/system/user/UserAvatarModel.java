@@ -15,7 +15,7 @@
  */
 package org.opsli.api.wrapper.system.user;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.opsli.common.annotation.validator.Validator;
@@ -24,14 +24,14 @@ import org.opsli.common.enums.ValidatorType;
 /**
  * 用户信息表
  *
- * @author Parker
+ * @author Pace
  * @date 2020-09-16 17:33
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
 public class UserAvatarModel {
 
-    @ApiModelProperty(value = "图片地址")
+    @Schema(description = "图片地址")
     @Validator({ValidatorType.IS_NOT_NULL, ValidatorType.IS_URL})
     private String imgUrl;
 

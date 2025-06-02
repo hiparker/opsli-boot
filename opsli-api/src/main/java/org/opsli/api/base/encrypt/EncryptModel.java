@@ -15,28 +15,30 @@
  */
 package org.opsli.api.base.encrypt;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import org.opsli.common.annotation.validator.Validator;
 import org.opsli.common.annotation.validator.ValidatorLenMax;
 import org.opsli.common.enums.ValidatorType;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
  * 登陆 加解密
  *
- * @author Parker
+ * @author Pace
  * @date 2021-01-24 12:48 下午
  **/
 @Data
 public class EncryptModel implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Validator({ValidatorType.IS_NOT_NULL})
     @ValidatorLenMax(2000)
-    @ApiModelProperty(value = "加密数据")
+    @Schema(description = "加密数据")
     private String encryptData;
 
 }

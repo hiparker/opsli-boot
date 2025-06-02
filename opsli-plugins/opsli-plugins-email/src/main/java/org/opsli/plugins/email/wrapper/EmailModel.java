@@ -6,7 +6,7 @@ import lombok.EqualsAndHashCode;
 /**
  * 邮件服务
  *
- * @author Parker
+ * @author Pace
  * @date 2020-09-19 20:03
  */
 @Data

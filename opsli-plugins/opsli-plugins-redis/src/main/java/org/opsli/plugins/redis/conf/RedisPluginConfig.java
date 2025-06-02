@@ -29,7 +29,7 @@ import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactor
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.RedisSerializer;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -38,7 +38,7 @@ import java.util.List;
 /**
  * Redis 配置类
  *
- * @author Parker
+ * @author Pace
  * @date 2020-09-16 11:47
  */
 @Slf4j

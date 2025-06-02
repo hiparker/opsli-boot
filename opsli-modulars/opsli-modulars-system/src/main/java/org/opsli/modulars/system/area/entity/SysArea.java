@@ -26,7 +26,7 @@ import org.opsli.core.base.entity.BaseEntity;
 /**
  * 地域表
  *
- * @author Parker
+ * @author Pace
  * @date 2020-11-28 18:59:59
  */
 @Data

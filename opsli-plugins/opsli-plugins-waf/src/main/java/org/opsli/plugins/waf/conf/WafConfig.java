@@ -24,14 +24,14 @@ import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import javax.annotation.Resource;
-import javax.servlet.DispatcherType;
+import jakarta.annotation.Resource;
+import jakarta.servlet.DispatcherType;
 
 /**
  * 软件防火墙
  * 防止XSS SQL 攻击
  *
- * @author Parker
+ * @author Pace
  * @date 2020-10-09
  */
 @Configuration

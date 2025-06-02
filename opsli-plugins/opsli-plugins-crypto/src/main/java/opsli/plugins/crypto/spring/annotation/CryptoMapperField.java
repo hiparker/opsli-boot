@@ -11,7 +11,7 @@ import java.lang.annotation.*;
  * 字段加密
  * 注意注解只能放在可以被 mybatis Interceptor拦截器拦截的实体上 才能生效
  *
- * @author Parker
+ * @author Pace
  * @date 2022-08-07 17:33
  */
 @Documented

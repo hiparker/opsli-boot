@@ -23,7 +23,7 @@ import org.opsli.common.enums.ValidatorType;
 /**
  * 邮箱
  *
- * @author Parker
+ * @author Pace
  * @date 2022-07-16 8:14 PM
  **/
 @Data

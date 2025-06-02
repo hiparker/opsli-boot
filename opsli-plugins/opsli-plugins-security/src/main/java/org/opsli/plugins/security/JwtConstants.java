@@ -19,7 +19,7 @@ package org.opsli.plugins.security;
 /**
  * JWT 常量
  *
- * @author Parker
+ * @author Pace
  * @date 2021年12月22日16:18:15
  */
 public final class JwtConstants {

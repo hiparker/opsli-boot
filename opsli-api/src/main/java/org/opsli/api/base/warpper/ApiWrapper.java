@@ -16,22 +16,21 @@
 package org.opsli.api.base.warpper;
 
 import com.alibaba.excel.annotation.ExcelIgnore;
-import com.alibaba.excel.annotation.ExcelProperty;
 import com.alibaba.excel.annotation.write.style.*;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.Version;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
-import org.apache.poi.ss.usermodel.FillPatternType;
+import com.alibaba.excel.enums.poi.FillPatternTypeEnum;
 import org.opsli.api.base.encrypt.BaseEncrypt;
-import org.opsli.plugins.excel.annotation.ExcelInfo;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -46,7 +45,7 @@ import java.util.Date;
  * Entity 增加的 deleted 字段， 不需要同步更新到 Wrapper的Model中
  * Wrapper的Model 只是用于 对外展示
  *
- * @author Parker
+ * @author Pace
  * @date 2019-05-11
  */
 @Data
@@ -55,29 +54,30 @@ import java.util.Date;
 @ContentRowHeight(16)
 @HeadRowHeight(21)
 @HeadFontStyle(fontName = "Arial",color = 9,fontHeightInPoints = 10)
-@HeadStyle(fillPatternType = FillPatternType.SOLID_FOREGROUND, fillForegroundColor = 23)
+@HeadStyle(fillPatternType = FillPatternTypeEnum.SOLID_FOREGROUND, fillForegroundColor = 23)
 @ColumnWidth(22)
 public abstract class ApiWrapper extends BaseEncrypt implements Serializable {
 
+	@Serial
 	private static final long serialVersionUID = 1L;
 
 	/** ID */
 	@TableId
-	@ApiModelProperty(value = "ID")
+	@Schema(description = "ID")
 	@ExcelIgnore
 	//@ExcelProperty(value = "ID", order = 1000)
 	//@ExcelInfo
 	private String id;
 
 	/** 创建人 */
-	@ApiModelProperty(value = "创建人")
+	@Schema(description = "创建人")
 	@ExcelIgnore
 	//@ExcelProperty(value = "创建人", order = 1001)
 	//@ExcelInfo
 	private String createBy;
 
 	/** 创建时间 */
-	@ApiModelProperty(value = "创建时间")
+	@Schema(description = "创建时间")
 	@ExcelIgnore
 	//@ExcelProperty(value = "创建时间", order = 1002)
 	//@ExcelInfo
@@ -86,14 +86,14 @@ public abstract class ApiWrapper extends BaseEncrypt implements Serializable {
 	private Date createTime;
 
 	/** 更新人 */
-	@ApiModelProperty(value = "修改人")
+	@Schema(description = "修改人")
 	@ExcelIgnore
 	//@ExcelProperty(value = "修改人", order = 1003)
 	//@ExcelInfo
 	private String updateBy;
 
 	/** 更新时间 */
-	@ApiModelProperty(value = "修改时间")
+	@Schema(description = "修改时间")
 	@ExcelIgnore
 	//@ExcelProperty(value = "修改时间", order = 1004)
 	//@ExcelInfo
@@ -102,7 +102,7 @@ public abstract class ApiWrapper extends BaseEncrypt implements Serializable {
 	private Date updateTime;
 
 	/** 乐观锁 版本 */
-	@ApiModelProperty(value = "版本")
+	@Schema(description = "版本")
 	@ExcelIgnore
 	@Version
 	private Integer version;

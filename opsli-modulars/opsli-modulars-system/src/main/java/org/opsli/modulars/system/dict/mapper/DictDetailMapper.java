@@ -22,7 +22,7 @@ import org.opsli.modulars.system.dict.entity.SysDictDetail;
 /**
  * 数据字典 明细 Mapper
  *
- * @author Parker
+ * @author Pace
  * @date 2020-09-16 17:33
  */
 @Mapper

@@ -19,7 +19,7 @@ package org.opsli.common.base.msg;
  * 总消息类 用来存放消息
  * opsli将消息全部提取出至一个总文件
  *
- * @author Parker
+ * @author Pace
  * @date 2020-09-22 17:07
  */
 public interface BaseMsg {

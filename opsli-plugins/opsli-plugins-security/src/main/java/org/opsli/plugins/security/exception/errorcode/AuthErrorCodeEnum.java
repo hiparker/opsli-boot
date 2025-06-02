@@ -32,7 +32,7 @@ package org.opsli.plugins.security.exception.errorcode;
  *  模块标识
  * 00 - 公共模块
  *
- * @author Parker
+ * @author Pace
  * @date 2020-09-13 19:36
  */
 public enum AuthErrorCodeEnum implements BaseAuthMsg {

@@ -9,7 +9,7 @@ import java.util.Map;
 /**
  * 限流器测试
  *
- * @author Parker
+ * @author Pace
  * @date 2021-01-05 17:17
  */
 public class LimiterTest {

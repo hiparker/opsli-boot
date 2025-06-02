@@ -22,7 +22,7 @@ import org.opsli.core.base.entity.BaseEntity;
 /**
  * 代码生成器 - 表结构
  *
- * @author parker
+ * @author Pace
  * @date 2020-09-16 17:34
  */
 @Data

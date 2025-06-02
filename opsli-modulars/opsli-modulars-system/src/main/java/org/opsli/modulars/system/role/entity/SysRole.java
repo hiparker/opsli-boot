@@ -25,7 +25,7 @@ import org.opsli.core.base.entity.BaseEntity;
 /**
  * 角色表
  *
- * @author Parker
+ * @author Pace
  * @date 2020-09-16 17:33
  */
 @Data
@@ -46,7 +46,7 @@ public class SysRole extends BaseEntity {
     private String dataScope;
 
     /** 备注 */
-    @TableField(updateStrategy = FieldStrategy.IGNORED)
+    @TableField(updateStrategy = FieldStrategy.ALWAYS)
     private String remark;
 
 

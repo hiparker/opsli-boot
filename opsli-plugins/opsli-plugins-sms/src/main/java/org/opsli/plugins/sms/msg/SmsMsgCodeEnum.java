@@ -32,7 +32,7 @@ import org.opsli.common.base.msg.BaseMsg;
  * 10000 ~ 10099 短信服务
  * 10100 ~ 10199 微信服务
  *
- * @author Parker
+ * @author Pace
  * @date 2020-09-13 19:36
  */
 public enum SmsMsgCodeEnum implements BaseMsg {
