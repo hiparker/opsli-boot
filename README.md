@@ -1,4 +1,4 @@
-# OPSLI 快速开发平台 (v2.0)
+# OPSLI 快速开发平台 (v2.2)
 <div align="center">
  <img width="500" src="https://gitee.com/hiparker/opsli-ui/raw/master/repository-images/logo.png"/>
  <br/> <br/>
@@ -71,7 +71,7 @@
 
 **身份安全**：修改邮箱、手机号或忘记密码时，有独立的身份认证鉴权
 
-**在线文档**：通过接入Knife4j，实现在线API文档的查看与调试;
+**在线文档**：通过接入SpringDoc，实现在线API文档的查看与调试;
 
 **业务分离**：采用前后端分离的框架设计，前端采用vue-admin-beautiful（开源版本 基于element-ui）
 

@@ -2,15 +2,15 @@
 
 # 端口设置
 server:
-  port: 10110
+  port: 7000
 
 spring:
   data:
     #redis 配置
     redis:
       database: 8
-      host: 182.43.20.249
-      password: 'opsli@123456'
+      host: 127.0.0.1
+      password: '1234567'
       port: 6677
 
   # 数据库配置
@@ -34,9 +34,9 @@ spring:
       #primary: master
       datasource:
         master:
-          url: jdbc:mysql://182.43.20.249:3306/opsli-boot-dev?characterEncoding=UTF-8&useUnicode=true&useSSL=false&tinyInt1isBit=false&rewriteBatchedStatements=true&serverTimezone=Asia/Shanghai
-          username: opsli-boot-dev
-          password: YkpFNZM4CRWw5y2i
+          url: jdbc:mysql://127.0.0.1:3306/opsli-boot-dev?characterEncoding=UTF-8&useUnicode=true&useSSL=false&tinyInt1isBit=false&rewriteBatchedStatements=true&serverTimezone=Asia/Shanghai
+          username: opsli-boot
+          password: 12345678
           driver-class-name: com.mysql.cj.jdbc.Driver
         # 多数据源配置
         #slave-datasource:
