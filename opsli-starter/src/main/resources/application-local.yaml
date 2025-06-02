@@ -2,7 +2,7 @@
 
 # 端口设置
 server:
-  port: 10110
+  port: 7000
 
 spring:
   data:

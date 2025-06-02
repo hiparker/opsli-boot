@@ -1,4 +1,4 @@
-# OPSLI 快速开发平台 (v2.0)
+# OPSLI 快速开发平台 (v2.2)
 <div align="center">
  <img width="500" src="https://gitee.com/hiparker/opsli-ui/raw/master/repository-images/logo.png"/>
  <br/> <br/>

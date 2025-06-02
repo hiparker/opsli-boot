@@ -271,7 +271,3 @@ springdoc:
   writer-with-default-pretty-printer: true  # 格式化JSON输出
   model-and-view-allowed: true  # 允许ModelAndView作为返回类型
   override-with-generic-response: true  # 使用泛型响应覆盖
-
-
-pagehelper:
-  bound-sql-interceptors:
