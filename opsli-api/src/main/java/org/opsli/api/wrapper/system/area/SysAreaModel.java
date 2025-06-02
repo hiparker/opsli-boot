@@ -16,7 +16,7 @@
 package org.opsli.api.wrapper.system.area;
 
 import com.alibaba.excel.annotation.ExcelProperty;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.opsli.api.base.warpper.ApiWrapper;
@@ -28,7 +28,7 @@ import org.opsli.plugins.excel.annotation.ExcelInfo;
 /**
  * 地域表
  *
- * @author Parker
+ * @author Pace
  * @date 2020-11-28 18:59:59
  */
 @Data
@@ -36,14 +36,14 @@ import org.opsli.plugins.excel.annotation.ExcelInfo;
 public class SysAreaModel extends ApiWrapper {
 
     /** 父级主键 */
-    @ApiModelProperty(value = "父级主键")
+    @Schema(description = "父级主键")
     @ExcelProperty(value = "父级主键", order = 1)
     @ExcelInfo
     @ValidatorLenMax(19)
     private String parentId;
 
     /** 地域编号 */
-    @ApiModelProperty(value = "地域编号")
+    @Schema(description = "地域编号")
     @ExcelProperty(value = "地域编号", order = 2)
     @ExcelInfo
     @Validator({ValidatorType.IS_NOT_NULL, ValidatorType.IS_INTEGER})
@@ -51,7 +51,7 @@ public class SysAreaModel extends ApiWrapper {
     private String areaCode;
 
     /** 地域名称 */
-    @ApiModelProperty(value = "地域名称")
+    @Schema(description = "地域名称")
     @ExcelProperty(value = "地域名称", order = 3)
     @ExcelInfo
     @Validator({ValidatorType.IS_NOT_NULL, ValidatorType.IS_GENERAL_WITH_CHINESE})

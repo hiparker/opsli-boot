@@ -28,7 +28,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 /**
  * MyBatis - Plus 配置
  *
- * @author Parker
+ * @author Pace
  * @date 2020-09-15
  */
 @Slf4j
@@ -41,6 +41,9 @@ public class MyBatisPlusConfig {
 	 */
 	@Bean
 	public MybatisPlusInterceptor mybatisPlusInterceptor() {
+		// 关闭 pagehelper 输出banner
+		System.setProperty("pagehelper.banner", "false");
+
 		MybatisPlusInterceptor mybatisPlusInterceptor = new MybatisPlusInterceptor();
 
 		// 乐观锁
@@ -62,5 +65,7 @@ public class MyBatisPlusConfig {
 		sqlSessionFactory.getConfiguration().addInterceptor(new MybatisAutoFillInterceptor());
 		return "interceptor";
 	}
+
+
 
 }

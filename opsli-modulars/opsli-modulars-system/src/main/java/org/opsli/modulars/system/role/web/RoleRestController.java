@@ -17,8 +17,10 @@ package org.opsli.modulars.system.role.web;
 
 import cn.hutool.core.convert.Convert;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.opsli.api.base.result.ResultWrapper;
 import org.opsli.api.web.system.role.RoleApi;
@@ -36,18 +38,16 @@ import org.opsli.modulars.system.role.service.IRoleService;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.util.Optional;
 
 
 /**
  * 角色管理 Controller
  *
- * @author Parker
+ * @author Pace
  * @date 2020-09-16 17:33
  */
-@Api(tags = "角色管理")
+@Tag(name = "角色管理")
 @Slf4j
 @ApiRestController("/{ver}/system/role")
 public class RoleRestController extends BaseRestController<SysRole, RoleModel, IRoleService>
@@ -58,7 +58,7 @@ public class RoleRestController extends BaseRestController<SysRole, RoleModel, I
      * @param model 模型
      * @return ResultWrapper
      */
-    @ApiOperation(value = "获得单条角色", notes = "获得单条角色 - ID")
+    @Operation(summary = "获得单条角色 - ID")
     @PreAuthorize("hasAuthority('system_role_select')")
     @Override
     public ResultWrapper<RoleModel> get(RoleModel model) {
@@ -73,7 +73,7 @@ public class RoleRestController extends BaseRestController<SysRole, RoleModel, I
      * @param request request
      * @return ResultWrapper
      */
-    @ApiOperation(value = "获得分页数据", notes = "获得分页数据 - 查询构造器")
+    @Operation(summary = "获得分页数据 - 查询构造器")
     //@PreAuthorize("hasAuthority('system_role_select')")
     @Override
     public ResultWrapper<?> findPage(Integer pageNo, Integer pageSize, HttpServletRequest request) {
@@ -93,7 +93,7 @@ public class RoleRestController extends BaseRestController<SysRole, RoleModel, I
      * @param model 模型
      * @return ResultWrapper
      */
-    @ApiOperation(value = "新增角色", notes = "新增角色")
+    @Operation(summary = "新增角色")
     @PreAuthorize("hasAuthority('system_role_insert')")
     @OperateLogger(description = "新增角色",
             module = ModuleEnum.MODULE_ROLE, operationType = OperationTypeEnum.INSERT, db = true)
@@ -109,7 +109,7 @@ public class RoleRestController extends BaseRestController<SysRole, RoleModel, I
      * @param model 模型
      * @return ResultWrapper
      */
-    @ApiOperation(value = "修改角色", notes = "修改角色")
+    @Operation(summary = "修改角色")
     @PreAuthorize("hasAuthority('system_role_update')")
     @OperateLogger(description = "修改角色",
             module = ModuleEnum.MODULE_ROLE, operationType = OperationTypeEnum.UPDATE, db = true)
@@ -129,7 +129,7 @@ public class RoleRestController extends BaseRestController<SysRole, RoleModel, I
      * @param id ID
      * @return ResultWrapper
      */
-    @ApiOperation(value = "删除角色数据", notes = "删除角色数据")
+    @Operation(summary = "删除角色数据")
     @PreAuthorize("hasAuthority('system_role_delete')")
     @OperateLogger(description = "删除角色数据",
             module = ModuleEnum.MODULE_ROLE, operationType = OperationTypeEnum.DELETE, db = true)
@@ -148,7 +148,7 @@ public class RoleRestController extends BaseRestController<SysRole, RoleModel, I
      * @param ids ID 数组
      * @return ResultWrapper
      */
-    @ApiOperation(value = "批量删除角色数据", notes = "批量删除角色数据")
+    @Operation(summary = "批量删除角色数据")
     @PreAuthorize("hasAuthority('system_role_delete')")
     @OperateLogger(description = "批量删除角色数据",
             module = ModuleEnum.MODULE_ROLE, operationType = OperationTypeEnum.DELETE, db = true)
@@ -169,13 +169,13 @@ public class RoleRestController extends BaseRestController<SysRole, RoleModel, I
      * @param type 类型
      * @param request request
      */
-    @ApiOperation(value = "Excel 导出认证", notes = "Excel 导出认证")
+    @Operation(summary = "Excel 导出认证")
     @PreAuthorize("hasAnyAuthority('system_role_export', 'system_role_import')")
     @Override
     public ResultWrapper<String> exportExcelAuth(String type, HttpServletRequest request) {
         Optional<String> certificateOptional =
                 super.excelExportAuth(type, RoleApi.SUB_TITLE, request);
-        if(!certificateOptional.isPresent()){
+        if(certificateOptional.isEmpty()){
             return ResultWrapper.getErrorResultWrapper();
         }
         return ResultWrapper.getSuccessResultWrapper(certificateOptional.get());
@@ -186,7 +186,7 @@ public class RoleRestController extends BaseRestController<SysRole, RoleModel, I
      * 角色 Excel 导出
      * @param response response
      */
-    @ApiOperation(value = "导出Excel", notes = "导出Excel")
+    @Operation(summary = "导出Excel")
     @PreAuthorize("hasAuthority('system_role_export')")
     @OperateLogger(description = "导出Excel",
             module = ModuleEnum.MODULE_ROLE, operationType = OperationTypeEnum.SELECT, db = true)
@@ -202,7 +202,7 @@ public class RoleRestController extends BaseRestController<SysRole, RoleModel, I
      * @param request 文件流 request
      * @return ResultWrapper
      */
-    @ApiOperation(value = "导入Excel", notes = "导入Excel")
+    @Operation(summary = "导入Excel")
     @PreAuthorize("hasAuthority('system_role_import')")
     @OperateLogger(description = "角色 Excel 导入",
             module = ModuleEnum.MODULE_ROLE, operationType = OperationTypeEnum.INSERT, db = true)

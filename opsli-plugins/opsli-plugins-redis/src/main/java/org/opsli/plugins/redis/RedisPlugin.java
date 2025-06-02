@@ -36,7 +36,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Redis 插件类
  *
- * @author parker
+ * @author Pace
  * @date 2020-09-14
  */
 @Slf4j

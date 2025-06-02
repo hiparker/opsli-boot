@@ -15,40 +15,39 @@
  */
 package org.opsli.modulars.generator.logs.web;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.beanutils.BeanUtils;
-import org.opsli.core.log.annotation.OperateLogger;
-import org.opsli.core.log.enums.ModuleEnum;
-import org.opsli.core.log.enums.OperationTypeEnum;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.opsli.api.base.result.ResultWrapper;
 import org.opsli.common.annotation.ApiRestController;
 import org.opsli.core.base.controller.BaseRestController;
+import org.opsli.core.log.annotation.OperateLogger;
+import org.opsli.core.log.enums.ModuleEnum;
+import org.opsli.core.log.enums.OperationTypeEnum;
 import org.opsli.modulars.generator.logs.api.GenLogsApi;
 import org.opsli.modulars.generator.logs.entity.GenLogs;
 import org.opsli.modulars.generator.logs.service.IGenLogsService;
 import org.opsli.modulars.generator.logs.wrapper.GenLogsModel;
 import org.opsli.plugins.generator.utils.GeneratorHandleUtil;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 
 /**
  * 代码生成器日志
  *
- * @author parker
+ * @author Pace
  * @date 2020-09-16 17:34
  */
-@Api(tags = GenLogsApi.TITLE)
+@Tag(name = GenLogsApi.TITLE)
 @Slf4j
 @ApiRestController("/{ver}/generator/logs")
 public class GenLogsRestController extends BaseRestController<GenLogs, GenLogsModel, IGenLogsService>
         implements GenLogsApi {
 
-    @ApiOperation(value = "获得当前表生成记录", notes = "获得当前表生成记录")
+    @Operation(summary = "获得当前表生成记录")
     @PreAuthorize("hasAuthority('dev_generator_select')")
     @Override
     public ResultWrapper<GenLogsModel> getByTableId(String tableId) {
@@ -62,7 +61,7 @@ public class GenLogsRestController extends BaseRestController<GenLogs, GenLogsMo
     /**
      * 代码生成 修改
      */
-    @ApiOperation(value = "代码生成", notes = "代码生成")
+    @Operation(summary = "代码生成")
     @PreAuthorize("hasAuthority('dev_generator_create')")
     @OperateLogger(description = "代码生成",
             module = ModuleEnum.MODULE_GENERATOR, operationType = OperationTypeEnum.INSERT, db = true)
@@ -91,7 +90,7 @@ public class GenLogsRestController extends BaseRestController<GenLogs, GenLogsMo
      * @param tableId 表ID
      * @return ResultWrapper
      */
-    @ApiOperation(value = "生成菜单", notes = "生成菜单")
+    @Operation(summary = "生成菜单")
     @PreAuthorize("hasAuthority('dev_generator_createMenu')")
     @OperateLogger(description = "代码生成 - 生成菜单",
             module = ModuleEnum.MODULE_GENERATOR, operationType = OperationTypeEnum.INSERT, db = true)

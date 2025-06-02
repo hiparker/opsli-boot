@@ -18,7 +18,7 @@ package org.opsli.common.enums;
 /**
  * 数据库类型
  *
- * @author Parker
+ * @author Pace
  * @date 2020-09-16 17:42
  */
 public enum CacheType {

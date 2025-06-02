@@ -15,18 +15,18 @@
  */
 package org.opsli.api.base.result;
 
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import lombok.experimental.Accessors;
 import org.opsli.common.base.msg.BaseMsg;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
  * 返回包装类
  *
- * @author Parker
+ * @author Pace
  * @date 2021年12月30日15:31:41
  */
 @Data
@@ -34,34 +34,34 @@ import java.io.Serializable;
 @Accessors(chain = true)
 @AllArgsConstructor
 @NoArgsConstructor
-@ApiModel(value = "基础返回实体",
-		description="视图层返回Api对象  code:编号  msg:信息  timestamp:时间戳  data:数据")
+@Schema(description = "基础返回实体 - 视图层返回Api对象  code:编号  msg:信息  timestamp:时间戳  data:数据")
 public class ResultWrapper<T> implements Serializable {
 
+	@Serial
 	private static final long serialVersionUID = 1L;
 
 	/**
 	 * 响应提示信息
 	 */
-	@ApiModelProperty(name = "msg", dataType = "string", value = "响应信息")
+	@Schema(name = "msg", description = "响应信息")
 	private String msg;
 
 	/**
 	 * 返回码：0正常，-1以上为错误信息
 	 */
-	@ApiModelProperty(name = "code", dataType = "int", value = "响应码")
+	@Schema(name = "code", description = "响应码")
 	private int code;
 
 	/**
 	 * 返回
 	 */
-	@ApiModelProperty(name = "data", dataType = "object", value = "数据内容")
+	@Schema(name = "data", description = "数据内容")
 	private T data;
 
 	/**
 	 * 时间戳
 	 */
-	@ApiModelProperty(name = "timestamp", dataType = "long", value = "时间戳")
+	@Schema(name = "timestamp", description = "时间戳")
 	private long timestamp;
 
 
@@ -241,7 +241,7 @@ public class ResultWrapper<T> implements Serializable {
 	/**
 	 * 请求状态枚举
 	 *
-	 * @author Parker
+	 * @author Pace
 	 * @date 2021年12月30日15:29:29
 	 */
 	@Getter

@@ -15,8 +15,10 @@
  */
 package org.opsli.modulars.system.logs.web;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.opsli.api.base.result.ResultWrapper;
 import org.opsli.api.web.system.logs.OperationLogRestApi;
@@ -33,17 +35,15 @@ import org.opsli.modulars.system.logs.entity.OperationLog;
 import org.opsli.modulars.system.logs.service.IOperationLogService;
 import org.springframework.security.access.prepost.PreAuthorize;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.util.Optional;
 
 /**
  * 行为日志 Controller
  *
- * @author Parker
+ * @author Pace
  * @date 2022-07-26 19:21:57
  */
-@Api(tags = OperationLogRestApi.TITLE)
+@Tag(name = OperationLogRestApi.TITLE)
 @Slf4j
 @ApiRestController("/{ver}/system/op-logs")
 public class OperationLogRestController extends BaseRestController<OperationLog, OperationLogModel, IOperationLogService>
@@ -55,7 +55,7 @@ public class OperationLogRestController extends BaseRestController<OperationLog,
     * @param model 模型
     * @return ResultVo
     */
-    @ApiOperation(value = "获得单条行为日志", notes = "获得单条行为日志 - ID")
+    @Operation(summary = "获得单条行为日志 - ID")
     @PreAuthorize("hasAuthority('system_op_logs_select')")
     @Override
     public ResultWrapper<OperationLogModel> get(OperationLogModel model) {
@@ -73,7 +73,7 @@ public class OperationLogRestController extends BaseRestController<OperationLog,
     * @param request request
     * @return ResultVo
     */
-    @ApiOperation(value = "获得分页数据", notes = "获得分页数据 - 查询构造器")
+    @Operation(summary = "获得分页数据 - 查询构造器")
     @PreAuthorize("hasAuthority('system_op_logs_select')")
     @Override
     public ResultWrapper<?> findPage(Integer pageNo, Integer pageSize, HttpServletRequest request) {
@@ -92,13 +92,13 @@ public class OperationLogRestController extends BaseRestController<OperationLog,
      * @param type 类型
      * @param request request
      */
-    @ApiOperation(value = "Excel 导出认证", notes = "Excel 导出认证")
+    @Operation(summary = "Excel 导出认证")
     @PreAuthorize("hasAuthority('system_op_logs_export')")
     @Override
     public ResultWrapper<String> exportExcelAuth(String type, HttpServletRequest request) {
         Optional<String> certificateOptional =
                 super.excelExportAuth(type, OperationLogRestApi.SUB_TITLE, request);
-        if(!certificateOptional.isPresent()){
+        if(certificateOptional.isEmpty()){
             return ResultWrapper.getErrorResultWrapper();
         }
         return ResultWrapper.getSuccessResultWrapper(certificateOptional.get());
@@ -109,7 +109,7 @@ public class OperationLogRestController extends BaseRestController<OperationLog,
      * 行为日志 Excel 导出
      * @param response response
      */
-    @ApiOperation(value = "导出Excel", notes = "导出Excel")
+    @Operation(summary = "导出Excel")
     @PreAuthorize("hasAuthority('system_op_logs_export')")
     @OperateLogger(description = "导出Excel",
             module = ModuleEnum.MODULE_OPERATION, operationType = OperationTypeEnum.SELECT, db = true)

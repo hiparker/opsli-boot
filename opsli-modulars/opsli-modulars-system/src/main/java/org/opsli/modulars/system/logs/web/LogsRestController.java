@@ -15,32 +15,30 @@
  */
 package org.opsli.modulars.system.logs.web;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.opsli.api.base.result.ResultWrapper;
 import org.opsli.api.web.system.logs.LogsApi;
 import org.opsli.api.wrapper.system.logs.LogsModel;
 import org.opsli.common.annotation.ApiRestController;
-
 import org.opsli.core.base.controller.BaseRestController;
 import org.opsli.core.persistence.Page;
 import org.opsli.core.persistence.querybuilder.QueryBuilder;
 import org.opsli.core.persistence.querybuilder.WebQueryBuilder;
 import org.opsli.modulars.system.logs.entity.SysLogs;
 import org.opsli.modulars.system.logs.service.ILogsService;
-
-import javax.servlet.http.HttpServletRequest;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 
 /**
  * 日志 Controller
  *
- * @author Parker
+ * @author Pace
  * @date 2020-11-28 18:59:59
  */
-@Api(tags = LogsApi.TITLE)
+@Tag(name = LogsApi.TITLE)
 @Slf4j
 @ApiRestController("/{ver}/system/logs")
 public class LogsRestController extends BaseRestController<SysLogs, LogsModel, ILogsService>
@@ -52,7 +50,7 @@ public class LogsRestController extends BaseRestController<SysLogs, LogsModel, I
      * @param model 模型
      * @return ResultWrapper
      */
-    @ApiOperation(value = "获得单条日志", notes = "获得单条日志 - ID")
+    @Operation(summary = "获得单条日志 - ID")
     @PreAuthorize("hasAuthority('devops_logs_select')")
     @Override
     public ResultWrapper<LogsModel> get(LogsModel model) {
@@ -67,7 +65,7 @@ public class LogsRestController extends BaseRestController<SysLogs, LogsModel, I
      * @param request request
      * @return ResultWrapper
      */
-    @ApiOperation(value = "获得分页数据", notes = "获得分页数据 - 查询构造器")
+    @Operation(summary = "获得分页数据 - 查询构造器")
     @PreAuthorize("hasAuthority('devops_logs_select')")
     @Override
     public ResultWrapper<?> findPage(Integer pageNo, Integer pageSize, HttpServletRequest request) {

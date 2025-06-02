@@ -24,7 +24,7 @@ import java.util.Collection;
 /**
  * 邮件接口
  *
- * @author Parker
+ * @author Pace
  * @date 2020-09-19 20:03
  */
 public interface EmailPlugin {

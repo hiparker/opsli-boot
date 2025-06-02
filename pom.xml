@@ -13,11 +13,11 @@
         <!--项目开发者的信息 -->
         <developer>
             <!--项目开发者的唯一标识符 -->
-            <id>parker</id>
+            <id>pace</id>
             <!--项目开发者的全名 -->
-            <name>Parker Zhou</name>
+            <name>Pace Zhou</name>
             <!--项目开发者的email -->
-            <email>meet.parker@foxmail.com</email>
+            <email>meet.pace@foxmail.com</email>
             <!--项目开发者的主页的URL -->
             <url>https://www.opsli.com</url>
             <!--项目开发者在项目中扮演的角色，角色元素描述了各种角色 -->
@@ -34,8 +34,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.7.10</version>
-        <relativePath/> <!-- lookup parent from repository -->
+        <version>3.4.6</version>
     </parent>
 
     <!-- opsli-boot-parent 信息 -->
@@ -58,45 +57,36 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <java.version>1.8</java.version>
-        <!-- 修复 CVE-2023-20860 -->
-        <spring-boot.version>2.7.10</spring-boot.version>
+        <java.version>22</java.version>
+        <spring-boot.version>3.4.6</spring-boot.version>
         <skipTests>true</skipTests>
 
         <fastjson.version>1.2.83</fastjson.version>
-        <mybatis.version>3.5.9</mybatis.version>
-        <mybatis-plus.version>3.5.2</mybatis-plus.version>
-        <pagehelper.version>1.4.6</pagehelper.version>
-        <knife4j.version>3.0.3</knife4j.version>
+        <mybatis-plus.version>3.5.12</mybatis-plus.version>
+        <pagehelper.version>2.1.0</pagehelper.version>
+        <spring.doc.version>2.8.8</spring.doc.version>
 
-        <jwt.version>3.10.3</jwt.version>
-        <oshi.version>5.6.1</oshi.version>
-        <jna.version>5.8.0</jna.version>
-        <ehcache.version>3.9.0</ehcache.version>
-        <redisson.version>3.15.4</redisson.version>
+        <jwt.version>4.5.0</jwt.version>
+        <oshi.version>6.8.1</oshi.version>
+        <jna.version>5.17.0</jna.version>
+        <redisson.version>3.48.0</redisson.version>
         <captcha.version>1.6.2</captcha.version>
-        <bouncycastle.version>1.69</bouncycastle.version>
+        <bouncycastle.version>1.80</bouncycastle.version>
 
         <!-- 数据库相关 -->
-        <druid.version>1.1.17</druid.version>
-        <dynamic.version>2.5.4</dynamic.version>
-        <mysql.version>8.0.28</mysql.version>
-        <sqlserver.version>4.0</sqlserver.version>
-        <oracle.version>11.2.0.3</oracle.version>
-        <postgresql.version>42.3.3</postgresql.version>
+        <druid.version>1.2.25</druid.version>
+        <dynamic.version>4.3.1</dynamic.version>
 
         <!-- 工具 -->
-        <hutool.version>5.7.14</hutool.version>
-        <guava.version>31.1-jre</guava.version>
-        <commons.io.version>2.11.0</commons.io.version>
-        <commons.lang3.version>3.11</commons.lang3.version>
-        <snakeyaml.version>2.0</snakeyaml.version>
-        <email.version>1.6.2</email.version>
-        <logback.version>1.2.9</logback.version>
-        <protobuf-java.version>3.18.2</protobuf-java.version>
-        <beanutils.version>1.9.4</beanutils.version>
-        <transmittable.version>2.12.5</transmittable.version>
-        <cglib.version>3.3.0</cglib.version>
+        <hutool.version>5.8.38</hutool.version>
+        <enjoy.version>5.2.2</enjoy.version>
+        <guava.version>33.4.8-jre</guava.version>
+        <caffeine.version>3.1.8</caffeine.version>
+        <snakeyaml.version>2.4</snakeyaml.version>
+        <logback.version>1.5.13</logback.version>
+        <beanutils.version>1.11.0</beanutils.version>
+        <transmittable.version>2.14.5</transmittable.version>
+        <javassist.version>3.30.2-GA</javassist.version>
 
         <!-- 需要使用着两个版本 来引入对应的模块和插件 -->
         <!-- API版本 -->
@@ -120,28 +110,8 @@
                 <version>${spring-boot.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
-                <exclusions>
-                    <!-- 修复 CVE-2021-42550 -->
-                    <exclusion>
-                        <groupId>ch.qos.logback</groupId>
-                        <artifactId>logback-access</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>ch.qos.logback</groupId>
-                        <artifactId>logback-classic</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>ch.qos.logback</groupId>
-                        <artifactId>logback-core</artifactId>
-                    </exclusion>
-
-                    <!-- 修复 CVE-2022-21363  -->
-                    <exclusion>
-                        <groupId>mysql</groupId>
-                        <artifactId>mysql-connector-java</artifactId>
-                    </exclusion>
-                </exclusions>
             </dependency>
+
 
             <!-- captcha -->
             <dependency>
@@ -150,11 +120,11 @@
                 <version>${captcha.version}</version>
             </dependency>
 
+            <!-- spring doc -->
             <dependency>
-                <groupId>cglib</groupId>
-                <artifactId>cglib</artifactId>
-                <version>${cglib.version}</version>
-                <scope>compile</scope>
+                <groupId>org.springdoc</groupId>
+                <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+                <version>${spring.doc.version}</version>
             </dependency>
 
             <!-- JWT -->
@@ -173,60 +143,29 @@
 
             <!-- mybatis-plus -->
             <dependency>
-                <groupId>org.mybatis</groupId>
-                <artifactId>mybatis</artifactId>
-                <version>${mybatis.version}</version>
-            </dependency>
-            <dependency>
                 <groupId>com.baomidou</groupId>
-                <artifactId>mybatis-plus-boot-starter</artifactId>
+                <artifactId>mybatis-plus-spring-boot3-starter</artifactId>
                 <version>${mybatis-plus.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.github.pagehelper</groupId>
+                <artifactId>pagehelper-spring-boot-starter</artifactId>
+                <version>${pagehelper.version}</version>
             </dependency>
 
             <!-- druid -->
             <dependency>
                 <groupId>com.alibaba</groupId>
-                <artifactId>druid-spring-boot-starter</artifactId>
+                <artifactId>druid-spring-boot-3-starter</artifactId>
                 <version>${druid.version}</version>
             </dependency>
 
             <!-- 动态数据源 -->
             <dependency>
                 <groupId>com.baomidou</groupId>
-                <artifactId>dynamic-datasource-spring-boot-starter</artifactId>
+                <artifactId>dynamic-datasource-spring-boot3-starter</artifactId>
                 <version>${dynamic.version}</version>
-            </dependency>
-
-            <!--mysql-->
-            <dependency>
-                <groupId>mysql</groupId>
-                <artifactId>mysql-connector-java</artifactId>
-                <version>${mysql.version}</version>
-                <scope>runtime</scope>
-            </dependency>
-
-            <!--  sqlserver-->
-            <dependency>
-                <groupId>com.microsoft.sqlserver</groupId>
-                <artifactId>sqljdbc4</artifactId>
-                <version>${sqlserver.version}</version>
-                <scope>runtime</scope>
-            </dependency>
-
-            <!-- oracle驱动 -->
-            <dependency>
-                <groupId>com.oracle</groupId>
-                <artifactId>ojdbc6</artifactId>
-                <version>${oracle.version}</version>
-                <scope>runtime</scope>
-            </dependency>
-
-            <!-- postgresql驱动 -->
-            <dependency>
-                <groupId>org.postgresql</groupId>
-                <artifactId>postgresql</artifactId>
-                <version>${postgresql.version}</version>
-                <scope>runtime</scope>
             </dependency>
 
             <!-- OSHI 系统监控-->
@@ -241,23 +180,23 @@
                 <version>${jna.version}</version>
             </dependency>
 
-            <!-- 修复 CVE-2021-22569  -->
-            <dependency>
-                <groupId>com.google.protobuf</groupId>
-                <artifactId>protobuf-java</artifactId>
-                <version>${protobuf-java.version}</version>
-            </dependency>
-
             <dependency>
                 <groupId>com.jfinal</groupId>
                 <artifactId>enjoy</artifactId>
-                <version>4.9.06</version>
+                <version>${enjoy.version}</version>
             </dependency>
 
         </dependencies>
     </dependencyManagement>
 
     <dependencies>
+
+        <!-- Javassist 显式依赖 -->
+        <dependency>
+            <groupId>org.javassist</groupId>
+            <artifactId>javassist</artifactId>
+            <version>${javassist.version}</version>
+        </dependency>
 
         <!-- ———————————————————— 集成springboot 相关组件 - 开始 ———————————————————— -->
         <dependency>
@@ -289,8 +228,8 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-configuration-processor</artifactId>
             <optional>true</optional>
+            <scope>provided</scope>
         </dependency>
-
 
         <!-- 热部署 如果使用 Jrebel 忽略就好,如果不使用 Jrebel 则放开 -->
         <!--
@@ -304,11 +243,6 @@
 
         <!-- ———————————————————— 集成工具 - 开始 ———————————————————— -->
         <!-- commons -->
-        <dependency>
-            <groupId>commons-io</groupId>
-            <artifactId>commons-io</artifactId>
-            <version>${commons.io.version}</version>
-        </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
@@ -325,7 +259,6 @@
         </dependency>
 
 
-        <!-- 修复 CVE-2020-8908 -->
         <!-- guava -->
         <dependency>
             <groupId>com.google.guava</groupId>
@@ -333,10 +266,18 @@
             <version>${guava.version}</version>
         </dependency>
 
+        <!-- caffeine -->
+        <dependency>
+            <groupId>com.github.ben-manes.caffeine</groupId>
+            <artifactId>caffeine</artifactId>
+            <version>${caffeine.version}</version>
+        </dependency>
+
         <!-- Lombok -->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
+            <scope>provided</scope>
         </dependency>
 
         <!-- alibaba fastjson -->
@@ -352,25 +293,17 @@
             <version>${transmittable.version}</version>
         </dependency>
 
-        <!-- 糊涂工具包 -->
+        <!-- hutool工具包 -->
         <dependency>
             <groupId>cn.hutool</groupId>
             <artifactId>hutool-all</artifactId>
             <version>${hutool.version}</version>
         </dependency>
 
-        <dependency>
-            <groupId>cglib</groupId>
-            <artifactId>cglib</artifactId>
-            <version>${cglib.version}</version>
-            <scope>compile</scope>
-        </dependency>
-
-        <!-- 修复 Cxa9261daf-3755 -->
         <!-- 国密算法包 -->
         <dependency>
             <groupId>org.bouncycastle</groupId>
-            <artifactId>bcprov-jdk15to18</artifactId>
+            <artifactId>bcprov-jdk18on</artifactId>
             <version>${bouncycastle.version}</version>
         </dependency>
 
@@ -382,28 +315,6 @@
             <version>${snakeyaml.version}</version>
         </dependency>
 
-        <dependency>
-            <groupId>com.sun.mail</groupId>
-            <artifactId>javax.mail</artifactId>
-            <version>${email.version}</version>
-        </dependency>
-
-        <!-- 修复 CVE-2021-42550 -->
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-access</artifactId>
-            <version>${logback.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-classic</artifactId>
-            <version>${logback.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-core</artifactId>
-            <version>${logback.version}</version>
-        </dependency>
 
         <!-- ———————————————————— 集成工具 - 结束 ———————————————————— -->
 
@@ -418,14 +329,6 @@
         </dependency>
 
         <!-- 阿里云 OSS -->
-        <dependency>
-            <groupId>com.aliyun.oss</groupId>
-            <artifactId>aliyun-sdk-oss</artifactId>
-            <version>3.15.1</version>
-            <scope>provided</scope>
-            <optional>true</optional>
-        </dependency>
-
         <!-- ———————————————————— OSS云存储 - 结束 ———————————————————— -->
 
     </dependencies>
@@ -437,15 +340,15 @@
         <repository>
             <id>aliyun</id>
             <name>aliyun Repository</name>
-            <url>http://maven.aliyun.com/nexus/content/groups/public</url>
+            <url>https://maven.aliyun.com/repository/public</url>
             <snapshots>
                 <enabled>false</enabled>
             </snapshots>
         </repository>
         <repository>
-            <id>uk</id>
-            <name>uk Repository</name>
-            <url>http://uk.maven.org/maven2/</url>
+            <id>oschina</id>
+            <name>oschina Repository</name>
+            <url>http://maven.oschina.net/content/groups/public</url>
             <snapshots>
                 <enabled>false</enabled>
             </snapshots>
@@ -504,8 +407,8 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
+                    <source>22</source>
+                    <target>22</target>
                     <encoding>UTF-8</encoding>
                 </configuration>
             </plugin>

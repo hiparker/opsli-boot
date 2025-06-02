@@ -19,8 +19,10 @@ package org.opsli.modulars.system.options.web;
 
 import cn.hutool.core.convert.Convert;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import opsli.plugins.crypto.CryptoPlugin;
 import opsli.plugins.crypto.enums.CryptoAsymmetricType;
@@ -45,8 +47,6 @@ import org.opsli.modulars.system.options.service.ISysOptionsService;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -55,10 +55,10 @@ import java.util.Optional;
 /**
  * 系统参数 Controller
  *
- * @author Parker
+ * @author Pace
  * @date 2021-02-07 18:24:38
  */
-@Api(tags = OptionsApi.TITLE)
+@Tag(name = OptionsApi.TITLE)
 @Slf4j
 @ApiRestController("/{ver}/system/options")
 public class SysOptionsRestController extends BaseRestController<SysOptions, OptionsModel, ISysOptionsService>
@@ -70,7 +70,7 @@ public class SysOptionsRestController extends BaseRestController<SysOptions, Opt
     * @param model 模型
     * @return ResultWrapper
     */
-    @ApiOperation(value = "获得单条系统参数", notes = "获得单条系统参数 - ID")
+    @Operation(summary = "获得单条系统参数 - ID")
     @PreAuthorize("hasAuthority('system_options_select')")
     @Override
     public ResultWrapper<OptionsModel> get(OptionsModel model) {
@@ -85,7 +85,7 @@ public class SysOptionsRestController extends BaseRestController<SysOptions, Opt
     * @param request request
     * @return ResultWrapper
     */
-    @ApiOperation(value = "获得分页数据", notes = "获得分页数据 - 查询构造器")
+    @Operation(summary = "获得分页数据 - 查询构造器")
     @PreAuthorize("hasAuthority('system_options_select')")
     @Override
     public ResultWrapper<?> findPage(Integer pageNo, Integer pageSize, HttpServletRequest request) {
@@ -108,7 +108,7 @@ public class SysOptionsRestController extends BaseRestController<SysOptions, Opt
     * @param model 模型
     * @return ResultWrapper
     */
-    @ApiOperation(value = "新增系统参数数据", notes = "新增系统参数数据")
+    @Operation(summary = "新增系统参数数据")
     @PreAuthorize("hasAuthority('system_options_insert')")
     @OperateLogger(description = "新增系统参数数据",
             module = ModuleEnum.MODULE_COMMON, operationType = OperationTypeEnum.INSERT, db = true)
@@ -127,7 +127,7 @@ public class SysOptionsRestController extends BaseRestController<SysOptions, Opt
     * @param model 模型
     * @return ResultWrapper
     */
-    @ApiOperation(value = "修改系统参数数据", notes = "修改系统参数数据")
+    @Operation(summary = "修改系统参数数据")
     @PreAuthorize("hasAuthority('system_options_update')")
     @OperateLogger(description = "修改系统参数数据",
             module = ModuleEnum.MODULE_COMMON, operationType = OperationTypeEnum.UPDATE, db = true)
@@ -146,7 +146,7 @@ public class SysOptionsRestController extends BaseRestController<SysOptions, Opt
      * @param params Map
      * @return ResultWrapper
      */
-    @ApiOperation(value = "修改系统参数数据", notes = "修改系统参数数据")
+    @Operation(summary = "修改系统参数数据")
     @PreAuthorize("hasAuthority('system_options_update')")
     @OperateLogger(description = "修改系统参数数据",
             module = ModuleEnum.MODULE_COMMON, operationType = OperationTypeEnum.UPDATE, db = true)
@@ -166,7 +166,7 @@ public class SysOptionsRestController extends BaseRestController<SysOptions, Opt
     * @param id ID
     * @return ResultWrapper
     */
-    @ApiOperation(value = "删除系统参数数据", notes = "删除系统参数数据")
+    @Operation(summary = "删除系统参数数据")
     @PreAuthorize("hasAuthority('system_options_update')")
     @OperateLogger(description = "删除系统参数数据",
             module = ModuleEnum.MODULE_COMMON, operationType = OperationTypeEnum.DELETE, db = true)
@@ -184,7 +184,7 @@ public class SysOptionsRestController extends BaseRestController<SysOptions, Opt
     * @param ids ID 数组
     * @return ResultWrapper
     */
-    @ApiOperation(value = "批量删除系统参数数据", notes = "批量删除系统参数数据")
+    @Operation(summary = "批量删除系统参数数据")
     @PreAuthorize("hasAuthority('system_options_update')")
     @OperateLogger(description = "批量删除系统参数数据",
             module = ModuleEnum.MODULE_COMMON, operationType = OperationTypeEnum.DELETE, db = true)
@@ -204,13 +204,13 @@ public class SysOptionsRestController extends BaseRestController<SysOptions, Opt
      * @param type 类型
      * @param request request
      */
-    @ApiOperation(value = "Excel 导出认证", notes = "Excel 导出认证")
+    @Operation(summary = "Excel 导出认证")
     @PreAuthorize("hasAnyAuthority('system_options_export', 'system_options_import')")
     @Override
     public ResultWrapper<String> exportExcelAuth(String type, HttpServletRequest request) {
         Optional<String> certificateOptional =
                 super.excelExportAuth(type, OptionsApi.SUB_TITLE, request);
-        if(!certificateOptional.isPresent()){
+        if(certificateOptional.isEmpty()){
             return ResultWrapper.getErrorResultWrapper();
         }
         return ResultWrapper.getSuccessResultWrapper(certificateOptional.get());
@@ -221,7 +221,7 @@ public class SysOptionsRestController extends BaseRestController<SysOptions, Opt
      * 系统参数 Excel 导出
      * @param response response
      */
-    @ApiOperation(value = "导出Excel", notes = "导出Excel")
+    @Operation(summary = "导出Excel")
     @PreAuthorize("hasAuthority('system_options_export')")
     @OperateLogger(description = "导出Excel",
             module = ModuleEnum.MODULE_COMMON, operationType = OperationTypeEnum.SELECT, db = true)
@@ -238,13 +238,34 @@ public class SysOptionsRestController extends BaseRestController<SysOptions, Opt
     * @param request 文件流 request
     * @return ResultWrapper
     */
-    @ApiOperation(value = "导入Excel", notes = "导入Excel")
+    @Operation(summary = "导入Excel")
     @PreAuthorize("hasAuthority('system_options_import')")
     @OperateLogger(description = "系统参数 Excel 导入",
             module = ModuleEnum.MODULE_COMMON, operationType = OperationTypeEnum.INSERT, db = true)
     @Override
     public ResultWrapper<?> importExcel(MultipartHttpServletRequest request) {
         return super.importExcel(request);
+    }
+
+
+    /**
+     * 创建加密 公私钥
+     * @return ResultWrapper
+     */
+    @Override
+    @Operation(summary = "创建加密 公私钥")
+    @PreAuthorize("hasAuthority('system_options_update')")
+    public ResultWrapper<?> createCrypto(String type) {
+        CryptoAsymmetricType cryptoType = CryptoAsymmetricType.getCryptoType(type);
+        if(cryptoType == null){
+            return ResultWrapper.getErrorResultWrapper();
+        }
+
+        CryptoAsymmetricService asymmetricService = CryptoPlugin.getAsymmetric();
+        CryptoAsymmetric keyModel = asymmetricService.createKeyModel(cryptoType);
+        return ResultWrapper.getSuccessResultWrapper(
+                keyModel
+        );
     }
 
 
@@ -298,24 +319,4 @@ public class SysOptionsRestController extends BaseRestController<SysOptions, Opt
         );
     }
 
-
-    /**
-     * 创建加密 公私钥
-     * @return ResultWrapper
-     */
-    @Override
-    @ApiOperation(value = "创建加密 公私钥", notes = "创建加密 公私钥")
-    @PreAuthorize("hasAuthority('system_options_update')")
-    public ResultWrapper<?> createCrypto(String type) {
-        CryptoAsymmetricType cryptoType = CryptoAsymmetricType.getCryptoType(type);
-        if(cryptoType == null){
-            return ResultWrapper.getErrorResultWrapper();
-        }
-
-        CryptoAsymmetricService asymmetricService = CryptoPlugin.getAsymmetric();
-        CryptoAsymmetric keyModel = asymmetricService.createKeyModel(cryptoType);
-        return ResultWrapper.getSuccessResultWrapper(
-                keyModel
-        );
-    }
 }

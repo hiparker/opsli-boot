@@ -22,7 +22,7 @@ import org.opsli.core.persistence.querybuilder.conf.WebQueryConf;
 /**
  * 查询构建器责任链
  *
- * @author Parker
+ * @author Pace
  * @date 2020-09-13 19:36
  */
 public interface QueryBuilderChain {

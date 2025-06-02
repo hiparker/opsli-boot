@@ -20,17 +20,16 @@ import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.util.ClassUtil;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.opsli.core.autoconfigure.properties.DbSourceProperties;
-import org.opsli.plugins.generator.database.mysql.MySqlSyncColumnType;
-import org.opsli.plugins.generator.enums.DataBaseType;
 import org.opsli.core.utils.SpringContextHolder;
 import org.opsli.modulars.generator.importable.entity.DatabaseColumn;
 import org.opsli.modulars.generator.importable.entity.DatabaseTable;
 import org.opsli.modulars.generator.importable.service.DatabaseTableService;
+import org.opsli.plugins.generator.enums.DataBaseType;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.lang.reflect.Modifier;
@@ -43,7 +42,7 @@ import java.util.concurrent.ConcurrentMap;
 /**
  * 数据库同步策略 工具类
  *
- * @author parker
+ * @author Pace
  * @date 2020-09-16 17:34
  */
 @Slf4j
@@ -238,8 +237,9 @@ public class ImportTableUtil{
     // ====================================
 
 
-    @Bean
-    public void initImportTable(){
+    @Autowired
+    public void init(DbSourceProperties dbSourceProperties) {
+        ImportTableUtil.dbSourceProperties = dbSourceProperties;
 
         // 拿到state包下 实现了 SystemEventState 接口的,所有子类
         Set<Class<?>> clazzSet = ClassUtil.scanPackageBySuper(
@@ -257,10 +257,5 @@ public class ImportTableUtil{
             // 加入集合
             HANDLER_MAP.put(handler.getType(),handler);
         }
-    }
-
-    @Autowired
-    public void init(DbSourceProperties dbSourceProperties) {
-        ImportTableUtil.dbSourceProperties = dbSourceProperties;
     }
 }

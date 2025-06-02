@@ -15,13 +15,13 @@
  */
 package org.opsli.plugins.security.handler;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * 登录后 监听器
  *
- * @author Parker
+ * @author Pace
  * @date 2022-07-16 10:51 PM
  **/
 public interface LoginAccessDeniedListener {

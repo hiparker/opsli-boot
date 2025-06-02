@@ -20,7 +20,7 @@ import org.opsli.common.base.msg.BaseMsg;
 /**
  * Jwt 异常
  *
- * @author Parker
+ * @author Pace
  * @date 2020-09-17 23:40
  */
 public class JwtException extends ServiceException {

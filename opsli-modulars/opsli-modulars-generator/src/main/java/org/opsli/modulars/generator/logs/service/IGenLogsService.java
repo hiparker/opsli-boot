@@ -19,13 +19,13 @@ import org.opsli.core.base.service.interfaces.CrudServiceInterface;
 import org.opsli.modulars.generator.logs.entity.GenLogs;
 import org.opsli.modulars.generator.logs.wrapper.GenLogsModel;
 
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 
 
 /**
  * 代码生成器 - 日志 接口
  *
- * @author parker
+ * @author Pace
  * @date 2020-09-16 17:34
  */
 public interface IGenLogsService extends CrudServiceInterface<GenLogs, GenLogsModel> {

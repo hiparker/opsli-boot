@@ -24,7 +24,7 @@ import java.io.InputStream;
 /**
  * 云存储 (支持本地、七牛、阿里云、腾讯云、又拍云)
  *
- * @author Parker
+ * @author Pace
  * @date 2021年4月30日16:12:45
  */
 public interface OssStorageService {

@@ -16,12 +16,11 @@
 package org.opsli.plugins.generator;
 
 import cn.hutool.core.util.ClassUtil;
+import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
-import org.opsli.plugins.generator.enums.DataBaseType;
-import org.opsli.plugins.generator.SyncStrategy;
 import org.opsli.core.utils.SpringContextHolder;
 import org.opsli.modulars.generator.table.wrapper.GenTableAndColumnModel;
-import org.springframework.context.annotation.Bean;
+import org.opsli.plugins.generator.enums.DataBaseType;
 import org.springframework.context.annotation.Configuration;
 
 import java.lang.reflect.Modifier;
@@ -32,7 +31,7 @@ import java.util.concurrent.ConcurrentMap;
 /**
  * 数据库同步策略 工具类
  *
- * @author parker
+ * @author Pace
  * @date 2020-09-15 14:50
  */
 @Slf4j
@@ -44,7 +43,7 @@ public class SqlSyncUtil {
     private static final ConcurrentMap<DataBaseType, SyncStrategy> HANDLER_MAP = new ConcurrentHashMap<>();
 
 
-    @Bean
+    @PostConstruct
     public void initSyncStrategy(){
 
         // 拿到state包下 实现了 SystemEventState 接口的,所有子类

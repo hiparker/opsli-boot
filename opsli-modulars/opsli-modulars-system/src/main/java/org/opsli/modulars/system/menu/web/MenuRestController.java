@@ -24,8 +24,9 @@ import cn.hutool.core.lang.tree.TreeNodeConfig;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.opsli.api.base.result.ResultWrapper;
@@ -56,7 +57,6 @@ import org.opsli.modulars.system.user.service.IUserRoleRefService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Map;
 
@@ -64,10 +64,10 @@ import java.util.Map;
 /**
  * 菜单管理 Controller
  *
- * @author Parker
+ * @author Pace
  * @date 2020-09-16 17:33
  */
-@Api(tags = MenuApi.TITLE)
+@Tag(name = MenuApi.TITLE)
 @Slf4j
 @ApiRestController("/{ver}/system/menu")
 public class MenuRestController extends BaseRestController<SysMenu, MenuModel, IMenuService>
@@ -95,7 +95,7 @@ public class MenuRestController extends BaseRestController<SysMenu, MenuModel, I
      *
      * @return ResultWrapper
      */
-    @ApiOperation(value = "根据 获得用户 菜单 - 权限", notes = "根据 获得用户 菜单 - 权限")
+    @Operation(summary = "根据 获得用户 菜单 - 权限")
     @Override
     public ResultWrapper<?> getMenuAndPermsTree(String label) {
         UserModel user = UserUtil.getUser();
@@ -124,7 +124,7 @@ public class MenuRestController extends BaseRestController<SysMenu, MenuModel, I
      *
      * @return ResultWrapper
      */
-    @ApiOperation(value = "当前登陆用户菜单", notes = "当前登陆用户菜单")
+    @Operation(summary = "当前登陆用户菜单")
     @Override
     public ResultWrapper<?> findMenuTree() {
         UserModel user = UserUtil.getUser();
@@ -153,7 +153,7 @@ public class MenuRestController extends BaseRestController<SysMenu, MenuModel, I
      * @param id 自身ID （不为空 则排除自身）
      * @return ResultWrapper
      */
-    @ApiOperation(value = "获得菜单树 懒加载", notes = "获得菜单树 懒加载")
+    @Operation(summary = "获得菜单树 懒加载")
     @PreAuthorize("hasAuthority('system_menu_select')")
     @Override
     public ResultWrapper<?> findMenuTreeByLazy(String parentId, String id) {
@@ -200,7 +200,7 @@ public class MenuRestController extends BaseRestController<SysMenu, MenuModel, I
      * @param parentId 父节点ID
      * @return ResultWrapper
      */
-    @ApiOperation(value = "获得列表菜单树 懒加载", notes = "获得列表菜单树 懒加载")
+    @Operation(summary = "获得列表菜单树 懒加载")
     @PreAuthorize("hasAuthority('system_menu_select')")
     @Override
     public ResultWrapper<?> findMenuTreePageByLazy(String parentId) {
@@ -234,7 +234,7 @@ public class MenuRestController extends BaseRestController<SysMenu, MenuModel, I
      * 获得列表菜单树
      * @return ResultWrapper
      */
-    @ApiOperation(value = "获得列表菜单树", notes = "获得列表菜单树")
+    @Operation(summary = "获得列表菜单树")
     @PreAuthorize("hasAuthority('system_menu_select')")
     @Override
     public ResultWrapper<?> findMenuTreePage(HttpServletRequest request) {
@@ -255,7 +255,7 @@ public class MenuRestController extends BaseRestController<SysMenu, MenuModel, I
      * 获得菜单List
      * @return ResultWrapper
      */
-    @ApiOperation(value = "获得菜单List", notes = "获得菜单List")
+    @Operation(summary = "获得菜单List")
     @PreAuthorize("hasAuthority('system_menu_select')")
     @Override
     public ResultWrapper<List<MenuModel>> findList() {
@@ -271,7 +271,7 @@ public class MenuRestController extends BaseRestController<SysMenu, MenuModel, I
      * @param model 模型
      * @return ResultWrapper
      */
-    @ApiOperation(value = "获得单条菜单", notes = "获得单条菜单 - ID")
+    @Operation(summary = "获得单条菜单 - ID")
     @PreAuthorize("hasAuthority('system_menu_select')")
     @Override
     public ResultWrapper<MenuModel> get(MenuModel model) {
@@ -292,7 +292,7 @@ public class MenuRestController extends BaseRestController<SysMenu, MenuModel, I
      * @param parentId 父节点ID
      * @return ResultWrapper
      */
-    @ApiOperation(value = "获得单条菜单", notes = "获得单条菜单 - ID")
+    @Operation(summary = "获得单条菜单 - 父级ID")
     @PreAuthorize("hasAuthority('system_menu_select')")
     @Override
     public ResultWrapper<MenuModel> getParent(String parentId) {
@@ -317,7 +317,7 @@ public class MenuRestController extends BaseRestController<SysMenu, MenuModel, I
      * @param request request
      * @return ResultWrapper
      */
-    @ApiOperation(value = "获得分页数据", notes = "获得分页数据 - 查询构造器")
+    @Operation(summary = "获得分页数据 - 查询构造器")
     @PreAuthorize("hasAuthority('system_menu_select')")
     @Override
     public ResultWrapper<?> findPage(Integer pageNo, Integer pageSize, HttpServletRequest request) {
@@ -335,7 +335,7 @@ public class MenuRestController extends BaseRestController<SysMenu, MenuModel, I
      * @param model 模型
      * @return ResultWrapper
      */
-    @ApiOperation(value = "新增菜单", notes = "新增菜单")
+    @Operation(summary = "新增菜单")
     @PreAuthorize("hasAuthority('system_menu_insert')")
     @OperateLogger(description = "新增菜单",
             module = ModuleEnum.MODULE_MENU, operationType = OperationTypeEnum.INSERT, db = true)
@@ -354,7 +354,7 @@ public class MenuRestController extends BaseRestController<SysMenu, MenuModel, I
      * @param model 模型
      * @return ResultWrapper
      */
-    @ApiOperation(value = "修改菜单", notes = "修改菜单")
+    @Operation(summary = "修改菜单")
     @PreAuthorize("hasAuthority('system_menu_update')")
     @OperateLogger(description = "修改菜单",
             module = ModuleEnum.MODULE_MENU, operationType = OperationTypeEnum.UPDATE, db = true)
@@ -374,7 +374,7 @@ public class MenuRestController extends BaseRestController<SysMenu, MenuModel, I
      * @param id ID
      * @return ResultWrapper
      */
-    @ApiOperation(value = "删除菜单数据", notes = "删除菜单数据")
+    @Operation(summary = "删除菜单数据")
     @PreAuthorize("hasAuthority('system_menu_delete')")
     @OperateLogger(description = "删除菜单数据",
             module = ModuleEnum.MODULE_MENU, operationType = OperationTypeEnum.DELETE, db = true)
@@ -393,7 +393,7 @@ public class MenuRestController extends BaseRestController<SysMenu, MenuModel, I
      * @param ids ID 数组
      * @return ResultWrapper
      */
-    @ApiOperation(value = "批量删除菜单数据", notes = "批量删除菜单数据")
+    @Operation(summary = "批量删除菜单数据")
     @PreAuthorize("hasAuthority('system_menu_delete')")
     @OperateLogger(description = "批量删除菜单数据",
             module = ModuleEnum.MODULE_MENU, operationType = OperationTypeEnum.DELETE, db = true)

@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Configuration;
 /**
  * 加密配置加载
  *
- * @author Parker
+ * @author Pace
  * @date 2022-08-07
  */
 @Configuration

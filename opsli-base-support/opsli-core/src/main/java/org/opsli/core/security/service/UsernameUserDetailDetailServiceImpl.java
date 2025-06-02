@@ -38,7 +38,7 @@ import java.util.stream.Collectors;
  * 用户名+密码 获取用户信息Service
  * 实际只需要用到 用户名唯一主键即可
  *
- * @author Parker
+ * @author Pace
  * @date 2022-07-14 4:44 PM
  **/
 @AllArgsConstructor

@@ -21,7 +21,7 @@ import java.lang.annotation.*;
  * 搜索历史注解
  * 默认按照当前用户 key， 搜索记录排行最高
  *
- * @author Parker
+ * @author Pace
  * @date 2020-09-22 17:07
  */
 @Target(ElementType.METHOD)

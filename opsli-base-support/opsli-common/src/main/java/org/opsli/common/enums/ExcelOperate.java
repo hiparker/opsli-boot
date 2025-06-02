@@ -19,7 +19,7 @@ package org.opsli.common.enums;
 /**
  * Excel 操作类型
  *
- * @author Parker
+ * @author Pace
  * @date 2020-09-16 17:42
  */
 public enum ExcelOperate {

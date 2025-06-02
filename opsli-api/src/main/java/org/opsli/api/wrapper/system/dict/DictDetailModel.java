@@ -17,7 +17,7 @@ package org.opsli.api.wrapper.system.dict;
 
 import com.alibaba.excel.annotation.ExcelIgnore;
 import com.alibaba.excel.annotation.ExcelProperty;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.opsli.api.base.warpper.ApiWrapper;
@@ -29,7 +29,7 @@ import org.opsli.plugins.excel.annotation.ExcelInfo;
 /**
  * 数据字典 - 明细
  *
- * @author Parker
+ * @author Pace
  * @date 2020-09-16 17:33
  */
 @Data
@@ -38,20 +38,20 @@ public class DictDetailModel extends ApiWrapper {
 
 
     /** 字典ID */
-    @ApiModelProperty(value = "字典类型ID")
+    @Schema(description = "字典类型ID")
     @ExcelIgnore
     @Validator(ValidatorType.IS_NOT_NULL)
     private String typeId;
 
     /** 类型编号 - 冗余 */
-    @ApiModelProperty(value = "字典类型Code")
+    @Schema(description = "字典类型Code")
     @ExcelIgnore
     @Validator({ValidatorType.IS_NOT_NULL, ValidatorType.IS_GENERAL})
     @ValidatorLenMax(120)
     private String typeCode;
 
     /** 字典名称 */
-    @ApiModelProperty(value = "字典名称")
+    @Schema(description = "字典名称")
     @ExcelProperty(value = "字典名称", order = 1)
     @ExcelInfo
     @Validator({ValidatorType.IS_NOT_NULL, ValidatorType.IS_GENERAL_WITH_CHINESE})
@@ -59,7 +59,7 @@ public class DictDetailModel extends ApiWrapper {
     private String dictName;
 
     /** 字典值 */
-    @ApiModelProperty(value = "字典值")
+    @Schema(description = "字典值")
     @ExcelProperty(value = "字典值", order = 2)
     @ExcelInfo
     @Validator({ValidatorType.IS_NOT_NULL})
@@ -67,7 +67,7 @@ public class DictDetailModel extends ApiWrapper {
     private String dictValue;
 
     /** 是否内置数据 0否  1是*/
-    @ApiModelProperty(value = "是否内置数据 0否  1是")
+    @Schema(description = "是否内置数据 0否  1是")
     @ExcelProperty(value = "是否内置数据", order = 2)
     @ExcelInfo(dictType = "no_yes")
     @Validator({ValidatorType.IS_NOT_NULL})
@@ -75,7 +75,7 @@ public class DictDetailModel extends ApiWrapper {
     private String izLock;
 
     /** 排序 */
-    @ApiModelProperty(value = "排序")
+    @Schema(description = "排序")
     @ExcelProperty(value = "排序", order = 2)
     @ExcelInfo
     @Validator({ValidatorType.IS_NOT_NULL, ValidatorType.IS_INTEGER})
@@ -83,7 +83,7 @@ public class DictDetailModel extends ApiWrapper {
     private Integer sortNo;
 
     /** 备注 */
-    @ApiModelProperty(value = "备注")
+    @Schema(description = "备注")
     @ExcelProperty(value = "备注", order = 2)
     @ExcelInfo
     @ValidatorLenMax(255)

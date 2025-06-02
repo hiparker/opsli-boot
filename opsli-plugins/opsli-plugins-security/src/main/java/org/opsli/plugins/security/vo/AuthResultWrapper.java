@@ -19,12 +19,13 @@ import lombok.*;
 import lombok.experimental.Accessors;
 import org.opsli.plugins.security.exception.errorcode.BaseAuthMsg;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
  * 返回包装类
  *
- * @author Parker
+ * @author Pace
  * @date 2021年12月30日15:31:41
  */
 @Data
@@ -34,6 +35,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 public class AuthResultWrapper<T> implements Serializable {
 
+	@Serial
 	private static final long serialVersionUID = 1L;
 
 	/**
@@ -258,7 +260,7 @@ public class AuthResultWrapper<T> implements Serializable {
 	/**
 	 * 请求状态枚举
 	 *
-	 * @author Parker
+	 * @author Pace
 	 * @date 2021年12月30日15:29:29
 	 */
 	@Getter

@@ -28,7 +28,7 @@ import java.util.Set;
 /**
  * 组织机构 Service
  *
- * @author Parker
+ * @author Pace
  * @date 2021-02-07 18:24:38
  */
 public interface ISysOrgService extends CrudServiceInterface<SysOrg, SysOrgModel> {

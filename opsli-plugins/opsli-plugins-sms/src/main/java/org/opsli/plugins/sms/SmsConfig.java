@@ -16,9 +16,9 @@
 package org.opsli.plugins.sms;
 
 import cn.hutool.extra.spring.SpringUtil;
+import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.opsli.plugins.sms.service.SmsService;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.util.Map;
@@ -26,14 +26,14 @@ import java.util.Map;
 /**
  * Redisson自动化配置
  *
- * @author Parker
+ * @author Pace
  * @date 2019/6/19 下午11:55
  */
 @Slf4j
 @Configuration
 public class SmsConfig {
 
-    @Bean
+    @PostConstruct
     public void initRedisPushSubHandler(){
         Map<String, SmsService> beansOfType = SpringUtil.getBeansOfType(SmsService.class);
         for (Map.Entry<String, SmsService> smsServiceEntry : beansOfType.entrySet()) {

@@ -19,7 +19,7 @@ package org.opsli.modulars.generator.template.wrapper;
 
 
 import com.alibaba.excel.annotation.ExcelProperty;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.opsli.api.base.warpper.ApiWrapper;
@@ -31,16 +31,16 @@ import org.opsli.plugins.excel.annotation.ExcelInfo;
 /**
 * 代码模板详情 Model
 *
-* @author Parker
+* @author Pace
 * @date 2021-05-28 17:12:38
 */
 @Data
 @EqualsAndHashCode(callSuper = false)
 public class GenTemplateDetailModel extends ApiWrapper {
 
-    
+
     /** 父级ID */
-    @ApiModelProperty(value = "父级ID")
+    @Schema(description = "父级ID")
     @ExcelProperty(value = "父级ID", order = 1)
     @ExcelInfo
     @Validator({
@@ -50,7 +50,7 @@ public class GenTemplateDetailModel extends ApiWrapper {
     private String parentId;
 
     /** 类型 0 后端 1 前端 */
-    @ApiModelProperty(value = "类型")
+    @Schema(description = "类型")
     @ExcelProperty(value = "类型", order = 2)
     @ExcelInfo
     @Validator({
@@ -60,7 +60,7 @@ public class GenTemplateDetailModel extends ApiWrapper {
     private String type;
 
     /** 路径 */
-    @ApiModelProperty(value = "路径")
+    @Schema(description = "路径")
     @ExcelProperty(value = "路径", order = 3)
     @ExcelInfo
     @Validator({
@@ -70,7 +70,7 @@ public class GenTemplateDetailModel extends ApiWrapper {
     private String path;
 
     /** 文件名 */
-    @ApiModelProperty(value = "文件名")
+    @Schema(description = "文件名")
     @ExcelProperty(value = "文件名", order = 4)
     @ExcelInfo
     @Validator({
@@ -80,7 +80,7 @@ public class GenTemplateDetailModel extends ApiWrapper {
     private String fileName;
 
     /** 文件内容 */
-    @ApiModelProperty(value = "文件内容")
+    @Schema(description = "文件内容")
     @ExcelProperty(value = "文件内容", order = 5)
     @ExcelInfo
     @Validator({
@@ -90,7 +90,7 @@ public class GenTemplateDetailModel extends ApiWrapper {
     private String fileContent;
 
     /** 是否忽略文件名 */
-    @ApiModelProperty(value = "文件名")
+    @Schema(description = "文件名")
     @ExcelProperty(value = "文件名", order = 6)
     @ExcelInfo
     @Validator({

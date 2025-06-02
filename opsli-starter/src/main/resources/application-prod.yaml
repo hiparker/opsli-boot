@@ -5,12 +5,13 @@ server:
   port: 7000
 
 spring:
-  #redis 配置
-  redis:
-    database: 0
-    host: 127.0.0.1
-    password: '123456'
-    port: 6379
+  data:
+    #redis 配置
+    redis:
+      database: 0
+      host: 127.0.0.1
+      password: '123456'
+      port: 6379
 
   # 数据库配置
   datasource:
@@ -50,23 +51,14 @@ redisson:
     server:
       enable: true
       type: standalone
-      address: "${spring.redis.host}:${spring.redis.port}"
-      password: "${spring.redis.password}"
-      database: ${spring.redis.database}
+      address: "${spring.data.redis.host}:${spring.data.redis.port}"
+      password: "${spring.data.redis.password}"
+      database: ${spring.data.redis.database}
 
-# knife4j 文档 配置
-knife4j:
-  basic:
-    ## 开启Swagger的Basic认证功能,默认是false
-    enable: false
-    ## Basic认证用户名
-    username: admin
-    ## Basic认证密码
-    password: 123456
-
-  # 是否生产环境 （生产环境默认屏蔽文档）
-  production: true
-
+# swagger接口文档(生产环境关闭接口文档)
+springdoc:
+  swagger-ui:
+    enabled: false
 
 # opsli 自定义配置
 opsli:

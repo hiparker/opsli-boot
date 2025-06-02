@@ -22,13 +22,13 @@ import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.Optional;
 
 /**
  * 用户认证信息上下文
  *
- * @author Parker
+ * @author Pace
  * @date 2021年12月22日16:22:59
  */
 public final class UserContextHolder {

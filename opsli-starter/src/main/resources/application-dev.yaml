@@ -2,15 +2,16 @@
 
 # 端口设置
 server:
-  port: 7000
+  port: 10110
 
 spring:
-  #redis 配置
-  redis:
-    database: 8
-    host: 10.0.0.28
-    password: '123456'
-    port: 6379
+  data:
+    #redis 配置
+    redis:
+      database: 8
+      host: 182.43.20.249
+      password: 'opsli@123456'
+      port: 6677
 
   # 数据库配置
   datasource:
@@ -33,9 +34,9 @@ spring:
       #primary: master
       datasource:
         master:
-          url: jdbc:mysql://10.0.0.28:3306/opsli-boot?characterEncoding=UTF-8&useUnicode=true&useSSL=false&tinyInt1isBit=false&rewriteBatchedStatements=true&serverTimezone=Asia/Shanghai
-          username: opsli-boot
-          password: asRtHGtxSZYGEtmJ
+          url: jdbc:mysql://182.43.20.249:3306/opsli-boot-dev?characterEncoding=UTF-8&useUnicode=true&useSSL=false&tinyInt1isBit=false&rewriteBatchedStatements=true&serverTimezone=Asia/Shanghai
+          username: opsli-boot-dev
+          password: YkpFNZM4CRWw5y2i
           driver-class-name: com.mysql.cj.jdbc.Driver
         # 多数据源配置
         #slave-datasource:
@@ -50,9 +51,9 @@ redisson:
     server:
       enable: true
       type: standalone
-      address: "${spring.redis.host}:${spring.redis.port}"
-      password: "${spring.redis.password}"
-      database: ${spring.redis.database}
+      address: "${spring.data.redis.host}:${spring.data.redis.port}"
+      password: "${spring.data.redis.password}"
+      database: ${spring.data.redis.database}
 
 #mybatis-plus 插件
 mybatis-plus:
@@ -60,18 +61,10 @@ mybatis-plus:
     # 打印SQL 开发测试使用 生产关闭 ***
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 
-# knife4j 文档 配置
-knife4j:
-  basic:
-    ## 开启Swagger的Basic认证功能,默认是false
-    enable: true
-    ## Basic认证用户名
-    username: admin
-    ## Basic认证密码
-    password: 123456
-
-  # 是否生产环境 （生产环境默认屏蔽文档）
-  production: false
+# swagger接口文档
+springdoc:
+  swagger-ui:
+    enabled: true
 
 # opsli 自定义配置
 opsli:

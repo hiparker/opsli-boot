@@ -18,7 +18,7 @@ package org.opsli.core.log.enums;
 /**
  * 操作类型
  *
- * @author Parker
+ * @author Pace
  * @date 2021年7月15日20:27:27
  */
 public enum OperationTypeEnum {

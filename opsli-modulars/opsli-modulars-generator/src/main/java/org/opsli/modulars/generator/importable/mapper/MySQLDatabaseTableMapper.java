@@ -25,7 +25,7 @@ import java.util.List;
 /**
  * 代码生成器 - 数据库表 Mapper
  *
- * @author parker
+ * @author Pace
  * @date 2020-09-16 17:34
  */
 @Mapper

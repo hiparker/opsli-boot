@@ -20,7 +20,7 @@ import java.lang.annotation.*;
 /**
  * Excel 字典标示
  *
- * @author Parker
+ * @author Pace
  * @date 2020-09-16 11:47
  */
 @Retention(RetentionPolicy.RUNTIME)

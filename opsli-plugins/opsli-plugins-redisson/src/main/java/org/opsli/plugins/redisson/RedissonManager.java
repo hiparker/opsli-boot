@@ -66,7 +66,7 @@ public class RedissonManager {
                 }
 
                 try {
-                    Object obj = aClass.newInstance();
+                    Object obj = aClass.getDeclaredConstructor().newInstance();
                     RedissonConfigService handler = (RedissonConfigService) obj;
                     // 加入集合
                     strategyMap.put(handler.getType(),handler);

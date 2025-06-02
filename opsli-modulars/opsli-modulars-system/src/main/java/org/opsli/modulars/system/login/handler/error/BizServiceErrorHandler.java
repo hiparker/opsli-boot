@@ -24,12 +24,12 @@ import org.opsli.plugins.security.utils.WebUtils;
 import org.opsli.plugins.security.vo.AuthResultWrapper;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * 业务异常 处理器
- * @author Parker
+ * @author Pace
  * @date 2022-07-17 12:57 PM
  **/
 @Slf4j

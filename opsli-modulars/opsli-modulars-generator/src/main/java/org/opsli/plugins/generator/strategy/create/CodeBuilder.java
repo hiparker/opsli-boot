@@ -39,7 +39,7 @@ import org.opsli.plugins.generator.utils.EnjoyUtil;
 import org.opsli.plugins.generator.utils.GenTemplateUtil;
 import org.opsli.plugins.generator.utils.GeneratorHandleUtil;
 
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -49,7 +49,7 @@ import java.util.Map;
 /**
  * Java代码构建器
  *
- * @author parker
+ * @author Pace
  * @date 2020-09-13 19:36
  */
 @Slf4j

@@ -16,22 +16,18 @@
 package org.opsli.modulars.generator.table.web;
 
 import cn.hutool.core.convert.Convert;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
-import org.opsli.core.log.annotation.OperateLogger;
-import org.opsli.core.log.enums.ModuleEnum;
-import org.opsli.core.log.enums.OperationTypeEnum;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.opsli.api.base.result.ResultWrapper;
 import org.opsli.common.annotation.ApiRestController;
-
 import org.opsli.common.exception.ServiceException;
 import org.opsli.common.utils.WrapperUtil;
 import org.opsli.core.base.controller.BaseRestController;
-import org.opsli.plugins.generator.exception.GeneratorException;
-import org.opsli.plugins.generator.msg.GeneratorMsg;
-import org.opsli.plugins.generator.SqlSyncUtil;
+import org.opsli.core.log.annotation.OperateLogger;
+import org.opsli.core.log.enums.ModuleEnum;
+import org.opsli.core.log.enums.OperationTypeEnum;
 import org.opsli.core.msg.CoreMsg;
 import org.opsli.core.persistence.Page;
 import org.opsli.core.persistence.querybuilder.QueryBuilder;
@@ -44,10 +40,13 @@ import org.opsli.modulars.generator.table.entity.GenTable;
 import org.opsli.modulars.generator.table.service.IGenTableService;
 import org.opsli.modulars.generator.table.wrapper.GenTableAndColumnModel;
 import org.opsli.modulars.generator.table.wrapper.GenTableModel;
+import org.opsli.plugins.generator.SqlSyncUtil;
+import org.opsli.plugins.generator.exception.GeneratorException;
+import org.opsli.plugins.generator.msg.GeneratorMsg;
 import org.opsli.plugins.generator.utils.GeneratorHandleUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Map;
 
@@ -55,10 +54,10 @@ import java.util.Map;
 /**
  * 代码生成器 - 表
  *
- * @author parker
+ * @author Pace
  * @date 2020-09-16 17:34
  */
-@Api(tags = TableApi.TITLE)
+@Tag(name = TableApi.TITLE)
 @Slf4j
 @ApiRestController("/{ver}/generator/table")
 public class GenTableRestController extends BaseRestController<GenTable, GenTableModel, IGenTableService>
@@ -73,7 +72,7 @@ public class GenTableRestController extends BaseRestController<GenTable, GenTabl
      * @param model 模型
      * @return ResultWrapper
      */
-    @ApiOperation(value = "获得单条表", notes = "获得单条表 - ID")
+    @Operation(summary = "获得单条表 - ID")
     @PreAuthorize("hasAuthority('dev_generator_select')")
     @Override
     public ResultWrapper<GenTableAndColumnModel> get(GenTableModel model) {
@@ -106,7 +105,7 @@ public class GenTableRestController extends BaseRestController<GenTable, GenTabl
      * @param request request
      * @return ResultWrapper
      */
-    @ApiOperation(value = "获得分页数据", notes = "获得分页数据 - 查询构造器")
+    @Operation(summary = "获得分页数据 - 查询构造器")
     @PreAuthorize("hasAuthority('dev_generator_select')")
     @Override
     public ResultWrapper<?> findPage(Integer pageNo, Integer pageSize, HttpServletRequest request) {
@@ -126,7 +125,7 @@ public class GenTableRestController extends BaseRestController<GenTable, GenTabl
      * @param model 模型
      * @return ResultWrapper
      */
-    @ApiOperation(value = "新增表", notes = "新增表")
+    @Operation(summary = "新增表")
     @PreAuthorize("hasAuthority('dev_generator_insert')")
     @OperateLogger(description = "新增表",
             module = ModuleEnum.MODULE_GENERATOR, operationType = OperationTypeEnum.INSERT, db = true)
@@ -149,7 +148,7 @@ public class GenTableRestController extends BaseRestController<GenTable, GenTabl
      * @param model 模型
      * @return ResultWrapper
      */
-    @ApiOperation(value = "修改表", notes = "修改表")
+    @Operation(summary = "修改表")
     @PreAuthorize("hasAuthority('dev_generator_update')")
     @OperateLogger(description = "修改表",
             module = ModuleEnum.MODULE_GENERATOR, operationType = OperationTypeEnum.UPDATE, db = true)
@@ -173,7 +172,7 @@ public class GenTableRestController extends BaseRestController<GenTable, GenTabl
      * @param id ID
      * @return ResultWrapper
      */
-    @ApiOperation(value = "删除表数据", notes = "删除表数据")
+    @Operation(summary = "删除表数据")
     @PreAuthorize("hasAuthority('dev_generator_delete')")
     @OperateLogger(description = "删除表数据",
             module = ModuleEnum.MODULE_GENERATOR, operationType = OperationTypeEnum.DELETE, db = true)
@@ -201,7 +200,7 @@ public class GenTableRestController extends BaseRestController<GenTable, GenTabl
      * @param ids ID 数组
      * @return ResultWrapper
      */
-    @ApiOperation(value = "批量删除表数据", notes = "批量删除表数据")
+    @Operation(summary = "批量删除表数据")
     @PreAuthorize("hasAuthority('dev_generator_delete')")
     @OperateLogger(description = "批量删除表数据",
             module = ModuleEnum.MODULE_GENERATOR, operationType = OperationTypeEnum.DELETE, db = true)
@@ -230,7 +229,7 @@ public class GenTableRestController extends BaseRestController<GenTable, GenTabl
      * @param id ID
      * @return ResultWrapper
      */
-    @ApiOperation(value = "同步数据库表", notes = "同步数据库表")
+    @Operation(summary = "同步数据库表")
     @PreAuthorize("hasAuthority('dev_generator_sync')")
     @OperateLogger(description = "同步数据库表",
             module = ModuleEnum.MODULE_GENERATOR, operationType = OperationTypeEnum.UPDATE, db = true)
@@ -261,7 +260,7 @@ public class GenTableRestController extends BaseRestController<GenTable, GenTabl
         return ResultWrapper.getSuccessResultWrapperByMsg("同步成功");
     }
 
-    @ApiOperation(value = "获得当前数据库表", notes = "获得当前数据库表")
+    @Operation(summary = "获得当前数据库表")
     @PreAuthorize("hasAuthority('dev_generator_select')")
     @Override
     public ResultWrapper<?> getTables() {
@@ -271,7 +270,8 @@ public class GenTableRestController extends BaseRestController<GenTable, GenTabl
         return ResultWrapper.getSuccessResultWrapper(ImportTableUtil.findTables());
     }
 
-    @ApiOperation(value = "导入数据库表", notes = "导入数据库表")
+
+    @Operation(summary = "导入数据库表")
     @PreAuthorize("hasAuthority('dev_generator_import')")
     @OperateLogger(description = "导入数据库表",
             module = ModuleEnum.MODULE_GENERATOR, operationType = OperationTypeEnum.INSERT, db = true)
@@ -289,8 +289,8 @@ public class GenTableRestController extends BaseRestController<GenTable, GenTabl
         return ResultWrapper.getSuccessResultWrapperByMsg("导入成功");
     }
 
-    @ApiOperation(value = "获得数据库类型下 字段类型",
-            notes = "获得数据库类型下 字段类型")
+
+    @Operation(summary = "获得数据库类型下 字段类型")
     @Override
     public ResultWrapper<List<String>> getFieldTypes() {
         // 判断代码生成器 是否启用
@@ -299,8 +299,7 @@ public class GenTableRestController extends BaseRestController<GenTable, GenTabl
         return ResultWrapper.getSuccessResultWrapper(ImportTableUtil.getFieldTypes());
     }
 
-    @ApiOperation(value = "获得数据库类型下 全部类型对应Java类型",
-            notes = "获得数据库类型下 全部类型对应Java类型")
+    @Operation(summary = "获得数据库类型下 全部类型对应Java类型")
     @Override
     public ResultWrapper<Map<String, String>> getJavaFieldTypes() {
         // 判断代码生成器 是否启用
@@ -309,8 +308,7 @@ public class GenTableRestController extends BaseRestController<GenTable, GenTabl
         return ResultWrapper.getSuccessResultWrapper(ImportTableUtil.getJavaFieldTypes());
     }
 
-    @ApiOperation(value = "获得全部类型对应Java类型集合（兜底String 类型）",
-            notes = "获得全部类型对应Java类型集合（兜底String 类型）")
+    @Operation(summary = "获得全部类型对应Java类型集合（兜底String 类型）")
     @Override
     public ResultWrapper<Map<String, List<String>>> getJavaFieldTypesBySafety() {
         // 判断代码生成器 是否启用

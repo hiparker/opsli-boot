@@ -27,7 +27,7 @@ import java.util.function.Function;
 /**
  * 多线程锁执行器 正常处理
  *
- * @author Parker
+ * @author Pace
  * @date 2020-12-10 10:36
  */
 @Slf4j

@@ -25,7 +25,7 @@ import java.util.jar.JarInputStream;
 /**
  * 名称空间实用工具
  *
- * @author Parker
+ * @author Pace
  * @date 2020-09-19 23:21
  */
 public final class PackageUtil {

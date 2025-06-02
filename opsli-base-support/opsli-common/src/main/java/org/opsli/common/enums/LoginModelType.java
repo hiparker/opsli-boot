@@ -21,7 +21,7 @@ import cn.hutool.core.util.StrUtil;
 /**
  * 登陆类型
  *
- * @author Parker
+ * @author Pace
  * @date 2022-07-21 2:07 PM
  **/
 public enum LoginModelType {

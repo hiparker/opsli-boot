@@ -25,7 +25,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 /**
  * 密码工具类
  *
- * @author Parker
+ * @author Pace
  * @date 2022-07-19 10:21 AM
  **/
 public final class PasswordUtil {

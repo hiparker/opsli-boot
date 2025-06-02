@@ -18,7 +18,7 @@ package org.opsli.plugins.security.handler;
 /**
  * 登录前 监听器
  *
- * @author Parker
+ * @author Pace
  * @date 2022-07-16 10:51 PM
  **/
 public interface LoginBeforeListener {

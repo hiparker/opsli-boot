@@ -24,7 +24,7 @@ import org.opsli.api.wrapper.gentest.user.TestUserModel;
 /**
  * 某系统用户 Service
  *
- * @author Parker
+ * @author Pace
  * @date 2020-11-22 12:12:05
  */
 public interface ITestUserService extends CrudServiceInterface<TestUser, TestUserModel> {

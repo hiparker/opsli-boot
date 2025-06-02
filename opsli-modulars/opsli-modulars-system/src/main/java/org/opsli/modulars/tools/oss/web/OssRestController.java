@@ -1,9 +1,9 @@
 package org.opsli.modulars.tools.oss.web;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.io.FileUtil;
-import com.alibaba.excel.util.CollectionUtils;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.opsli.api.base.result.ResultWrapper;
 import org.opsli.common.annotation.ApiRestController;
@@ -24,10 +24,10 @@ import java.util.List;
 /**
  * 文件管理 Controller
  *
- * @author Parker
+ * @author Pace
  * @date 2020-09-13 17:40
  */
-@Api(tags = "文件管理类")
+@Tag(name = "文件管理类")
 @Slf4j
 @ApiRestController("/{ver}/tools/oss")
 public class OssRestController {
@@ -37,19 +37,19 @@ public class OssRestController {
      * @param request 文件流 request
      * @return ResultWrapper
      */
-    @ApiOperation(value = "文件上传", notes = "文件上传")
+    @Operation(summary = "文件上传")
     @PostMapping("/upload")
     public ResultWrapper<?> upload(MultipartHttpServletRequest request) {
         Iterator<String> itr = request.getFileNames();
         String uploadedFile = itr.next();
         List<MultipartFile> files = request.getFiles(uploadedFile);
-        if (CollectionUtils.isEmpty(files)) {
+        if (CollUtil.isEmpty(files)) {
             // 请选择文件
             return ResultWrapper.getCustomResultWrapper(SystemMsg.EXCEPTION_USER_FILE_NULL);
         }
 
         try {
-            MultipartFile multipartFile = files.get(0);
+            MultipartFile multipartFile = files.getFirst();
             Resource resource = multipartFile.getResource();
             String filename = resource.getFilename();
 

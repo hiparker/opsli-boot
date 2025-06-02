@@ -15,8 +15,8 @@
  */
 package org.opsli.modulars.tools.common;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.opsli.api.base.result.ResultWrapper;
@@ -37,10 +37,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 /**
  * 操作身份认证 Controller
  *
- * @author Parker
+ * @author Pace
  * @date 2020-09-16 17:33
  */
-@Api(tags = RoleMenuRefApi.TITLE)
+@Tag(name = "登录相关")
 @Slf4j
 @AllArgsConstructor
 @ApiRestController("/{ver}/operation/auth")
@@ -55,7 +55,7 @@ public class OperationAuthRestController {
      * 直接获取当前用户
      */
     @Limiter(qps = 1)
-    @ApiOperation(value = "生成Email 验证码(自身)", notes = "生成Email 验证码(自身)")
+    @Operation(summary = "生成Email 验证码(自身)")
     @PostMapping("/email/create-code/{type}")
     public ResultWrapper<?> createEmailCode(@PathVariable String type) {
         UserModel user = UserUtil.getUser();
@@ -84,7 +84,7 @@ public class OperationAuthRestController {
      * @return ResultWrapper<String> 授权码
      */
     @Limiter(qps = 1)
-    @ApiOperation(value = "验证Email 验证码(自身)", notes = "验证Email 验证码(自身)")
+    @Operation(summary = "验证Email 验证码(自身)")
     @PostMapping("/email/check-code/{type}/{code}")
     public ResultWrapper<String> checkEmailCode(@PathVariable String type, @PathVariable String code) {
         UserModel user = UserUtil.getUserBySource();
@@ -114,7 +114,7 @@ public class OperationAuthRestController {
      * 直接获取当前用户
      */
     @Limiter(qps = 1)
-    @ApiOperation(value = "生成Mobile 验证码(自身)", notes = "生成Mobile 验证码(自身)")
+    @Operation(summary = "生成Mobile 验证码(自身)")
     @PostMapping("/mobile/create-code/{type}")
     public ResultWrapper<?> createMobileCode(@PathVariable String type) {
         UserModel user = UserUtil.getUser();
@@ -142,7 +142,7 @@ public class OperationAuthRestController {
      * @return ResultWrapper<String> 授权码
      */
     @Limiter(qps = 1)
-    @ApiOperation(value = "验证 Mobile 验证码(自身)", notes = "验证 Mobile 验证码(自身)")
+    @Operation(summary = "验证 Mobile 验证码(自身)")
     @PostMapping("/mobile/check-code/{type}/{code}")
     public ResultWrapper<String> checkMobileCode(@PathVariable String type, @PathVariable String code) {
         UserModel user = UserUtil.getUserBySource();

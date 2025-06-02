@@ -22,7 +22,7 @@ import org.opsli.core.base.entity.BaseEntity;
 /**
  * 登录日志信息
  *
- * @author Parker
+ * @author Pace
  * @date 2022年3月18日17:45:18
  */
 @Data

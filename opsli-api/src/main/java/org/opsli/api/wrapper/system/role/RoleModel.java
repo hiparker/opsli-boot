@@ -17,7 +17,7 @@ package org.opsli.api.wrapper.system.role;
 
 import com.alibaba.excel.annotation.ExcelIgnore;
 import com.alibaba.excel.annotation.ExcelProperty;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.opsli.api.base.warpper.ApiWrapper;
@@ -37,7 +37,7 @@ import org.opsli.plugins.excel.annotation.ExcelInfo;
 public class RoleModel extends ApiWrapper {
 
     /** 角色编码 */
-    @ApiModelProperty(value = "角色编码")
+    @Schema(description = "角色编码")
     @ExcelProperty(value = "角色编码", order = 1)
     @ExcelInfo
     @Validator({ValidatorType.IS_NOT_NULL, ValidatorType.IS_GENERAL})
@@ -45,7 +45,7 @@ public class RoleModel extends ApiWrapper {
     private String roleCode;
 
     /** 角色名称 */
-    @ApiModelProperty(value = "角色编码")
+    @Schema(description = "角色编码")
     @ExcelProperty(value = "角色编码", order = 2)
     @ExcelInfo
     @Validator({ValidatorType.IS_NOT_NULL, ValidatorType.IS_GENERAL_WITH_CHINESE})
@@ -53,7 +53,7 @@ public class RoleModel extends ApiWrapper {
     private String roleName;
 
     /** 标签 */
-    @ApiModelProperty(value = "标签")
+    @Schema(description = "标签")
     @ExcelProperty(value = "标签", order = 4)
     @ExcelInfo(dictType = "menu_role_type")
     @Validator({ValidatorType.IS_NOT_NULL})
@@ -62,7 +62,7 @@ public class RoleModel extends ApiWrapper {
 
 
     /** 授权数据范围 */
-    @ApiModelProperty(value = "授权数据范围")
+    @Schema(description = "授权数据范围")
     @ExcelProperty(value = "授权数据范围", order = 5)
     @ExcelInfo(dictType = "role_data_scope")
     @Validator({ValidatorType.IS_NOT_NULL})
@@ -70,7 +70,7 @@ public class RoleModel extends ApiWrapper {
     private String dataScope;
 
     /** 备注 */
-    @ApiModelProperty(value = "备注")
+    @Schema(description = "备注")
     @ExcelProperty(value = "备注", order = 6)
     @ExcelInfo
     @ValidatorLenMax(255)
@@ -78,7 +78,7 @@ public class RoleModel extends ApiWrapper {
 
 
     /** 多租户字段 */
-    @ApiModelProperty(value = "多租户ID")
+    @Schema(description = "多租户ID")
     @ExcelIgnore
     @ValidatorLenMax(20)
     private String tenantId;

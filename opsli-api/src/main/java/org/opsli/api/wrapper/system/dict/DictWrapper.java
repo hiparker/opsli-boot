@@ -21,7 +21,7 @@ import lombok.EqualsAndHashCode;
 /**
  * 数据字典 - 工具类用
  *
- * @author Parker
+ * @author Pace
  * @date 2020-09-16 17:33
  */
 @Data

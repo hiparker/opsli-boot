@@ -18,7 +18,7 @@ package org.opsli.plugins.security.eventbus;
 /**
  * EventBus 消费者接口
  *
- * @author Parker
+ * @author Pace
  * @date 2020/9/25 12:19
  */
 public interface ISecurityEventConsumer<T> {

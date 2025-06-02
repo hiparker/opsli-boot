@@ -31,7 +31,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * 多线程锁执行器
  * 用于当前方法中复杂业务多线程处理，等待线程执行完毕后 获得统一结果
  *
- * @author Parker
+ * @author Pace
  * @date 2020-12-10 10:36
  */
 @Slf4j
@@ -144,7 +144,7 @@ public class AsyncProcessExecutorOldByWait implements AsyncProcessExecutor {
     /**
      * 线程锁对象
      *
-     * @author Parker
+     * @author Pace
      * @date 2020-10-08 10:24
      */
     @Getter

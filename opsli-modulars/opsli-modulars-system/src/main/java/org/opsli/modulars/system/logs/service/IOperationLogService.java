@@ -24,7 +24,7 @@ import org.opsli.api.wrapper.system.logs.OperationLogModel;
 /**
  * 行为日志 Service
  *
- * @author Parker
+ * @author Pace
  * @date 2022-07-26 19:21:57
  */
 public interface IOperationLogService extends CrudServiceInterface<OperationLog, OperationLogModel> {

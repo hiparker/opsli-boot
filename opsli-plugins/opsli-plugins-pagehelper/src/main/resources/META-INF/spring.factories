@@ -1,3 +1,0 @@
-# Auto Configure
-org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-org.opsli.plugins.pagehelper.PageHelperAutoConfiguration

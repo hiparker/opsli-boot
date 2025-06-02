@@ -3,7 +3,7 @@ package org.opsli.common.constants;
 /**
  * Token类型
  *
- * @author Parker
+ * @author Pace
  * @date 2020-09-16 17:42
  */
 public final class TokenTypeConstants {

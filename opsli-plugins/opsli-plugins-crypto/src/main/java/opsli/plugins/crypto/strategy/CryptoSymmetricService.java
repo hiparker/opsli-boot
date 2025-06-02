@@ -23,7 +23,7 @@ import opsli.plugins.crypto.model.CryptoSymmetric;
 /**
  * 对称 加解密策略接口
  *
- * @author Parker
+ * @author Pace
  * @date 2021年5月17日15:49:15
  */
 public interface CryptoSymmetricService {

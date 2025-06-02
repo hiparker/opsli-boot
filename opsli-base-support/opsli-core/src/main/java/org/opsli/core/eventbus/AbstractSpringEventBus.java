@@ -22,7 +22,7 @@ import org.springframework.context.ApplicationContextAware;
 /**
  * EventBus 与 Spring 打通桥梁
  *
- * @author Parker
+ * @author Pace
  * @date 2021年12月7日10:39:16
  */
 public abstract class AbstractSpringEventBus implements IEventBus, ApplicationContextAware {

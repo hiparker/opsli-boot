@@ -18,7 +18,7 @@ package org.opsli.core.log.enums;
 /**
  * 日志类型
  *
- * @author Parker
+ * @author Pace
  * @date 2021年7月15日20:28:24
  */
 public enum LogTypeEnum {

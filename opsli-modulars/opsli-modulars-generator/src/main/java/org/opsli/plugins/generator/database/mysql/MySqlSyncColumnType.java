@@ -29,7 +29,7 @@ import java.util.Map;
 /**
  * MySQL 字段类型 判断
  *
- * @author parker
+ * @author Pace
  * @date 2020-11-18 13:21
  */
 public enum MySqlSyncColumnType {

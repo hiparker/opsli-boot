@@ -18,7 +18,7 @@ package org.opsli.modulars.generator.template.wrapper;
 
 
 import com.alibaba.excel.annotation.ExcelProperty;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.opsli.api.base.warpper.ApiWrapper;
@@ -30,16 +30,16 @@ import org.opsli.plugins.excel.annotation.ExcelInfo;
 /**
 * 代码模板 Model
 *
-* @author Parker
+* @author Pace
 * @date 2021-05-27 14:33:49
 */
 @Data
 @EqualsAndHashCode(callSuper = false)
 public class GenTemplateModel extends ApiWrapper {
 
-    
+
     /** 模板名称 */
-    @ApiModelProperty(value = "模板名称")
+    @Schema(description = "模板名称")
     @ExcelProperty(value = "模板名称", order = 1)
     @ExcelInfo
     @Validator({
@@ -50,7 +50,7 @@ public class GenTemplateModel extends ApiWrapper {
     private String tempName;
 
     /** 表类型 */
-    @ApiModelProperty(value = "表类型")
+    @Schema(description = "表类型")
     @ExcelProperty(value = "表类型", order = 2)
     @ExcelInfo( dictType = "table_type" )
     @Validator({
@@ -59,9 +59,9 @@ public class GenTemplateModel extends ApiWrapper {
     @ValidatorLenMax(30)
     private String tableType;
 
-    
+
     /** 备注信息 */
-    @ApiModelProperty(value = "备注信息")
+    @Schema(description = "备注信息")
     @ExcelProperty(value = "备注信息", order = 3)
     @ExcelInfo
     @ValidatorLenMax(255)

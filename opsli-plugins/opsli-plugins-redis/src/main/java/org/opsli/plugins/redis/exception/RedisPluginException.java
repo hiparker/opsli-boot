@@ -21,7 +21,7 @@ import org.opsli.common.exception.ServiceException;
 /**
  * Redis 异常
  *
- * @author Parker
+ * @author Pace
  * @date 2020-09-16 11:47
  */
 public class RedisPluginException extends ServiceException {

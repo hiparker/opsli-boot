@@ -16,13 +16,13 @@
 package org.opsli.modulars.system.monitor.web;
 
 import com.google.common.collect.Maps;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.opsli.api.base.result.ResultWrapper;
 import org.opsli.common.annotation.ApiRestController;
 import org.opsli.core.utils.SystemInfoUtil;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 
 import java.util.Map;
@@ -33,7 +33,7 @@ import java.util.Map;
  * @author 薛佳琪
  * @date 2020-09-16 17:33
  */
-@Api(tags = "系统监控")
+@Tag(name = "系统监控")
 @Slf4j
 @ApiRestController("/{ver}/system/monitor")
 public class MonitorController {
@@ -42,9 +42,9 @@ public class MonitorController {
      * 查询服务器信息
      * @return ResultWrapper
      */
+    @Operation(summary = "当前服务器信息")
     @PreAuthorize("hasAuthority('devops_sysmonitor_select')")
     @GetMapping("/getSystemInfo")
-    @ApiOperation(value = "当前服务器信息", notes = "当前服务器信息")
     public ResultWrapper<?> getSystemInfo() {
         Map<String,Object> map = Maps.newHashMapWithExpectedSize(5);
         //服务器信息
@@ -64,9 +64,9 @@ public class MonitorController {
      * 查询CPU信息
      * @return ResultWrapper
      */
+    @Operation(summary = "查询CPU信息")
     @PreAuthorize("hasAuthority('devops_sysmonitor_select')")
     @GetMapping("/getCpuInfo")
-    @ApiOperation(value = "当前CPU信息", notes = "当前CPU信息")
     public ResultWrapper<?> getCpuInfo() {
         return ResultWrapper
                 .getSuccessResultWrapper(SystemInfoUtil.INSTANCE.getCpuInfo());
@@ -76,9 +76,9 @@ public class MonitorController {
      * 查询内存信息
      * @return ResultWrapper
      */
+    @Operation(summary = "当前内存信息")
     @PreAuthorize("hasAuthority('devops_sysmonitor_select')")
     @GetMapping("/getMemInfo")
-    @ApiOperation(value = "当前内存信息", notes = "当前内存信息")
     public ResultWrapper<?> getMemInfo() {
         return ResultWrapper.getSuccessResultWrapper(
                 SystemInfoUtil.INSTANCE.getMemoryInfo());
@@ -88,9 +88,9 @@ public class MonitorController {
      * 查询JVM信息
      * @return ResultWrapper
      */
+    @Operation(summary = "当前JVM信息")
     @PreAuthorize("hasAuthority('devops_sysmonitor_select')")
     @GetMapping("/getJVMInfo")
-    @ApiOperation(value = "当前JVM信息", notes = "当前JVM信息")
     public ResultWrapper<?> getJvmInfo() {
         return ResultWrapper.getSuccessResultWrapper(
                 SystemInfoUtil.INSTANCE.getJvmInfo());

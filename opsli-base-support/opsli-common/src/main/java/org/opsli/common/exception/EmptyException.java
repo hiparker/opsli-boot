@@ -19,7 +19,7 @@ package org.opsli.common.exception;
 /**
  * 空异常
  *
- * @author Parker
+ * @author Pace
  * @date 2020-09-17 23:40
  */
 public class EmptyException extends ServiceException{

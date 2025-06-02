@@ -5,7 +5,7 @@ package org.opsli.plugins.redis.pushsub.receiver;
 /**
  * Redis 消息订阅实现基类
  *
- * @author Parker
+ * @author Pace
  * @date 2020-09-15
  */
 public abstract class BaseReceiver {

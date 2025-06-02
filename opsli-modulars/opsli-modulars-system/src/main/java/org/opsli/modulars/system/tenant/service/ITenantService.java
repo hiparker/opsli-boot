@@ -23,7 +23,7 @@ import org.opsli.modulars.system.tenant.entity.SysTenant;
 /**
  * 租户 Service
  *
- * @author Parker
+ * @author Pace
  * @date 2020-09-16 17:33
  */
 public interface ITenantService extends CrudServiceInterface<SysTenant, TenantModel> {

@@ -16,7 +16,7 @@
 package org.opsli.api.wrapper.system.tenant;
 
 import com.alibaba.excel.annotation.ExcelProperty;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.opsli.api.base.warpper.ApiWrapper;
@@ -28,7 +28,7 @@ import org.opsli.plugins.excel.annotation.ExcelInfo;
 /**
  * 租户表
  *
- * @author Parker
+ * @author Pace
  * @date 2020-09-16 17:33
  */
 @Data
@@ -37,7 +37,7 @@ public class TenantModel extends ApiWrapper {
 
 
     /** 租户名称 */
-    @ApiModelProperty(value = "租户名称")
+    @Schema(description = "租户名称")
     @ExcelProperty(value = "租户名称", order = 1)
     @ExcelInfo
     @Validator({ValidatorType.IS_NOT_NULL, ValidatorType.IS_GENERAL_WITH_CHINESE})
@@ -45,7 +45,7 @@ public class TenantModel extends ApiWrapper {
     private String tenantName;
 
     /** 是否启用 0否  1是*/
-    @ApiModelProperty(value = "是否启用")
+    @Schema(description = "是否启用")
     @ExcelProperty(value = "是否启用", order = 2)
     @ExcelInfo(dictType = "no_yes")
     @Validator({ValidatorType.IS_NOT_NULL})
@@ -53,7 +53,7 @@ public class TenantModel extends ApiWrapper {
     private String enable;
 
     /** 备注 */
-    @ApiModelProperty(value = "备注")
+    @Schema(description = "备注")
     @ExcelProperty(value = "备注", order = 3)
     @ExcelInfo
     @ValidatorLenMax(255)

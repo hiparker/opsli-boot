@@ -22,7 +22,7 @@ import org.springframework.util.StringUtils;
 /**
  * SQL过滤
  *
- * @author Parker
+ * @author Pace
  * @date 2020-10-09
  */
 public final class SQLFilterKit {

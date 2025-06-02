@@ -9,10 +9,10 @@ import org.opsli.common.utils.IPUtil;
 import org.opsli.core.utils.UserUtil;
 import org.springframework.util.ObjectUtils;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
- * @author Parker
+ * @author Pace
  * @date 2022/3/18 14:34
  */
 public final class UserLoginLogFactory {

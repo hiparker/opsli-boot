@@ -25,7 +25,7 @@ import org.opsli.modulars.system.user.entity.SysUserWeb;
 /**
  * 用户信息 Service
  *
- * @author Parker
+ * @author Pace
  * @date 2020-09-16 17:33
  */
 public interface IUserService extends CrudServiceInterface<SysUser, UserModel> {

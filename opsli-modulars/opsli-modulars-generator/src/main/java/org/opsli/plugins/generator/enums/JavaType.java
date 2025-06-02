@@ -25,7 +25,7 @@ import java.util.List;
 /**
  * Java 类型
  *
- * @author Parker
+ * @author Pace
  * @date 2021年5月26日16:31:08
  */
 public enum JavaType {

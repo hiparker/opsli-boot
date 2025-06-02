@@ -21,7 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
@@ -30,7 +30,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * 加载用户信息工厂
  *
- * @author Parker
+ * @author Pace
  * @date 2022-07-18 10:16 AM
  **/
 @Component

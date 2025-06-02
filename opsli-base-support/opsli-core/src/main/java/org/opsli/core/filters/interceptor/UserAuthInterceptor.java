@@ -15,19 +15,20 @@
  */
 package org.opsli.core.filters.interceptor;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.opsli.core.holder.UserContextHolder;
 import org.opsli.core.utils.UserTokenUtil;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.resource.ResourceHttpRequestHandler;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * 用户权限拦截器,支持自解析 jwt token
  *
- * @author Parker
+ * @author Pace
  * @date 2021年12月22日16:35:20
  */
 @Slf4j
@@ -35,7 +36,7 @@ public class UserAuthInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(
-            HttpServletRequest request, HttpServletResponse response, Object handler){
+            @NotNull HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull Object handler){
 
         if (handler instanceof ResourceHttpRequestHandler) {
             return true;
@@ -53,7 +54,7 @@ public class UserAuthInterceptor implements HandlerInterceptor {
 
     @Override
     public void afterCompletion(
-            HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex){
+            @NotNull HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull Object handler, Exception ex){
         // 上下文属性值清除，防止内存泄漏
         UserContextHolder.clear();
     }
