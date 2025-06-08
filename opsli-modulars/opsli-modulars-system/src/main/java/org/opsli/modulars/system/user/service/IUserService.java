@@ -51,6 +51,12 @@ public interface IUserService extends CrudServiceInterface<SysUser, UserModel> {
      */
     UserModel queryByEmail(String email);
 
+    /**
+     * 修改个人信息
+     * @param userSelfSaveModel model
+     * @return boolean
+     */
+    boolean updateUserInfo(UserSelfSaveModel userSelfSaveModel);
 
     /**
      * 修改密码 验证旧密码
