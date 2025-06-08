@@ -199,8 +199,10 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
 
         UserModel user = UserUtil.getUserBySource();
         userPassword.setUserId(user.getId());
-        IService.updatePasswordByCheckOld(userPassword);
-        return ResultWrapper.getSuccessResultWrapper();
+
+        boolean flag = IService.updatePasswordByCheckOld(userPassword);
+        return  flag ? ResultWrapper.getSuccessResultWrapper()
+                : ResultWrapper.getErrorResultWrapper();
     }
 
     /**
@@ -229,8 +231,9 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
         userPassword.setUserId(userBySource.getId());
         userPassword.setNewPassword(updateUserPasswordByForgetModel.getNewPassword());
 
-        IService.updatePasswordByNotCheckOld(userPassword);
-        return ResultWrapper.getSuccessResultWrapper();
+        boolean flag = IService.updatePasswordByNotCheckOld(userPassword);
+        return  flag ? ResultWrapper.getSuccessResultWrapper()
+                : ResultWrapper.getErrorResultWrapper();
     }
 
     /**
@@ -251,9 +254,10 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
         // 验证对象
         ValidatorUtil.verify(updateUserEmailModel);
 
-        // 修改用户邮箱
-        IService.updateUserEmail(updateUserEmailModel);
-        return ResultWrapper.getSuccessResultWrapper();
+        // 修改邮箱
+        boolean flag = IService.updateUserEmail(updateUserEmailModel);
+        return  flag ? ResultWrapper.getSuccessResultWrapper()
+                : ResultWrapper.getErrorResultWrapper();
     }
 
     /**
@@ -274,9 +278,10 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
         // 验证对象
         ValidatorUtil.verify(updateUserMobileModel);
 
-        // 修改用户邮箱
-        IService.updateUserMobile(updateUserMobileModel);
-        return ResultWrapper.getSuccessResultWrapper();
+        // 修改手机
+        boolean flag = IService.updateUserMobile(updateUserMobileModel);
+        return  flag ? ResultWrapper.getSuccessResultWrapper()
+                : ResultWrapper.getErrorResultWrapper();
     }
 
     /**
@@ -292,10 +297,9 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
         UserModel userModel = new UserModel();
         userModel.setId(user.getId());
         userModel.setAvatar(userAvatarModel.getImgUrl());
-        IService.updateAvatar(userModel);
-        // 刷新用户信息
-        UserUtil.refreshUser(user);
-        return ResultWrapper.getSuccessResultWrapper();
+        boolean flag = IService.updateAvatar(userModel);
+        return  flag ? ResultWrapper.getSuccessResultWrapper()
+                : ResultWrapper.getErrorResultWrapper();
     }
 
     // ==================================================
@@ -535,13 +539,9 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
             throw new ServiceException(SystemMsg.EXCEPTION_USER_ILLEGAL_PARAMETER);
         }
 
-        // 防止篡改手机号、邮箱号
-        model.setMobile(null);
-        model.setEmail(null);
-
-        // 调用修改方法
-        IService.update(Convert.convert(UserModel.class, model));
-        return ResultWrapper.getSuccessResultWrapperByMsg("修改用户信息成功");
+        boolean flag = IService.updateUserInfo(model);
+        return  flag ? ResultWrapper.getSuccessResultWrapperByMsg("修改用户信息成功")
+                : ResultWrapper.getErrorResultWrapper();
     }
 
     /**

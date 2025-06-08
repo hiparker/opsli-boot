@@ -49,11 +49,11 @@ public class SysUser extends BaseEntity {
     private String realName;
 
     /** 手机 */
-    @TableField(updateStrategy = FieldStrategy.ALWAYS)
+    @TableField(updateStrategy = FieldStrategy.NOT_EMPTY)
     private String mobile;
 
     /** 邮箱 */
-    @TableField(updateStrategy = FieldStrategy.ALWAYS)
+    @TableField(updateStrategy = FieldStrategy.NOT_EMPTY)
     private String email;
 
     /** 工号 */

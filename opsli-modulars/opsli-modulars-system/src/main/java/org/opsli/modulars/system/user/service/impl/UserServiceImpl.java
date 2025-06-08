@@ -610,8 +610,7 @@ public class UserServiceImpl extends CrudServiceImpl<UserMapper, SysUser, UserMo
             // 刷新用户缓存
             this.clearCache(Collections.singletonList(userModel));
         }
-
-        return false;
+        return ret;
     }
 
 
@@ -654,8 +653,7 @@ public class UserServiceImpl extends CrudServiceImpl<UserMapper, SysUser, UserMo
             // 刷新用户缓存
             this.clearCache(Collections.singletonList(userModel));
         }
-
-        return false;
+        return ret;
     }
 
     @Override
@@ -678,12 +676,10 @@ public class UserServiceImpl extends CrudServiceImpl<UserMapper, SysUser, UserMo
 
         // 修改密码
         boolean ret = mapper.updatePassword(userPassword);
-
         if(ret){
             // 刷新用户缓存
             this.clearCache(Collections.singletonList(userModel));
         }
-
         return ret;
     }
 
@@ -722,7 +718,33 @@ public class UserServiceImpl extends CrudServiceImpl<UserMapper, SysUser, UserMo
         SysUser sysUser = new SysUser();
         sysUser.setId(model.getId());
         sysUser.setAvatar(model.getAvatar());
-        return mapper.updateAvatar(sysUser);
+        boolean ret = mapper.updateAvatar(sysUser);
+        if(ret){
+            // 刷新用户缓存
+            this.clearCache(Collections.singletonList(model));
+        }
+        return ret;
+    }
+
+    /**
+     * 修改个人信息
+     * @param userSelfSaveModel model
+     * @return boolean
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public boolean updateUserInfo(UserSelfSaveModel userSelfSaveModel){
+        UserModel currUser = UserUtil.getUserBySource();
+        LambdaUpdateWrapper<SysUser> updateWrapper = new LambdaUpdateWrapper<>();
+        updateWrapper.set(SysUser::getRealName, userSelfSaveModel.getRealName())
+                     .set(SysUser::getSign, userSelfSaveModel.getSign())
+                     .eq(SysUser::getId, currUser.getId());
+        boolean ret = this.update(updateWrapper);
+        if(ret){
+            // 刷新用户缓存
+            this.clearCache(Collections.singletonList(currUser));
+        }
+        return ret;
     }
 
 
