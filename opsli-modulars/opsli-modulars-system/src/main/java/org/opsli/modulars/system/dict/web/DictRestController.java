@@ -69,6 +69,7 @@ public class DictRestController extends BaseRestController<SysDict, DictModel, I
      * @return ResultWrapper
      */
     @Operation(summary = "获得单条字典数据 - ID")
+    @PreAuthorize("hasAuthority('system_dict_select')")
     @Override
     public ResultWrapper<DictModel> get(DictModel model) {
         model = IService.get(model);
@@ -83,6 +84,7 @@ public class DictRestController extends BaseRestController<SysDict, DictModel, I
      * @return ResultWrapper
      */
     @Operation(summary = "获得分页数据 - 查询构造器")
+    @PreAuthorize("hasAuthority('system_dict_select')")
     @Override
     public ResultWrapper<?> findPage(Integer pageNo, Integer pageSize, HttpServletRequest request) {
 
@@ -173,7 +175,7 @@ public class DictRestController extends BaseRestController<SysDict, DictModel, I
      * @return ResultWrapper
      */
     @Operation(summary = "批量删除字典数据")
-    @PreAuthorize("hasAuthority('system_dict_insert')")
+    @PreAuthorize("hasAuthority('system_dict_delete')")
     @OperateLogger(description = "批量删除字典数据",
             module = ModuleEnum.MODULE_DICT, operationType = OperationTypeEnum.DELETE, db = true)
     @Override

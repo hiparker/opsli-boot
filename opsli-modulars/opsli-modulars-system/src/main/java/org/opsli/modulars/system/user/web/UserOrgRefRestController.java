@@ -72,6 +72,9 @@ public class UserOrgRefRestController implements UserOrgRefApi {
         // 演示模式 不允许操作
         this.demoError();
 
+        // 修复越权漏洞 - 校验当前登录人是否有权为目标 userId 设置组织
+        UserUtil.checkUserAccess(model.getUserId());
+
         boolean ret = iUserOrgRefService.setOrg(model);
         if(!ret){
             // 权限设置失败

@@ -99,7 +99,7 @@ public class TenantRestController extends BaseRestController<SysTenant, TenantMo
      * @return ResultWrapper
      */
     @Operation(summary = "获得分页数据 - 查询构造器")
-    //@PreAuthorize("hasAuthority('system_tenant_select')")
+    @PreAuthorize("hasAuthority('system_tenant_select')")
     @Override
     public ResultWrapper<?> findPage(Integer pageNo, Integer pageSize, HttpServletRequest request) {
 

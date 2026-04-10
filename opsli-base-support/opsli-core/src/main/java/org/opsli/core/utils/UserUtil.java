@@ -42,6 +42,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.core.annotation.Order;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -745,6 +746,59 @@ public class UserUtil {
         List<String> userAllPermsByUserId = UserUtil.getUserAllPermsByUserId(currUser.getId());
         return !CollUtil.isEmpty(userAllPermsByUserId) &&
                 userAllPermsByUserId.contains(PERMS_TENANT);
+    }
+
+    /**
+     * 校验当前登录人是否有权访问目标 userId 的数据 - 修复越权漏洞
+     * <p>
+     * 规则：
+     * <ol>
+     *   <li>查自己 → 放行</li>
+     *   <li>当前用户是超级管理员 → 放行</li>
+     *   <li>目标用户是超级管理员 → 仅超管可访问（普通人拦截）</li>
+     *   <li>跨租户访问 → 拦截</li>
+     *   <li>同租户且目标非超管 → 放行</li>
+     * </ol>
+     * 不满足放行条件的一律抛 {@link AccessDeniedException}，由统一异常处理返回无权访问
+     *
+     * @param targetUserId 目标用户ID
+     */
+    public static void checkUserAccess(String targetUserId) {
+        // 判断 工具类是否初始化完成
+        ThrowExceptionUtil.isThrowException(!IS_INIT,
+                CoreMsg.OTHER_EXCEPTION_UTILS_INIT);
+
+        if (StringUtils.isBlank(targetUserId)) {
+            throw new AccessDeniedException("参数错误");
+        }
+
+        // getUser() 失败会直接抛 TokenException，此处不会返回 null
+        UserModel currUser = getUser();
+
+        // 1) 查自己：放行
+        if (StringUtils.equals(currUser.getId(), targetUserId)) {
+            return;
+        }
+
+        // 2) 当前用户是超级管理员：放行
+        if (StringUtils.equals(SUPER_ADMIN, currUser.getUsername())) {
+            return;
+        }
+
+        UserModel targetUser = getUser(targetUserId);
+        if (targetUser == null) {
+            throw new AccessDeniedException("用户不存在");
+        }
+
+        // 3) 非超管不能查超级管理员的数据
+        if (StringUtils.equals(SUPER_ADMIN, targetUser.getUsername())) {
+            throw new AccessDeniedException("无权访问");
+        }
+
+        // 4) 非超管不能跨租户访问
+        if (!StringUtils.equals(currUser.getTenantId(), targetUser.getTenantId())) {
+            throw new AccessDeniedException("无权访问");
+        }
     }
 
     // =====================================

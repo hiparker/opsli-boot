@@ -74,7 +74,7 @@ public class RoleRestController extends BaseRestController<SysRole, RoleModel, I
      * @return ResultWrapper
      */
     @Operation(summary = "获得分页数据 - 查询构造器")
-    //@PreAuthorize("hasAuthority('system_role_select')")
+    @PreAuthorize("hasAuthority('system_role_select')")
     @Override
     public ResultWrapper<?> findPage(Integer pageNo, Integer pageSize, HttpServletRequest request) {
 
