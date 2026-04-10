@@ -148,6 +148,13 @@
                 <version>${mybatis-plus.version}</version>
             </dependency>
 
+            <!-- mybatis-plus SQL 解析模块（3.5.9 起拆出），BlockAttackInnerInterceptor 必需 -->
+            <dependency>
+                <groupId>com.baomidou</groupId>
+                <artifactId>mybatis-plus-jsqlparser</artifactId>
+                <version>${mybatis-plus.version}</version>
+            </dependency>
+
             <dependency>
                 <groupId>com.github.pagehelper</groupId>
                 <artifactId>pagehelper-spring-boot-starter</artifactId>

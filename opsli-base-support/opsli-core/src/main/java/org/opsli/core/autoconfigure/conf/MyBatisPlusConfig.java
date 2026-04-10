@@ -16,6 +16,7 @@
 package org.opsli.core.autoconfigure.conf;
 
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
+import com.baomidou.mybatisplus.extension.plugins.inner.BlockAttackInnerInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.OptimisticLockerInnerInterceptor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.session.SqlSessionFactory;
@@ -49,8 +50,9 @@ public class MyBatisPlusConfig {
 		// 乐观锁
 		mybatisPlusInterceptor.addInnerInterceptor(new OptimisticLockerInnerInterceptor());
 
-		// 防止全表更新与删除插件
-		//mybatisPlusInterceptor.addInnerInterceptor(new BlockAttackInnerInterceptor());
+		// 防止全表更新与删除插件 - 安全加固
+		// 拦截无 WHERE 条件的 UPDATE/DELETE，避免因业务 bug 或 SQL 注入导致整表数据被清空
+		mybatisPlusInterceptor.addInnerInterceptor(new BlockAttackInnerInterceptor());
 
 		return mybatisPlusInterceptor;
 	}
