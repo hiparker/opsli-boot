@@ -543,6 +543,9 @@ public class UserServiceImpl extends CrudServiceImpl<UserMapper, SysUser, UserMo
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean updatePasswordByNotCheckOld(ToUserPassword toUserPassword) {
+        // 修复越权漏洞 - 校验当前登录人是否有权修改目标 userId 的密码
+        UserUtil.checkUserAccess(toUserPassword.getUserId());
+
         UserModel userModel = super.get(toUserPassword.getUserId());
         // 如果为空则 不修改密码
         if(userModel == null){
@@ -659,6 +662,9 @@ public class UserServiceImpl extends CrudServiceImpl<UserMapper, SysUser, UserMo
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean resetPassword(UserPassword userPassword) {
+        // 修复越权漏洞 - 校验当前登录人是否有权重置目标 userId 的密码
+        UserUtil.checkUserAccess(userPassword.getUserId());
+
         UserModel userModel = super.get(userPassword.getUserId());
         // 如果为空则 不修改密码
         if(userModel == null){

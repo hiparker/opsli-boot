@@ -64,8 +64,11 @@ public class UserRoleRefRestController implements UserRoleRefApi {
      * @return ResultWrapper
      */
     @Operation(summary = "根据 userId 获得用户角色Id集合")
+    @PreAuthorize("hasAuthority('system_user_select')")
     @Override
     public ResultWrapper<UserRoleRefModel> getRoles(String userId) {
+        // 修复 越权漏洞 - 校验当前登录人是否有权访问目标 userId 的数据
+        UserUtil.checkUserAccess(userId);
 
         List<String> roleIdList = iUserRoleRefService.getRoleIdList(userId);
         String defRoleId = iUserRoleRefService.getDefRoleId(userId);
@@ -90,6 +93,9 @@ public class UserRoleRefRestController implements UserRoleRefApi {
     public ResultWrapper<?> setRoles(UserRoleRefModel model) {
         // 演示模式 不允许操作
         this.demoError();
+
+        // 修复越权漏洞 - 校验当前登录人是否有权为目标 userId 设置角色
+        UserUtil.checkUserAccess(model.getUserId());
 
         boolean ret = iUserRoleRefService.setRoles(model);
         if(ret){

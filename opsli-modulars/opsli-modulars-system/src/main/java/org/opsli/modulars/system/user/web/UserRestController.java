@@ -97,8 +97,15 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
      * @return ResultWrapper
      */
     @Operation(summary = "当前登陆用户信息 By Id")
+    @PreAuthorize("hasAuthority('system_user_select')")
     @Override
     public ResultWrapper<UserInfo> getInfoById(String userId) {
+        // 修复 越权漏洞 - 校验当前登录人是否有权访问目标 userId 的数据
+        // （内部方法 getInfo() 通过 this.getInfoById(...) 调用时，
+        //  Spring AOP 对 this 调用不生效，@PreAuthorize 不会触发；
+        //  checkUserAccess 查自己时直接放行，保持既有行为）
+        UserUtil.checkUserAccess(userId);
+
         UserModel currUser = UserUtil.getUserBySource(userId);
         if(currUser == null){
             throw new TokenException(TokenMsg.EXCEPTION_TOKEN_LOSE_EFFICACY);
@@ -159,8 +166,15 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
      * @return ResultWrapper
      */
     @Operation(summary = "用户组织机构")
+    @PreAuthorize("hasAuthority('system_user_select')")
     @Override
     public ResultWrapper<?> getOrgByUserId(String userId) {
+        // 修复 越权漏洞 - 校验当前登录人是否有权访问目标 userId 的数据
+        // （内部方法 getOrg() 通过 this.getOrgByUserId(user.getId()) 调用时，
+        //  Spring AOP 对 this 调用不生效，@PreAuthorize 不会触发；
+        //  checkUserAccess 查自己时直接放行，保持既有行为）
+        UserUtil.checkUserAccess(userId);
+
         List<UserOrgRefModel> orgListByUserId = UserUtil.getOrgListByUserId(userId);
         return ResultWrapper.getSuccessResultWrapper(orgListByUserId);
     }
@@ -171,8 +185,12 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
      * @return ResultWrapper
      */
     @Operation(summary = "根据 userId 获得用户角色Id集合")
+    @PreAuthorize("hasAuthority('system_user_select')")
     @Override
     public ResultWrapper<List<String>> getRoleIdsByUserId(String userId) {
+        // 修复 越权漏洞 - 校验当前登录人是否有权访问目标 userId 的数据
+        UserUtil.checkUserAccess(userId);
+
         List<String> roleIdList = iUserRoleRefService.getRoleIdList(userId);
         return ResultWrapper.getSuccessResultWrapper(roleIdList);
     }
@@ -392,6 +410,9 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
         // 验证对象
         ValidatorUtil.verify(enableUserModel);
 
+        // 修复越权漏洞 - 校验当前登录人是否有权操作目标 userId
+        UserUtil.checkUserAccess(enableUserModel.getUserId());
+
         // 变更账户状态
         boolean lockAccountFlag = IService.enableAccount(
                 enableUserModel.getUserId(), enableUserModel.getEnabled());
@@ -562,6 +583,9 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
         // 转换模型
         String id = JSONUtil.parseObj(asymmetricDecryptToObj).getStr("id");
 
+        // 修复越权漏洞 - 校验当前登录人是否有权删除目标用户
+        UserUtil.checkUserAccess(id);
+
         IService.delete(id);
 
         return ResultWrapper.getSuccessResultWrapperByMsg("删除用户信息成功");
@@ -587,6 +611,14 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
         String ids = JSONUtil.parseObj(asymmetricDecryptToObj).getStr("ids");
 
         String[] idArray = Convert.toStrArray(ids);
+
+        // 修复越权漏洞 - 逐个校验当前登录人是否有权删除目标用户
+        if(idArray != null){
+            for(String uid : idArray){
+                UserUtil.checkUserAccess(uid);
+            }
+        }
+
         IService.deleteAll(idArray);
 
         return ResultWrapper.getSuccessResultWrapperByMsg("批量删除用户信息成功");

@@ -148,6 +148,13 @@
                 <version>${mybatis-plus.version}</version>
             </dependency>
 
+            <!-- mybatis-plus SQL 解析模块（3.5.9 起拆出），BlockAttackInnerInterceptor 必需 -->
+            <dependency>
+                <groupId>com.baomidou</groupId>
+                <artifactId>mybatis-plus-jsqlparser</artifactId>
+                <version>${mybatis-plus.version}</version>
+            </dependency>
+
             <dependency>
                 <groupId>com.github.pagehelper</groupId>
                 <artifactId>pagehelper-spring-boot-starter</artifactId>
@@ -213,11 +220,15 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-aop</artifactId>
         </dependency>
-        <!-- actuator 端点监控 -->
+
+
+        <!-- 修复 CVE-2026-22733 移除 actuator（项目系统监控使用 OSHI 实现，不依赖此组件） -->
+        <!--
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
+        -->
 
         <dependency>
             <groupId>org.springframework.boot</groupId>

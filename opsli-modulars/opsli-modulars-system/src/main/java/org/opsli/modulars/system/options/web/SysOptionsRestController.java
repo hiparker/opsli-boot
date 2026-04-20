@@ -28,9 +28,11 @@ import opsli.plugins.crypto.CryptoPlugin;
 import opsli.plugins.crypto.enums.CryptoAsymmetricType;
 import opsli.plugins.crypto.model.CryptoAsymmetric;
 import opsli.plugins.crypto.strategy.CryptoAsymmetricService;
+import org.apache.commons.lang3.StringUtils;
 import org.opsli.api.base.result.ResultWrapper;
 import org.opsli.api.web.system.options.OptionsApi;
 import org.opsli.api.wrapper.system.options.OptionsModel;
+import org.opsli.api.wrapper.system.user.UserModel;
 import org.opsli.common.annotation.ApiRestController;
 import org.opsli.common.enums.DictType;
 import org.opsli.common.utils.WrapperUtil;
@@ -42,8 +44,10 @@ import org.opsli.core.persistence.Page;
 import org.opsli.core.persistence.querybuilder.QueryBuilder;
 import org.opsli.core.persistence.querybuilder.WebQueryBuilder;
 import org.opsli.core.utils.OptionsUtil;
+import org.opsli.core.utils.UserUtil;
 import org.opsli.modulars.system.options.entity.SysOptions;
 import org.opsli.modulars.system.options.service.ISysOptionsService;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
@@ -292,7 +296,15 @@ public class SysOptionsRestController extends BaseRestController<SysOptions, Opt
      * @return ResultWrapper
      */
     @Override
+    @PreAuthorize("hasAuthority('system_options_select')")
     public ResultWrapper<Map<String, OptionsModel>> findAllOptions() {
+        // 修复 越权漏洞 - 系统参数属于平台级全局配置（含阿里云 AccessKey / 邮箱配置 / 非对称加密公钥等），
+        // 仅允许超级管理员访问，防止租户管理员跨租户读取敏感配置
+        UserModel currUser = UserUtil.getUser();
+        if (!StringUtils.equals(UserUtil.SUPER_ADMIN, currUser.getUsername())) {
+            throw new AccessDeniedException("无权访问");
+        }
+
         QueryWrapper<SysOptions> queryWrapper = new QueryWrapper<>();
         // 查询内置数据
         queryWrapper.eq("iz_lock", DictType.NO_YES_YES.getValue());
