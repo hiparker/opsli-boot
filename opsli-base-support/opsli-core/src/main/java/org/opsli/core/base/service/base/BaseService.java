@@ -23,7 +23,7 @@ import org.opsli.core.base.service.interfaces.BaseServiceInterface;
 /**
  * 基础Service
  *
- * @author Parker
+ * @author Pace
  * @date 2020-09-15
  */
 public abstract class BaseService <M extends BaseMapper<T>, T extends BaseEntity>

@@ -18,7 +18,7 @@ package org.opsli.plugins.security.eventbus;
 /**
  * EventBus 接口
  *
- * @author Parker
+ * @author Pace
  * @date 2021年12月7日10:38:24
  */
 public interface ISecurityEventBus {

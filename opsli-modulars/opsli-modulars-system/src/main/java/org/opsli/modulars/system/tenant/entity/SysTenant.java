@@ -25,7 +25,7 @@ import org.opsli.core.base.entity.BaseEntity;
 /**
  * 租户表
  *
- * @author Parker
+ * @author Pace
  * @date 2020-09-16 17:33
  */
 @Data
@@ -40,7 +40,7 @@ public class SysTenant extends BaseEntity {
     private String enable;
 
     /** 备注 */
-    @TableField(updateStrategy = FieldStrategy.IGNORED)
+    @TableField(updateStrategy = FieldStrategy.ALWAYS)
     private String remark;
 
 

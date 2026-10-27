@@ -16,7 +16,7 @@
 package org.opsli.api.wrapper.system.user;
 
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.opsli.api.wrapper.system.org.SysOrgModel;
@@ -30,7 +30,7 @@ import java.util.List;
 /**
  * 角色表
  *
- * @author Parker
+ * @author Pace
  * @date 2020-09-16 17:33
  */
 @Data
@@ -39,15 +39,15 @@ import java.util.List;
 public class UserOrgRefWebModel implements Serializable {
 
     /** 用户ID */
-    @ApiModelProperty(value = "用户ID")
+    @Schema(description = "用户ID")
     @Validator({ValidatorType.IS_NOT_NULL})
     @ValidatorLenMax(50)
     private String userId;
 
-    @ApiModelProperty(value = "默认组织")
+    @Schema(description = "默认组织")
     private SysOrgModel defModel;
 
-    @ApiModelProperty(value = "组织机构")
+    @Schema(description = "组织机构")
     private List<SysOrgModel> orgModelList;
 
 }

@@ -17,8 +17,8 @@ package org.opsli.modulars.system.dict.web;
 
 import cn.hutool.core.convert.Convert;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.opsli.api.base.result.ResultWrapper;
@@ -44,17 +44,17 @@ import org.opsli.modulars.system.dict.entity.SysDict;
 import org.opsli.modulars.system.dict.service.IDictService;
 import org.springframework.security.access.prepost.PreAuthorize;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
 
 
 /**
  * 数据字典 Controller
  *
- * @author Parker
+ * @author Pace
  * @date 2020-09-16 17:33
  */
-@Api(tags = DictApi.TITLE)
+@Tag(name = DictApi.TITLE)
 @Slf4j
 @ApiRestController("/{ver}/system/dict")
 public class DictRestController extends BaseRestController<SysDict, DictModel, IDictService>
@@ -68,7 +68,7 @@ public class DictRestController extends BaseRestController<SysDict, DictModel, I
      * @param model 模型
      * @return ResultWrapper
      */
-    @ApiOperation(value = "获得单条字典数据", notes = "获得单条字典数据 - ID")
+    @Operation(summary = "获得单条字典数据 - ID")
     @Override
     public ResultWrapper<DictModel> get(DictModel model) {
         model = IService.get(model);
@@ -82,7 +82,7 @@ public class DictRestController extends BaseRestController<SysDict, DictModel, I
      * @param request request
      * @return ResultWrapper
      */
-    @ApiOperation(value = "获得分页数据", notes = "获得分页数据 - 查询构造器")
+    @Operation(summary = "获得分页数据 - 查询构造器")
     @Override
     public ResultWrapper<?> findPage(Integer pageNo, Integer pageSize, HttpServletRequest request) {
 
@@ -99,7 +99,7 @@ public class DictRestController extends BaseRestController<SysDict, DictModel, I
      * @param model 模型
      * @return ResultWrapper
      */
-    @ApiOperation(value = "新增字典数据", notes = "新增字典数据")
+    @Operation(summary = "新增字典数据")
     @PreAuthorize("hasAuthority('system_dict_insert')")
     @OperateLogger(description = "新增字典数据",
             module = ModuleEnum.MODULE_DICT, operationType = OperationTypeEnum.INSERT, db = true)
@@ -115,7 +115,7 @@ public class DictRestController extends BaseRestController<SysDict, DictModel, I
      * @param model 模型
      * @return ResultWrapper
      */
-    @ApiOperation(value = "修改字典数据", notes = "修改字典数据")
+    @Operation(summary = "修改字典数据")
     @PreAuthorize("hasAuthority('system_dict_update')")
     @OperateLogger(description = "修改字典数据",
             module = ModuleEnum.MODULE_DICT, operationType = OperationTypeEnum.UPDATE, db = true)
@@ -145,7 +145,7 @@ public class DictRestController extends BaseRestController<SysDict, DictModel, I
      * @param id ID
      * @return ResultWrapper
      */
-    @ApiOperation(value = "删除字典数据数据", notes = "删除字典数据数据")
+    @Operation(summary = "删除字典数据数据")
     @PreAuthorize("hasAuthority('system_dict_delete')")
     @OperateLogger(description = "删除字典数据数据",
             module = ModuleEnum.MODULE_DICT, operationType = OperationTypeEnum.DELETE, db = true)
@@ -172,7 +172,7 @@ public class DictRestController extends BaseRestController<SysDict, DictModel, I
      * @param ids ID 数组
      * @return ResultWrapper
      */
-    @ApiOperation(value = "批量删除字典数据", notes = "批量删除字典明细数据")
+    @Operation(summary = "批量删除字典数据")
     @PreAuthorize("hasAuthority('system_dict_insert')")
     @OperateLogger(description = "批量删除字典数据",
             module = ModuleEnum.MODULE_DICT, operationType = OperationTypeEnum.DELETE, db = true)
@@ -207,7 +207,7 @@ public class DictRestController extends BaseRestController<SysDict, DictModel, I
      * @param typeCode 字典类型编号
      * @return ResultWrapper
      */
-    @ApiOperation(value = "根据字典类型编号 查询出所有字典", notes = "根据字典类型编号 查询出所有字典")
+    @Operation(summary = "根据字典类型编号 查询出所有字典")
     @Override
     public ResultWrapper<?> getDictListByCode(String typeCode) {
         List<DictWrapper> dictList = DictUtil.getDictList(typeCode);

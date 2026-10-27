@@ -23,7 +23,7 @@ import org.opsli.modulars.generator.table.wrapper.GenTableAndColumnModel;
 /**
  * 代码生成器 - 生成日志 + 代码模型
  *
- * @author parker
+ * @author Pace
  * @date 2020-09-16 17:34
  */
 @Data

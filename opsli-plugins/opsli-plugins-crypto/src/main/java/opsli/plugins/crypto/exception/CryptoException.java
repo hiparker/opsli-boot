@@ -21,7 +21,7 @@ import org.opsli.common.exception.ServiceException;
 /**
  * 加解密 异常
  *
- * @author Parker
+ * @author Pace
  * @date 2021年5月17日16:49:53
  */
 public class CryptoException extends ServiceException {

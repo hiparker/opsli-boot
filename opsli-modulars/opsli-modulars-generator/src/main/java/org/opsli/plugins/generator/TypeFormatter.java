@@ -24,7 +24,7 @@ import java.util.List;
 /**
  * 将各数据库类型格式化成统一的类型
  *
- * @author Parker
+ * @author Pace
  * @date 2021年5月26日14:45:15
  */
 public interface TypeFormatter {

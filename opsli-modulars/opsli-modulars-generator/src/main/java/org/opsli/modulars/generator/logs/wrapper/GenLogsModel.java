@@ -16,7 +16,7 @@
 package org.opsli.modulars.generator.logs.wrapper;
 
 import com.alibaba.excel.annotation.ExcelIgnore;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.opsli.api.base.warpper.ApiWrapper;
@@ -27,7 +27,7 @@ import org.opsli.common.enums.ValidatorType;
 /**
  * 代码生成器 - 生成日志 模型
  *
- * @author parker
+ * @author Pace
  * @date 2020-09-16 17:34
  */
 @Data
@@ -36,14 +36,14 @@ public class GenLogsModel extends ApiWrapper {
 
 
     /** 归属表ID */
-    @ApiModelProperty(value = "归属表ID")
+    @Schema(description = "归属表ID")
     @ExcelIgnore
     @Validator({ValidatorType.IS_NOT_NULL})
     @ValidatorLenMax(19)
     private String tableId;
 
     /** 表类型 */
-    @ApiModelProperty(value = "表类型")
+    @Schema(description = "表类型")
     @ExcelIgnore
     @Validator({ValidatorType.IS_NOT_NULL})
     @ValidatorLenMax(1)
@@ -51,49 +51,49 @@ public class GenLogsModel extends ApiWrapper {
 
 
     /** 包名 */
-    @ApiModelProperty(value = "包名")
+    @Schema(description = "包名")
     @ExcelIgnore
     @Validator({ValidatorType.IS_NOT_NULL})
     @ValidatorLenMax(255)
     private String packageName;
 
     /** 模块名 */
-    @ApiModelProperty(value = "模块名")
+    @Schema(description = "模块名")
     @ExcelIgnore
     @Validator({ValidatorType.IS_NOT_NULL})
     @ValidatorLenMax(40)
     private String moduleName;
 
     /** 子模块名 */
-    @ApiModelProperty(value = "子模块名")
+    @Schema(description = "子模块名")
     @ExcelIgnore
     @ValidatorLenMax(40)
     private String subModuleName;
 
 
     /** 代码标题 */
-    @ApiModelProperty(value = "代码标题")
+    @Schema(description = "代码标题")
     @ExcelIgnore
     @Validator({ValidatorType.IS_NOT_NULL})
     @ValidatorLenMax(100)
     private String codeTitle;
 
     /** 代码标题简介 */
-    @ApiModelProperty(value = "代码标题简介")
+    @Schema(description = "代码标题简介")
     @ExcelIgnore
     @Validator({ValidatorType.IS_NOT_NULL})
     @ValidatorLenMax(100)
     private String codeTitleBrief;
 
     /** 作者名 */
-    @ApiModelProperty(value = "作者名")
+    @Schema(description = "作者名")
     @ExcelIgnore
     @Validator({ValidatorType.IS_NOT_NULL})
     @ValidatorLenMax(64)
     private String authorName;
 
     /** 模板ID */
-    @ApiModelProperty(value = "模板ID")
+    @Schema(description = "模板ID")
     @ExcelIgnore
     @Validator({ValidatorType.IS_NOT_NULL})
     @ValidatorLenMax(19)

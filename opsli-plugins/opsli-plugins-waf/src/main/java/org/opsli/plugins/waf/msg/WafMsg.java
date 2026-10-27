@@ -20,7 +20,7 @@ import org.opsli.common.base.msg.BaseMsg;
 /**
  * 防火墙 消息
  *
- * @author Parker
+ * @author Pace
  * @date 2020-09-16
  */
 public enum WafMsg implements BaseMsg {

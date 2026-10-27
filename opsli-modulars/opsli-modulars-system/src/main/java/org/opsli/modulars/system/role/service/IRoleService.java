@@ -23,7 +23,7 @@ import org.opsli.modulars.system.role.entity.SysRole;
 /**
  * 角色 Service
  *
- * @author Parker
+ * @author Pace
  * @date 2020-09-17 13:07
  */
 public interface IRoleService extends CrudServiceInterface<SysRole, RoleModel> {

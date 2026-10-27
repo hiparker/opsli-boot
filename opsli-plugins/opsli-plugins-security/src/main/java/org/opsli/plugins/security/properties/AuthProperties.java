@@ -25,7 +25,7 @@ import java.util.List;
 /**
  * 认证配置
  *
- * @author Parker
+ * @author Pace
  * @date 2020-09-15
  */
 @Component

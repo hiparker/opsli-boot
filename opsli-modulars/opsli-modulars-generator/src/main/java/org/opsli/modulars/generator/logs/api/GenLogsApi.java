@@ -20,8 +20,8 @@ import org.opsli.modulars.generator.logs.wrapper.GenLogsModel;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 
 /**
@@ -32,7 +32,7 @@ import javax.servlet.http.HttpServletResponse;
  *
  * 这样写法虽然比较绕，但是当单体项目想要改造微服务架构时 时非常容易的
  *
- * @author parker
+ * @author Pace
  * @date 2020-09-16 17:34
  */
 public interface GenLogsApi {

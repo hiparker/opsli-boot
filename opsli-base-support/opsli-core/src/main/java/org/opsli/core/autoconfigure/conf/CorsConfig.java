@@ -22,7 +22,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 /**
  * Cors 跨域处理
  *
- * @author Parker
+ * @author Pace
  * @date  2022年07月14日12:57:33
  **/
 @Configuration

@@ -42,7 +42,7 @@ import org.opsli.core.persistence.querybuilder.conf.WebQueryConf;
 import org.springframework.core.GenericTypeResolver;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.List;
@@ -61,7 +61,7 @@ import java.util.Map;
  * 单独按照ID查询数据 和 按照ID修改、删除数据 隔离级别暂时不需要
  * 既然能从page列表中看到的数据 则是这个租户的数据
  *
- * @author Parker
+ * @author Pace
  * @date 2020-09-15
  */
 @Slf4j

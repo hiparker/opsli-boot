@@ -28,7 +28,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -38,7 +38,7 @@ import static org.opsli.common.constants.OrderConstants.UTIL_ORDER;
 /**
  * 搜索历史工具类
  *
- * @author Parker
+ * @author Pace
  * @date 2020-09-19 20:03
  */
 @Slf4j

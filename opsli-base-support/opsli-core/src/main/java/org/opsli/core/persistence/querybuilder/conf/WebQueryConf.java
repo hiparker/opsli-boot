@@ -25,7 +25,7 @@ import java.util.Map;
 /**
  * Web 请求配置类
  *
- * @author Parker
+ * @author Pace
  * @date 2021年3月3日17:12:08
  */
 public class WebQueryConf {

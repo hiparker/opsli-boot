@@ -23,7 +23,7 @@ import org.opsli.modulars.generator.logs.entity.GenLogs;
 /**
  * 代码生成器 - 生成日志 Mapper
  *
- * @author parker
+ * @author Pace
  * @date 2020-09-16 17:34
  */
 @Mapper

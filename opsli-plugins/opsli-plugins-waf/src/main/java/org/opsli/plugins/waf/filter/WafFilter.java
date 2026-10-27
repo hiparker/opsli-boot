@@ -19,15 +19,15 @@ package org.opsli.plugins.waf.filter;
 
 import org.opsli.plugins.waf.servlet.WafHttpServletRequestWrapper;
 
-import javax.servlet.*;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.*;
+import jakarta.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.Set;
 
 /**
  * 防火墙
  *
- * @author Parker
+ * @author Pace
  * @date 2020-10-09
  */
 public class WafFilter implements Filter {

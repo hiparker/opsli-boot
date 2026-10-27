@@ -20,16 +20,18 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.SpringSecurityCoreVersion;
 import org.springframework.util.Assert;
 
+import java.io.Serial;
 import java.util.Collection;
 
 /**
  * 手机密码 验证器
  *
- * @author Parker
+ * @author Pace
  * @date 2022年07月18日10:41:50
  */
 public class MobilePasswordAuthenticationToken extends AbstractAuthenticationToken {
 
+    @Serial
     private static final long serialVersionUID = SpringSecurityCoreVersion.SERIAL_VERSION_UID;
 
     /** 手机账号 */

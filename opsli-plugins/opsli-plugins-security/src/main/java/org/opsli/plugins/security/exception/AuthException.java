@@ -23,7 +23,7 @@ import org.opsli.plugins.security.exception.errorcode.BaseAuthMsg;
 /**
  * 认证异常
  *
- * @author Parker
+ * @author Pace
  * @date 2020-09-13 19:41
  */
 @Data

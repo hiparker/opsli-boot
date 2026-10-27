@@ -23,7 +23,7 @@ import org.opsli.modulars.generator.column.entity.GenTableColumn;
 /**
  * 代码生成器 - 表结构 Mapper
  *
- * @author parker
+ * @author Pace
  * @date 2020-09-16 17:34
  */
 @Mapper

@@ -23,7 +23,7 @@ import org.opsli.modulars.system.user.entity.SysUserOrgRef;
 /**
  * 用户组织 Mapper
  *
- * @author Parker
+ * @author Pace
  * @date 2020-09-16 17:33
  */
 @Mapper

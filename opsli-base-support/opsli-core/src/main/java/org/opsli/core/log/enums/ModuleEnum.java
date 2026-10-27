@@ -19,7 +19,7 @@ package org.opsli.core.log.enums;
 /**
  * 模块字典
  *
- * @author Parker
+ * @author Pace
  * @date 2021年7月15日20:19:27
  */
 public enum ModuleEnum {

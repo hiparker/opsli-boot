@@ -26,7 +26,7 @@ import java.util.function.Function;
 /**
  * 字段处理工具类
  *
- * @author Parker
+ * @author Pace
  * @date 2020-09-19 23:21
  */
 public final class FieldUtil {
@@ -115,36 +115,67 @@ public final class FieldUtil {
      * @return String
      */
     public static <T> String getFileName(SFunction<T, ?> fn) {
-        // 从function取出序列化方法
-        Method writeReplaceMethod;
+        if (fn == null) {
+            throw new IllegalArgumentException("Function cannot be null");
+        }
+
         try {
-            writeReplaceMethod = fn.getClass().getDeclaredMethod("writeReplace");
+            // 获取writeReplace方法
+            Method writeReplaceMethod = fn.getClass().getDeclaredMethod("writeReplace");
+
+            // 使用新的canAccess API替代isAccessible
+            boolean wasAccessible = writeReplaceMethod.canAccess(fn);
+            if (!wasAccessible) {
+                writeReplaceMethod.setAccessible(true);
+            }
+
+            try {
+                // 获取序列化Lambda信息
+                SerializedLambda serializedLambda = (SerializedLambda) writeReplaceMethod.invoke(fn);
+
+                // 提取并转换字段名
+                return extractFieldName(serializedLambda.getImplMethodName());
+
+            } finally {
+                // 恢复原始访问性
+                if (!wasAccessible) {
+                    writeReplaceMethod.setAccessible(false);
+                }
+            }
+
         } catch (NoSuchMethodException e) {
-            throw new RuntimeException(e);
-        }
-
-        // 从序列化方法取出序列化的lambda信息
-        boolean isAccessible = writeReplaceMethod.isAccessible();
-        writeReplaceMethod.setAccessible(true);
-        SerializedLambda serializedLambda;
-        try {
-            serializedLambda = (SerializedLambda) writeReplaceMethod.invoke(fn);
+            throw new IllegalArgumentException("Invalid lambda function: missing writeReplace method", e);
         } catch (IllegalAccessException | InvocationTargetException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Failed to extract lambda information", e);
         }
-        writeReplaceMethod.setAccessible(isAccessible);
+    }
 
-        // 从lambda信息取出method、field、class等
-        String fieldName = serializedLambda.getImplMethodName().substring("get".length());
-        fieldName = fieldName.replaceFirst(fieldName.charAt(0) + "", (fieldName.charAt(0) + "").toLowerCase());
-//        Field field;
-//        try {
-//            field = Class.forName(serializedLambda.getImplClass().replace("/", ".")).getDeclaredField(fieldName);
-//        } catch (ClassNotFoundException | NoSuchFieldException e) {
-//            throw new RuntimeException(e);
-//        }
+    /**
+     * 从方法名提取字段名
+     * 支持 get/is/has 等前缀
+     */
+    private static String extractFieldName(String methodName) {
+        if (methodName == null || methodName.isEmpty()) {
+            throw new IllegalArgumentException("Method name cannot be null or empty");
+        }
 
-        return fieldName;
+        String fieldName;
+
+        // 处理不同的getter前缀
+        if (methodName.startsWith("get") && methodName.length() > 3) {
+            fieldName = methodName.substring(3);
+        } else if (methodName.startsWith("is") && methodName.length() > 2) {
+            fieldName = methodName.substring(2);
+        } else if (methodName.startsWith("has") && methodName.length() > 3) {
+            fieldName = methodName.substring(3);
+        } else {
+            // 如果不是标准getter，直接返回方法名
+            return methodName;
+        }
+
+        // 首字母小写
+        return Character.toLowerCase(fieldName.charAt(0)) + fieldName.substring(1);
+
     }
 
 

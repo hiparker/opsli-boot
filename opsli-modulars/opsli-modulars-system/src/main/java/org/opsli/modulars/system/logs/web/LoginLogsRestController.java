@@ -15,36 +15,30 @@
  */
 package org.opsli.modulars.system.logs.web;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.opsli.api.base.result.ResultWrapper;
 import org.opsli.api.web.system.logs.LoginLogsApi;
-import org.opsli.api.web.system.logs.LogsApi;
 import org.opsli.api.wrapper.system.logs.LoginLogsModel;
-import org.opsli.api.wrapper.system.logs.LogsModel;
 import org.opsli.common.annotation.ApiRestController;
-
 import org.opsli.core.base.controller.BaseRestController;
 import org.opsli.core.persistence.Page;
 import org.opsli.core.persistence.querybuilder.QueryBuilder;
 import org.opsli.core.persistence.querybuilder.WebQueryBuilder;
 import org.opsli.modulars.system.logs.entity.SysLoginLogs;
-import org.opsli.modulars.system.logs.entity.SysLogs;
 import org.opsli.modulars.system.logs.service.ILoginLogsService;
-import org.opsli.modulars.system.logs.service.ILogsService;
-
-import javax.servlet.http.HttpServletRequest;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 
 /**
  * 登录日志 Controller
  *
- * @author Parker
+ * @author Pace
  * @date 2020-11-28 18:59:59
  */
-@Api(tags = LoginLogsApi.TITLE)
+@Tag(name = LoginLogsApi.TITLE)
 @Slf4j
 @ApiRestController("/{ver}/system/login-logs")
 public class LoginLogsRestController extends BaseRestController<SysLoginLogs, LoginLogsModel, ILoginLogsService>
@@ -57,7 +51,7 @@ public class LoginLogsRestController extends BaseRestController<SysLoginLogs, Lo
      * @param request request
      * @return ResultWrapper
      */
-    @ApiOperation(value = "获得分页数据", notes = "获得分页数据 - 查询构造器")
+    @Operation(summary = "获得分页数据 - 查询构造器")
     @PreAuthorize("hasAuthority('devops_login_logs_select')")
     @Override
     public ResultWrapper<?> findPage(Integer pageNo, Integer pageSize, HttpServletRequest request) {

@@ -36,7 +36,7 @@ import org.opsli.core.utils.UserTokenUtil;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -44,7 +44,7 @@ import java.util.UUID;
 /**
  * 操作日志拦截器
  *
- * @author Parker
+ * @author Pace
  * @date 2021年7月15日20:28:24
  */
 @Slf4j

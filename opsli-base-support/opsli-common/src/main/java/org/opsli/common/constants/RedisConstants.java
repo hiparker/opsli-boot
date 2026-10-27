@@ -3,7 +3,7 @@ package org.opsli.common.constants;
 /**
  * Redis 常量
  * {} 为项目名称
- * @author Parker
+ * @author Pace
  * @date 2021/12/10 19:52
  */
 public final class RedisConstants {

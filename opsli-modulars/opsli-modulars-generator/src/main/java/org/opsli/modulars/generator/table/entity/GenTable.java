@@ -24,7 +24,7 @@ import org.opsli.core.base.entity.BaseEntity;
 /**
  * 代码生成器 - 表
  *
- * @author parker
+ * @author Pace
  * @date 2020-09-16 17:34
  */
 @Data
@@ -45,14 +45,14 @@ public class GenTable extends BaseEntity {
     private String jdbcType;
 
     /** 描述 */
-    @TableField(updateStrategy = FieldStrategy.IGNORED)
+    @TableField(updateStrategy = FieldStrategy.ALWAYS)
     private String comments;
 
     /** 同步 */
     private String izSync;
 
     /** 备注 */
-    @TableField(updateStrategy = FieldStrategy.IGNORED)
+    @TableField(updateStrategy = FieldStrategy.ALWAYS)
     private String remark;
 
 

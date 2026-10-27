@@ -15,7 +15,7 @@
  */
 package org.opsli.modulars.system.login.dto;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import org.opsli.common.annotation.validator.Validator;
 import org.opsli.common.annotation.validator.ValidatorLenMax;
@@ -23,7 +23,7 @@ import org.opsli.common.annotation.validator.ValidatorLenMin;
 import org.opsli.common.enums.ValidatorType;
 
 /**
- * @author Parker
+ * @author Pace
  * @date 2022-07-16 8:14 PM
  **/
 @Data
@@ -44,7 +44,7 @@ public class LoginModel {
     private String verificationCode;
 
     /** UUID */
-    @ApiModelProperty(value = "UUID")
+    @Schema(description = "UUID")
     private String uuid;
 
     /** 登录来源: 0:PC端；1:APP-安卓 2:APP-IOS 3:小程序 */

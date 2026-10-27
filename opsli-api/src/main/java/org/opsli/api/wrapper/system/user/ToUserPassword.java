@@ -17,7 +17,7 @@ package org.opsli.api.wrapper.system.user;
 
 import com.alibaba.excel.annotation.ExcelIgnore;
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.opsli.common.annotation.validator.Validator;
@@ -25,12 +25,13 @@ import org.opsli.common.annotation.validator.ValidatorLenMax;
 import org.opsli.common.annotation.validator.ValidatorLenMin;
 import org.opsli.common.enums.ValidatorType;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
  * 用户 修改密码
  *
- * @author Parker
+ * @author Pace
  * @date 2020-09-16 17:33
  */
 @Data
@@ -38,21 +39,22 @@ import java.io.Serializable;
 @ExcelIgnoreUnannotated
 public class ToUserPassword implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /** User Id */
-    @ApiModelProperty(value = "用户Id")
+    @Schema(description = "用户Id")
     private String userId;
 
     /** 新密码 */
-    @ApiModelProperty(value = "新密码")
+    @Schema(description = "新密码")
     @Validator({ValidatorType.IS_NOT_NULL, ValidatorType.IS_SECURITY_PASSWORD})
     @ValidatorLenMin(6)
     @ValidatorLenMax(50)
     private String newPassword;
 
     /** 登录密码强度 前端不可改 */
-    @ApiModelProperty(value = "登录密码强度 前端不可改")
+    @Schema(description = "登录密码强度 前端不可改")
     @ExcelIgnore
     @ValidatorLenMin(1)
     @ValidatorLenMax(1)

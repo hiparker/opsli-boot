@@ -20,7 +20,7 @@ import org.opsli.common.base.msg.BaseMsg;
 /**
  * Java 防火墙 异常类
  *
- * @author Parker
+ * @author Pace
  * @date 2020-10-09
  */
 public class WafException extends ServiceException {

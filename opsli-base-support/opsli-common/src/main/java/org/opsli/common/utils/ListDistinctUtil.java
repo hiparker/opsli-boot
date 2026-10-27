@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
 /**
  * List 去重
  *
- * @author Parker
+ * @author Pace
  * @date 2021-01-05 14:26
  */
 @Slf4j

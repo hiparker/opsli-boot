@@ -38,7 +38,7 @@ import java.util.List;
  * @param <T>
  * @param <E>
  *
- * @author Parker
+ * @author Pace
  * @date 2020-09-15
  */
 public interface CrudServiceInterface<T extends BaseEntity, E extends ApiWrapper> extends BaseServiceInterface<T> {
@@ -208,7 +208,7 @@ public interface CrudServiceInterface<T extends BaseEntity, E extends ApiWrapper
      * @return  Page<T>
      */
     Page<T,E> findPageNotCount(Page<T,E> page);
-    
+
 
 }
 

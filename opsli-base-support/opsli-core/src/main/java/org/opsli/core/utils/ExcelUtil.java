@@ -16,14 +16,15 @@
 package org.opsli.core.utils;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.convert.Convert;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.date.TimeInterval;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.alibaba.excel.support.ExcelTypeEnum;
-import com.google.common.collect.Maps;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.opsli.api.base.warpper.ApiWrapper;
@@ -37,16 +38,18 @@ import org.opsli.plugins.excel.exception.ExcelPluginException;
 import org.opsli.plugins.excel.listener.BatchExcelListener;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Field;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 /**
- * Excel 工具类
+ * Excel 工具类 - 性能优化版本
  *
- * @author parker
- * @date 2020-09-22 11:17
+ * @author Pace
+ * @date 2025-06-01 11:17
  */
 @Slf4j
 public final class ExcelUtil {
@@ -54,8 +57,21 @@ public final class ExcelUtil {
     /** 字典KEY */
     public static final String DICT_NAME_KEY = "dictName";
     public static final String DICT_VALUE_KEY = "dictValue";
-    /** 字段字典Map */
-    private static final Map<Class<?>, JSONObject> FIELD_DICT_MAP = Maps.newHashMap();
+
+    /** 字段字典缓存 - 使用 Guava Cache 提供过期和大小限制 */
+    private static final Cache<Class<?>, JSONObject> FIELD_DICT_CACHE = CacheBuilder.newBuilder()
+            .maximumSize(1000)
+            .expireAfterWrite(30, TimeUnit.MINUTES)
+            .build();
+
+    /** 字典数据缓存 - 避免重复查询字典 */
+    private static final Cache<String, Map<String, String>> DICT_DATA_CACHE = CacheBuilder.newBuilder()
+            .maximumSize(5000)
+            .expireAfterWrite(10, TimeUnit.MINUTES)
+            .build();
+
+    /** ModelHelper 缓存 */
+    private static final Map<Class<?>, AbstractModelHelper> MODEL_HELPER_CACHE = new ConcurrentHashMap<>();
 
     private ExcelUtil(){}
 
@@ -77,19 +93,16 @@ public final class ExcelUtil {
 
     public <T> List<T> readExcel(MultipartFile excel, Class<T> rowModel) throws ExcelPluginException {
         List<T> ts = ExcelUtilSingletonHolder.EXCEL_PLUGIN.readExcel(excel, rowModel);
-        // 处理数据
         return this.handleDatas(ts, rowModel, ExcelOperate.READ);
     }
 
-    public <T> List<T> radExcel(MultipartFile excel, Class<T> rowModel, String sheetName) throws ExcelPluginException {
+    public <T> List<T> readExcel(MultipartFile excel, Class<T> rowModel, String sheetName) throws ExcelPluginException {
         List<T> ts = ExcelUtilSingletonHolder.EXCEL_PLUGIN.readExcel(excel, rowModel, sheetName);
-        // 处理数据
         return this.handleDatas(ts, rowModel, ExcelOperate.READ);
     }
 
     public <T> List<T> readExcel(MultipartFile excel, Class<T> rowModel, String sheetName, int headLineNum) throws ExcelPluginException {
         List<T> ts = ExcelUtilSingletonHolder.EXCEL_PLUGIN.readExcel(excel, rowModel, sheetName, headLineNum);
-        // 处理数据
         return this.handleDatas(ts, rowModel, ExcelOperate.READ);
     }
 
@@ -112,14 +125,14 @@ public final class ExcelUtil {
 
     ///////////////////////
 
-    public <T> void writeExcel(HttpServletResponse response, List<T> list, String fileName, String sheetName, Class<T> classType, ExcelTypeEnum excelTypeEnum) throws ExcelPluginException {
-        // 处理数据
+    public <T> void writeExcel(HttpServletResponse response, List<T> list, String fileName, String sheetName,
+                               Class<T> classType, ExcelTypeEnum excelTypeEnum) throws ExcelPluginException {
         List<T> ts = this.handleDatas(list, classType, ExcelOperate.WRITE);
         ExcelUtilSingletonHolder.EXCEL_PLUGIN.writeExcel(response, ts, fileName, sheetName, classType, excelTypeEnum);
     }
 
     /**
-     * 处理字典
+     * 处理字典 - 性能优化版本
      * @param datas 数据
      * @param typeClazz 数据CLazz
      * @param operate 操作方式
@@ -127,126 +140,266 @@ public final class ExcelUtil {
      * @return List<T>
      */
     public <T> List<T> handleDatas(List<T> datas, Class<T> typeClazz, ExcelOperate operate){
-        // 计时器
-        TimeInterval timer = DateUtil.timer();
-        // 空处理
-        if(datas == null || datas.size() == 0){
+        if (CollUtil.isEmpty(datas)) {
             return datas;
         }
 
-        try {
-            JSONObject fieldsJson = this.getFields(typeClazz);
-            JSONObject fieldsDictJson = this.getFieldsDict(fieldsJson);
+        TimeInterval timer = DateUtil.timer();
 
-            // 获得 helper类
-            AbstractModelHelper modelHelper = ModelFactoryHelper.getModelHelper(typeClazz);
-            // 字典赋值
-            for (T data : datas) {
-                switch (operate) {
-                    case READ:
-                        modelHelper.transformByImport(fieldsDictJson, cast(data));
-                        break;
-                    case WRITE:
-                        modelHelper.transformByExport(fieldsDictJson, cast(data));
-                        break;
-                    default:
-                        break;
-                }
+        try {
+            // 获取字段字典配置（使用缓存）
+            JSONObject fieldsJson = this.getFieldsFromCache(typeClazz);
+            if (JSONUtil.isNull(fieldsJson) || fieldsJson.isEmpty()) {
+                return datas;
             }
 
-        }catch (Exception e){
-            log.error(e.getMessage(), e);
+            // 获取字典数据（使用缓存）
+            JSONObject fieldsDictJson = this.getFieldsDictFromCache(fieldsJson);
+            if (JSONUtil.isNull(fieldsDictJson)) {
+                return datas;
+            }
+
+            // 获得 helper类（使用缓存）
+            AbstractModelHelper modelHelper = getModelHelperFromCache(typeClazz);
+
+            // 批量处理数据
+            this.batchProcessData(datas, modelHelper, fieldsDictJson, operate);
+
+        } catch (Exception e) {
+            log.error("Excel数据处理失败: {}", e.getMessage(), e);
             return datas;
-        }finally {
-            // 花费毫秒数
+        } finally {
             long timerCount = timer.interval();
-            log.info("Excel 处理数据耗时："+ DateUtil.formatBetween(timerCount));
+            log.info("Excel 处理数据耗时：{} ms, 数据量：{}", timerCount, datas.size());
         }
 
         return datas;
     }
 
     /**
-     * 获得字段字典Code
-     *
-     * @param clazz 类clazz
-     * @return JSONObject
+     * 批量处理数据
      */
-    public JSONObject getFields(Class<?> clazz){
-        // 加入内部缓存 防止每次导出都重复反射对象
-        JSONObject fieldNameAndTypeCodeDict = FIELD_DICT_MAP.get(clazz);
-        if(!JSONUtil.isNull(fieldNameAndTypeCodeDict)){
-            return fieldNameAndTypeCodeDict;
+    private <T> void batchProcessData(List<T> datas, AbstractModelHelper modelHelper,
+                                      JSONObject fieldsDictJson, ExcelOperate operate) {
+        // 使用并行流处理大量数据，小量数据使用串行流
+        if (datas.size() > 1000) {
+            datas.parallelStream().forEach(data -> processData(data, modelHelper, fieldsDictJson, operate));
+        } else {
+            datas.forEach(data -> processData(data, modelHelper, fieldsDictJson, operate));
         }
+    }
 
-        fieldNameAndTypeCodeDict = JSONUtil.createObj();
+    /**
+     * 处理单个数据
+     */
+    private <T> void processData(T data, AbstractModelHelper modelHelper,
+                                 JSONObject fieldsDictJson, ExcelOperate operate) {
+        try {
+            switch (operate) {
+                case READ:
+                    modelHelper.transformByImport(fieldsDictJson, cast(data));
+                    break;
+                case WRITE:
+                    modelHelper.transformByExport(fieldsDictJson, cast(data));
+                    break;
+                default:
+                    break;
+            }
+        } catch (Exception e) {
+            log.warn("处理数据失败: {}", e.getMessage());
+        }
+    }
+
+    /**
+     * 从缓存获取字段配置
+     */
+    private JSONObject getFieldsFromCache(Class<?> clazz) {
+        try {
+            return FIELD_DICT_CACHE.get(clazz, () -> this.buildFieldsConfig(clazz));
+        } catch (ExecutionException e) {
+            log.error("获取字段配置失败: {}", e.getMessage(), e);
+            return this.buildFieldsConfig(clazz);
+        }
+    }
+
+    /**
+     * 构建字段配置
+     */
+    private JSONObject buildFieldsConfig(Class<?> clazz) {
+        JSONObject fieldNameAndTypeCodeDict = JSONUtil.createObj();
+
+        // 使用缓存的反射结果
         Field[] fields = ReflectUtil.getFields(clazz);
+
         for (Field field : fields) {
             ExcelInfo excelInfo = field.getAnnotation(ExcelInfo.class);
-            if (excelInfo != null) {
-                // 字典
-                String dictType = excelInfo.dictType();
-                if (StringUtils.isNotEmpty(dictType)) {
-                    fieldNameAndTypeCodeDict.putOpt(field.getName(), dictType);
-                }
+            if (excelInfo != null && StringUtils.isNotEmpty(excelInfo.dictType())) {
+                fieldNameAndTypeCodeDict.putOpt(field.getName(), excelInfo.dictType());
             }
         }
-        FIELD_DICT_MAP.put(clazz, fieldNameAndTypeCodeDict);
+
         return fieldNameAndTypeCodeDict;
     }
 
-
     /**
-     * 获得字段字典
-     *
-     * @param fieldNameAndTypeCodeDict 字段
-     * @return JSONObject
+     * 从缓存获取字典数据
      */
-    public JSONObject getFieldsDict(final JSONObject fieldNameAndTypeCodeDict){
-        // 非空判断
-        if(JSONUtil.isNull(fieldNameAndTypeCodeDict)){
+    private JSONObject getFieldsDictFromCache(JSONObject fieldNameAndTypeCodeDict) {
+        if (JSONUtil.isNull(fieldNameAndTypeCodeDict) || fieldNameAndTypeCodeDict.isEmpty()) {
             return null;
         }
 
         JSONObject dictJson = JSONUtil.createObj();
 
         try {
-            // 取字典 值
-            for (String s : fieldNameAndTypeCodeDict.keySet()) {
-                String key = Convert.toStr(s);
-                String typeCode = fieldNameAndTypeCodeDict.getStr(key);
-                List<DictWrapper> dictWrapperList = DictUtil.getDictList(typeCode);
-                // 如果字典 List 为空 则走下一个
-                if (CollUtil.isEmpty(dictWrapperList)) {
-                    continue;
+            // 批量获取所有需要的字典类型
+            Set<String> dictTypes = fieldNameAndTypeCodeDict.values()
+                    .stream()
+                    .map(Object::toString)
+                    .collect(Collectors.toSet());
+
+            // 批量加载字典数据
+            Map<String, JSONObject> dictDataMap = this.batchLoadDictData(dictTypes);
+
+            // 构建最终的字典JSON
+            for (Map.Entry<String, Object> entry : fieldNameAndTypeCodeDict.entrySet()) {
+                String typeCode = entry.getValue().toString();
+                JSONObject dictObject = dictDataMap.get(typeCode);
+                if (dictObject != null) {
+                    dictJson.putOpt(typeCode, dictObject);
                 }
-
-                JSONObject dictObject = JSONUtil.createObj();
-                JSONObject nameJsonObject = JSONUtil.createObj();
-                JSONObject valueJsonObject = JSONUtil.createObj();
-                for (DictWrapper wrapper : dictWrapperList) {
-                    JSONObject dictWrapper = JSONUtil.parseObj(wrapper);
-                    if (!JSONUtil.isNull(dictWrapper)) {
-                        nameJsonObject.putOpt(wrapper.getDictName(), wrapper.getDictValue());
-                        valueJsonObject.putOpt(wrapper.getDictValue(), wrapper.getDictName());
-                    }
-                }
-
-                dictObject.putOpt(DICT_NAME_KEY, nameJsonObject);
-                dictObject.putOpt(DICT_VALUE_KEY, valueJsonObject);
-
-                dictJson.putOpt(typeCode, dictObject);
             }
-        }catch (Exception ignored){}
+        } catch (Exception e) {
+            log.error("获取字典数据失败: {}", e.getMessage(), e);
+        }
+
         return dictJson;
     }
 
+    /**
+     * 批量加载字典数据
+     */
+    private Map<String, JSONObject> batchLoadDictData(Set<String> dictTypes) {
+        Map<String, JSONObject> result = new HashMap<>();
 
-    private static <T extends ApiWrapper> T cast(Object msg){
-        if(null == msg){
-            return null;
+        for (String dictType : dictTypes) {
+            try {
+                // 先从缓存获取name->value映射
+                Map<String, String> nameToValue = DICT_DATA_CACHE.get(dictType + "_name",
+                        () -> this.loadDictNameToValue(dictType));
+
+                // 再从缓存获取value->name映射
+                Map<String, String> valueToName = DICT_DATA_CACHE.get(dictType + "_value",
+                        () -> this.loadDictValueToName(dictType));
+
+                if (!nameToValue.isEmpty() || !valueToName.isEmpty()) {
+                    JSONObject dictObject = JSONUtil.createObj();
+                    dictObject.putOpt(DICT_NAME_KEY, JSONUtil.parseObj(nameToValue));
+                    dictObject.putOpt(DICT_VALUE_KEY, JSONUtil.parseObj(valueToName));
+                    result.put(dictType, dictObject);
+                }
+            } catch (ExecutionException e) {
+                log.warn("加载字典数据失败 [{}]: {}", dictType, e.getMessage());
+            }
         }
-        return (T) msg;
+
+        return result;
     }
 
+    /**
+     * 加载字典name->value映射
+     */
+    private Map<String, String> loadDictNameToValue(String dictType) {
+        List<DictWrapper> dictWrapperList = DictUtil.getDictList(dictType);
+        if (CollUtil.isEmpty(dictWrapperList)) {
+            return Collections.emptyMap();
+        }
+
+        return dictWrapperList.stream()
+                .filter(Objects::nonNull)
+                .filter(wrapper -> StringUtils.isNotEmpty(wrapper.getDictName())
+                        && StringUtils.isNotEmpty(wrapper.getDictValue()))
+                .collect(Collectors.toMap(
+                        DictWrapper::getDictName,
+                        DictWrapper::getDictValue,
+                        (existing, replacement) -> existing // 处理重复key
+                ));
+    }
+
+    /**
+     * 加载字典value->name映射
+     */
+    private Map<String, String> loadDictValueToName(String dictType) {
+        List<DictWrapper> dictWrapperList = DictUtil.getDictList(dictType);
+        if (CollUtil.isEmpty(dictWrapperList)) {
+            return Collections.emptyMap();
+        }
+
+        return dictWrapperList.stream()
+                .filter(Objects::nonNull)
+                .filter(wrapper -> StringUtils.isNotEmpty(wrapper.getDictName())
+                        && StringUtils.isNotEmpty(wrapper.getDictValue()))
+                .collect(Collectors.toMap(
+                        DictWrapper::getDictValue,
+                        DictWrapper::getDictName,
+                        (existing, replacement) -> existing // 处理重复key
+                ));
+    }
+
+    /**
+     * 从缓存获取ModelHelper
+     */
+    private <T> AbstractModelHelper getModelHelperFromCache(Class<T> typeClazz) {
+        return MODEL_HELPER_CACHE.computeIfAbsent(typeClazz, clazz -> {
+            try {
+                return ModelFactoryHelper.getModelHelper(clazz);
+            } catch (Exception e) {
+                throw new RuntimeException("获取ModelHelper失败", e);
+            }
+        });
+    }
+
+
+    /**
+     * 获得字段字典Code - 保持向后兼容
+     * @deprecated 使用 getFieldsFromCache 替代
+     */
+    @Deprecated
+    public JSONObject getFields(Class<?> clazz) {
+        return getFieldsFromCache(clazz);
+    }
+
+    /**
+     * 获得字段字典 - 保持向后兼容
+     * @deprecated 使用 getFieldsDictFromCache 替代
+     */
+    @Deprecated
+    public JSONObject getFieldsDict(final JSONObject fieldNameAndTypeCodeDict) {
+        return getFieldsDictFromCache(fieldNameAndTypeCodeDict);
+    }
+
+    /**
+     * 清理缓存
+     */
+    public static void clearCache() {
+        FIELD_DICT_CACHE.invalidateAll();
+        DICT_DATA_CACHE.invalidateAll();
+        MODEL_HELPER_CACHE.clear();
+        log.info("Excel工具类缓存已清理");
+    }
+
+    /**
+     * 获取缓存统计信息
+     */
+    public static String getCacheStats() {
+        return String.format("字段缓存: %s, 字典缓存: %s, Helper缓存: %d",
+                FIELD_DICT_CACHE.stats(),
+                DICT_DATA_CACHE.stats(),
+                MODEL_HELPER_CACHE.size());
+    }
+
+    @SuppressWarnings("unchecked")
+    private static <T extends ApiWrapper> T cast(Object msg) {
+        return msg == null ? null : (T) msg;
+    }
 }

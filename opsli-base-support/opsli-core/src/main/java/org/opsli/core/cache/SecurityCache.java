@@ -42,7 +42,7 @@ import java.util.function.Function;
  * 实际业务的话 这两种一般也是足够了
  * 依赖于 RedisTemplate 和 LRU cache，多套业务部署 最大穿透次数为 业务服务N次
  *
- * @author Parker
+ * @author Pace
  * @date 2021/12/10 12:39
  */
 @Slf4j

@@ -21,6 +21,7 @@ import opsli.plugins.crypto.model.CryptoAsymmetric;
 import opsli.plugins.crypto.model.CryptoSymmetric;
 import opsli.plugins.crypto.strategy.CryptoAsymmetricService;
 import opsli.plugins.crypto.strategy.CryptoSymmetricService;
+import org.opsli.core.cache.CacheUtil;
 import org.opsli.core.options.CryptoConfigFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -32,7 +33,7 @@ import static org.opsli.common.constants.OrderConstants.UTIL_ORDER;
 /**
  * 登陆加解密 工具类
  *
- * @author Parker
+ * @author Pace
  * @date 2022-07-25 6:06 PM
  **/
 @Component
@@ -72,7 +73,7 @@ public class CryptoUtil {
 
 
     @Autowired
-    public void init(OptionsUtil optionsUtil){
+    public void init(OptionsUtil optionsUtil, CacheUtil cacheUtil){
         // 非对称
         ASYMMETRIC = CryptoPlugin.getAsymmetric();
         ASYMMETRIC_CRYPTO_MODEL = CryptoConfigFactory.INSTANCE.getCryptoAsymmetric();

@@ -20,7 +20,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 /**
  * 基础服务接口
  *
- * @author Parker
+ * @author Pace
  * @date 2020-09-15
  */
 public interface BaseServiceInterface<T> extends IService<T> {

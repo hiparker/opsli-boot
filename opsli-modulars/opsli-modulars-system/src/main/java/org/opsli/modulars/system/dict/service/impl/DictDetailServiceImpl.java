@@ -47,7 +47,7 @@ import java.util.*;
 /**
  * 数据字典 明细 接口实现类
  *
- * @author Parker
+ * @author Pace
  * @date 2020-09-16 17:33
  */
 @Service

@@ -25,7 +25,7 @@ import org.springframework.stereotype.Component;
 /**
  * 用户其他附属条件检查
  *
- * @author Parker
+ * @author Pace
  * @date 2022年07月18日16:18:37
  */
 @Component

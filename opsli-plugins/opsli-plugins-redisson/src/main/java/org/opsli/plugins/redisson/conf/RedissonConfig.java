@@ -29,7 +29,7 @@ import org.springframework.core.annotation.Order;
 /**
  * Redisson自动化配置
  *
- * @author Parker
+ * @author Pace
  * @date 2019/6/19 下午11:55
  */
 @Slf4j

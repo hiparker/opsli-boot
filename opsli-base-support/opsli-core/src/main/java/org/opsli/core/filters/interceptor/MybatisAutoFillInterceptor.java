@@ -20,7 +20,8 @@ import cn.hutool.core.convert.Convert;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ReflectUtil;
 import com.baomidou.mybatisplus.annotation.TableField;
-import com.google.common.collect.Lists;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.binding.MapperMethod;
@@ -36,8 +37,11 @@ import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.util.*;
-import java.util.function.Consumer;
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Properties;
 
 /**
  * MyBatis 拦截器 注入属性用
@@ -52,215 +56,363 @@ import java.util.function.Consumer;
  *
  * 参考地址：https://www.cnblogs.com/qingshan-tang/p/13299701.html
  *
- * @author Parker
+ * 2025年06月01日13:15:17 提供性能优化
+ *
+ * @author Pace
  * @date 2020-03-01
  */
 @Component
 @Slf4j
 @Intercepts(@Signature(type = Executor.class, method = "update", args = {MappedStatement.class, Object.class}))
 public class MybatisAutoFillInterceptor implements Interceptor {
+    /** 使用 Caffeine 缓存提供更好的性能 */
+    private static final Cache<Class<?>, FieldProcessor> PROCESSOR_CACHE = Caffeine.newBuilder()
+            .maximumSize(1000)
+            .expireAfterAccess(Duration.ofHours(1))
+            .build();
 
-    private static final String ET = "et";
-
-    /** 实体类字段 */
-    static private final Map<Class<?>, Field[]> ENTITY_FIELD_MAP = new HashMap<>();
+    /** 线程本地缓存，避免重复计算 */
+    private static final ThreadLocal<ProcessorContext> CONTEXT_CACHE =
+            ThreadLocal.withInitial(ProcessorContext::new);
 
     @Override
-    public Object intercept(Invocation invocation) throws IllegalAccessException, InvocationTargetException {
-        fillField(invocation);
-        return invocation.proceed();
+    public Object intercept(Invocation invocation) throws InvocationTargetException, IllegalAccessException {
+        ProcessorContext context = CONTEXT_CACHE.get();
+        try {
+            context.reset();
+            processInvocation(invocation, context);
+            return invocation.proceed();
+        } finally {
+            context.reset();
+        }
     }
 
     /**
-     * 注入字段
-     * @param invocation 源
+     * 处理调用
      */
-    private void fillField(Invocation invocation) {
+    private void processInvocation(Invocation invocation, ProcessorContext context) {
         Object[] args = invocation.getArgs();
-        SqlCommandType sqlCommandType = null;
-        for (Object arg : args) {
-            //第一个参数处理。根据它判断是否给“操作属性”赋值。
-            //如果是第一个参数 MappedStatement
-            if (arg instanceof MappedStatement) {
-                MappedStatement ms = (MappedStatement) arg;
-                sqlCommandType = ms.getSqlCommandType();
-                //如果是“增加”或“更新”操作，则继续进行默认操作信息赋值。否则，则退出
-                if (sqlCommandType == SqlCommandType.INSERT || sqlCommandType == SqlCommandType.UPDATE) {
-                    continue;
-                } else {
-                    break;
-                }
-            }
 
-            if (sqlCommandType == SqlCommandType.INSERT) {
-                // 新增
-                this.insertFill(arg);
+        MappedStatement ms = (MappedStatement) args[0];
+        Object parameter = args[1];
 
-            } else if (sqlCommandType == SqlCommandType.UPDATE) {
-                // 修改
-                this.updateFill(arg);
-            }
-        }
-    }
-
-    /**
-     * 新增数据
-     * @param arg 参数
-     */
-    public void insertFill(Object arg) {
-        if(arg == null ){
+        if (parameter == null) {
             return;
         }
 
-        // 当前时间
-        Date currDate = DateUtil.date();
-        final Object argObj = arg;
-
-        // 处理字段
-        loopHandlerField(argObj, (fieldName)->{
-            switch (fieldName) {
-                // 创建人、更新人
-                case MyBatisConstants.FIELD_CREATE_BY:
-                case MyBatisConstants.FIELD_UPDATE_BY:
-                    // 如果创建人 为空则进行默认赋值
-                    Object createOrUpdateValue = ReflectUtil.getFieldValue(argObj, fieldName);
-                    if(StringUtils.isBlank(Convert.toStr(createOrUpdateValue))){
-                        BeanUtil.setProperty(argObj, fieldName, UserUtil.getUser().getId());
-                    }
-                    break;
-                // 创建日期、更新日期
-                case MyBatisConstants.FIELD_CREATE_TIME:
-                case MyBatisConstants.FIELD_UPDATE_TIME:
-                    BeanUtil.setProperty(argObj, fieldName, currDate);
-                    break;
-                // 乐观锁
-                case MyBatisConstants.FIELD_OPTIMISTIC_LOCK:
-                    BeanUtil.setProperty(argObj, fieldName, DictType.NO_YES_NO.getValue());
-                    break;
-                // 逻辑删除
-                case MyBatisConstants.FIELD_DELETE_LOGIC:
-                    BeanUtil.setProperty(argObj, fieldName,  MyBatisConstants.LOGIC_NOT_DELETE_VALUE);
-                    break;
-                // 多租户设置
-                case MyBatisConstants.FIELD_TENANT:
-                    // 2020-12-05 修复当前租户可能为空字符串报错问题
-                    // 如果租户ID 为空则进行默认赋值
-                    Object tenantValue = ReflectUtil.getFieldValue(argObj, fieldName);
-                    if(StringUtils.isBlank(Convert.toStr(tenantValue))){
-                        BeanUtil.setProperty(argObj, fieldName,  UserUtil.getTenantId());
-                    }
-                    break;
-                // 组织机构设置
-                case MyBatisConstants.FIELD_ORG_GROUP:
-                    // 如果组织IDs 为空则进行默认赋值
-                    Object orgValue = ReflectUtil.getFieldValue(argObj, fieldName);
-                    if(StringUtils.isBlank(Convert.toStr(orgValue))){
-                        UserOrgRefModel userOrgRefModel =
-                                UserUtil.getUserDefOrgByUserId(UserUtil.getUser().getId());
-                        if(null != userOrgRefModel){
-                            String orgIds = userOrgRefModel.getOrgIds();
-                            BeanUtil.setProperty(argObj, fieldName, orgIds);
-                        }
-                    }
-                    break;
-                default:
-                    break;
-            }
-        });
-    }
-
-    /**
-     * 修改数据
-     * @param arg 参数
-     */
-    public void updateFill(Object arg) {
-        if(arg == null ){
+        SqlCommandType commandType = ms.getSqlCommandType();
+        if (commandType != SqlCommandType.INSERT && commandType != SqlCommandType.UPDATE) {
             return;
         }
 
-        // 2020-09-19
-        // 修改这儿 有可能会拿到一个 MapperMethod，需要特殊处理
-        if (arg instanceof MapperMethod.ParamMap) {
-            MapperMethod.ParamMap<?> paramMap = (MapperMethod.ParamMap<?>) arg;
-            arg = paramMap.containsKey(ET)
-                    ? paramMap.get(ET)
-                    : paramMap.get("param1");
-            if (arg == null) {
-                return;
-            }
+        // 提取真实参数
+        Object realParam = extractRealParameter(parameter);
+        if (realParam == null) {
+            return;
         }
 
-        // 当前时间
-        Date currDate = DateUtil.date();
-        final Object argObj = arg;
+        // 获取或创建字段处理器
+        FieldProcessor processor = getFieldProcessor(realParam.getClass());
 
-        // 处理字段
-        loopHandlerField(argObj, (fieldName)->{
-            switch (fieldName) {
-                // 更新人
-                case MyBatisConstants.FIELD_UPDATE_BY:
-                    // 如果更新人 为空则进行默认赋值
-                    Object updateValue = ReflectUtil.getFieldValue(argObj, fieldName);
-                    if(StringUtils.isBlank(Convert.toStr(updateValue))){
-                        BeanUtil.setProperty(argObj, fieldName, UserUtil.getUser().getId());
-                    }
-                    break;
-                // 更新日期
-                case MyBatisConstants.FIELD_UPDATE_TIME:
-                    BeanUtil.setProperty(argObj, fieldName, currDate);
-                    break;
-                default:
-                    break;
-            }
-        });
+        // 执行字段处理
+        context.setOperationType(commandType);
+        processor.process(realParam, context);
     }
 
     /**
-     * 循环处理字段
-     *
-     * @param arg 参数
-     * @param callback 回调函数
+     * 提取真实参数
      */
-    private void loopHandlerField(Object arg, Consumer<String> callback){
-        // 排除字段
-        List<String> existField = Lists.newArrayList();
+    private Object extractRealParameter(Object parameter) {
+        if (parameter instanceof MapperMethod.ParamMap) {
+            MapperMethod.ParamMap<?> paramMap = (MapperMethod.ParamMap<?>) parameter;
+            return paramMap.containsKey("et") ? paramMap.get("et") : paramMap.get("param1");
+        }
+        return parameter;
+    }
 
-        // 字段缓存 减少每次更新 反射
-        Field[] fields = ENTITY_FIELD_MAP.get(arg.getClass());
-        if(fields == null){
-            fields = ReflectUtil.getFields(arg.getClass());
-            ENTITY_FIELD_MAP.put(arg.getClass(), fields);
+    /**
+     * 获取字段处理器
+     */
+    private FieldProcessor getFieldProcessor(Class<?> clazz) {
+        return PROCESSOR_CACHE.get(clazz, this::createFieldProcessor);
+    }
+
+    /**
+     * 创建字段处理器
+     */
+    private FieldProcessor createFieldProcessor(Class<?> clazz) {
+        return new ReflectionFieldProcessor(clazz);
+    }
+
+    /**
+     * 处理器上下文
+     */
+    private static class ProcessorContext {
+        private SqlCommandType operationType;
+        private Date currentDate;
+        private String userId;
+        private String tenantId;
+        private UserOrgRefModel userOrgRef;
+        private boolean userInfoLoaded = false;
+
+        void reset() {
+            operationType = null;
+            currentDate = null;
+            userId = null;
+            tenantId = null;
+            userOrgRef = null;
+            userInfoLoaded = false;
         }
 
-        for (Field f : fields) {
-            // 判断是否是排除字段
-            if (existField.contains(f.getName())) {
-                continue;
-            }
+        void setOperationType(SqlCommandType type) {
+            this.operationType = type;
+            this.currentDate = DateUtil.date();
+        }
 
-            // 如果设置为忽略字段 则直接跳过不处理
-            TableField tableField = f.getAnnotation(TableField.class);
-            if (tableField != null) {
-                if (!tableField.exist()) {
-                    existField.add(f.getName());
-                    continue;
+        boolean isInsert() {
+            return operationType == SqlCommandType.INSERT;
+        }
+
+        boolean isUpdate() {
+            return operationType == SqlCommandType.UPDATE;
+        }
+
+        Date getCurrentDate() {
+            return currentDate;
+        }
+
+        synchronized void loadUserInfo() {
+            if (!userInfoLoaded) {
+                try {
+                    var user = UserUtil.getUser();
+                    userId = user.getId();
+                    tenantId = UserUtil.getTenantId();
+                    userOrgRef = UserUtil.getUserDefOrgByUserId(userId);
+                } catch (Exception e) {
+                    userId = "";
+                    tenantId = "";
+                    userOrgRef = null;
                 }
+                userInfoLoaded = true;
             }
+        }
 
-            // 回调函数
-            callback.accept(f.getName());
+        String getUserId() {
+            loadUserInfo();
+            return userId;
+        }
+
+        String getTenantId() {
+            loadUserInfo();
+            return tenantId;
+        }
+
+        UserOrgRefModel getUserOrgRef() {
+            loadUserInfo();
+            return userOrgRef;
         }
     }
 
-    // =======================================
+    /**
+     * 字段处理器接口
+     */
+    private interface FieldProcessor {
+        void process(Object target, ProcessorContext context);
+    }
+
+    /**
+     * 基于反射的字段处理器
+     */
+    private static class ReflectionFieldProcessor implements FieldProcessor {
+        private final FieldHandler[] handlers;
+
+        public ReflectionFieldProcessor(Class<?> clazz) {
+            this.handlers = buildHandlers(clazz);
+        }
+
+        @Override
+        public void process(Object target, ProcessorContext context) {
+            for (FieldHandler handler : handlers) {
+                handler.handle(target, context);
+            }
+        }
+
+        private FieldHandler[] buildHandlers(Class<?> clazz) {
+            Field[] fields = ReflectUtil.getFields(clazz);
+            List<FieldHandler> handlerList = new ArrayList<>();
+
+            for (Field field : fields) {
+                // 跳过排除字段
+                TableField tableField = field.getAnnotation(TableField.class);
+                if (tableField != null && !tableField.exist()) {
+                    continue;
+                }
+
+                FieldHandler handler = createFieldHandler(field);
+                if (handler != null) {
+                    handlerList.add(handler);
+                }
+            }
+
+            return handlerList.toArray(new FieldHandler[0]);
+        }
+
+        private FieldHandler createFieldHandler(Field field) {
+            String fieldName = field.getName();
+            return switch (fieldName) {
+                case MyBatisConstants.FIELD_CREATE_BY -> new CreateByFieldHandler(field);
+                case MyBatisConstants.FIELD_UPDATE_BY -> new UpdateByFieldHandler(field);
+                case MyBatisConstants.FIELD_CREATE_TIME -> new CreateTimeFieldHandler(field);
+                case MyBatisConstants.FIELD_UPDATE_TIME -> new UpdateTimeFieldHandler(field);
+                case MyBatisConstants.FIELD_OPTIMISTIC_LOCK -> new OptimisticLockFieldHandler(field);
+                case MyBatisConstants.FIELD_DELETE_LOGIC -> new DeleteLogicFieldHandler(field);
+                case MyBatisConstants.FIELD_TENANT -> new TenantFieldHandler(field);
+                case MyBatisConstants.FIELD_ORG_GROUP -> new OrgGroupFieldHandler(field);
+                default -> null;
+            };
+        }
+    }
+
+    /**
+     * 字段处理器基类
+     */
+    private abstract static class FieldHandler {
+        protected final Field field;
+
+        protected FieldHandler(Field field) {
+            this.field = field;
+        }
+
+        abstract void handle(Object target, ProcessorContext context);
+
+        protected void setFieldValue(Object target, Object value) {
+            try {
+                BeanUtil.setProperty(target, field.getName(), value);
+            } catch (Exception e) {
+                if (log.isDebugEnabled()) {
+                    log.debug("设置字段 {} 值失败: {}", field.getName(), e.getMessage());
+                }
+            }
+        }
+
+        protected Object getFieldValue(Object target) {
+            return ReflectUtil.getFieldValue(target, field.getName());
+        }
+
+        protected boolean isBlank(Object value) {
+            return StringUtils.isBlank(Convert.toStr(value));
+        }
+    }
+
+    // 具体的字段处理器实现
+    private static class CreateByFieldHandler extends FieldHandler {
+        CreateByFieldHandler(Field field) { super(field); }
+
+        @Override
+        void handle(Object target, ProcessorContext context) {
+            if (context.isInsert() && isBlank(getFieldValue(target))) {
+                String userId = context.getUserId();
+                if (StringUtils.isNotBlank(userId)) {
+                    setFieldValue(target, userId);
+                }
+            }
+        }
+    }
+
+    private static class UpdateByFieldHandler extends FieldHandler {
+        UpdateByFieldHandler(Field field) { super(field); }
+
+        @Override
+        void handle(Object target, ProcessorContext context) {
+            if (isBlank(getFieldValue(target))) {
+                String userId = context.getUserId();
+                if (StringUtils.isNotBlank(userId)) {
+                    setFieldValue(target, userId);
+                }
+            }
+        }
+    }
+
+    private static class CreateTimeFieldHandler extends FieldHandler {
+        CreateTimeFieldHandler(Field field) { super(field); }
+
+        @Override
+        void handle(Object target, ProcessorContext context) {
+            if (context.isInsert()) {
+                setFieldValue(target, context.getCurrentDate());
+            }
+        }
+    }
+
+    private static class UpdateTimeFieldHandler extends FieldHandler {
+        UpdateTimeFieldHandler(Field field) { super(field); }
+
+        @Override
+        void handle(Object target, ProcessorContext context) {
+            setFieldValue(target, context.getCurrentDate());
+        }
+    }
+
+    private static class OptimisticLockFieldHandler extends FieldHandler {
+        OptimisticLockFieldHandler(Field field) { super(field); }
+
+        @Override
+        void handle(Object target, ProcessorContext context) {
+            if (context.isInsert()) {
+                setFieldValue(target, DictType.NO_YES_NO.getValue());
+            }
+        }
+    }
+
+    private static class DeleteLogicFieldHandler extends FieldHandler {
+        DeleteLogicFieldHandler(Field field) { super(field); }
+
+        @Override
+        void handle(Object target, ProcessorContext context) {
+            if (context.isInsert()) {
+                setFieldValue(target, MyBatisConstants.LOGIC_NOT_DELETE_VALUE);
+            }
+        }
+    }
+
+    private static class TenantFieldHandler extends FieldHandler {
+        TenantFieldHandler(Field field) { super(field); }
+
+        @Override
+        void handle(Object target, ProcessorContext context) {
+            if (context.isInsert() && isBlank(getFieldValue(target))) {
+                String tenantId = context.getTenantId();
+                if (StringUtils.isNotBlank(tenantId)) {
+                    setFieldValue(target, tenantId);
+                }
+            }
+        }
+    }
+
+    private static class OrgGroupFieldHandler extends FieldHandler {
+        OrgGroupFieldHandler(Field field) { super(field); }
+
+        @Override
+        void handle(Object target, ProcessorContext context) {
+            if (context.isInsert() && isBlank(getFieldValue(target))) {
+                UserOrgRefModel userOrgRef = context.getUserOrgRef();
+                if (userOrgRef != null && StringUtils.isNotBlank(userOrgRef.getOrgIds())) {
+                    setFieldValue(target, userOrgRef.getOrgIds());
+                }
+            }
+        }
+    }
 
     @Override
-    public Object plugin(Object o) {
-        return Plugin.wrap(o, this);
+    public Object plugin(Object target) {
+        return Plugin.wrap(target, this);
     }
 
     @Override
     public void setProperties(Properties properties) {
+        // 配置参数
     }
-
 }
+
+
+

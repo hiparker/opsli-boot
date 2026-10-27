@@ -21,7 +21,7 @@ import org.opsli.common.exception.ServiceException;
 /**
  * 代码生成器 异常类
  *
- * @author parker
+ * @author Pace
  * @date 2020-09-22 11:17
  */
 public class GeneratorException extends ServiceException {

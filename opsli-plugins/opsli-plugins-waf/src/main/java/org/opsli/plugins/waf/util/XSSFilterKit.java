@@ -22,7 +22,7 @@ import java.util.regex.Pattern;
 /**
  * XSS 过滤
  *
- * @author Parker
+ * @author Pace
  * @date 2020-10-09
  * */
 public final class XSSFilterKit {

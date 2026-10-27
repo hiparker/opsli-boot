@@ -46,7 +46,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * 对称加密
  *
- * @author Parker
+ * @author Pace
  * @date 2021年5月18日10:53:27
  */
 @Slf4j

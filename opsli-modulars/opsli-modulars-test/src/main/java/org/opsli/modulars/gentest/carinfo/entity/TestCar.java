@@ -27,7 +27,7 @@ import org.opsli.core.base.entity.BaseEntity;
 /**
  * 测试汽车 Entity
  *
- * @author Parker
+ * @author Pace
  * @date 2022-08-06 23:53:30
  */
 @Data

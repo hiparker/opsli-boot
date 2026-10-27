@@ -15,13 +15,14 @@
  */
 package org.opsli.modulars.system.login.web;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.opsli.api.base.encrypt.EncryptModel;
 import org.opsli.common.annotation.Limiter;
 import org.opsli.common.enums.LoginModelType;
 import org.opsli.common.utils.WrapperUtil;
+import org.opsli.core.utils.CryptoUtil;
 import org.opsli.core.utils.ValidatorUtil;
 import org.opsli.modulars.system.login.dto.LoginCodeModel;
 import org.opsli.modulars.system.login.handler.before.LoginCodeModelVerifyCodeBeforeHandler;
@@ -30,7 +31,6 @@ import org.opsli.modulars.system.login.handler.success.LoginClearErrorSuccessHan
 import org.opsli.modulars.system.login.handler.success.LoginCodeModelCreateAccessTokenHandler;
 import org.opsli.modulars.system.login.handler.success.LoginSuccessAfterVerifyHandler;
 import org.opsli.modulars.system.login.handler.success.LoginSuccessLogHandler;
-import org.opsli.core.utils.CryptoUtil;
 import org.opsli.plugins.security.authentication.EmailCodeAuthenticationToken;
 import org.opsli.plugins.security.authentication.MobileCodeAuthenticationToken;
 import org.opsli.plugins.security.handler.*;
@@ -45,10 +45,10 @@ import org.springframework.web.bind.annotation.RestController;
  * 手机号/邮箱+验证码 登录
  * 不需要继承 api 接口
  *
- * @author parker
+ * @author Pace
  * @date 2020-05-23 13:30
  */
-@Api(tags = "登录相关")
+@Tag(name = "登录相关")
 @Slf4j
 @RestController
 public class LoginByCodeRestController {
@@ -57,7 +57,7 @@ public class LoginByCodeRestController {
 
 
     @Limiter
-    @ApiOperation(value = "手机号/邮箱+验证码 登录", notes = "手机号/邮箱+验证码 登录")
+    @Operation(summary = "手机号/邮箱+验证码 登录")
     @PostMapping("/system/login-by-code")
     public void login(@RequestBody EncryptModel encryptModel){
         // 验证加密登录对象

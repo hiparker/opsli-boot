@@ -27,7 +27,7 @@ import java.util.List;
 /**
  * 代码模板详情 Service
  *
- * @author Parker
+ * @author Pace
  * @date 2021-05-28 17:12:38
  */
 public interface IGenTemplateDetailService extends CrudServiceInterface<GenTemplateDetail, GenTemplateDetailModel> {

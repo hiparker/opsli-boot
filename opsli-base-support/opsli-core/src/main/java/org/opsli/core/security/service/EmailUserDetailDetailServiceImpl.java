@@ -32,7 +32,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -40,7 +40,7 @@ import java.util.stream.Collectors;
  * 邮箱+验证码 获取用户信息Service
  * 实际只需要用到 邮箱唯一主键即可
  *
- * @author Parker
+ * @author Pace
  * @date 2022-07-14 4:44 PM
  **/
 @AllArgsConstructor

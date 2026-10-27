@@ -27,7 +27,7 @@ import org.opsli.core.utils.ValidatorUtil;
 /**
  * 加密参数
  *
- * @author Parker
+ * @author Pace
  * @date 2020-09-19 20:03
  */
 public enum CryptoConfigFactory {
@@ -71,7 +71,7 @@ public enum CryptoConfigFactory {
     /**
      * 对称加密
      *
-     * @author Parker
+     * @author Pace
      * @date 2021年5月17日15:59:52
      */
     @Data
@@ -90,7 +90,7 @@ public enum CryptoConfigFactory {
     /**
      * 非对称加密
      *
-     * @author Parker
+     * @author Pace
      * @date 2021年5月17日15:59:52
      */
     @Data

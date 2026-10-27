@@ -21,7 +21,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * Redis 锁
  *
- * @author Parker
+ * @author Pace
  * @date 2020-09-16 11:47
  */
 public class RedisLock {

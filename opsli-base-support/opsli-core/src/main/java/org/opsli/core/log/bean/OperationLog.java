@@ -18,18 +18,20 @@ package org.opsli.core.log.bean;
 import lombok.Data;
 import lombok.ToString;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
  * 操作日志
  *
- * @author Parker
+ * @author Pace
  * @date 2021年7月15日20:28:24
  */
 @Data
 @ToString
 public class OperationLog implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /** 日志ID */

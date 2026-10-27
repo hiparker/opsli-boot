@@ -22,7 +22,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 /**
  * 认证授权器
  *
- * @author Parker
+ * @author Pace
  * @date 2022-07-18 11:18 AM
  **/
 public interface IAuthenticationProvider {

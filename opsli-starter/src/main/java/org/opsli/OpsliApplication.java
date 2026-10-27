@@ -21,7 +21,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 /**
  * OPSLI 快速开发平台启动类
  *
- * @author Parker
+ * @author Pace
  * @date 2020-09-09
  */
 @SpringBootApplication

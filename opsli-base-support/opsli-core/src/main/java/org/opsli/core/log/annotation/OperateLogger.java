@@ -27,7 +27,7 @@ import java.lang.annotation.Target;
 /**
  * 日志注解
  *
- * @author Parker
+ * @author Pace
  * @date 2021年7月15日20:28:24
  */
 @Target({ElementType.METHOD}) //注解作用于方法级别

@@ -15,7 +15,7 @@
  */
 package org.opsli.core.options;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import org.opsli.common.annotation.OptionDict;
 import org.opsli.common.annotation.validator.Validator;
@@ -25,12 +25,13 @@ import org.opsli.core.utils.OptionsUtil;
 import org.opsli.core.utils.ValidatorUtil;
 import org.opsli.plugins.email.conf.EmailConfig;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
  * 邮件配置
  *
- * @author Parker
+ * @author Pace
  * @date 2020-09-19 20:03
  */
 public enum EmailConfigFactory {
@@ -59,45 +60,46 @@ public enum EmailConfigFactory {
     /**
      * 邮件配置
      *
-     * @author Parker
+     * @author Pace
      */
     @Data
     public static class EmailConfigOption implements Serializable {
 
+        @Serial
         private static final long serialVersionUID = 1L;
 
         /** SMTP地址 */
-        @ApiModelProperty(value = "SMTP地址")
+        @Schema(description = "SMTP地址")
         @Validator({ValidatorType.IS_NOT_NULL})
         @OptionDict("email_smtp")
         private String smtp;
 
         /** SMTP端口 */
-        @ApiModelProperty(value = "SMTP端口")
+        @Schema(description = "SMTP端口")
         @Validator({ValidatorType.IS_NOT_NULL})
         @OptionDict("email_port")
         private Integer port;
 
         /** 开启SSL认证 */
-        @ApiModelProperty(value = "开启SSL认证")
+        @Schema(description = "开启SSL认证")
         @Validator({ValidatorType.IS_NOT_NULL})
         @OptionDict("email_ssl_enable")
         private String sslEnable;
 
         /** 邮箱账号 */
-        @ApiModelProperty(value = "邮箱账号")
+        @Schema(description = "邮箱账号")
         @Validator({ValidatorType.IS_NOT_NULL})
         @OptionDict("email_account")
         private String account;
 
         /** 邮箱密码 */
-        @ApiModelProperty(value = "邮箱密码")
+        @Schema(description = "邮箱密码")
         @Validator({ValidatorType.IS_NOT_NULL})
         @OptionDict("email_password")
         private String password;
 
         /** 发件人 */
-        @ApiModelProperty(value = "发件人")
+        @Schema(description = "发件人")
         @Validator({ValidatorType.IS_NOT_NULL})
         @OptionDict("email_addresser")
         private String addresser;

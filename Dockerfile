@@ -1,5 +1,5 @@
-# openjdk 8u222
-FROM openjdk:8u222-jre
+# openjdk 22
+FROM azul/zulu-openjdk:22-jre
 
 MAINTAINER opsli.com
 LABEL description=OPSLI-快速开发平台

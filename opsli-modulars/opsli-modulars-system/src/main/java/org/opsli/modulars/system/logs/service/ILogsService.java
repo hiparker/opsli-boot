@@ -23,7 +23,7 @@ import org.opsli.modulars.system.logs.entity.SysLogs;
 /**
  * 日志 Service
  *
- * @author Parker
+ * @author Pace
  * @date 2020-11-28 18:59:59
  */
 public interface ILogsService extends CrudServiceInterface<SysLogs, LogsModel> {

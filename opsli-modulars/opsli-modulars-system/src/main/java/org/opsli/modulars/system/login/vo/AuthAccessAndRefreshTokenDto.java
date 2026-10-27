@@ -19,12 +19,13 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
  * 登录 Token 传输实体
  *
- * @author Parker
+ * @author Pace
  * @since 2021-12-27
  */
 @Getter
@@ -32,6 +33,7 @@ import java.io.Serializable;
 @Builder
 public class AuthAccessAndRefreshTokenDto implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /** 刷新Token */

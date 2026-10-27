@@ -21,13 +21,13 @@ import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.date.TimeInterval;
+import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.lang.tree.Tree;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.alibaba.excel.support.ExcelTypeEnum;
-import com.alibaba.excel.util.CollectionUtils;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -66,8 +66,10 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -76,7 +78,7 @@ import java.util.function.Function;
 /**
  * 默认 范型引用 子类的Service ， 为简单的CRUD做足准备
  *
- * @author Parker
+ * @author Pace
  * @date 2020-09-15
  */
 @Slf4j
@@ -124,7 +126,7 @@ public abstract class BaseRestController <T extends BaseEntity, E extends ApiWra
         Iterator<String> itr = request.getFileNames();
         String uploadedFile = itr.next();
         List<MultipartFile> files = request.getFiles(uploadedFile);
-        if (CollectionUtils.isEmpty(files)) {
+        if (CollUtil.isEmpty(files)) {
             // 请选择文件
             return ResultWrapper.getCustomResultWrapper(CoreMsg.EXCEL_FILE_NULL);
         }
@@ -366,6 +368,7 @@ public abstract class BaseRestController <T extends BaseEntity, E extends ApiWra
     @Data
     public static class ExcelExportCache implements Serializable {
 
+        @Serial
         private static final long serialVersionUID = 1L;
 
         public final static String EXCEL_IMPORT_TEMPLATE_EXPORT = "import-template-export";

@@ -24,7 +24,7 @@ import org.springframework.stereotype.Component;
 /**
  * 接口路径前缀配置
  *
- * @author Parker
+ * @author Pace
  * @date 2020-09-15
  */
 @Configuration

@@ -33,7 +33,7 @@ import static org.opsli.common.constants.OrderConstants.EXCEPTION_HANDLER_ORDER;
 /**
  * 遗产拦截器
  *
- * @author parker
+ * @author Pace
  * @date 2020-09-13
  */
 @Slf4j

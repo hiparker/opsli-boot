@@ -21,8 +21,10 @@ import cn.hutool.core.util.DesensitizedUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.opsli.api.base.encrypt.EncryptModel;
@@ -60,8 +62,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 import java.util.Optional;
 
@@ -69,10 +69,10 @@ import java.util.Optional;
 /**
  * 用户管理 Controller
  *
- * @author Parker
+ * @author Pace
  * @date 2020-09-16 17:33
  */
-@Api(tags = UserApi.TITLE)
+@Tag(name = UserApi.TITLE)
 @Slf4j
 @ApiRestController("/{ver}/system/user")
 public class UserRestController extends BaseRestController<SysUser, UserModel, IUserService>
@@ -85,7 +85,7 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
      * 当前登陆用户信息
      * @return ResultWrapper
      */
-    @ApiOperation(value = "当前登陆用户信息", notes = "当前登陆用户信息")
+    @Operation(summary = "当前登陆用户信息")
     @Override
     public ResultWrapper<UserInfo> getInfo(HttpServletRequest request) {
         UserModel currUser = UserUtil.getUserBySource();
@@ -96,7 +96,7 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
      * 当前登陆用户信息 By Id
      * @return ResultWrapper
      */
-    @ApiOperation(value = "当前登陆用户信息 By Id", notes = "当前登陆用户信息 By Id")
+    @Operation(summary = "当前登陆用户信息 By Id")
     @Override
     public ResultWrapper<UserInfo> getInfoById(String userId) {
         UserModel currUser = UserUtil.getUserBySource(userId);
@@ -146,7 +146,7 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
      * 当前登陆用户组织机构
      * @return ResultWrapper
      */
-    @ApiOperation(value = "当前登陆用户组织机构", notes = "当前登陆用户组织机构")
+    @Operation(summary = "当前登陆用户组织机构")
     @Override
     public ResultWrapper<?> getOrg() {
         UserModel user = UserUtil.getUser();
@@ -158,7 +158,7 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
      * @param userId 用户ID
      * @return ResultWrapper
      */
-    @ApiOperation(value = "用户组织机构", notes = "用户组织机构")
+    @Operation(summary = "用户组织机构")
     @Override
     public ResultWrapper<?> getOrgByUserId(String userId) {
         List<UserOrgRefModel> orgListByUserId = UserUtil.getOrgListByUserId(userId);
@@ -170,7 +170,7 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
      * @param userId 用户Id
      * @return ResultWrapper
      */
-    @ApiOperation(value = "根据 userId 获得用户角色Id集合", notes = "根据 userId 获得用户角色Id集合")
+    @Operation(summary = "根据 userId 获得用户角色Id集合")
     @Override
     public ResultWrapper<List<String>> getRoleIdsByUserId(String userId) {
         List<String> roleIdList = iUserRoleRefService.getRoleIdList(userId);
@@ -183,7 +183,7 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
      * 修改密码
      * @return ResultWrapper
      */
-    @ApiOperation(value = "修改密码", notes = "修改密码")
+    @Operation(summary = "修改密码")
     @Override
     public ResultWrapper<?> updatePassword(EncryptModel encryptModel) {
         // 演示模式 不允许操作
@@ -199,14 +199,17 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
 
         UserModel user = UserUtil.getUserBySource();
         userPassword.setUserId(user.getId());
-        IService.updatePasswordByCheckOld(userPassword);
-        return ResultWrapper.getSuccessResultWrapper();
+
+        boolean flag = IService.updatePasswordByCheckOld(userPassword);
+        return  flag ? ResultWrapper.getSuccessResultWrapper()
+                : ResultWrapper.getErrorResultWrapper();
     }
 
     /**
      * 修改密码 忘记密码
      * @return ResultWrapper
      */
+    @Operation(summary = "忘记密码")
     @Override
     public ResultWrapper<?> updatePasswordByForget(EncryptModel encryptModel) {
         // 演示模式 不允许操作
@@ -228,15 +231,16 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
         userPassword.setUserId(userBySource.getId());
         userPassword.setNewPassword(updateUserPasswordByForgetModel.getNewPassword());
 
-        IService.updatePasswordByNotCheckOld(userPassword);
-        return ResultWrapper.getSuccessResultWrapper();
+        boolean flag = IService.updatePasswordByNotCheckOld(userPassword);
+        return  flag ? ResultWrapper.getSuccessResultWrapper()
+                : ResultWrapper.getErrorResultWrapper();
     }
 
     /**
      * 修改邮箱
      * @return ResultWrapper
      */
-    @ApiOperation(value = "修改邮箱", notes = "修改邮箱")
+    @Operation(summary = "修改邮箱")
     @Override
     public ResultWrapper<?> updateEmail(EncryptModel encryptModel) {
         // 演示模式 不允许操作
@@ -250,16 +254,17 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
         // 验证对象
         ValidatorUtil.verify(updateUserEmailModel);
 
-        // 修改用户邮箱
-        IService.updateUserEmail(updateUserEmailModel);
-        return ResultWrapper.getSuccessResultWrapper();
+        // 修改邮箱
+        boolean flag = IService.updateUserEmail(updateUserEmailModel);
+        return  flag ? ResultWrapper.getSuccessResultWrapper()
+                : ResultWrapper.getErrorResultWrapper();
     }
 
     /**
      * 修改手机
      * @return ResultWrapper
      */
-    @ApiOperation(value = "修改手机", notes = "修改手机")
+    @Operation(summary = "修改手机")
     @Override
     public ResultWrapper<?> updateMobile(EncryptModel encryptModel) {
         // 演示模式 不允许操作
@@ -273,9 +278,10 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
         // 验证对象
         ValidatorUtil.verify(updateUserMobileModel);
 
-        // 修改用户邮箱
-        IService.updateUserMobile(updateUserMobileModel);
-        return ResultWrapper.getSuccessResultWrapper();
+        // 修改手机
+        boolean flag = IService.updateUserMobile(updateUserMobileModel);
+        return  flag ? ResultWrapper.getSuccessResultWrapper()
+                : ResultWrapper.getErrorResultWrapper();
     }
 
     /**
@@ -283,7 +289,7 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
      * @param userAvatarModel 图片地址
      * @return ResultWrapper
      */
-    @ApiOperation(value = "上传头像", notes = "上传头像")
+    @Operation(summary = "上传头像")
     @Override
     public ResultWrapper<?> updateAvatar(UserAvatarModel userAvatarModel) {
         UserModel user = UserUtil.getUserBySource();
@@ -291,10 +297,9 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
         UserModel userModel = new UserModel();
         userModel.setId(user.getId());
         userModel.setAvatar(userAvatarModel.getImgUrl());
-        IService.updateAvatar(userModel);
-        // 刷新用户信息
-        UserUtil.refreshUser(user);
-        return ResultWrapper.getSuccessResultWrapper();
+        boolean flag = IService.updateAvatar(userModel);
+        return  flag ? ResultWrapper.getSuccessResultWrapper()
+                : ResultWrapper.getErrorResultWrapper();
     }
 
     // ==================================================
@@ -303,7 +308,7 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
      * 修改密码
      * @return ResultVo
      */
-    @ApiOperation(value = "修改密码", notes = "修改密码")
+    @Operation(summary = "修改密码")
     @PreAuthorize("hasAuthority('system_user_updatePassword')")
     @OperateLogger(description = "修改密码",
             module = ModuleEnum.MODULE_USER, operationType = OperationTypeEnum.UPDATE, db = true)
@@ -328,7 +333,7 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
      * 重置密码
      * @return ResultWrapper
      */
-    @ApiOperation(value = "重置密码", notes = "重置密码")
+    @Operation(summary = "重置密码")
     @PreAuthorize("hasAuthority('system_user_resetPassword')")
     @OperateLogger(description = "重置密码",
             module = ModuleEnum.MODULE_USER, operationType = OperationTypeEnum.UPDATE, db = true)
@@ -370,7 +375,7 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
      * 变更账户状态
      * @return ResultWrapper
      */
-    @ApiOperation(value = "锁定账户", notes = "锁定账户")
+    @Operation(summary = "锁定账户")
     @PreAuthorize("hasAuthority('system_user_enable')")
     @OperateLogger(description = "锁定账户",
             module = ModuleEnum.MODULE_USER, operationType = OperationTypeEnum.UPDATE, db = true)
@@ -403,7 +408,7 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
      * @param model 模型
      * @return ResultWrapper
      */
-    @ApiOperation(value = "获得单条用户信息", notes = "获得单条用户信息 - ID")
+    @Operation(summary = "获得单条用户信息 - ID")
     @PreAuthorize("hasAuthority('system_user_select')")
     @Override
     public ResultWrapper<UserModel> get(UserModel model) {
@@ -424,7 +429,7 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
      * @param request request
      * @return ResultWrapper
      */
-    @ApiOperation(value = "获得分页数据", notes = "获得分页数据 - 查询构造器")
+    @Operation(summary = "获得分页数据 - 查询构造器")
     @PreAuthorize("hasAuthority('system_user_select')")
     @Override
     public ResultWrapper<?> findPage(Integer pageNo, Integer pageSize,
@@ -458,7 +463,7 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
      * @param request request
      * @return ResultWrapper
      */
-    @ApiOperation(value = "获得分页数据", notes = "获得分页数据 - 查询构造器")
+    @Operation(summary = "获得分页数据 - 查询构造器")
     @PreAuthorize("hasAuthority('system_set_tenant_admin')")
     @Override
     public ResultWrapper<?> findPageByTenant(Integer pageNo, Integer pageSize,
@@ -488,7 +493,7 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
      * @param model 模型
      * @return ResultWrapper
      */
-    @ApiOperation(value = "新增用户信息", notes = "新增用户信息")
+    @Operation(summary = "新增用户信息")
     @PreAuthorize("hasAuthority('system_user_insert')")
     @OperateLogger(description = "新增用户信息",
             module = ModuleEnum.MODULE_USER, operationType = OperationTypeEnum.INSERT, db = true)
@@ -505,7 +510,7 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
      * @param model 模型
      * @return ResultWrapper
      */
-    @ApiOperation(value = "修改用户信息", notes = "修改用户信息")
+    @Operation(summary = "修改用户信息")
     @PreAuthorize("hasAuthority('system_user_update')")
     @OperateLogger(description = "修改用户信息",
             module = ModuleEnum.MODULE_USER, operationType = OperationTypeEnum.UPDATE, db = true)
@@ -523,24 +528,20 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
      * @param model 模型
      * @return ResultWrapper
      */
-    @ApiOperation(value = "修改自身用户信息", notes = "修改自身用户信息")
+    @Operation(summary = "修改自身用户信息")
     @OperateLogger(description = "修改自身用户信息",
             module = ModuleEnum.MODULE_USER, operationType = OperationTypeEnum.UPDATE, db = true)
     @Override
-    public ResultWrapper<?> updateSelf(UserModel model) {
+    public ResultWrapper<?> updateSelf(UserSelfSaveModel model) {
         UserModel currUser = UserUtil.getUserBySource();
         if(!StringUtils.equals(currUser.getId(), model.getId())){
             // 非法参数 防止其他用户 通过该接口 修改非自身用户数据
             throw new ServiceException(SystemMsg.EXCEPTION_USER_ILLEGAL_PARAMETER);
         }
 
-        // 防止篡改手机号、邮箱号
-        model.setMobile(null);
-        model.setEmail(null);
-
-        // 调用修改方法
-        IService.update(model);
-        return ResultWrapper.getSuccessResultWrapperByMsg("修改用户信息成功");
+        boolean flag = IService.updateUserInfo(model);
+        return  flag ? ResultWrapper.getSuccessResultWrapperByMsg("修改用户信息成功")
+                : ResultWrapper.getErrorResultWrapper();
     }
 
     /**
@@ -548,7 +549,7 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
      * @param encryptModel 加密 id ID
      * @return ResultWrapper
      */
-    @ApiOperation(value = "删除用户信息数据", notes = "删除用户信息数据")
+    @Operation(summary = "删除用户信息数据")
     @PreAuthorize("hasAuthority('system_user_delete')")
     @OperateLogger(description = "删除用户信息数据",
             module = ModuleEnum.MODULE_USER, operationType = OperationTypeEnum.DELETE, db = true)
@@ -572,7 +573,7 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
      * @param encryptModel 加密 ID 数组
      * @return ResultWrapper
      */
-    @ApiOperation(value = "批量删除用户信息数据", notes = "批量删除用户信息数据")
+    @Operation(summary = "批量删除用户信息数据")
     @PreAuthorize("hasAuthority('system_user_delete')")
     @OperateLogger(description = "批量删除用户信息数据",
             module = ModuleEnum.MODULE_USER, operationType = OperationTypeEnum.DELETE, db = true)
@@ -598,13 +599,13 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
      * @param type 类型
      * @param request request
      */
-    @ApiOperation(value = "Excel 导出认证", notes = "Excel 导出认证")
+    @Operation(summary = "Excel 导出认证")
     @PreAuthorize("hasAnyAuthority('system_user_export', 'system_user_import')")
     @Override
     public ResultWrapper<String> exportExcelAuth(String type, HttpServletRequest request) {
         Optional<String> certificateOptional =
                 super.excelExportAuth(type, UserApi.SUB_TITLE, request);
-        if(!certificateOptional.isPresent()){
+        if(certificateOptional.isEmpty()){
             return ResultWrapper.getErrorResultWrapper();
         }
         return ResultWrapper.getSuccessResultWrapper(certificateOptional.get());
@@ -615,7 +616,7 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
      * 用户信息 Excel 导出
      * @param response response
      */
-    @ApiOperation(value = "导出Excel", notes = "导出Excel")
+    @Operation(summary = "导出Excel")
     @PreAuthorize("hasAuthority('system_user_export')")
     @OperateLogger(description = "导出Excel",
             module = ModuleEnum.MODULE_USER, operationType = OperationTypeEnum.SELECT, db = true)
@@ -630,7 +631,7 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
      * @param request 文件流 request
      * @return ResultWrapper
      */
-    @ApiOperation(value = "导入Excel", notes = "导入Excel")
+    @Operation(summary = "导入Excel")
     @PreAuthorize("hasAuthority('system_user_import')")
     @OperateLogger(description = "用户信息 Excel 导入",
             module = ModuleEnum.MODULE_USER, operationType = OperationTypeEnum.INSERT, db = true)
@@ -644,7 +645,7 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
      * @param tenantId 租户ID
      * @return ResultWrapper
      */
-    @ApiOperation(value = "切换租户", notes = "切换租户")
+    @Operation(summary = "切换租户")
     @Override
     public ResultWrapper<?> switchTenant(String tenantId) {
         UserModel currUser = UserUtil.getUserBySource();
@@ -707,7 +708,7 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
      * 切换回自己账户
      * @return ResultWrapper
      */
-    @ApiOperation(value = "切换回自己账户", notes = "切换回自己账户")
+    @Operation(summary = "切换回自己账户")
     @Override
     public ResultWrapper<?> switchOneself() {
         UserModel currUser = UserUtil.getUserBySource();
@@ -730,7 +731,7 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
      * @param username 用户名
      * @return ResultWrapper
      */
-    @ApiOperation(value = "根据 username 获得用户", notes = "根据 username 获得用户")
+    @Operation(summary = "根据 username 获得用户")
     @Override
     public ResultWrapper<UserModel> getUserByUsername(String username) {
         UserModel userModel = IService.queryByUserName(username);
@@ -743,7 +744,7 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
         return ResultWrapper.getSuccessResultWrapper(userModel);
     }
 
-    @ApiOperation(value = "根据 手机号 获得用户", notes = "根据 手机号 获得用户")
+    @Operation(summary = "根据 手机号 获得用户")
     @Override
     public ResultWrapper<UserModel> getUserByMobile(String mobile) {
         UserModel userModel = IService.queryByMobile(mobile);
@@ -756,7 +757,7 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
         return ResultWrapper.getSuccessResultWrapper(userModel);
     }
 
-    @ApiOperation(value = "根据 邮箱 获得用户", notes = "根据 邮箱 获得用户")
+    @Operation(summary = "根据 邮箱 获得用户")
     @Override
     public ResultWrapper<UserModel> getUserByEmail(String email) {
         UserModel userModel = IService.queryByEmail(email);
@@ -774,7 +775,7 @@ public class UserRestController extends BaseRestController<SysUser, UserModel, I
      * @param id 模型
      * @return ResultWrapper
      */
-    @ApiOperation(value = "根据 ID 获得用户", notes = "根据 ID 获得用户")
+    @Operation(summary = "根据 ID 获得用户")
     @Override
     public ResultWrapper<UserModel> getById(String id) {
         UserModel userModel = IService.get(id);

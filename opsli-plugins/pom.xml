@@ -17,7 +17,6 @@
     <!-- 插件 -->
     <modules>
         <module>opsli-plugins-redis</module>
-        <module>opsli-plugins-ehcache</module>
         <module>opsli-plugins-excel</module>
         <module>opsli-plugins-redisson</module>
         <module>opsli-plugins-waf</module>
@@ -25,7 +24,6 @@
         <module>opsli-plugins-email</module>
         <module>opsli-plugins-sms</module>
         <module>opsli-plugins-security</module>
-        <module>opsli-plugins-pagehelper</module>
     </modules>
 
     <dependencyManagement>

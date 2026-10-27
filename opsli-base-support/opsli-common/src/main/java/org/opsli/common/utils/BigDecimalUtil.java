@@ -20,7 +20,7 @@ import java.math.BigDecimal;
 /**
  * 小数精度处理工具类
  *
- * @author Parker
+ * @author Pace
  * @date 2020-09-19 23:21
  */
 public class BigDecimalUtil {

@@ -25,7 +25,7 @@ import org.opsli.core.base.entity.BaseEntity;
 /**
  * 用户信息 - 组织机构
  *
- * @author Parker
+ * @author Pace
  * @date 2020-09-16 17:33
  */
 @Data
@@ -54,11 +54,11 @@ public class SysUserWeb extends BaseEntity {
     private String realName;
 
     /** 手机 */
-    @TableField(updateStrategy = FieldStrategy.IGNORED)
+    @TableField(updateStrategy = FieldStrategy.ALWAYS)
     private String mobile;
 
     /** 邮箱 */
-    @TableField(updateStrategy = FieldStrategy.IGNORED)
+    @TableField(updateStrategy = FieldStrategy.ALWAYS)
     private String email;
 
     /** 工号 */
@@ -71,11 +71,11 @@ public class SysUserWeb extends BaseEntity {
     private String loginIp;
 
     /** 备注 */
-    @TableField(updateStrategy = FieldStrategy.IGNORED)
+    @TableField(updateStrategy = FieldStrategy.ALWAYS)
     private String remark;
 
     /** 签名 */
-    @TableField(updateStrategy = FieldStrategy.IGNORED)
+    @TableField(updateStrategy = FieldStrategy.ALWAYS)
     private String sign;
 
     /** 允许切换租户（0 不允许 1 允许） */

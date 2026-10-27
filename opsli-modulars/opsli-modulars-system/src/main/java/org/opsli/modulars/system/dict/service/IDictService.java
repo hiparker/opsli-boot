@@ -23,7 +23,7 @@ import org.opsli.modulars.system.dict.entity.SysDict;
 /**
  * 数据字典 接口
  *
- * @author Parker
+ * @author Pace
  * @date 2020-09-16 17:33
  */
 public interface IDictService extends CrudServiceInterface<SysDict, DictModel> {

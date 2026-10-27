@@ -18,12 +18,12 @@ package org.opsli.common.utils;
 import cn.hutool.core.lang.Validator;
 import cn.hutool.core.net.NetUtil;
 import cn.hutool.core.util.StrUtil;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * IP 工具类
  *
- * @author Parker
+ * @author Pace
  * @date 2020-09-19 23:21
  */
 public final class IPUtil {

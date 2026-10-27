@@ -24,7 +24,7 @@ import java.io.Serializable;
 /**
  * 角色表 - 菜单表
  *
- * @author Parker
+ * @author Pace
  * @date 2020-09-16 17:33
  */
 @Data

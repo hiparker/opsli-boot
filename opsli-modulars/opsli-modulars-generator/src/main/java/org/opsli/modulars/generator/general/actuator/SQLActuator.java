@@ -22,7 +22,7 @@ import org.apache.ibatis.annotations.Update;
 /**
  * 代码生成器 - SQL 执行器
  *
- * @author parker
+ * @author Pace
  * @date 2020-09-16 17:34
  */
 @Mapper

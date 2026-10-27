@@ -18,7 +18,7 @@ package org.opsli.modulars.generator.template.wrapper;
 
 
 import com.alibaba.excel.annotation.ExcelProperty;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.opsli.api.base.warpper.ApiWrapper;
@@ -30,16 +30,16 @@ import org.opsli.plugins.excel.annotation.ExcelInfo;
 /**
 * 代码模板 Model
 *
-* @author Parker
+* @author Pace
 * @date 2021-05-27 14:33:49
 */
 @Data
 @EqualsAndHashCode(callSuper = false)
 public class GenTemplateCopyModel extends ApiWrapper {
 
-    
+
     /** 模板名称 */
-    @ApiModelProperty(value = "模板名称")
+    @Schema(description = "模板名称")
     @ExcelProperty(value = "模板名称", order = 1)
     @ExcelInfo
     @Validator({

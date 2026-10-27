@@ -15,7 +15,7 @@
  */
 package org.opsli.api.wrapper.system.logs;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.opsli.api.base.warpper.ApiWrapper;
@@ -23,7 +23,7 @@ import org.opsli.api.base.warpper.ApiWrapper;
 /**
  * 登录 日志表
  *
- * @author Parker
+ * @author Pace
  * @date 2020-09-16 17:33
  */
 @Data
@@ -42,13 +42,13 @@ public class LoginLogsModel extends ApiWrapper {
     /**
      * 用户名称
      */
-    @ApiModelProperty(value = "用户名称")
+    @Schema(description = "用户名称")
     private String username;
 
     /**
      * 真实姓名
      */
-    @ApiModelProperty(value = "真实姓名")
+    @Schema(description = "真实姓名")
     private String realName;
 
     /**
@@ -56,25 +56,25 @@ public class LoginLogsModel extends ApiWrapper {
      * 1 : 登录
      * 2 : 登出
      */
-    @ApiModelProperty(value = "日志类型")
+    @Schema(description = "日志类型")
     private String type;
 
     /**
      * 操作IP地址
      */
-    @ApiModelProperty(value = "操作IP地址")
+    @Schema(description = "操作IP地址")
     private String remoteAddr;
 
     /**
      * 用户代理
      */
-    @ApiModelProperty(value = "用户代理")
+    @Schema(description = "用户代理")
     private String userAgent;
 
     /**
      * 登陆来源
      */
-    @ApiModelProperty(value = "登陆来源")
+    @Schema(description = "登陆来源")
     private String loginFrom;
 
 }

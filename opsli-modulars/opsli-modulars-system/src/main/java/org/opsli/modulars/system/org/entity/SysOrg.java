@@ -26,7 +26,7 @@ import org.opsli.core.base.entity.BaseEntity;
 /**
  * 组织机构表
  *
- * @author Parker
+ * @author Pace
  * @date 2021-02-07 18:24:38
  */
 @Data
@@ -49,7 +49,7 @@ public class SysOrg extends BaseEntity {
     private Integer sortNo;
 
     /** 备注 */
-    @TableField(updateStrategy = FieldStrategy.IGNORED)
+    @TableField(updateStrategy = FieldStrategy.ALWAYS)
     private String remark;
 
     // ========================================

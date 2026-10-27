@@ -18,8 +18,8 @@ package org.opsli.modulars.generator.template.web;
 
 
 import cn.hutool.core.convert.Convert;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.extern.slf4j.Slf4j;
 import org.opsli.api.base.result.ResultWrapper;
 import org.opsli.api.web.system.user.UserApi;
@@ -40,8 +40,8 @@ import org.opsli.plugins.generator.utils.GeneratorHandleUtil;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
 import java.util.Optional;
 
@@ -49,10 +49,10 @@ import java.util.Optional;
 /**
  * 代码模板详情 Controller
  *
- * @author Parker
+ * @author Pace
  * @date 2021-05-28 17:12:38
  */
-@Api(tags = GenTemplateDetailRestApi.TITLE)
+@Tag(name = GenTemplateDetailRestApi.TITLE)
 @Slf4j
 @ApiRestController("/{ver}/generator/template/detail")
 public class GenTemplateDetailRestController extends BaseRestController<GenTemplateDetail, GenTemplateDetailModel, IGenTemplateDetailService>
@@ -64,7 +64,7 @@ public class GenTemplateDetailRestController extends BaseRestController<GenTempl
     * @param model 模型
     * @return ResultWrapper
     */
-    @ApiOperation(value = "获得单条代码模板详情", notes = "获得单条代码模板详情 - ID")
+    @Operation(summary = "获得单条代码模板详情 - ID")
     @PreAuthorize("hasAuthority('generator_template_select')")
     @Override
     public ResultWrapper<GenTemplateDetailModel> get(GenTemplateDetailModel model) {
@@ -82,7 +82,7 @@ public class GenTemplateDetailRestController extends BaseRestController<GenTempl
     * @param request request
     * @return ResultWrapper
     */
-    @ApiOperation(value = "获得分页数据", notes = "获得分页数据 - 查询构造器")
+    @Operation(summary = "获得分页数据 - 查询构造器")
     @PreAuthorize("hasAuthority('generator_template_select')")
     @Override
     public ResultWrapper<?> findPage(Integer pageNo, Integer pageSize, HttpServletRequest request) {
@@ -102,7 +102,7 @@ public class GenTemplateDetailRestController extends BaseRestController<GenTempl
     * @param model 模型
     * @return ResultWrapper
     */
-    @ApiOperation(value = "新增代码模板详情数据", notes = "新增代码模板详情数据")
+    @Operation(summary = "新增代码模板详情数据")
     @PreAuthorize("hasAuthority('generator_template_insert')")
     @OperateLogger(description = "新增代码模板详情数据",
             module = ModuleEnum.MODULE_GENERATOR, operationType = OperationTypeEnum.INSERT, db = true)
@@ -121,7 +121,7 @@ public class GenTemplateDetailRestController extends BaseRestController<GenTempl
     * @param model 模型
     * @return ResultWrapper
     */
-    @ApiOperation(value = "修改代码模板详情数据", notes = "修改代码模板详情数据")
+    @Operation(summary = "修改代码模板详情数据")
     @PreAuthorize("hasAuthority('generator_template_update')")
     @OperateLogger(description = "修改代码模板详情数据",
             module = ModuleEnum.MODULE_GENERATOR, operationType = OperationTypeEnum.UPDATE, db = true)
@@ -141,7 +141,7 @@ public class GenTemplateDetailRestController extends BaseRestController<GenTempl
     * @param id ID
     * @return ResultWrapper
     */
-    @ApiOperation(value = "删除代码模板详情数据", notes = "删除代码模板详情数据")
+    @Operation(summary = "删除代码模板详情数据")
     @PreAuthorize("hasAuthority('generator_template_update')")
     @OperateLogger(description = "删除代码模板详情数据",
             module = ModuleEnum.MODULE_GENERATOR, operationType = OperationTypeEnum.DELETE, db = true)
@@ -159,7 +159,7 @@ public class GenTemplateDetailRestController extends BaseRestController<GenTempl
     * @param ids ID 数组
     * @return ResultWrapper
     */
-    @ApiOperation(value = "批量删除代码模板详情数据", notes = "批量删除代码模板详情数据")
+    @Operation(summary = "批量删除代码模板详情数据")
     @PreAuthorize("hasAuthority('generator_template_update')")
     @OperateLogger(description = "批量删除代码模板详情数据",
             module = ModuleEnum.MODULE_GENERATOR, operationType = OperationTypeEnum.DELETE, db = true)
@@ -180,13 +180,13 @@ public class GenTemplateDetailRestController extends BaseRestController<GenTempl
      * @param type 类型
      * @param request request
      */
-    @ApiOperation(value = "Excel 导出认证", notes = "Excel 导出认证")
+    @Operation(summary = "Excel 导出认证")
     @PreAuthorize("hasAnyAuthority('generator_template_export', 'generator_template_import')")
     @Override
     public ResultWrapper<String> exportExcelAuth(String type, HttpServletRequest request) {
         Optional<String> certificateOptional =
                 super.excelExportAuth(type, UserApi.SUB_TITLE, request);
-        if(!certificateOptional.isPresent()){
+        if(certificateOptional.isEmpty()){
             return ResultWrapper.getErrorResultWrapper();
         }
         return ResultWrapper.getSuccessResultWrapper(certificateOptional.get());
@@ -197,7 +197,7 @@ public class GenTemplateDetailRestController extends BaseRestController<GenTempl
      * 代码模板详情 Excel 导出
      * @param response response
      */
-    @ApiOperation(value = "导出Excel", notes = "导出Excel")
+    @Operation(summary = "导出Excel")
     @PreAuthorize("hasAuthority('generator_template_export')")
     @OperateLogger(description = "导出Excel",
             module = ModuleEnum.MODULE_GENERATOR, operationType = OperationTypeEnum.SELECT, db = true)
@@ -213,7 +213,7 @@ public class GenTemplateDetailRestController extends BaseRestController<GenTempl
     * @param request 文件流 request
     * @return ResultWrapper
     */
-    @ApiOperation(value = "导入Excel", notes = "导入Excel")
+    @Operation(summary = "导入Excel")
     @PreAuthorize("hasAuthority('generator_template_import')")
     @OperateLogger(description = "代码模板详情 Excel 导入",
             module = ModuleEnum.MODULE_GENERATOR, operationType = OperationTypeEnum.INSERT, db = true)

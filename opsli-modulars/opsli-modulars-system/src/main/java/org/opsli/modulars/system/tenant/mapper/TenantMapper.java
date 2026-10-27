@@ -24,7 +24,7 @@ import org.opsli.modulars.system.tenant.entity.SysTenant;
 /**
  * 租户 Mapper
  *
- * @author Parker
+ * @author Pace
  * @date 2020-09-16 17:33
  */
 @Mapper

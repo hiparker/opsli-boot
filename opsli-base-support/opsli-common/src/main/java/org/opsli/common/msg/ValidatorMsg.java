@@ -20,7 +20,7 @@ import org.opsli.common.base.msg.BaseMsg;
 /**
  * 参数验证 - 消息
  *
- * @author Parker
+ * @author Pace
  * @date 2020-09-13 19:36
  */
 public enum ValidatorMsg implements BaseMsg {

@@ -3,7 +3,7 @@ package org.opsli.common.thread;
 /**
  * 异步进程 执行器 工厂
  *
- * @author Parker
+ * @author Pace
  * @date 2021年7月15日13:43:37
  */
 public final class AsyncProcessExecutorFactory {

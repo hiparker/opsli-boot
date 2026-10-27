@@ -5,7 +5,7 @@
     <!-- %r 输出自应用启动到输出该log信息耗费的毫秒数  -->
     <!-- %c 输出所属的类目，通常就是所在类的全名 -->
     <!-- %t 输出产生该日志事件的线程名 -->
-    <!-- %n 输出一个回车换行符，Windows平台为“/r/n”，Unix平台为“/n” -->
+    <!-- %n 输出一个回车换行符，Windows平台为"/r/n"，Unix平台为"/n" -->
     <!-- %d 输出日志时间点的日期或时间，默认格式为ISO8601，也可以在其后指定格式，比如：%d{yyy MMM dd HH:mm:ss,SSS}，输出类似：2002年10月18日 22：10：28，921  -->
     <!-- %l 输出日志事件的发生位置，包括类目名、发生的线程，以及在代码中的行数。举例：Testlo4.main(TestLog4.java:10)  -->
     <!-- ========================================================================== -->
@@ -64,7 +64,7 @@
         <append>true</append>
     </appender>
 
-    <!-- INFO文件日志 -->
+    <!-- INFO文件日志 - 🔧 修复了 Spring Boot 3.x 兼容性问题 -->
     <appender name="FILE_INFO" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <filter class="ch.qos.logback.classic.filter.LevelFilter">
             <level>ERROR</level>
@@ -73,15 +73,16 @@
         </filter>
 
         <file>${log_path}/${app_name}_info.log</file>
-        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <!-- 每天一归档 -->
-            <fileNamePattern>${log_path}/history/${app_name}_info.log.%d{yyyy-MM-dd}_%i.zip</fileNamePattern>
+
+        <!-- 🚨 修复：使用正确的 Spring Boot 3.x 兼容滚动策略 -->
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <!-- 修复文件名模式：%i 索引位置调整 -->
+            <fileNamePattern>${log_path}/history/${app_name}_info.log.%d{yyyy-MM-dd}.%i.zip</fileNamePattern>
             <maxHistory>30</maxHistory>
-            <timeBasedFileNamingAndTriggeringPolicy
-                    class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
-                <!-- 最大64MB 超过最大值，会重新建一个文件 -->
-                <maxFileSize>${file_size}</maxFileSize>
-            </timeBasedFileNamingAndTriggeringPolicy>
+            <!-- 最大64MB 超过最大值，会重新建一个文件 -->
+            <maxFileSize>${file_size}</maxFileSize>
+            <!-- 所有归档文件的总大小限制 -->
+            <totalSizeCap>10GB</totalSizeCap>
         </rollingPolicy>
 
         <encoder>
@@ -94,8 +95,7 @@
     </appender>
 
     <!-- 警告文件日志 -->
-    <appender name="FILE_WARN"
-              class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <appender name="FILE_WARN" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <filter class="ch.qos.logback.classic.filter.LevelFilter">
             <level>WARN</level>
             <onMatch>ACCEPT</onMatch>
@@ -107,7 +107,7 @@
             <maxHistory>${maxHistory}</maxHistory>
         </rollingPolicy>
 
-        <encoder  class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
             <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-4relative [%thread] %-5level %logger{35} - %msg%n</pattern>
             <charset>UTF-8</charset>
         </encoder>
@@ -117,8 +117,7 @@
     </appender>
 
     <!-- 错误文件日志 -->
-    <appender name="FILE_ERROR"
-              class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <appender name="FILE_ERROR" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <filter class="ch.qos.logback.classic.filter.LevelFilter">
             <level>ERROR</level>
             <onMatch>ACCEPT</onMatch>
@@ -139,11 +138,14 @@
         <append>true</append>
     </appender>
 
+    <!-- 异步日志配置 -->
     <appender name="ASYNC_LOG_DEBUG" class="ch.qos.logback.classic.AsyncAppender">
         <!-- 不丢失日志.默认的,如果队列的80%已满,则会丢弃TRACT、DEBUG、INFO级别的日志 -->
         <discardingThreshold>0</discardingThreshold>
         <!-- 更改默认的队列的深度,该值会影响性能.默认值为256 -->
         <queueSize>${queueSize}</queueSize>
+        <!-- 添加调用者数据，用于更好的日志跟踪 -->
+        <includeCallerData>false</includeCallerData>
         <appender-ref ref="FILE_DEBUG"/>
     </appender>
 
@@ -152,6 +154,7 @@
         <discardingThreshold>0</discardingThreshold>
         <!-- 更改默认的队列的深度,该值会影响性能.默认值为256 -->
         <queueSize>${queueSize}</queueSize>
+        <includeCallerData>false</includeCallerData>
         <appender-ref ref="FILE_INFO"/>
     </appender>
 
@@ -160,6 +163,7 @@
         <discardingThreshold>0</discardingThreshold>
         <!-- 更改默认的队列的深度,该值会影响性能.默认值为256 -->
         <queueSize>${queueSize}</queueSize>
+        <includeCallerData>false</includeCallerData>
         <appender-ref ref="FILE_WARN"/>
     </appender>
 
@@ -168,41 +172,101 @@
         <discardingThreshold>0</discardingThreshold>
         <!-- 更改默认的队列的深度,该值会影响性能.默认值为256 -->
         <queueSize>${queueSize}</queueSize>
+        <includeCallerData>false</includeCallerData>
         <appender-ref ref="FILE_ERROR"/>
     </appender>
 
+    <!-- 特定包的日志级别配置 - Spring Boot 3.x 优化 -->
+    <logger name="org.springframework" level="INFO" additivity="false">
+        <appender-ref ref="consoleAppender"/>
+    </logger>
+
+    <logger name="org.mybatis" level="DEBUG" additivity="false">
+        <appender-ref ref="consoleAppender"/>
+        <appender-ref ref="ASYNC_LOG_DEBUG"/>
+    </logger>
+
+    <logger name="com.baomidou.mybatisplus" level="DEBUG" additivity="false">
+        <appender-ref ref="consoleAppender"/>
+        <appender-ref ref="ASYNC_LOG_DEBUG"/>
+    </logger>
 
     <!-- local环境，只输出控制台日志 -->
     <springProfile name="local">
         <root level="${log_level}">
-            <appender-ref ref="consoleAppender" />
+            <appender-ref ref="consoleAppender"/>
         </root>
     </springProfile>
 
     <!-- dev环境 -->
     <springProfile name="dev">
         <root level="${log_level}">
-            <appender-ref ref="consoleAppender" />
-            <appender-ref ref="ASYNC_LOG_INFO" />
-            <appender-ref ref="ASYNC_LOG_ERROR" />
+            <appender-ref ref="consoleAppender"/>
+            <appender-ref ref="ASYNC_LOG_DEBUG"/>
+            <appender-ref ref="ASYNC_LOG_INFO"/>
+            <appender-ref ref="ASYNC_LOG_WARN"/>
+            <appender-ref ref="ASYNC_LOG_ERROR"/>
         </root>
     </springProfile>
 
     <!-- test环境 -->
     <springProfile name="test">
         <root level="${log_level}">
-            <appender-ref ref="consoleAppender" />
-            <appender-ref ref="ASYNC_LOG_INFO" />
-            <appender-ref ref="ASYNC_LOG_ERROR" />
+            <appender-ref ref="consoleAppender"/>
+            <appender-ref ref="ASYNC_LOG_INFO"/>
+            <appender-ref ref="ASYNC_LOG_WARN"/>
+            <appender-ref ref="ASYNC_LOG_ERROR"/>
         </root>
     </springProfile>
 
     <!-- prod环境 -->
     <springProfile name="prod">
+        <root level="WARN">
+            <!-- 生产环境建议不输出控制台日志，减少性能消耗 -->
+            <!-- <appender-ref ref="consoleAppender"/> -->
+            <appender-ref ref="ASYNC_LOG_INFO"/>
+            <appender-ref ref="ASYNC_LOG_WARN"/>
+            <appender-ref ref="ASYNC_LOG_ERROR"/>
+        </root>
+    </springProfile>
+
+    <!-- 默认配置 - 如果没有匹配的 profile -->
+    <!-- local环境，只输出控制台日志 -->
+    <springProfile name="local">
         <root level="${log_level}">
-            <appender-ref ref="consoleAppender" />
-            <appender-ref ref="ASYNC_LOG_INFO" />
-            <appender-ref ref="ASYNC_LOG_ERROR" />
+            <appender-ref ref="consoleAppender"/>
+        </root>
+    </springProfile>
+
+    <!-- dev环境 -->
+    <springProfile name="dev">
+        <root level="${log_level}">
+            <appender-ref ref="consoleAppender"/>
+            <appender-ref ref="ASYNC_LOG_DEBUG"/>
+            <appender-ref ref="ASYNC_LOG_INFO"/>
+            <appender-ref ref="ASYNC_LOG_WARN"/>
+            <appender-ref ref="ASYNC_LOG_ERROR"/>
+        </root>
+    </springProfile>
+
+    <!-- test环境 -->
+    <springProfile name="test">
+        <root level="${log_level}">
+            <appender-ref ref="consoleAppender"/>
+            <appender-ref ref="ASYNC_LOG_INFO"/>
+            <appender-ref ref="ASYNC_LOG_WARN"/>
+            <appender-ref ref="ASYNC_LOG_ERROR"/>
+        </root>
+    </springProfile>
+
+    <!-- prod环境 -->
+    <springProfile name="prod">
+        <root level="WARN">
+            <!-- 生产环境建议不输出控制台日志，减少性能消耗 -->
+            <!-- <appender-ref ref="consoleAppender"/> -->
+            <appender-ref ref="ASYNC_LOG_INFO"/>
+            <appender-ref ref="ASYNC_LOG_WARN"/>
+            <appender-ref ref="ASYNC_LOG_ERROR"/>
         </root>
     </springProfile>
 

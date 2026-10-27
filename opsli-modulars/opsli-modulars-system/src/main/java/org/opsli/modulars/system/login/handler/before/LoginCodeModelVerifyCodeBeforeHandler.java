@@ -25,7 +25,7 @@ import org.springframework.stereotype.Component;
 
 /**
  * 验证账号与验证码 (LoginModel)
- * @author Parker
+ * @author Pace
  * @date 2022-07-17 12:57 PM
  **/
 @AllArgsConstructor

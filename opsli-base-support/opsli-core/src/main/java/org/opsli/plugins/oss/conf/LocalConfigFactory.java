@@ -15,7 +15,7 @@
  */
 package org.opsli.plugins.oss.conf;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import org.opsli.common.annotation.OptionDict;
 import org.opsli.common.annotation.validator.Validator;
@@ -23,12 +23,13 @@ import org.opsli.common.annotation.validator.ValidatorLenMax;
 import org.opsli.common.enums.ValidatorType;
 import org.opsli.core.utils.OptionsUtil;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
  * 本地存储配置工程
  *
- * @author Parker
+ * @author Pace
  * @date 2020-09-19 20:03
  */
 public enum LocalConfigFactory implements ConfigFactory<LocalConfigFactory.LocalConfig> {
@@ -55,22 +56,23 @@ public enum LocalConfigFactory implements ConfigFactory<LocalConfigFactory.Local
     /**
      * 本地存储配置
      *
-     * @author Parker
+     * @author Pace
      */
     @Data
     public static class LocalConfig implements Serializable {
 
+        @Serial
         private static final long serialVersionUID = 1L;
 
         /** 域名 */
-        @ApiModelProperty(value = "域名")
+        @Schema(description = "域名")
         @Validator({ValidatorType.IS_NOT_NULL})
         @ValidatorLenMax(100)
         @OptionDict("storage_local_domain")
         private String domain;
 
         /** 前缀 */
-        @ApiModelProperty(value = "前缀")
+        @Schema(description = "前缀")
         @ValidatorLenMax(100)
         @OptionDict("storage_local_path_prefix")
         private String pathPrefix;

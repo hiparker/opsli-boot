@@ -17,7 +17,7 @@ package org.opsli.api.wrapper.system.user;
 
 import com.alibaba.excel.annotation.ExcelIgnore;
 import com.alibaba.excel.annotation.ExcelProperty;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.opsli.api.base.warpper.ApiWrapper;
@@ -30,7 +30,7 @@ import org.opsli.plugins.excel.annotation.ExcelInfo;
 /**
  * 用户信息表
  *
- * @author Parker
+ * @author Pace
  * @date 2020-09-16 17:33
  */
 @Data
@@ -38,12 +38,12 @@ import org.opsli.plugins.excel.annotation.ExcelInfo;
 public class UserWebModel extends ApiWrapper {
 
     /** 角色名称 */
-    @ApiModelProperty(value = "角色名称")
+    @Schema(description = "角色名称")
     @ExcelIgnore
     private String roleNames;
 
     /** 登录账户 */
-    @ApiModelProperty(value = "登录账户")
+    @Schema(description = "登录账户")
     @ExcelIgnore
     @Validator({ValidatorType.IS_NOT_NULL, ValidatorType.IS_GENERAL})
     @ValidatorLenMax(32)
@@ -51,28 +51,28 @@ public class UserWebModel extends ApiWrapper {
     private String username;
 
     /** 登录密码 */
-    @ApiModelProperty(value = "登录密码")
+    @Schema(description = "登录密码")
     @ExcelIgnore
     @ValidatorLenMin(6)
     @ValidatorLenMax(50)
     private String password;
 
     /** 登录密码强度 */
-    @ApiModelProperty(value = "登录密码强度")
+    @Schema(description = "登录密码强度")
     @ExcelIgnore
     @ValidatorLenMin(1)
     @ValidatorLenMax(1)
     private String passwordLevel;
 
     /** 启用状态 */
-    @ApiModelProperty(value = "启用状态")
+    @Schema(description = "启用状态")
     @ExcelIgnore
     @Validator({ValidatorType.IS_NOT_NULL})
     @ValidatorLenMax(1)
     private String enable;
 
     /** 真实姓名 */
-    @ApiModelProperty(value = "真实姓名")
+    @Schema(description = "真实姓名")
     @ExcelProperty(value = "真实姓名", order = 1)
     @ExcelInfo
     @Validator({ValidatorType.IS_NOT_NULL, ValidatorType.IS_GENERAL_WITH_CHINESE})
@@ -80,14 +80,14 @@ public class UserWebModel extends ApiWrapper {
     private String realName;
 
     /** 手机 */
-    @ApiModelProperty(value = "手机")
+    @Schema(description = "手机")
     @ExcelProperty(value = "手机", order = 2)
     @ExcelInfo
     @Validator({ValidatorType.IS_MOBILE})
     private String mobile;
 
     /** 邮箱 */
-    @ApiModelProperty(value = "邮箱")
+    @Schema(description = "邮箱")
     @ExcelProperty(value = "邮箱", order = 3)
     @ExcelInfo
     @Validator({ValidatorType.IS_EMAIL})
@@ -95,7 +95,7 @@ public class UserWebModel extends ApiWrapper {
     private String email;
 
     /** 工号 */
-    @ApiModelProperty(value = "工号")
+    @Schema(description = "工号")
     @ExcelProperty(value = "工号", order = 4)
     @ExcelInfo
     @Validator({ValidatorType.IS_GENERAL})
@@ -103,26 +103,26 @@ public class UserWebModel extends ApiWrapper {
     private String no;
 
     /** 头像 */
-    @ApiModelProperty(value = "头像")
+    @Schema(description = "头像")
     @ExcelIgnore
     @ValidatorLenMax(255)
     private String avatar;
 
     /** 最后登陆IP */
-    @ApiModelProperty(value = "最后登陆IP")
+    @Schema(description = "最后登陆IP")
     @ExcelIgnore
     @Validator(ValidatorType.IS_IPV4)
     private String loginIp;
 
     /** 备注 */
-    @ApiModelProperty(value = "备注")
+    @Schema(description = "备注")
     @ExcelProperty(value = "备注", order = 5)
     @ExcelInfo
     @ValidatorLenMax(255)
     private String remark;
 
     /** 签名 */
-    @ApiModelProperty(value = "签名")
+    @Schema(description = "签名")
     @ExcelProperty(value = "签名", order = 5)
     @ExcelInfo
     @ValidatorLenMax(255)
@@ -130,13 +130,13 @@ public class UserWebModel extends ApiWrapper {
 
 
     /** 多租户字段 */
-    @ApiModelProperty(value = "多租户ID")
+    @Schema(description = "多租户ID")
     @ExcelIgnore
     @ValidatorLenMax(20)
     private String tenantId;
 
     /** 允许切换租户（0 不允许 1 允许） */
-    @ApiModelProperty(value = "是否允许切换运营商")
+    @Schema(description = "是否允许切换运营商")
     private String enableSwitchTenant;
 
 }

@@ -25,7 +25,7 @@ import org.opsli.common.enums.SystemInfo;
  *
  * 防止广播数据处理到自身时出现延迟问题
  *
- * @author Parker
+ * @author Pace
  * @date 2020-09-16 11:47
  */
 @Data

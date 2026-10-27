@@ -27,12 +27,12 @@ import org.springframework.web.servlet.config.annotation.PathMatchConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 
 /**
  * 配置统一的后台接口访问路径的前缀
  *
- * @author Parker
+ * @author Pace
  * @date 2020-09-15
  */
 @Slf4j

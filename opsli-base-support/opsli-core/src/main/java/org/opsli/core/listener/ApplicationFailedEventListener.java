@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 /**
  * 系统启动失败
  *
- * @author parker
+ * @author Pace
  * @date 2020-03-31 13:56
  */
 @Component

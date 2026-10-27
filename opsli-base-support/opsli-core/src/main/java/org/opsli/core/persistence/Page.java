@@ -20,6 +20,8 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.github.pagehelper.PageSerializable;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.opsli.api.base.warpper.ApiWrapper;
 import org.opsli.core.base.entity.BaseEntity;
@@ -31,9 +33,11 @@ import java.util.List;
  *
  * @param <T>
  * @param <E>
- * @author Parker
+ * @author Pace
  * @date 2020-09-21 23:57
  */
+@Getter
+@Setter
 @Slf4j
 public class Page<T extends BaseEntity,E extends ApiWrapper> extends PageSerializable<E>{
 
@@ -115,30 +119,6 @@ public class Page<T extends BaseEntity,E extends ApiWrapper> extends PageSeriali
 
 
     // =======================================================
-
-    public int getPageNo() {
-        return pageNo;
-    }
-
-    public void setPageNo(int pageNo) {
-        this.pageNo = pageNo;
-    }
-
-    public int getPageSize() {
-        return pageSize;
-    }
-
-    public void setPageSize(int pageSize) {
-        this.pageSize = pageSize;
-    }
-
-    public QueryWrapper<T> getQueryWrapper() {
-        return queryWrapper;
-    }
-
-    public void setQueryWrapper(QueryWrapper<T> queryWrapper) {
-        this.queryWrapper = queryWrapper;
-    }
 
 
     //////////////////////////////////////////////////////////

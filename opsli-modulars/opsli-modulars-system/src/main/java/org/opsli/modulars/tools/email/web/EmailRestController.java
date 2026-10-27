@@ -1,7 +1,7 @@
 package org.opsli.modulars.tools.email.web;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.opsli.api.base.result.ResultWrapper;
 import org.opsli.common.annotation.ApiRestController;
@@ -16,10 +16,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 /**
  * 邮件 Controller
  *
- * @author Parker
+ * @author Pace
  * @date 2020-09-13 17:40
  */
-@Api(tags = "邮件类")
+@Tag(name = "邮件类")
 @Slf4j
 @ApiRestController("/{ver}/tools/email")
 public class EmailRestController {
@@ -32,7 +32,7 @@ public class EmailRestController {
      * @param model 模型
      * @return ResultWrapper
      */
-    @ApiOperation(value = "测试发送邮件", notes = "测试发送邮件")
+    @Operation(summary = "测试发送邮件")
     @PostMapping("/testSend")
     public ResultWrapper<?> testSend(@RequestBody EmailModel model) {
         try {

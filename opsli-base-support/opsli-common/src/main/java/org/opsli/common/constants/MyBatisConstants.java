@@ -20,7 +20,7 @@ package org.opsli.common.constants;
 /**
  * MyBatis 常量
  *
- * @author Parker
+ * @author Pace
  * @date 2020-09-16 17:42
  */
 public final class MyBatisConstants {

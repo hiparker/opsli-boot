@@ -17,7 +17,7 @@ package org.opsli.api.wrapper.gentest.user;
 
 import java.util.Date;
 import com.alibaba.excel.annotation.ExcelProperty;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.opsli.api.base.warpper.ApiWrapper;
@@ -32,7 +32,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 /**
  * 某系统用户
  *
- * @author Parker
+ * @author Pace
  * @date 2020-11-22 12:12:05
  */
 @Data
@@ -40,7 +40,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 public class TestUserModel extends ApiWrapper {
 
     /** 名称 */
-    @ApiModelProperty(value = "名称")
+    @Schema(description = "名称")
     @ExcelProperty(value = "名称", order = 1)
     @ExcelInfo
     @Validator({ValidatorType.IS_GENERAL_WITH_CHINESE})
@@ -48,7 +48,7 @@ public class TestUserModel extends ApiWrapper {
     private String name;
 
     /** 金钱 */
-    @ApiModelProperty(value = "金钱")
+    @Schema(description = "金钱")
     @ExcelProperty(value = "金钱", order = 2)
     @ExcelInfo
     @Validator({ValidatorType.IS_NOT_NULL, ValidatorType.IS_MONEY})
@@ -56,7 +56,7 @@ public class TestUserModel extends ApiWrapper {
     private Double money;
 
     /** 年龄 */
-    @ApiModelProperty(value = "年龄")
+    @Schema(description = "年龄")
     @ExcelProperty(value = "年龄", order = 3)
     @ExcelInfo
     @Validator({ValidatorType.IS_NOT_NULL, ValidatorType.IS_INTEGER})
@@ -64,7 +64,7 @@ public class TestUserModel extends ApiWrapper {
     private Integer age;
 
     /** 生日 */
-    @ApiModelProperty(value = "生日")
+    @Schema(description = "生日")
     @ExcelProperty(value = "生日", order = 4)
     @ExcelInfo
     @Validator({ValidatorType.IS_NOT_NULL, })
@@ -73,7 +73,7 @@ public class TestUserModel extends ApiWrapper {
     private Date birth;
 
     /** 是否启用 */
-    @ApiModelProperty(value = "是否启用")
+    @Schema(description = "是否启用")
     @ExcelProperty(value = "是否启用", order = 5)
     @ExcelInfo( dictType = "no_yes" )
     @Validator({ValidatorType.IS_NOT_NULL, })

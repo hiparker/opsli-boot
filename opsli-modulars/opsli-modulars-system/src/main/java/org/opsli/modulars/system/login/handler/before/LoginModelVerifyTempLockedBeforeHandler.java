@@ -36,7 +36,7 @@ import java.util.Date;
 
 /**
  * 验证账号临时锁定 (LoginModel)
- * @author Parker
+ * @author Pace
  * @date 2022-07-17 12:57 PM
  **/
 @AllArgsConstructor

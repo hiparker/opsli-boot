@@ -24,7 +24,7 @@ import java.util.Collections;
 /**
  * SqlServer 字段格式化判断
  *
- * @author Parker
+ * @author Pace
  * @date 2021年5月26日14:51:50
  */
 public class SqlServerTypeFormatter implements TypeFormatter {

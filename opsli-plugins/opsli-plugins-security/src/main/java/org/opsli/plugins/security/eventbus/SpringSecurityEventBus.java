@@ -29,7 +29,7 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * 操作日志事件 总线
- * @author Parker
+ * @author Pace
  * @date 2021年12月7日10:42:39
  */
 @Slf4j

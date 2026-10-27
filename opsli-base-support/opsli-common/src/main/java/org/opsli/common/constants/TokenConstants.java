@@ -18,7 +18,7 @@ package org.opsli.common.constants;
 /**
  * Token 常量类
  *
- * @author Parker
+ * @author Pace
  * @date 2020-09-16 17:42
  */
 public final class TokenConstants {

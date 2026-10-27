@@ -2,7 +2,7 @@ package org.opsli.core.autoconfigure.properties;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
-import com.baomidou.dynamic.datasource.spring.boot.autoconfigure.DataSourceProperty;
+import com.baomidou.dynamic.datasource.creator.DataSourceProperty;
 import com.baomidou.dynamic.datasource.spring.boot.autoconfigure.DynamicDataSourceProperties;
 import com.google.common.collect.Maps;
 import lombok.Data;
@@ -16,7 +16,7 @@ import java.util.Map;
 /**
  * 获得数据源工具类
  *
- * @author Parker
+ * @author Pace
  * @date 2020-09-15
  */
 @Slf4j

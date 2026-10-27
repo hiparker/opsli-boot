@@ -21,15 +21,15 @@ import org.opsli.plugins.security.utils.WebUtils;
 import org.opsli.plugins.security.vo.AuthResultWrapper;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
  * 内部认证 异常处理
  *
- * @author Parker
+ * @author Pace
  * @date 2022年07月22日16:31:16
  */
 @Component

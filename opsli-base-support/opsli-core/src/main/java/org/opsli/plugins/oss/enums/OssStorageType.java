@@ -18,7 +18,7 @@ package org.opsli.plugins.oss.enums;
 /**
  * 存储服务类型
  *
- * @author Parker
+ * @author Pace
  * @date 2020-09-19 20:03
  */
 public enum OssStorageType {

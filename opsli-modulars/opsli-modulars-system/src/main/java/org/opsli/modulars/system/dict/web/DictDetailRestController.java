@@ -17,8 +17,8 @@ package org.opsli.modulars.system.dict.web;
 
 import cn.hutool.core.convert.Convert;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.opsli.api.base.result.ResultWrapper;
@@ -42,16 +42,16 @@ import org.opsli.modulars.system.dict.entity.SysDictDetail;
 import org.opsli.modulars.system.dict.service.IDictDetailService;
 import org.springframework.security.access.prepost.PreAuthorize;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
 
 /**
  * 数据字典明细 Controller
  *
- * @author Parker
+ * @author Pace
  * @date 2020-09-16 17:33
  */
-@Api(tags = DictDetailApi.TITLE)
+@Tag(name = DictDetailApi.TITLE)
 @Slf4j
 @ApiRestController("/{ver}/system/dict/detail")
 public class DictDetailRestController extends BaseRestController<SysDictDetail, DictDetailModel, IDictDetailService>
@@ -66,7 +66,7 @@ public class DictDetailRestController extends BaseRestController<SysDictDetail, 
      * @param model 模型
      * @return ResultWrapper
      */
-    @ApiOperation(value = "获得单条字典明细数据", notes = "获得单条字典明细数据 - ID")
+    @Operation(summary = "获得单条字典明细数据 - ID")
     @Override
     public ResultWrapper<DictDetailModel> get(DictDetailModel model) {
         model = IService.get(model);
@@ -80,7 +80,7 @@ public class DictDetailRestController extends BaseRestController<SysDictDetail, 
      * @param request request
      * @return ResultWrapper
      */
-    @ApiOperation(value = "获得分页数据", notes = "获得分页数据 - 查询构造器")
+    @Operation(summary = "获得分页数据 - 查询构造器")
     @Override
     public ResultWrapper<?> findPage(Integer pageNo, Integer pageSize, HttpServletRequest request) {
 
@@ -97,7 +97,7 @@ public class DictDetailRestController extends BaseRestController<SysDictDetail, 
      * @param model 模型
      * @return ResultWrapper
      */
-    @ApiOperation(value = "新增字典明细数据", notes = "新增字典明细数据")
+    @Operation(summary = "新增字典明细数据")
     @PreAuthorize("hasAuthority('system_dict_insert')")
     @OperateLogger(description = "新增字典明细数据",
             module = ModuleEnum.MODULE_DICT, operationType = OperationTypeEnum.INSERT, db = true)
@@ -113,7 +113,7 @@ public class DictDetailRestController extends BaseRestController<SysDictDetail, 
      * @param model 模型
      * @return ResultWrapper
      */
-    @ApiOperation(value = "修改字典明细数据", notes = "修改字典明细数据")
+    @Operation(summary = "修改字典明细数据")
     @PreAuthorize("hasAuthority('system_dict_update')")
     @OperateLogger(description = "修改字典明细数据",
             module = ModuleEnum.MODULE_DICT, operationType = OperationTypeEnum.UPDATE, db = true)
@@ -143,7 +143,7 @@ public class DictDetailRestController extends BaseRestController<SysDictDetail, 
      * @param id ID
      * @return ResultWrapper
      */
-    @ApiOperation(value = "删除数据", notes = "删除数据")
+    @Operation(summary = "删除数据")
     @PreAuthorize("hasAuthority('system_dict_delete')")
     @OperateLogger(description = "删除字典明细数据",
             module = ModuleEnum.MODULE_DICT, operationType = OperationTypeEnum.DELETE, db = true)
@@ -170,7 +170,7 @@ public class DictDetailRestController extends BaseRestController<SysDictDetail, 
      * @param ids ID 数组
      * @return ResultWrapper
      */
-    @ApiOperation(value = "批量删除字典数据", notes = "批量删除数据")
+    @Operation(summary = "批量删除字典数据")
     @PreAuthorize("hasAuthority('system_dict_delete')")
     @OperateLogger(description = "批量删除字典明细数据",
             module = ModuleEnum.MODULE_DICT, operationType = OperationTypeEnum.DELETE, db = true)
@@ -206,7 +206,7 @@ public class DictDetailRestController extends BaseRestController<SysDictDetail, 
      * @param typeCode 字典类型编号
      * @return ResultWrapper
      */
-    @ApiOperation(value = "根据字典类型编号 查询出所有字典", notes = "根据字典类型编号 查询出所有字典")
+    @Operation(summary = "根据字典类型编号 查询出所有字典")
     @Override
     public ResultWrapper<List<DictDetailModel>> findListByTypeCode(String typeCode) {
         return ResultWrapper.getSuccessResultWrapper(

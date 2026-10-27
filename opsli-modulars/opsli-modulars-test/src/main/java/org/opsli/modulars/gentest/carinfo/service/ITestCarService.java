@@ -24,7 +24,7 @@ import org.opsli.api.wrapper.gentest.carinfo.TestCarModel;
 /**
  * 测试汽车 Service
  *
- * @author Parker
+ * @author Pace
  * @date 2022-08-06 23:53:30
  */
 public interface ITestCarService extends CrudServiceInterface<TestCar, TestCarModel> {

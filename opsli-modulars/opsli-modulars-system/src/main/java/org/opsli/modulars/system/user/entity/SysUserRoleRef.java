@@ -32,7 +32,7 @@ import java.io.Serializable;
 /**
  * 用户信息 - 角色 关联关系表
  *
- * @author Parker
+ * @author Pace
  * @date 2020-09-16 17:33
  */
 @Data

@@ -15,8 +15,9 @@
  */
 package org.opsli.modulars.tools.searchhis.web;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.opsli.api.base.result.ResultWrapper;
 import org.opsli.common.annotation.ApiRestController;
@@ -25,16 +26,15 @@ import org.opsli.common.annotation.SearchHis;
 import org.opsli.core.utils.SearchHisUtil;
 import org.springframework.web.bind.annotation.PostMapping;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.Set;
 
 /**
  * 搜索历史记录
  *
- * @author parker
+ * @author Pace
  * @date 2020-05-23 13:30
  */
-@Api(tags = "搜索历史记录")
+@Tag(name = "搜索历史记录")
 @Slf4j
 @ApiRestController("/{ver}/tools/searchhis")
 public class SearchHisRestController {
@@ -43,7 +43,7 @@ public class SearchHisRestController {
      * 获得搜索历史记录
      */
     @Limiter
-    @ApiOperation(value = "获得搜索历史记录", notes = "获得搜索历史记录")
+    @Operation(summary = "获得搜索历史记录")
     @PostMapping("/getSearchHis")
     public ResultWrapper<?> getSearchHis(String key, Integer count, HttpServletRequest request){
 
@@ -57,7 +57,7 @@ public class SearchHisRestController {
      */
     @Limiter
     @SearchHis(keys = {"test"})
-    @ApiOperation(value = "测试存入搜索历史记录", notes = "测试存入搜索历史记录")
+    @Operation(summary = "测试存入搜索历史记录")
     @PostMapping("/testPutSearchHis")
     public void testPutSearchHis(String test, HttpServletRequest request){
     }

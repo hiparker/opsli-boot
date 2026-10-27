@@ -25,7 +25,7 @@ import java.util.List;
 /**
  * 代码生成器 - 表结构 接口
  *
- * @author parker
+ * @author Pace
  * @date 2020-09-16 17:34
  */
 public interface IGenTableColumnService extends CrudServiceInterface<GenTableColumn, GenTableColumnModel> {

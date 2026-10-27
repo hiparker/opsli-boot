@@ -23,8 +23,8 @@ import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.opsli.api.base.result.ResultWrapper;
@@ -62,10 +62,10 @@ import java.util.Set;
 /**
  * 组织机构 Controller
  *
- * @author Parker
+ * @author Pace
  * @date 2021-02-07 18:24:38
  */
-@Api(tags = SysOrgRestApi.TITLE)
+@Tag(name = SysOrgRestApi.TITLE)
 @Slf4j
 @ApiRestController("/{ver}/system/org")
 public class SysOrgRestController extends BaseRestController<SysOrg, SysOrgModel, ISysOrgService>
@@ -84,7 +84,7 @@ public class SysOrgRestController extends BaseRestController<SysOrg, SysOrgModel
      * 获得当前用户下 组织
      * @return ResultWrapper
      */
-    @ApiOperation(value = "获得当前用户下 组织", notes = "获得当前用户下 组织")
+    @Operation(summary = "获得当前用户下 组织")
     @Override
     public ResultWrapper<?> findTreeByDefWithUserToLike() {
         // 生成 全部/未分组
@@ -150,7 +150,7 @@ public class SysOrgRestController extends BaseRestController<SysOrg, SysOrgModel
      * 获得组织树 懒加载
      * @return ResultWrapper
      */
-    @ApiOperation(value = "获得组织树 懒加载", notes = "获得组织树 懒加载")
+    @Operation(summary = "获得组织树 懒加载")
     @Override
     public ResultWrapper<?> findTreeLazy(String parentId, String id) {
         List<SysOrgModel> orgModelList;
@@ -206,7 +206,7 @@ public class SysOrgRestController extends BaseRestController<SysOrg, SysOrgModel
      * 获得组织树
      * @return ResultWrapper
      */
-    @ApiOperation(value = "获得组织树", notes = "获得组织树")
+    @Operation(summary = "获得组织树")
     @Override
     public ResultWrapper<?> findTreeByDef(boolean isGen, String id) {
         List<SysOrgModel> orgModelList = Lists.newArrayList();
@@ -293,7 +293,7 @@ public class SysOrgRestController extends BaseRestController<SysOrg, SysOrgModel
     * @param model 模型
     * @return ResultWrapper
     */
-    @ApiOperation(value = "获得单条组织机构", notes = "获得单条组织机构 - ID")
+    @Operation(summary = "获得单条组织机构 - ID")
     @PreAuthorize("hasAuthority('system_org_select')")
     @Override
     public ResultWrapper<SysOrgModel> get(SysOrgModel model) {
@@ -314,7 +314,7 @@ public class SysOrgRestController extends BaseRestController<SysOrg, SysOrgModel
     * @param model 模型
     * @return ResultWrapper
     */
-    @ApiOperation(value = "新增组织机构数据", notes = "新增组织机构数据")
+    @Operation(summary = "新增组织机构数据")
     @PreAuthorize("hasAuthority('system_org_insert')")
     @OperateLogger(description = "新增组织机构数据",
             module = ModuleEnum.MODULE_ORG, operationType = OperationTypeEnum.INSERT, db = true)
@@ -349,7 +349,7 @@ public class SysOrgRestController extends BaseRestController<SysOrg, SysOrgModel
     * @param model 模型
     * @return ResultWrapper
     */
-    @ApiOperation(value = "修改组织机构数据", notes = "修改组织机构数据")
+    @Operation(summary = "修改组织机构数据")
     @PreAuthorize("hasAuthority('system_org_update')")
     @OperateLogger(description = "修改组织机构数据",
             module = ModuleEnum.MODULE_ORG, operationType = OperationTypeEnum.UPDATE, db = true)
@@ -369,7 +369,7 @@ public class SysOrgRestController extends BaseRestController<SysOrg, SysOrgModel
     * @param id ID
     * @return ResultWrapper
     */
-    @ApiOperation(value = "删除组织机构数据", notes = "删除组织机构数据")
+    @Operation(summary = "删除组织机构数据")
     @PreAuthorize("hasAuthority('system_org_delete')")
     @OperateLogger(description = "删除组织机构数据",
             module = ModuleEnum.MODULE_ORG, operationType = OperationTypeEnum.DELETE, db = true)
@@ -387,7 +387,7 @@ public class SysOrgRestController extends BaseRestController<SysOrg, SysOrgModel
     * @param ids ID 数组
     * @return ResultWrapper
     */
-    @ApiOperation(value = "批量删除组织机构数据", notes = "批量删除组织机构数据")
+    @Operation(summary = "批量删除组织机构数据")
     @PreAuthorize("hasAuthority('system_org_delete')")
     @OperateLogger(description = "批量删除组织机构数据",
             module = ModuleEnum.MODULE_ORG, operationType = OperationTypeEnum.DELETE, db = true)

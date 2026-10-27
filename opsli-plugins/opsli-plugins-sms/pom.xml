@@ -21,6 +21,19 @@
             <groupId>cn.javaer.aliyun</groupId>
             <artifactId>aliyun-sms</artifactId>
             <version>${aliyun-sms.version}</version>
+             <exclusions>
+                <exclusion>
+                    <artifactId>org.apache.httpcomponents</artifactId>
+                    <groupId>httpclient</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <!-- 修复sms CVE-2020-13956 漏洞 -->
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>4.5.13</version>
         </dependency>
     </dependencies>
 

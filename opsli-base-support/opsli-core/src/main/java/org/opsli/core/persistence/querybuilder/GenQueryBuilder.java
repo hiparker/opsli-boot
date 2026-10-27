@@ -21,7 +21,7 @@ import org.opsli.core.base.entity.BaseEntity;
 /**
  * Web 条件构造器
  *
- * @author Parker
+ * @author Pace
  * @date 2020-09-21 23:57
  */
 public class GenQueryBuilder<T extends BaseEntity>  implements QueryBuilder<T> {

@@ -25,7 +25,7 @@ import java.util.UUID;
 /**
  * 生成token
  *
- * @author Parker
+ * @author Pace
  * @date 2017-05-20 14:41
  */
 public final class TokenGenerator {

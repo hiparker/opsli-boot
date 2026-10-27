@@ -16,8 +16,8 @@
 package org.opsli.modulars.system.user.web;
 
 import cn.hutool.core.convert.Convert;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.opsli.api.base.result.ResultWrapper;
@@ -42,10 +42,10 @@ import java.util.List;
 /**
  * 用户-角色 Controller
  *
- * @author Parker
+ * @author Pace
  * @date 2020-09-16 17:33
  */
-@Api(tags = UserRoleRefApi.TITLE)
+@Tag(name = UserRoleRefApi.TITLE)
 @Slf4j
 @ApiRestController("/{ver}/system/user/roles")
 public class UserRoleRefRestController implements UserRoleRefApi {
@@ -63,7 +63,7 @@ public class UserRoleRefRestController implements UserRoleRefApi {
      * @param userId 用户Id
      * @return ResultWrapper
      */
-    @ApiOperation(value = "根据 userId 获得用户角色Id集合", notes = "根据 userId 获得用户角色Id集合")
+    @Operation(summary = "根据 userId 获得用户角色Id集合")
     @Override
     public ResultWrapper<UserRoleRefModel> getRoles(String userId) {
 
@@ -84,6 +84,7 @@ public class UserRoleRefRestController implements UserRoleRefApi {
      * @param model 模型
      * @return ResultWrapper
      */
+    @Operation(summary = "设置角色")
     @Override
     @PreAuthorize("hasAuthority('system_user_setRole')")
     public ResultWrapper<?> setRoles(UserRoleRefModel model) {
@@ -103,6 +104,7 @@ public class UserRoleRefRestController implements UserRoleRefApi {
      * @param userId 用户Id
      * @return ResultWrapper
      */
+    @Operation(summary = "根据 userId 获得用户角色")
     @Override
     public ResultWrapper<List<String>> getRolesByUserId(String userId) {
         List<String> roleCodeList = iUserRoleRefService.getRoleCodeList(userId);
@@ -114,6 +116,7 @@ public class UserRoleRefRestController implements UserRoleRefApi {
      * @param userId 用户Id
      * @return ResultWrapper
      */
+    @Operation(summary = "根据 userId 获得用户默认角色")
     @Override
     public ResultWrapper<RoleModel> getDefRoleByUserId(String userId) {
         RoleModel defRoleByUserId = iUserRoleRefService.getDefRoleByUserId(userId);
@@ -125,6 +128,7 @@ public class UserRoleRefRestController implements UserRoleRefApi {
      * @param userId 用户Id
      * @return ResultWrapper
      */
+    @Operation(summary = "根据 userId 获得用户权限")
     @Override
     public ResultWrapper<List<String>> getAllPerms(String userId) {
         List<String> allPerms = iUserRoleRefService.getAllPerms(userId);
@@ -137,6 +141,7 @@ public class UserRoleRefRestController implements UserRoleRefApi {
      * @param userId 用户Id
      * @return ResultWrapper
      */
+    @Operation(summary = "根据 userId 获得用户菜单")
     @Override
     public ResultWrapper<List<MenuModel>> getMenuListByUserId(String userId) {
         List<MenuModel> menuModelList = iUserRoleRefService.getMenuListByUserId(userId);

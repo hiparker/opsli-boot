@@ -22,7 +22,7 @@ import java.lang.annotation.*;
  * 字段验证器 - 字段最大长度
  * 对应 数据库 真实长度数
  *
- * @author Parker
+ * @author Pace
  * @date 2020-09-22 17:07
  */
 @Retention(RetentionPolicy.RUNTIME)

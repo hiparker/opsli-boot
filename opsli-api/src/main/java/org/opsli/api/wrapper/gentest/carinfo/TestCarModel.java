@@ -18,7 +18,7 @@ package org.opsli.api.wrapper.gentest.carinfo;
 import java.math.BigDecimal;
 import java.util.Date;
 import com.alibaba.excel.annotation.ExcelProperty;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.opsli.api.base.warpper.ApiWrapper;
@@ -33,7 +33,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 /**
 * 测试汽车 Model
 *
-* @author Parker
+* @author Pace
 * @date 2022-08-06 23:53:30
 */
 @Data
@@ -41,29 +41,29 @@ import org.springframework.format.annotation.DateTimeFormat;
 public class TestCarModel extends ApiWrapper {
 
     /** 汽车名称 */
-    @ApiModelProperty(value = "汽车名称")
+    @Schema(description = "汽车名称")
     @ExcelProperty(value = "汽车名称", order = 1)
     @ExcelInfo
     @Validator({
-        ValidatorType.IS_GENERAL_WITH_CHINESE, 
+        ValidatorType.IS_GENERAL_WITH_CHINESE,
         ValidatorType.IS_NOT_NULL
     })
     @ValidatorLenMax(20)
     private String carName;
 
     /** 汽车类型 */
-    @ApiModelProperty(value = "汽车类型")
+    @Schema(description = "汽车类型")
     @ExcelProperty(value = "汽车类型", order = 2)
     @ExcelInfo
     @Validator({
-        ValidatorType.IS_GENERAL_WITH_CHINESE, 
+        ValidatorType.IS_GENERAL_WITH_CHINESE,
         ValidatorType.IS_NOT_NULL
     })
     @ValidatorLenMax(20)
     private String carType;
 
     /** 汽车品牌 */
-    @ApiModelProperty(value = "汽车品牌")
+    @Schema(description = "汽车品牌")
     @ExcelProperty(value = "汽车品牌", order = 3)
     @ExcelInfo
     @Validator({
@@ -73,7 +73,7 @@ public class TestCarModel extends ApiWrapper {
     private String carBrand;
 
     /** 生产日期 */
-    @ApiModelProperty(value = "生产日期")
+    @Schema(description = "生产日期")
     @ExcelProperty(value = "生产日期", order = 4)
     @ExcelInfo
     @Validator({
@@ -84,7 +84,7 @@ public class TestCarModel extends ApiWrapper {
     private Date produceData;
 
     /** 是否启用 */
-    @ApiModelProperty(value = "是否启用")
+    @Schema(description = "是否启用")
     @ExcelProperty(value = "是否启用", order = 5)
     @ExcelInfo( dictType = "no_yes" )
     @Validator({

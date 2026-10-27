@@ -44,14 +44,14 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
 
 
 /**
  * 代码生成器 - 日志 接口实现类
  *
- * @author parker
+ * @author Pace
  * @date 2020-09-16 17:34
  */
 @Lazy(false)

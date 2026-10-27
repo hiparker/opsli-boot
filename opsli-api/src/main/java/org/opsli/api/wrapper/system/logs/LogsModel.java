@@ -16,7 +16,7 @@
 package org.opsli.api.wrapper.system.logs;
 
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.opsli.api.base.warpper.ApiWrapper;
@@ -24,7 +24,7 @@ import org.opsli.api.base.warpper.ApiWrapper;
 /**
  * 日志表
  *
- * @author Parker
+ * @author Pace
  * @date 2020-09-16 17:33
  */
 @Data
@@ -40,49 +40,49 @@ public class LogsModel extends ApiWrapper {
     /**
      * 多租户字段
      */
-    @ApiModelProperty(value = "租户ID")
+    @Schema(description = "租户ID")
     private String tenantId;
 
     /**
      * 组织机构ID组 xxx,xxx
      */
-    @ApiModelProperty(value = "组织ID集合")
+    @Schema(description = "组织ID集合")
     private String orgIds;
 
     /** 日志类型（1：接入日志；2：错误日志） */
-    @ApiModelProperty(value = "日志类型")
+    @Schema(description = "日志类型")
     private String type;
 
     /** 日志标题 */
-    @ApiModelProperty(value = "日志标题")
+    @Schema(description = "日志标题")
     private String title;
 
     /** 操作用户的IP地址 */
-    @ApiModelProperty(value = "操作用户的IP地址")
+    @Schema(description = "操作用户的IP地址")
     private String remoteAddr;
 
     /** 操作用户代理信息 */
-    @ApiModelProperty(value = "操作用户代理信息")
+    @Schema(description = "操作用户代理信息")
     private String userAgent;
 
     /** 执行时间 */
-    @ApiModelProperty(value = "执行时间")
+    @Schema(description = "执行时间")
     private Long timeout;
 
     /** 操作的URI */
-    @ApiModelProperty(value = "操作的URI")
+    @Schema(description = "操作的URI")
     private String requestUri;
 
     /** 操作的方式 */
-    @ApiModelProperty(value = "操作的方式")
+    @Schema(description = "操作的方式")
     private String method;
 
     /** 操作提交的数据 */
-    @ApiModelProperty(value = "操作提交的数据")
+    @Schema(description = "操作提交的数据")
     private String params;
 
     /** 异常信息 */
-    @ApiModelProperty(value = "异常信息")
+    @Schema(description = "异常信息")
     private String exception;
 
 }

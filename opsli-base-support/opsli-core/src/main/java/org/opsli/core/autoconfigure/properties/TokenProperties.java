@@ -24,7 +24,7 @@ import org.springframework.stereotype.Component;
 /**
  * Token配置
  *
- * @author Parker
+ * @author Pace
  * @date 2020-09-15
  */
 @Configuration

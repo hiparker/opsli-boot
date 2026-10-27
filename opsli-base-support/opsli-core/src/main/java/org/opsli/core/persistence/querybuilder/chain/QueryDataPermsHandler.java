@@ -35,7 +35,7 @@ import java.util.List;
 /**
  * 数据权限赋值处理
  *
- * @author Parker
+ * @author Pace
  * @date 2020-09-13 19:36
  */
 public class QueryDataPermsHandler implements QueryBuilderChain{

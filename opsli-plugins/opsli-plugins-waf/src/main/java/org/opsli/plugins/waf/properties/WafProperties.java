@@ -11,7 +11,7 @@ import java.util.Set;
 /**
  * 软防火墙 配置
  *
- * @author Parker
+ * @author Pace
  * @date 2020-12-19
  */
 @ConfigurationProperties(prefix = WafProperties.PROP_PREFIX)

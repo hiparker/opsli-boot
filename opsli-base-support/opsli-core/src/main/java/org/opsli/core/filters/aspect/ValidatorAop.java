@@ -29,14 +29,14 @@ import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import static org.opsli.common.constants.OrderConstants.VERIFY_ARGS_AOP_SORT;
 
 /**
  * 参数校验 拦截处理
  *
- * @author parker
+ * @author Pace
  * @date 2020-09-16
  */
 @Slf4j

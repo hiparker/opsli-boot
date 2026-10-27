@@ -16,8 +16,9 @@
 package org.opsli.modulars.system.login.web;
 
 import com.google.common.collect.Maps;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.opsli.api.base.result.ResultWrapper;
@@ -36,17 +37,16 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
 
 /**
  * 登陆 公共服务
  * 不需要继承 api 接口
  *
- * @author parker
+ * @author Pace
  * @date 2020-05-23 13:30
  */
-@Api(tags = "登录相关")
+@Tag(name = "登录相关")
 @Slf4j
 @AllArgsConstructor
 @RestController
@@ -58,7 +58,7 @@ public class LoginCommonRestController {
      * 获得当前登录失败次数
      */
     @Limiter
-    @ApiOperation(value = "获得当前登录失败次数", notes = "获得当前登录失败次数")
+    @Operation(summary = "获得当前登录失败次数")
     @GetMapping("/system/slipCount")
     public ResultWrapper<?> slipCount(String username){
         // 获得当前失败次数
@@ -74,7 +74,7 @@ public class LoginCommonRestController {
      * 登出
      */
     @Limiter
-    @ApiOperation(value = "登出", notes = "登出")
+    @Operation(summary = "登出")
     @PostMapping("/system/logout")
     public ResultWrapper<?> logout(HttpServletRequest request) {
         String token = UserContextHolder.getToken().orElseThrow(() -> new TokenException(

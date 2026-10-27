@@ -16,7 +16,7 @@
 package org.opsli.api.wrapper.system.user;
 
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.opsli.common.annotation.validator.Validator;
@@ -24,12 +24,13 @@ import org.opsli.common.annotation.validator.ValidatorLenMax;
 import org.opsli.common.annotation.validator.ValidatorLenMin;
 import org.opsli.common.enums.ValidatorType;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
  * 用户 修改密码
  *
- * @author Parker
+ * @author Pace
  * @date 2020-09-16 17:33
  */
 @Data
@@ -37,10 +38,11 @@ import java.io.Serializable;
 @ExcelIgnoreUnannotated
 public class UpdateUserPasswordByForgetModel implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /** 新密码 */
-    @ApiModelProperty(value = "新密码")
+    @Schema(description = "新密码")
     @Validator({ValidatorType.IS_NOT_NULL, ValidatorType.IS_SECURITY_PASSWORD})
     @ValidatorLenMin(6)
     @ValidatorLenMax(50)

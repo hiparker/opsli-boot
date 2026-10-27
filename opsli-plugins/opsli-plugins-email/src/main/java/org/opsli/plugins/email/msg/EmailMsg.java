@@ -21,7 +21,7 @@ import org.opsli.common.base.msg.BaseMsg;
 /**
  * 邮件服务异常 - 消息
  *
- * @author Parker
+ * @author Pace
  * @date 2020-09-19 20:03
  */
 public enum EmailMsg implements BaseMsg {

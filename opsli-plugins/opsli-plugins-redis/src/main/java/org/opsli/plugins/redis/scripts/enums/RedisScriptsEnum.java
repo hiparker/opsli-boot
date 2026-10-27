@@ -19,7 +19,7 @@ package org.opsli.plugins.redis.scripts.enums;
 /**
  * Redis 脚本枚举
  *
- * @author Parker
+ * @author Pace
  * @date 2020-09-16 11:47
  */
 public enum RedisScriptsEnum {

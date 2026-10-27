@@ -25,7 +25,7 @@ import org.opsli.core.base.entity.BaseEntity;
 /**
  * 字典表 - 明细
  *
- * @author Parker
+ * @author Pace
  * @date 2020-09-16 17:33
  */
 @Data
@@ -52,7 +52,7 @@ public class SysDictDetail extends BaseEntity {
     private Integer sortNo;
 
     /** 备注 */
-    @TableField(updateStrategy = FieldStrategy.IGNORED)
+    @TableField(updateStrategy = FieldStrategy.ALWAYS)
     private String remark;
 
 

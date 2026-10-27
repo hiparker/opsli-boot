@@ -30,7 +30,7 @@ import java.util.Map;
  *
  * 所以要加上 @JsonProperty ，否者返回则为一个null
  *
- * @author Parker
+ * @author Pace
  * @date 2020-09-22 17:07
  */
 public class ResultDto<T> implements Serializable {

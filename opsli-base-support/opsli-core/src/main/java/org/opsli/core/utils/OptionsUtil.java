@@ -48,7 +48,7 @@ import static org.opsli.common.constants.OrderConstants.UTIL_ORDER;
  * 参数工具类
  * Hash 永久缓存
  *
- * @author Parker
+ * @author Pace
  * @date 2020-09-22 11:17
  */
 @Slf4j
@@ -149,7 +149,6 @@ public class OptionsUtil {
             }
             return resultVo.getData();
         });
-
         return Convert.convert(OptionsModel.class, cache);
     }
 

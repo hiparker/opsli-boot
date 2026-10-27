@@ -22,7 +22,7 @@ import lombok.Data;
 /**
  * MySQL 字段类型 属性
  *
- * @author parker
+ * @author Pace
  * @date 2020-11-18 13:21
  */
 @Data

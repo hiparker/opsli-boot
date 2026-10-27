@@ -20,7 +20,7 @@ import org.opsli.plugins.redis.lock.RedisLock;
 /**
  * Redis 锁 接口
  *
- * @author Parker
+ * @author Pace
  * @date 2020-09-16 11:47
  */
 public interface RedisLockPlugins {

@@ -15,7 +15,7 @@
  */
 package org.opsli.core.options;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import org.opsli.common.annotation.OptionDict;
 import org.opsli.common.annotation.validator.Validator;
@@ -28,7 +28,7 @@ import java.io.Serializable;
 /**
  * 阿里云短信-验证码配置
  *
- * @author Parker
+ * @author Pace
  * @date 2020-09-19 20:03
  */
 public enum SmsAliYunCaptchaConfigFactory {
@@ -57,7 +57,7 @@ public enum SmsAliYunCaptchaConfigFactory {
     /**
      * 阿里云短信验证码配置
      *
-     * @author Parker
+     * @author Pace
      */
     @Data
     public static class SmsAliYunCaptchaConfigOption implements Serializable {
@@ -65,13 +65,13 @@ public enum SmsAliYunCaptchaConfigFactory {
         private static final long serialVersionUID = 1L;
 
         /** 模版编码 */
-        @ApiModelProperty(value = "模版编码")
+        @Schema(description = "模版编码")
         @Validator({ValidatorType.IS_NOT_NULL})
         @OptionDict("sms_aliyun_captcha_template_code")
         private String templateCode;
 
         /** 签名 */
-        @ApiModelProperty(value = "签名")
+        @Schema(description = "签名")
         @Validator({ValidatorType.IS_NOT_NULL})
         @OptionDict("sms_aliyun_captcha_sign")
         private String sign;

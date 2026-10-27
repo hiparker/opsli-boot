@@ -31,7 +31,7 @@ import java.util.Set;
 /**
  * OSS服务 工厂
  *
- * @author Parker
+ * @author Pace
  * @date 2021年3月16日10:16:29
  */
 @Slf4j
@@ -104,7 +104,7 @@ public enum OssStorageFactory {
             }
 
             try {
-                Object obj = aClass.newInstance();
+                Object obj = aClass.getDeclaredConstructor().newInstance();
                 OssStorageService handler = (OssStorageService) obj;
 
                 // 加入集合

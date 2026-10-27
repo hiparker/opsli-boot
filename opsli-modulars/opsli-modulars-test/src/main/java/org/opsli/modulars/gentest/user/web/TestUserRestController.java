@@ -16,8 +16,10 @@
 package org.opsli.modulars.gentest.user.web;
 
 import cn.hutool.core.convert.Convert;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.opsli.api.base.result.ResultWrapper;
 import org.opsli.api.web.gentest.user.TestUserRestApi;
@@ -35,17 +37,15 @@ import org.opsli.modulars.gentest.user.service.ITestUserService;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.util.Optional;
 
 /**
  * 某系统用户 Controller
  *
- * @author Parker
+ * @author Pace
  * @date 2020-11-22 12:12:05
  */
-@Api(tags = TestUserRestApi.TITLE)
+@Tag(name = TestUserRestApi.TITLE)
 @Slf4j
 @ApiRestController("/{ver}/gentest/user")
 public class TestUserRestController extends BaseRestController<TestUser, TestUserModel, ITestUserService>
@@ -57,7 +57,7 @@ public class TestUserRestController extends BaseRestController<TestUser, TestUse
      * @param model 模型
      * @return ResultWrapper
      */
-    @ApiOperation(value = "获得单条用户", notes = "获得单条用户 - ID")
+    @Operation(summary = "获得单条用户 - ID")
     @PreAuthorize("hasAuthority('gentest_user_select')")
     @Override
     public ResultWrapper<TestUserModel> get(TestUserModel model) {
@@ -72,7 +72,7 @@ public class TestUserRestController extends BaseRestController<TestUser, TestUse
      * @param request request
      * @return ResultWrapper
      */
-    @ApiOperation(value = "获得分页数据", notes = "获得分页数据 - 查询构造器")
+    @Operation(summary = "获得分页数据 - 查询构造器")
     @PreAuthorize("hasAuthority('gentest_user_select')")
     @Override
     public ResultWrapper<?> findPage(Integer pageNo, Integer pageSize, HttpServletRequest request) {
@@ -90,7 +90,7 @@ public class TestUserRestController extends BaseRestController<TestUser, TestUse
      * @param model 模型
      * @return ResultWrapper
      */
-    @ApiOperation(value = "新增用户数据", notes = "新增用户数据")
+    @Operation(summary = "新增用户数据")
     @PreAuthorize("hasAuthority('gentest_user_insert')")
     @OperateLogger(description = "新增用户数据",
             module = ModuleEnum.MODULE_TEST_USER, operationType = OperationTypeEnum.INSERT, db = true)
@@ -106,7 +106,7 @@ public class TestUserRestController extends BaseRestController<TestUser, TestUse
      * @param model 模型
      * @return ResultWrapper
      */
-    @ApiOperation(value = "修改用户数据", notes = "修改用户数据")
+    @Operation(summary = "修改用户数据")
     @PreAuthorize("hasAuthority('gentest_user_update')")
     @OperateLogger(description = "修改用户数据",
             module = ModuleEnum.MODULE_TEST_USER, operationType = OperationTypeEnum.UPDATE, db = true)
@@ -123,7 +123,7 @@ public class TestUserRestController extends BaseRestController<TestUser, TestUse
      * @param id ID
      * @return ResultWrapper
      */
-    @ApiOperation(value = "删除用户数据", notes = "删除用户数据")
+    @Operation(summary = "删除用户数据")
     @PreAuthorize("hasAuthority('gentest_user_update')")
     @OperateLogger(description = "删除用户数据",
             module = ModuleEnum.MODULE_TEST_USER, operationType = OperationTypeEnum.DELETE, db = true)
@@ -138,7 +138,7 @@ public class TestUserRestController extends BaseRestController<TestUser, TestUse
      * @param ids ID 数组
      * @return ResultWrapper
      */
-    @ApiOperation(value = "批量删除用户数据", notes = "批量删除用户数据")
+    @Operation(summary = "批量删除用户数据")
     @PreAuthorize("hasAuthority('gentest_user_update')")
     @OperateLogger(description = "批量删除用户数据",
             module = ModuleEnum.MODULE_TEST_USER, operationType = OperationTypeEnum.DELETE, db = true)
@@ -157,13 +157,13 @@ public class TestUserRestController extends BaseRestController<TestUser, TestUse
      * @param type 类型
      * @param request request
      */
-    @ApiOperation(value = "Excel 导出认证", notes = "Excel 导出认证")
+    @Operation(summary = "Excel 导出认证")
     @PreAuthorize("hasAnyAuthority('gentest_user_export', 'gentest_user_import')")
     @Override
     public ResultWrapper<String> exportExcelAuth(String type, HttpServletRequest request) {
         Optional<String> certificateOptional =
                 super.excelExportAuth(type, TestUserRestApi.SUB_TITLE, request);
-        if(!certificateOptional.isPresent()){
+        if(certificateOptional.isEmpty()){
             return ResultWrapper.getErrorResultWrapper();
         }
         return ResultWrapper.getSuccessResultWrapper(certificateOptional.get());
@@ -174,7 +174,7 @@ public class TestUserRestController extends BaseRestController<TestUser, TestUse
      * 用户 Excel 导出
      * @param response response
      */
-    @ApiOperation(value = "导出Excel", notes = "导出Excel")
+    @Operation(summary = "导出Excel")
     @PreAuthorize("hasAuthority('gentest_user_export')")
     @OperateLogger(description = "导出Excel",
             module = ModuleEnum.MODULE_TEST_USER, operationType = OperationTypeEnum.SELECT, db = true)
@@ -190,7 +190,7 @@ public class TestUserRestController extends BaseRestController<TestUser, TestUse
      * @param request 文件流 request
      * @return ResultWrapper
      */
-    @ApiOperation(value = "导入Excel", notes = "导入Excel")
+    @Operation(summary = "导入Excel")
     @PreAuthorize("hasAuthority('gentest_user_import')")
     @OperateLogger(description = "用户 Excel 导入",
             module = ModuleEnum.MODULE_TEST_USER, operationType = OperationTypeEnum.INSERT, db = true)

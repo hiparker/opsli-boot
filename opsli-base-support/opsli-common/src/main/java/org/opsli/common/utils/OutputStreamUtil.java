@@ -20,7 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.opsli.common.exception.ServiceException;
 import org.opsli.common.msg.CommonMsg;
 
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
@@ -29,7 +29,7 @@ import java.nio.charset.StandardCharsets;
 /**
  * OutputStream 处理
  *
- * @author Parker
+ * @author Pace
  * @date 2021-01-05 14:26
  */
 @Slf4j

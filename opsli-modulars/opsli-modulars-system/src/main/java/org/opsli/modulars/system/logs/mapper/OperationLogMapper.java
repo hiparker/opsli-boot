@@ -23,7 +23,7 @@ import org.opsli.modulars.system.logs.entity.OperationLog;
 /**
  * 行为日志 Mapper
  *
- * @author Parker
+ * @author Pace
  * @date 2022-07-26 19:21:57
  */
 @Mapper

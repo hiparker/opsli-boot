@@ -18,7 +18,7 @@ package org.opsli.common.constants;
 /**
  * 菜单常量
  *
- * @author Parker
+ * @author Pace
  * @date 2021年3月10日15:50:16
  */
 public final class TreeConstants {

@@ -18,7 +18,7 @@ package org.opsli.api.wrapper.system.logs;
 import java.math.BigDecimal;
 import java.util.Date;
 import com.alibaba.excel.annotation.ExcelProperty;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.opsli.api.base.warpper.ApiWrapper;
@@ -33,7 +33,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 /**
 * 行为日志 Model
 *
-* @author Parker
+* @author Pace
 * @date 2022-07-26 19:21:57
 */
 @Data
@@ -44,84 +44,84 @@ public class OperationLogModel extends ApiWrapper {
     private String tenantId;
 
     /** 日志等级 */
-    @ApiModelProperty(value = "日志等级")
+    @Schema(description = "日志等级")
     @ExcelProperty(value = "日志等级", order = 1)
     @ExcelInfo( dictType = "log_level" )
     @ValidatorLenMax(8)
     private String level;
 
     /** 被操作的系统模块 */
-    @ApiModelProperty(value = "被操作的系统模块")
+    @Schema(description = "被操作的系统模块")
     @ExcelProperty(value = "被操作的系统模块", order = 2)
     @ExcelInfo( dictType = "log_model_type" )
     @ValidatorLenMax(20)
     private String moduleId;
 
     /** 方法名 */
-    @ApiModelProperty(value = "方法名")
+    @Schema(description = "方法名")
     @ExcelProperty(value = "方法名", order = 3)
     @ExcelInfo
     @ValidatorLenMax(100)
     private String method;
 
     /** 参数 */
-    @ApiModelProperty(value = "参数")
+    @Schema(description = "参数")
     @ExcelProperty(value = "参数", order = 4)
     @ExcelInfo
     @ValidatorLenMax(20000)
     private String args;
 
     /** 操作人id */
-    @ApiModelProperty(value = "操作人id")
+    @Schema(description = "操作人id")
     @ExcelProperty(value = "操作人id", order = 5)
     @ExcelInfo
     @ValidatorLenMax(19)
     private String userId;
 
     /** 操作账号 */
-    @ApiModelProperty(value = "操作账号")
+    @Schema(description = "操作账号")
     @ExcelProperty(value = "操作账号", order = 6)
     @ExcelInfo
     @ValidatorLenMax(32)
     private String username;
 
     /** 操作人真实名称 */
-    @ApiModelProperty(value = "操作人真实名称")
+    @Schema(description = "操作人真实名称")
     @ExcelProperty(value = "操作人真实名称", order = 7)
     @ExcelInfo
     @ValidatorLenMax(50)
     private String realName;
 
     /** 日志描述 */
-    @ApiModelProperty(value = "日志描述")
+    @Schema(description = "日志描述")
     @ExcelProperty(value = "日志描述", order = 8)
     @ExcelInfo
     @ValidatorLenMax(255)
     private String description;
 
     /** 操作类型 */
-    @ApiModelProperty(value = "操作类型")
+    @Schema(description = "操作类型")
     @ExcelProperty(value = "操作类型", order = 9)
     @ExcelInfo( dictType = "log_operation_type" )
     @ValidatorLenMax(20)
     private String operationType;
 
     /** 方法运行时间 */
-    @ApiModelProperty(value = "方法运行时间")
+    @Schema(description = "方法运行时间")
     @ExcelProperty(value = "方法运行时间", order = 10)
     @ExcelInfo
     @ValidatorLenMax(19)
     private String runTime;
 
     /** 方法返回值 */
-    @ApiModelProperty(value = "方法返回值")
+    @Schema(description = "方法返回值")
     @ExcelProperty(value = "方法返回值", order = 11)
     @ExcelInfo
     @ValidatorLenMax(20000)
     private String returnValue;
 
     /** 日志请求类型 */
-    @ApiModelProperty(value = "日志请求类型")
+    @Schema(description = "日志请求类型")
     @ExcelProperty(value = "日志请求类型", order = 12)
     @ExcelInfo( dictType = "log_type" )
     @ValidatorLenMax(8)

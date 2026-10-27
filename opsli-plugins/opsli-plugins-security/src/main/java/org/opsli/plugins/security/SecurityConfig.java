@@ -26,11 +26,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 /**
  * Redisson自动化配置
  *
- * @author Parker
+ * @author Pace
  * @date 2019/6/19 下午11:55
  */
 @Slf4j
-@Configuration
+@Configuration("pluginSecurityConfig")  // 明确指定名称
 @EnableConfigurationProperties(AuthProperties.class)
 public class SecurityConfig {
 

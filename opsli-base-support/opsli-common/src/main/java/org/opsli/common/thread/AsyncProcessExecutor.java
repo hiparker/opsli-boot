@@ -20,7 +20,7 @@ import java.util.function.Function;
 /**
  * 异步进程 执行器
  *
- * @author Parker
+ * @author Pace
  * @date 2021年7月15日13:43:37
  */
 public interface AsyncProcessExecutor {

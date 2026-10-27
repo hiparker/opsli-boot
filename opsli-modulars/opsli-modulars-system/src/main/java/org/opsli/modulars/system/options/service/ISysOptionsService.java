@@ -30,7 +30,7 @@ import java.util.Map;
 /**
  * 系统参数 Service
  *
- * @author Parker
+ * @author Pace
  * @date 2021-02-07 18:24:38
  */
 public interface ISysOptionsService extends CrudServiceInterface<SysOptions, OptionsModel> {

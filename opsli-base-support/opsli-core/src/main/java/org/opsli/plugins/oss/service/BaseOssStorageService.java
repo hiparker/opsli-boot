@@ -28,7 +28,7 @@ import java.io.InputStream;
 /**
  * 云存储 (支持本地、又拍云...持续更新中)
  *
- * @author Parker
+ * @author Pace
  * @date 2021年4月30日16:12:45
  */
 public abstract class BaseOssStorageService implements OssStorageService {

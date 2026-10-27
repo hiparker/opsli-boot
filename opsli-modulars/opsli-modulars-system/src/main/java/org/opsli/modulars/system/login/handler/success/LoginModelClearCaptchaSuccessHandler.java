@@ -23,12 +23,12 @@ import org.opsli.plugins.security.handler.LoginAccessSuccessListener;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * 登陆成功后 清除验证码信息 (LoginModel)
- * @author Parker
+ * @author Pace
  * @date 2022-07-17 12:57 PM
  **/
 @AllArgsConstructor

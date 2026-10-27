@@ -23,7 +23,7 @@ import org.opsli.modulars.gentest.carinfo.entity.TestCar;
 /**
  * 测试汽车 Mapper
  *
- * @author Parker
+ * @author Pace
  * @date 2022-08-06 23:53:30
  */
 @Mapper

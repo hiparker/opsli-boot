@@ -15,7 +15,8 @@
  */
 package org.opsli.modulars.system.user.web;
 
-import io.swagger.annotations.Api;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.opsli.api.base.result.ResultWrapper;
@@ -38,10 +39,10 @@ import java.util.List;
 /**
  * 用户-组织 Controller
  *
- * @author Parker
+ * @author Pace
  * @date 2020-09-16 17:33
  */
-@Api(tags = UserOrgRefApi.TITLE)
+@Tag(name = UserOrgRefApi.TITLE)
 @Slf4j
 @ApiRestController("/{ver}/system/user/org")
 public class UserOrgRefRestController implements UserOrgRefApi {
@@ -65,6 +66,7 @@ public class UserOrgRefRestController implements UserOrgRefApi {
      * @return ResultWrapper
      */
     @Override
+    @Operation(summary = "设置组织")
     @PreAuthorize("hasAuthority('system_user_setOrg')")
     public ResultWrapper<?> setOrg(UserOrgRefWebModel model) {
         // 演示模式 不允许操作
@@ -84,6 +86,7 @@ public class UserOrgRefRestController implements UserOrgRefApi {
      * @return ResultWrapper
      */
     @Override
+    @Operation(summary = "根据 userId 获得用户默认组织")
     public ResultWrapper<UserOrgRefModel> getDefOrgByUserId(String userId) {
         UserOrgRefModel userOrgRefModel = iUserOrgRefService.getDefOrgByUserId(userId);
         return ResultWrapper.getSuccessResultWrapper(userOrgRefModel);

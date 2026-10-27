@@ -30,7 +30,7 @@ import org.opsli.modulars.generator.template.wrapper.GenTemplateModel;
 /**
  * 代码模板 Service
  *
- * @author Parker
+ * @author Pace
  * @date 2021-05-27 14:33:49
  */
 public interface IGenTemplateService extends CrudServiceInterface<GenTemplate, GenTemplateModel> {

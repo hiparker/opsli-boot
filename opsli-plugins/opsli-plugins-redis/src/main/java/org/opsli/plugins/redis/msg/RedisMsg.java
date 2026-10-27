@@ -20,7 +20,7 @@ import org.opsli.common.base.msg.BaseMsg;
 /**
  * Redis消息
  *
- * @author Parker
+ * @author Pace
  * @date 2020-09-16 11:47
  */
 public enum RedisMsg implements BaseMsg {

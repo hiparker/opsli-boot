@@ -17,7 +17,7 @@ package org.opsli.modulars.generator.table.wrapper;
 
 import com.alibaba.excel.annotation.ExcelIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.opsli.api.base.warpper.ApiWrapper;
@@ -31,7 +31,7 @@ import java.util.List;
 /**
  * 代码生成器 - 表和表结构
  *
- * @author parker
+ * @author Pace
  * @date 2020-09-16 17:34
  */
 @Data
@@ -40,51 +40,51 @@ public class GenTableAndColumnModel extends ApiWrapper {
 
 
     /** 表名称 */
-    @ApiModelProperty(value = "表名称")
+    @Schema(description = "表名称")
     @ExcelIgnore
     @Validator({ValidatorType.IS_NOT_NULL, ValidatorType.IS_GENERAL})
     @ValidatorLenMax(100)
     private String tableName;
 
     /** 旧表名称 */
-    @ApiModelProperty(value = "旧表名称")
+    @Schema(description = "旧表名称")
     @ExcelIgnore
     private String oldTableName;
 
     /** 表类型 */
-    @ApiModelProperty(value = "表类型")
+    @Schema(description = "表类型")
     @ExcelIgnore
     @Validator({ValidatorType.IS_NOT_NULL})
     @ValidatorLenMax(1)
     private String tableType;
 
     /** 数据库类型 */
-    @ApiModelProperty(value = "数据库类型")
+    @Schema(description = "数据库类型")
     @ExcelIgnore
     @Validator({ValidatorType.IS_NOT_NULL})
     @ValidatorLenMax(30)
     private String jdbcType;
 
     /** 描述 */
-    @ApiModelProperty(value = "描述")
+    @Schema(description = "描述")
     @ExcelIgnore
     @ValidatorLenMax(200)
     private String comments;
 
     /** 同步 */
-    @ApiModelProperty(value = "同步")
+    @Schema(description = "同步")
     @ExcelIgnore
     @ValidatorLenMax(1)
     private String izSync;
 
     /** 备注 */
-    @ApiModelProperty(value = "备注")
+    @Schema(description = "备注")
     @ExcelIgnore
     @ValidatorLenMax(255)
     private String remark;
 
     /** 表结构 */
-    @ApiModelProperty(value = "表结构")
+    @Schema(description = "表结构")
     @ExcelIgnore
     @Validator({ValidatorType.IS_NOT_NULL})
     private List<GenTableColumnModel> columnList;

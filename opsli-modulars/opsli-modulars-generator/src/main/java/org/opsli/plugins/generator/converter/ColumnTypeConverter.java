@@ -22,7 +22,7 @@ import java.util.List;
 /**
  * 将数据库类型转换成各语言对应的类型
  *
- * @author Parker
+ * @author Pace
  * @date 2021年5月26日14:22:31
  */
 public interface ColumnTypeConverter {

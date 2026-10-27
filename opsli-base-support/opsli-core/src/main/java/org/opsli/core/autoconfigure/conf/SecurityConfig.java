@@ -25,56 +25,66 @@ import org.opsli.plugins.security.exception.handler.AuthenticationEntryPointImpl
 import org.opsli.plugins.security.properties.AuthProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.ProviderManager;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import java.util.List;
 import java.util.Map;
 
-
 /**
  * Security 配置
  *
- * @author Parker
- * @date  2022年07月14日12:57:33
+ * @author Pace
+ * @date  2025年05月31日17:02:33
  **/
 @AllArgsConstructor
 @Configuration
 @EnableWebSecurity
-@EnableGlobalMethodSecurity(prePostEnabled=true)
-public class SecurityConfig extends WebSecurityConfigurerAdapter {
+@EnableMethodSecurity(prePostEnabled = true)
+public class SecurityConfig {
 
     private final AuthProperties authProperties;
     private final AccessDeniedHandlerImpl accessDeniedHandler;
     private final AuthenticationEntryPointImpl authenticationEntryPoint;
     private final UidUserDetailDetailServiceImpl uidUserDetailDetailService;
 
-
-
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
+    /**
+     * 配置安全过滤器链
+     */
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-            .headers()
-                // 默认关闭 Security 的 xss防护，与系统本身的 xss防护冲突
-                .xssProtection().disable()
-                // 允许Iframe加载
-                .frameOptions().disable()
-            .and()
-            // 关闭csrf token认证不需要csrf防护
-            .csrf().disable()
-            // 关闭Session会话管理器 JWT 不需要
-            .sessionManagement().disable()
-            // 关闭记住我功能 JWT 不需要
-            .rememberMe().disable();
+                // 配置请求头
+                .headers(headers -> headers
+                        // 默认关闭 Security 的 xss防护，与系统本身的 xss防护冲突
+                        .httpStrictTransportSecurity(HeadersConfigurer.HstsConfig::disable)
+                        // 允许Iframe加载
+                        .frameOptions(HeadersConfigurer.FrameOptionsConfig::disable)
+                )
+                // 关闭csrf token认证不需要csrf防护
+                .csrf(AbstractHttpConfigurer::disable)
+                // 关闭Session会话管理器 JWT 不需要
+                .sessionManagement(session -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                )
+                // 关闭记住我功能 JWT 不需要
+                .rememberMe(AbstractHttpConfigurer::disable);
 
-        // 初始化 initAuthorizeRequests
+        // 初始化 授权请求配置
         this.initAuthorizeRequests(http);
+
+        return http.build();
     }
 
     /**
@@ -84,55 +94,89 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private void initAuthorizeRequests(HttpSecurity http) throws Exception {
         // 设置URL白名单
         List<String> permitAll = authProperties.getUrlExclusion().getPermitAll();
-        if(null != permitAll){
-            String[] urlExclusionArray = permitAll.toArray(new String[0]);
-            http.authorizeRequests()
-                    // URL 白名单
-                    .antMatchers(urlExclusionArray).permitAll();
-        }
+        http.authorizeHttpRequests(authz -> {
+            // 处理其他白名单路径
+            if (permitAll != null && !permitAll.isEmpty()) {
+                String[] urlArray = permitAll.toArray(new String[0]);
+                authz.requestMatchers(urlArray).permitAll();
+            }
 
-        // 除上面外的所有请求全部需要鉴权认证
-        http.authorizeRequests()
-                .anyRequest().authenticated();
+            // 其他请求需要认证
+            authz.anyRequest().authenticated();
+        });
 
         // 添加过滤器
         // 注意 自定义 Filter 不要交给 Spring管理
         http.addFilterBefore(new JwtAuthenticationTokenFilter(uidUserDetailDetailService),
                 UsernamePasswordAuthenticationFilter.class);
 
-
-
         // 异常处理
-        http.exceptionHandling()
+        http.exceptionHandling(exceptions -> exceptions
                 .accessDeniedHandler(accessDeniedHandler)
-                .authenticationEntryPoint(authenticationEntryPoint);
+                .authenticationEntryPoint(authenticationEntryPoint)
+        );
     }
 
     /**
-     * 认证管理器
+     * 主要的认证管理器 - 使用自定义的多Provider实现
+     * 移除了默认的 AuthenticationManager Bean，避免循环依赖
      */
     @Bean
-    @Override
-    public AuthenticationManager authenticationManagerBean() throws Exception {
-        return super.authenticationManagerBean();
+    @Primary
+    public AuthenticationManager authenticationManager() {
+        // 延迟获取 AuthenticationProvider，避免循环依赖
+        return new LazyAuthenticationManager();
     }
 
+    /**
+     * 延迟初始化的认证管理器，避免循环依赖
+     */
+    private static class LazyAuthenticationManager implements AuthenticationManager {
 
-    @Override
-    protected AuthenticationManager authenticationManager() {
-        // 设置 多Provider
-        Map<String, AuthenticationProvider> providerMap =
-                SpringUtil.getBeansOfType(AuthenticationProvider.class);
-        List<AuthenticationProvider> authenticationProviderList =
-                Lists.newArrayListWithCapacity(providerMap.size());
-        for (Map.Entry<String, AuthenticationProvider> providerEntry : providerMap.entrySet()) {
-            authenticationProviderList.add(providerEntry.getValue());
+        private volatile AuthenticationManager delegate;
+
+        @Override
+        public org.springframework.security.core.Authentication authenticate(
+                org.springframework.security.core.Authentication authentication)
+                throws org.springframework.security.core.AuthenticationException {
+
+            if (delegate == null) {
+                synchronized (this) {
+                    if (delegate == null) {
+                        delegate = createAuthenticationManager();
+                    }
+                }
+            }
+            return delegate.authenticate(authentication);
         }
 
-        ProviderManager authenticationManager = new ProviderManager(authenticationProviderList);
-        //不擦除认证密码，擦除会导致TokenBasedRememberMeServices因为找不到Credentials再调用UserDetailsService而抛出UsernameNotFoundException
-        authenticationManager.setEraseCredentialsAfterAuthentication(false);
-        return authenticationManager;
-    }
+        private AuthenticationManager createAuthenticationManager() {
+            // 获取所有的 AuthenticationProvider
+            Map<String, AuthenticationProvider> providerMap =
+                    SpringUtil.getBeansOfType(AuthenticationProvider.class);
 
+            List<AuthenticationProvider> authenticationProviderList =
+                    Lists.newArrayListWithCapacity(providerMap.size());
+
+            for (Map.Entry<String, AuthenticationProvider> providerEntry : providerMap.entrySet()) {
+                authenticationProviderList.add(providerEntry.getValue());
+            }
+
+            // 如果没有自定义Provider，使用默认配置
+            if (authenticationProviderList.isEmpty()) {
+                try {
+                    AuthenticationConfiguration authConfig =
+                            SpringUtil.getBean(AuthenticationConfiguration.class);
+                    return authConfig.getAuthenticationManager();
+                } catch (Exception e) {
+                    throw new RuntimeException("Failed to create default AuthenticationManager", e);
+                }
+            }
+
+            ProviderManager authenticationManager = new ProviderManager(authenticationProviderList);
+            // 不擦除认证密码，擦除会导致TokenBasedRememberMeServices因为找不到Credentials再调用UserDetailsService而抛出UsernameNotFoundException
+            authenticationManager.setEraseCredentialsAfterAuthentication(false);
+            return authenticationManager;
+        }
+    }
 }
