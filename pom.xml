@@ -346,17 +346,9 @@
             </snapshots>
         </repository>
         <repository>
-            <id>oschina</id>
-            <name>oschina Repository</name>
-            <url>http://maven.oschina.net/content/groups/public</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-        <repository>
-            <id>ibiblio</id>
-            <name>ibiblio Repository</name>
-            <url>http://mirrors.ibiblio.org/pub/mirrors/maven2</url>
+            <id>central</id>
+            <name>Maven Central</name>
+            <url>https://repo.maven.apache.org/maven2</url>
             <snapshots>
                 <enabled>false</enabled>
             </snapshots>
